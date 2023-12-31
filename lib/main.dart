@@ -21,20 +21,19 @@ class Stage extends Component with HasGameRef<MyGame> {
   late final int mapTileHeight;
   late final Vector2 mapSize;
   late final Cursor cursor;
+  final Vector2 tilesize = Vector2.all(16);
 
   Stage();
 
   @override
   Future<void> onLoad() async {
-    final tiledMap = await TiledComponent.load('Ch0.tmx', Vector2.all(16));
-    tiledMap.anchor = Anchor.topLeft;
-    tiledMap.scale = Vector2.all(gameRef.scaleFactor);
+    final tiles = await TiledComponent.load('Ch0.tmx', tilesize);
+    tiles.anchor = Anchor.topLeft;
+    tiles.scale = Vector2.all(gameRef.scaleFactor);
 
-    mapTileHeight = tiledMap.tileMap.map.height;
-    mapTileWidth = tiledMap.tileMap.map.width;
-    // Vector2 mapSize = Vector2(tiledMap.width, tiledMap.height);
-
-    add(tiledMap);
+    mapTileHeight = tiles.tileMap.map.height;
+    mapTileWidth = tiles.tileMap.map.width;
+    add(tiles);
 
     cursor = Cursor();
     add(cursor);
@@ -70,9 +69,10 @@ class Stage extends Component with HasGameRef<MyGame> {
 class Cursor extends PositionComponent with HasGameRef<MyGame> {
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
-  // The size of each tile in your map
-  // The cursor's position in terms of tiles, not pixels
-  Point tilePosition = Point(x:4, y:15);
+  late final BattleMenu battleMenu;
+
+  
+  Point tilePosition = Point(x:4, y:15); // The cursor's position in terms of tiles, not pixels
   late double tileSize;
 
   Cursor() {
@@ -97,6 +97,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> {
 
     // Add the animation component as a child
     add(_animationComponent);
+    battleMenu = BattleMenu();
+    add(battleMenu);
 
     // Set the initial size and position of the cursor
     size = Vector2.all(tileSize);
@@ -163,6 +165,93 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> {
 
 }
 
+class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibility {
+  late final SpriteComponent menuSprite;
+  late final AnimatedPointer pointer;
+  @override
+  Future<void> onLoad() async {
+    // Load and position the menu sprite
+    menuSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('action_menu.png'),
+        // size: Vector2(71, 122),
+    );
+    add(menuSprite);
+
+    // Create and position the pointer
+    pointer = AnimatedPointer();
+    add(pointer);
+    isVisible = false;
+  }
+
+  void toggleVisibility() {
+    isVisible = !isVisible;
+    // Additional logic to show/hide or enable/disable
+  }
+
+  @override
+  void render(Canvas canvas) {
+    if (isVisible) {
+      
+      super.render(canvas);  // Render only if menu is visible
+    }
+  }
+}
+
+class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
+  late final SpriteAnimationComponent _animationComponent;
+  late final SpriteSheet pointerSheet;
+
+  // Adjust these based on your menu layout
+  final double stepY = 16; // The vertical distance between menu items
+  int currentIndex = 0;   // The index of the current menu item
+
+  late double tileSize;
+
+  AnimatedPointer() {
+    // Initial size, will be updated in onLoad
+    tileSize = 16;
+  }
+  @override
+  Future<void> onLoad() async {
+    // Load the cursor image and create the animation component
+    ui.Image pointerImage = await gameRef.images.load('selection_pointer.png');
+    pointerSheet = SpriteSheet.fromColumnsAndRows(
+      image: pointerImage,
+      columns: 3,
+      rows: 1,
+    );
+
+    _animationComponent = SpriteAnimationComponent(
+      animation: pointerSheet.createAnimation(row: 0, stepTime: .2),
+      size: Vector2.all(tileSize), // Use tileSize for initial size
+    );
+
+    add(_animationComponent);
+
+    // Set the initial size and position of the cursor
+    size = Vector2.all(tileSize);
+  }
+
+  void moveUp() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updatePosition();
+    }
+  }
+
+  void moveDown() {
+    if (currentIndex < 7) {
+      currentIndex++;
+      updatePosition();
+    }
+  }
+
+  void updatePosition() {
+    // Update the position of the pointer based on the current index
+    y = 5 + stepY * currentIndex;
+  }
+}
+
 abstract class ScaleObserver {
   void onScaleChanged(double scaleFactor);
 }
@@ -170,7 +259,6 @@ abstract class ScaleObserver {
 class MyGame extends FlameGame with KeyboardEvents {
   late MaxViewport viewport;
   late Stage stage;
-  // late Cursor cursor;
   double _scaleFactor = 1;
   final List _observers = [];
   double get scaleFactor => _scaleFactor;
@@ -208,6 +296,9 @@ class MyGame extends FlameGame with KeyboardEvents {
     await world.add(stage);
     addObserver(stage);
     camera.follow(stage.cursor);
+
+    // battleMenu = BattleMenu();
+    // world.add(battleMenu);
   }
 
   @override
@@ -216,28 +307,45 @@ class MyGame extends FlameGame with KeyboardEvents {
 
     // Handling the keyboard events
     if (event is RawKeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-        stage.cursor.move(Direction.left);
+      if (event.logicalKey == LogicalKeyboardKey.keyA) {
+        stage.cursor.battleMenu.toggleVisibility();
         handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-        stage.cursor.move(Direction.right);
+      } else if (event.logicalKey == LogicalKeyboardKey.keyB) {
+        if (stage.cursor.battleMenu.isVisible) {stage.cursor.battleMenu.toggleVisibility();}
         handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-        stage.cursor.move(Direction.up);
-        handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-        stage.cursor.move(Direction.down);
-        handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.equal) { // "+" key for zooming in
-        scaleFactor *= 1.1;//.clamp(0.5, 2.0); // Zoom in and clamp between 0.5x and 2x
-        handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.minus) { // "-" key for zooming out
-        scaleFactor *= 0.9;//.clamp(0.5, 2.0); // Zoom out and clamp
-        handled = true;
+      } 
+      if (stage.cursor.battleMenu.isVisible) {
+        // Handle menu navigation
+        if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+          stage.cursor.battleMenu.pointer.moveUp();
+          handled = true;
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          stage.cursor.battleMenu.pointer.moveDown(); // Assuming 7 menu items, max index is 6
+          handled = true;
+        }
+      } else {
+        if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+          stage.cursor.move(Direction.left);
+          handled = true;
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+          stage.cursor.move(Direction.right);
+          handled = true;
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+          stage.cursor.move(Direction.up);
+          handled = true;
+        } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+          stage.cursor.move(Direction.down);
+          handled = true;
+        } else if (event.logicalKey == LogicalKeyboardKey.equal) { // "+" key for zooming in
+          scaleFactor *= 1.1;//.clamp(0.5, 2.0); // Zoom in and clamp between 0.5x and 2x
+          handled = true;
+        } else if (event.logicalKey == LogicalKeyboardKey.minus) { // "-" key for zooming out
+          scaleFactor *= 0.9;//.clamp(0.5, 2.0); // Zoom out and clamp
+          handled = true;
+        }
       }
     }
-
-    return handled ? KeyEventResult.handled : KeyEventResult.ignored;
+  return handled ? KeyEventResult.handled : KeyEventResult.ignored;
   }
 }
 
