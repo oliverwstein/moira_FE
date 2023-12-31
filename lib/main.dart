@@ -1,7 +1,10 @@
+import 'dart:ui' as ui;
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
+import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame/sprite.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -34,7 +37,10 @@ class MyGame extends FlameGame with KeyboardEvents {
     await super.onLoad();
     // Your existing onLoad implementation
     await add(MyStage());
-    cursor = Cursor();
+    ui.Image cursorImage = await Flame.images.load('cursor.png');
+    SpriteSheet cursorSheet = SpriteSheet.fromColumnsAndRows(image: cursorImage,
+      columns: 3, rows: 1, spacing: 0);
+    cursor = Cursor(SpriteAnimationComponent(animation:cursorSheet.createAnimation(row: 0, stepTime: .2), size:Vector2.all(16)));
     add(cursor);
   }
 
@@ -79,17 +85,20 @@ void main() {
     GameWidget(game: game),
   );
 }
+
 class Cursor extends PositionComponent {
+  late final SpriteAnimationComponent _animationComponent;
   // The size of each tile in your map
   static const int tileSize = 16;
   // The cursor's position in terms of tiles, not pixels
   Point tilePosition = Point(x:4, y:15);
 
-  Cursor() {
-    // Set the initial size and position of the cursor, perhaps based on the tile size
+  Cursor(SpriteAnimationComponent animationComponent) {
     width = height = tileSize.toDouble(); // Make the cursor the same size as a tile
     x = tilePosition.x*tileSize;
     y = tilePosition.y*tileSize;
+    _animationComponent = animationComponent;
+    add(_animationComponent);
   }
 
   // A method to move the cursor
@@ -113,10 +122,4 @@ class Cursor extends PositionComponent {
     y = tilePosition.y * tileSize;
   }
 
-  // Override render method to visually represent the cursor
-  @override
-  void render(Canvas canvas) {
-    // Render the cursor with a simple rectangle or your own cursor image
-    canvas.drawRect(size.toRect(), Paint()..color = Color(0xFFFFFFFF)); // A white cursor for example
-  }
 }
