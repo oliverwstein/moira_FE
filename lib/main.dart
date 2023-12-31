@@ -206,6 +206,7 @@ class MyGame extends FlameGame with KeyboardEvents {
     stage = Stage();
     await add(stage);
     addObserver(stage);
+    
   }
 
   @override
