@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_overrides
+
 import 'dart:ui' as ui;
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
@@ -17,7 +19,8 @@ enum Direction {
 class Stage extends Component with HasGameRef<MyGame> {
   late final int mapTileWidth;
   late final int mapTileHeight;
-  late final Cursor cursor;  // Declare Cursor here
+  late final Vector2 mapSize;
+  late final Cursor cursor;
 
   Stage();
 
@@ -29,12 +32,18 @@ class Stage extends Component with HasGameRef<MyGame> {
 
     mapTileHeight = tiledMap.tileMap.map.height;
     mapTileWidth = tiledMap.tileMap.map.width;
+    // Vector2 mapSize = Vector2(tiledMap.width, tiledMap.height);
 
     add(tiledMap);
 
     cursor = Cursor();
     add(cursor);
     gameRef.addObserver(cursor);
+    
+  }
+  @override
+  void update(double dt) {
+    super.update(dt);
   }
 
   @override
@@ -143,7 +152,6 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> {
     super.onRemove();
   }
   
-  @override
   void onScaleChanged(double scaleFactor) {
     tileSize = 16 * scaleFactor; // Update tileSize
     size = Vector2.all(tileSize); // Update the size of the cursor itself
@@ -183,17 +191,10 @@ class MyGame extends FlameGame with KeyboardEvents {
   void removeObserver(observer) {
     _observers.remove(observer);
   }
-  void centerCameraOnCursor() {
-        if (stage.cursor.parent != null) { // Ensure cursor is loaded and has a parent
-            Vector2 cursorPosition = stage.cursor.worldPosition;
-            camera.viewfinder.position = cursorPosition; // Center viewfinder on cursor
-        }
-    }
 
   @override
     void update(double dt) {
         super.update(dt);
-        centerCameraOnCursor(); // Keep the camera centered on the cursor
     }
 
   @override
@@ -204,9 +205,9 @@ class MyGame extends FlameGame with KeyboardEvents {
     viewport = MaxViewport();
     camera.viewport = viewport;
     stage = Stage();
-    await add(stage);
+    await world.add(stage);
     addObserver(stage);
-    
+    camera.follow(stage.cursor);
   }
 
   @override
