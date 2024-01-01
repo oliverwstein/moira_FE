@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_overrides
 
 import 'dart:ui' as ui;
+import 'package:flutter/material.dart' as mat;
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
@@ -16,24 +17,50 @@ enum Direction {
   right
 }
 
+class Tile {
+  final Point position;
+  String terrainType; // e.g., "grass", "water", "mountain"
+  Unit? unit; // Initially null, set when a unit moves into the tile
+
+  Tile(this.position, this.terrainType);
+
+  bool get isOccupied => unit != null;
+
+  void setUnit(Unit newUnit) {
+    unit = newUnit;
+  }
+
+  void removeUnit() {
+    unit = null;
+  }
+}
+
 class Stage extends Component with HasGameRef<MyGame> {
   late final int mapTileWidth;
   late final int mapTileHeight;
   late final Vector2 mapSize;
+  late final TiledComponent tiles;
   late final Cursor cursor;
   List<Unit> units = [];
   final Vector2 tilesize = Vector2.all(16);
-
+  late Map<Point, Tile> tilesMap = {};
   Stage();
 
   @override
   Future<void> onLoad() async {
-    final tiles = await TiledComponent.load('Ch0.tmx', tilesize);
+    tiles = await TiledComponent.load('Ch0.tmx', tilesize);
     tiles.anchor = Anchor.topLeft;
     tiles.scale = Vector2.all(gameRef.scaleFactor);
 
     mapTileHeight = tiles.tileMap.map.height;
     mapTileWidth = tiles.tileMap.map.width;
+    for (double x = 0; x < mapTileWidth; x++) {
+      for (double y = 0; y < mapTileHeight; y++) {
+        Point point = Point(x:x, y:y);
+        String terrainType = determineTerrainType(point); // Implement this based on your Tiled map properties
+        tilesMap[point] = Tile(point, terrainType);
+      }
+    }
     add(tiles);
 
     units.add(Unit(Point(x:59, y:10), 'arden.png'));
@@ -74,6 +101,21 @@ class Stage extends Component with HasGameRef<MyGame> {
         child.scale = Vector2.all(scaleFactor);
       }
     }
+  }
+
+  void updateTileWithUnit(Point oldPoint, Point newPoint, Unit unit) {
+    getTileAt(oldPoint)?.removeUnit();
+    getTileAt(newPoint)?.setUnit(unit);
+  }
+
+  Tile? getTileAt(Point point) {
+    return tilesMap[point];
+  }
+  String determineTerrainType(Point point){
+    double localId = point.y * mapTileWidth + point.x;
+    var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
+    var type = tile?.properties.firstOrNull?.value ?? 'plain';
+    return type as String;
   }
 }
 
@@ -268,7 +310,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> {
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
   late final String unitImageName;
-
+  bool canAct = true;
   
   late final Point tilePosition; // The units's position in terms of tiles, not pixels
   late double tileSize;
@@ -292,7 +334,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> {
       animation: unitSheet.createAnimation(row: 0, stepTime: .2),
       size: Vector2.all(tileSize), // Use tileSize for initial size
     );
-
+    
     // Add the animation component as a child
     add(_animationComponent);
 
@@ -304,6 +346,21 @@ class Unit extends PositionComponent with HasGameRef<MyGame> {
   Vector2 get worldPosition {
         return Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
     }
+
+  void toggleCanAct() {
+    canAct = !canAct;
+    // Define the grayscale paint
+    final grayscalePaint = mat.Paint()
+      ..colorFilter = const mat.ColorFilter.matrix([
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0,      0,      0,      1, 0,
+      ]);
+
+    // Apply or remove the grayscale effect based on canAct
+    _animationComponent.paint = canAct ? mat.Paint() : grayscalePaint;
+  }
 
   void move(Direction direction) {
     Stage stage = parent as Stage;
@@ -336,6 +393,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> {
     // Update the pixel position of the unit
     x = tilePosition.x * tileSize;
     y = tilePosition.y * tileSize;
+    
+    Point oldPosition = tilePosition;
+    stage.updateTileWithUnit(oldPosition, tilePosition, this);
   }
   @override
   void onMount() {
@@ -357,7 +417,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> {
     // Update position based on new tileSize
     position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
   }
+
 }
+
 abstract class ScaleObserver {
   void onScaleChanged(double scaleFactor);
 }
