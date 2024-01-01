@@ -65,34 +65,43 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
   }
 
   @override
-void render(Canvas canvas) {
-  super.render(canvas); // Don't forget to call super.render
-  switch(state) {
-    case TileState.blank:
-      // Do nothing
-      if(_moveAnimationComponent.isMounted){
-        remove(_moveAnimationComponent);
-      }
-      if(_attackAnimationComponent.isMounted){
-        remove(_attackAnimationComponent);
-      }
-      break;
-    case TileState.move:
-      // Render move animation component
-      if(_attackAnimationComponent.isMounted){
-        remove(_attackAnimationComponent);
-      }
-      add(_moveAnimationComponent);
-      break;
-    case TileState.attack:
-      // Render attack animation component
-      if(_moveAnimationComponent.isMounted){
-        remove(_moveAnimationComponent);
-      }
-      add(_attackAnimationComponent);
-      break;
+  void render(Canvas canvas) {
+    super.render(canvas); // Don't forget to call super.render
+    switch(state) {
+      case TileState.blank:
+        // Do nothing
+        if(_moveAnimationComponent.isMounted){
+          remove(_moveAnimationComponent);
+        }
+        if(_attackAnimationComponent.isMounted){
+          remove(_attackAnimationComponent);
+        }
+        break;
+      case TileState.move:
+        // Render move animation component
+        if(_attackAnimationComponent.isMounted){
+          remove(_attackAnimationComponent);
+        }
+        add(_moveAnimationComponent);
+        break;
+      case TileState.attack:
+        // Render attack animation component
+        if(_moveAnimationComponent.isMounted){
+          remove(_moveAnimationComponent);
+        }
+        add(_attackAnimationComponent);
+        break;
+    }
   }
-}
+  void onScaleChanged(double scaleFactor) {
+    tileSize = 16 * scaleFactor; // Update tileSize
+    size = Vector2.all(tileSize); // Update the size of the tile itself
+    _moveAnimationComponent.size = Vector2.all(tileSize*.9);
+    _attackAnimationComponent.size = Vector2.all(tileSize*.9);
+
+    // Update position based on new tileSize
+    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+  }
 }
 
 class Stage extends Component with HasGameRef<MyGame>{
@@ -121,6 +130,7 @@ class Stage extends Component with HasGameRef<MyGame>{
         String terrainType = determineTerrainType(point); // Implement this based on your Tiled map properties
         Tile tile = Tile(point, terrainType);
         add(tile);
+        gameRef.addObserver(tile);
         tilesMap[(x,y)] = tile;
       }
     }
@@ -594,7 +604,7 @@ abstract class CommandHandler {
 class MyGame extends FlameGame with KeyboardEvents {
   late MaxViewport viewport;
   late Stage stage;
-  double _scaleFactor = 1;
+  double _scaleFactor = 2;
   final List _observers = [];
   double get scaleFactor => _scaleFactor;
 
