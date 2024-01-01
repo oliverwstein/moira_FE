@@ -23,7 +23,7 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
   Unit? unit; // Initially null, set when a unit moves into the tile
   TileState state = TileState.blank;
 
-  Tile(Point gridCoord, this.terrainType){
+  Tile(this.gridCoord, this.terrainType){
     tileSize = 16 * MyGame().scaleFactor;
   }
   @override
@@ -44,16 +44,13 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
 
     _moveAnimationComponent = SpriteAnimationComponent(
       animation: movementSheet.createAnimation(row: 0, stepTime: .2),
-      size: Vector2.all(tileSize), // Use tileSize for initial size
+      size: Vector2.all(tileSize*.9), // Use tileSize for initial size
     );
 
     _attackAnimationComponent = SpriteAnimationComponent(
       animation: attackSheet.createAnimation(row: 0, stepTime: .2),
-      size: Vector2.all(tileSize), // Use tileSize for initial size
+      size: Vector2.all(tileSize*.9), // Use tileSize for initial size
     );
-
-    add(_moveAnimationComponent);
-    add(_attackAnimationComponent);
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 
@@ -73,14 +70,26 @@ void render(Canvas canvas) {
   switch(state) {
     case TileState.blank:
       // Do nothing
+      if(_moveAnimationComponent.isMounted){
+        remove(_moveAnimationComponent);
+      }
+      if(_attackAnimationComponent.isMounted){
+        remove(_attackAnimationComponent);
+      }
       break;
     case TileState.move:
       // Render move animation component
-      _moveAnimationComponent.render(canvas);
+      if(_attackAnimationComponent.isMounted){
+        remove(_attackAnimationComponent);
+      }
+      add(_moveAnimationComponent);
       break;
     case TileState.attack:
       // Render attack animation component
-      _attackAnimationComponent.render(canvas);
+      if(_moveAnimationComponent.isMounted){
+        remove(_moveAnimationComponent);
+      }
+      add(_attackAnimationComponent);
       break;
   }
 }
@@ -103,17 +112,19 @@ class Stage extends Component with HasGameRef<MyGame>{
     tiles = await TiledComponent.load('Ch0.tmx', tilesize);
     tiles.anchor = Anchor.topLeft;
     tiles.scale = Vector2.all(gameRef.scaleFactor);
-
+    add(tiles);
     mapTileHeight = tiles.tileMap.map.height;
     mapTileWidth = tiles.tileMap.map.width;
     for (double x = 0; x < mapTileWidth; x++) {
       for (double y = 0; y < mapTileHeight; y++) {
         Point point = Point(x:x, y:y);
         String terrainType = determineTerrainType(point); // Implement this based on your Tiled map properties
-        tilesMap[(x,y)] = Tile(point, terrainType);
+        Tile tile = Tile(point, terrainType);
+        add(tile);
+        tilesMap[(x,y)] = tile;
       }
     }
-    add(tiles);
+    
 
     units.add(Unit(Point(x:59, y:10), 'arden.png'));
     units.add(Unit(Point(x:60, y:12), 'alec.png'));
