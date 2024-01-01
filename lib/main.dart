@@ -21,6 +21,7 @@ class Stage extends Component with HasGameRef<MyGame> {
   late final int mapTileHeight;
   late final Vector2 mapSize;
   late final Cursor cursor;
+  List<Unit> units = [];
   final Vector2 tilesize = Vector2.all(16);
 
   Stage();
@@ -34,6 +35,16 @@ class Stage extends Component with HasGameRef<MyGame> {
     mapTileHeight = tiles.tileMap.map.height;
     mapTileWidth = tiles.tileMap.map.width;
     add(tiles);
+
+    units.add(Unit(Point(x:59, y:10), 'arden.png'));
+    units.add(Unit(Point(x:60, y:12), 'alec.png'));
+    units.add(Unit(Point(x:58, y:12), 'noish.png'));
+    units.add(Unit(Point(x:59, y:13), 'sigurd.png'));
+
+    for (Unit unit in units) {
+      add(unit);
+      gameRef.addObserver(unit);
+    }
 
     cursor = Cursor();
     add(cursor);
@@ -72,7 +83,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> {
   late final BattleMenu battleMenu;
 
   
-  Point tilePosition = Point(x:4, y:15); // The cursor's position in terms of tiles, not pixels
+  Point tilePosition = Point(x:59, y:12); // The cursor's position in terms of tiles, not pixels
   late double tileSize;
 
   Cursor() {
@@ -252,6 +263,101 @@ class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
   }
 }
 
+class Unit extends PositionComponent with HasGameRef<MyGame> {
+  late final SpriteAnimationComponent _animationComponent;
+  late final SpriteSheet unitSheet;
+  late final BattleMenu battleMenu;
+  late final String unitImageName;
+
+  
+  late final Point tilePosition; // The units's position in terms of tiles, not pixels
+  late double tileSize;
+
+  Unit(this.tilePosition, this.unitImageName) {
+    // Initial size, will be updated in onLoad
+    tileSize = 16 * MyGame().scaleFactor;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    // Load the unit image and create the animation component
+    ui.Image unitImage = await gameRef.images.load(unitImageName);
+    unitSheet = SpriteSheet.fromColumnsAndRows(
+      image: unitImage,
+      columns: 4,
+      rows: 1,
+    );
+
+    _animationComponent = SpriteAnimationComponent(
+      animation: unitSheet.createAnimation(row: 0, stepTime: .2),
+      size: Vector2.all(tileSize), // Use tileSize for initial size
+    );
+
+    // Add the animation component as a child
+    add(_animationComponent);
+
+    // Set the initial size and position of the unit
+    size = Vector2.all(tileSize);
+    position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
+  }
+
+  Vector2 get worldPosition {
+        return Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
+    }
+
+  void move(Direction direction) {
+    Stage stage = parent as Stage;
+
+    double newX = tilePosition.x;
+    double newY = tilePosition.y;
+
+    switch (direction) {
+      case Direction.left:
+        newX -= 1;
+        break;
+      case Direction.right:
+        newX += 1;
+        break;
+      case Direction.up:
+        newY -= 1;
+        break;
+      case Direction.down:
+        newY += 1;
+        break;
+    }
+
+    // Clamp the new position to ensure it's within the bounds of the map
+    newX = newX.clamp(0, stage.mapTileWidth - 1);
+    newY = newY.clamp(0, stage.mapTileHeight - 1);
+
+    // Update tilePosition if it's within the map
+    tilePosition = Point(x: newX, y: newY);
+
+    // Update the pixel position of the unit
+    x = tilePosition.x * tileSize;
+    y = tilePosition.y * tileSize;
+  }
+  @override
+  void onMount() {
+    super.onMount();
+    gameRef.addObserver(this);
+  }
+
+  @override
+  void onRemove() {
+    gameRef.removeObserver(this);
+    super.onRemove();
+  }
+  
+  void onScaleChanged(double scaleFactor) {
+    tileSize = 16 * scaleFactor; // Update tileSize
+    size = Vector2.all(tileSize); // Update the size of the unit itself
+    _animationComponent.size = Vector2.all(tileSize); // Update animation component size
+
+    // Update position based on new tileSize
+    position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
+  }
+}
 abstract class ScaleObserver {
   void onScaleChanged(double scaleFactor);
 }
