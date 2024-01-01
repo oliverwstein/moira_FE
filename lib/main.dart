@@ -67,9 +67,9 @@ class Stage extends Component with HasGameRef<MyGame> {
     units.add(Unit(Point(x:60, y:12), 'alec.png'));
     units.add(Unit(Point(x:58, y:12), 'noish.png'));
     units.add(Unit(Point(x:59, y:13), 'sigurd.png'));
-
     for (Unit unit in units) {
       add(unit);
+      getTileAt(unit.tilePosition)?.setUnit(unit);
       gameRef.addObserver(unit);
     }
 
@@ -331,7 +331,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> {
     );
 
     _animationComponent = SpriteAnimationComponent(
-      animation: unitSheet.createAnimation(row: 0, stepTime: .2),
+      animation: unitSheet.createAnimation(row: 0, stepTime: .5),
       size: Vector2.all(tileSize), // Use tileSize for initial size
     );
     
