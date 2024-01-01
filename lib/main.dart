@@ -302,8 +302,9 @@ class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibilit
   }
 
   void select(){
-    Stage stage = parent as Stage;
+    Stage stage = parent!.parent as Stage;
     stage.activeComponent = stage.cursor;
+    toggleVisibility();
   }
 
   @override
