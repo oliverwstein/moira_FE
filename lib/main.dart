@@ -389,8 +389,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
-    // Implement cursor specific command handling
-    return true; // return true if the command was handled
+    bool handled = false;
+    Stage stage = parent as Stage;
+    toggleCanAct();
+    stage.activeComponent = stage.cursor;
+    return handled;
   }
 
   @override
