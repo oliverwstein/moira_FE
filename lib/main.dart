@@ -43,8 +43,8 @@ class Stage extends Component with HasGameRef<MyGame>{
   late final Cursor cursor;
   List<Unit> units = [];
   final Vector2 tilesize = Vector2.all(16);
-  late Map<Point, Tile> tilesMap = {};
-  late final Component activeComponent;
+  late Map<(double, double), Tile> tilesMap = {};
+  late Component activeComponent;
   Stage();
 
   @override
@@ -59,7 +59,7 @@ class Stage extends Component with HasGameRef<MyGame>{
       for (double y = 0; y < mapTileHeight; y++) {
         Point point = Point(x:x, y:y);
         String terrainType = determineTerrainType(point); // Implement this based on your Tiled map properties
-        tilesMap[point] = Tile(point, terrainType);
+        tilesMap[(x,y)] = Tile(point, terrainType);
       }
     }
     add(tiles);
@@ -111,7 +111,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   }
 
   Tile? getTileAt(Point point) {
-    return tilesMap[point];
+    return tilesMap[(point.x, point.y)];
   }
   
   String determineTerrainType(Point point){
@@ -204,16 +204,34 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     y = tilePosition.y * tileSize;
   }
   
-  void select(){
+  void select() {
+  if (parent is Stage) {
     Stage stage = parent as Stage;
     Tile? tile = stage.getTileAt(tilePosition);
-    if(tile!.isOccupied){
-      Unit? unit = tile.unit;
-      if(unit!.canAct) {
-        stage.activeComponent = unit;
+
+    if (tile != null) {
+      // Proceed as normal if tile is not null
+      if (tile.isOccupied) {
+        Unit? unit = tile.unit;
+        if (unit != null && unit.canAct) {
+          stage.activeComponent = unit;
+        }
+      } else {
+        stage.cursor.battleMenu.toggleVisibility();
+        stage.activeComponent = stage.cursor.battleMenu;
       }
-    } else {stage.activeComponent = stage.cursor.battleMenu;}
+    } else {
+      // Throw an exception if tile is null
+      var x = tilePosition.x;
+      var y = tilePosition.y;
+      bool inMap = stage.tilesMap.containsKey((x:57.0, y:12.0));
+      throw Exception('Attempted to select a null tile at position ($x, $y). Point found = $inMap');
+    }
+  } else {
+    // Optionally, handle case where parent is not a Stage
+    throw Exception('Cursor\'s parent is not of type Stage.');
   }
+}
 
   @override
   void onMount() {
@@ -242,7 +260,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     } else if (command == LogicalKeyboardKey.arrowDown) {
       move(Direction.down);
       handled = true;
-    } else if (command == LogicalKeyboardKey.keyA || command == LogicalKeyboardKey.keyM) {
+    } else if (command == LogicalKeyboardKey.keyA) {
       select();
       handled = true;
     }
@@ -549,7 +567,6 @@ class MyGame extends FlameGame with KeyboardEvents {
   @override
   KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
-
     // First, handle any game-wide key events (like zooming)
     if (event is RawKeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.equal) { // Zoom in
@@ -558,9 +575,8 @@ class MyGame extends FlameGame with KeyboardEvents {
       } else if (event.logicalKey == LogicalKeyboardKey.minus) { // Zoom out
         scaleFactor *= 0.9;
         handled = true;
-      }
-      else {
-        bool handled = stage.keyCommandHandler(event.logicalKey);
+      } else {
+        handled = stage.keyCommandHandler(event.logicalKey);
       }
     }
     return handled ? KeyEventResult.handled : KeyEventResult.ignored;
