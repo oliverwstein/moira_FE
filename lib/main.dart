@@ -410,8 +410,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
     Stage stage = parent as Stage;
-    toggleCanAct();
-    stage.activeComponent = stage.cursor;
+    if (command == LogicalKeyboardKey.keyA) {
+      toggleCanAct();
+      stage.activeComponent = stage.cursor;
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) {
+      stage.activeComponent = stage.cursor;
+      handled = true;
+    }
     return handled;
   }
 
