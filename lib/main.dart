@@ -35,7 +35,7 @@ class Tile {
   }
 }
 
-class Stage extends Component with HasGameRef<MyGame> {
+class Stage extends Component with HasGameRef<MyGame>{
   late final int mapTileWidth;
   late final int mapTileHeight;
   late final Vector2 mapSize;
@@ -44,6 +44,7 @@ class Stage extends Component with HasGameRef<MyGame> {
   List<Unit> units = [];
   final Vector2 tilesize = Vector2.all(16);
   late Map<Point, Tile> tilesMap = {};
+  late final Component activeComponent;
   Stage();
 
   @override
@@ -74,6 +75,7 @@ class Stage extends Component with HasGameRef<MyGame> {
     }
 
     cursor = Cursor();
+    activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
     
@@ -111,20 +113,26 @@ class Stage extends Component with HasGameRef<MyGame> {
   Tile? getTileAt(Point point) {
     return tilesMap[point];
   }
+  
   String determineTerrainType(Point point){
     double localId = point.y * mapTileWidth + point.x;
     var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
     var type = tile?.properties.firstOrNull?.value ?? 'plain';
     return type as String;
   }
+
+  bool keyCommandHandler(LogicalKeyboardKey command) {
+    if (activeComponent is CommandHandler) {
+      return (activeComponent as CommandHandler).handleCommand(command);
+    }
+    return false;
+  }
 }
 
-class Cursor extends PositionComponent with HasGameRef<MyGame> {
+class Cursor extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   late final BattleMenu battleMenu;
-
-  
   Point tilePosition = Point(x:59, y:12); // The cursor's position in terms of tiles, not pixels
   late double tileSize;
 
@@ -195,6 +203,18 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> {
     x = tilePosition.x * tileSize;
     y = tilePosition.y * tileSize;
   }
+  
+  void select(){
+    Stage stage = parent as Stage;
+    Tile? tile = stage.getTileAt(tilePosition);
+    if(tile!.isOccupied){
+      Unit? unit = tile.unit;
+      if(unit!.canAct) {
+        stage.activeComponent = unit;
+      }
+    } else {stage.activeComponent = stage.cursor.battleMenu;}
+  }
+
   @override
   void onMount() {
     super.onMount();
@@ -205,6 +225,28 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> {
   void onRemove() {
     gameRef.removeObserver(this);
     super.onRemove();
+  }
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    bool handled = false;
+    if (command == LogicalKeyboardKey.arrowLeft) {
+      move(Direction.left);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) {
+      move(Direction.right);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowUp) {
+      move(Direction.up);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      move(Direction.down);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyA) {
+      select();
+      handled = true;
+    }
+    return handled;
   }
   
   void onScaleChanged(double scaleFactor) {
@@ -218,9 +260,16 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> {
 
 }
 
-class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibility {
+class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibility implements CommandHandler {
   late final SpriteComponent menuSprite;
   late final AnimatedPointer pointer;
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    // Implement cursor specific command handling
+    return true; // return true if the command was handled
+  }
+
   @override
   Future<void> onLoad() async {
     // Load and position the menu sprite
@@ -305,7 +354,7 @@ class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
   }
 }
 
-class Unit extends PositionComponent with HasGameRef<MyGame> {
+class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
@@ -318,6 +367,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> {
   Unit(this.tilePosition, this.unitImageName) {
     // Initial size, will be updated in onLoad
     tileSize = 16 * MyGame().scaleFactor;
+  }
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    // Implement cursor specific command handling
+    return true; // return true if the command was handled
   }
 
   @override
@@ -424,6 +479,10 @@ abstract class ScaleObserver {
   void onScaleChanged(double scaleFactor);
 }
 
+abstract class CommandHandler {
+  bool handleCommand(LogicalKeyboardKey command);
+}
+
 class MyGame extends FlameGame with KeyboardEvents {
   late MaxViewport viewport;
   late Stage stage;
@@ -464,56 +523,26 @@ class MyGame extends FlameGame with KeyboardEvents {
     await world.add(stage);
     addObserver(stage);
     camera.follow(stage.cursor);
-
-    // battleMenu = BattleMenu();
-    // world.add(battleMenu);
   }
 
   @override
   KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
 
-    // Handling the keyboard events
+    // First, handle any game-wide key events (like zooming)
     if (event is RawKeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.keyA) {
-        stage.cursor.battleMenu.toggleVisibility();
+      if (event.logicalKey == LogicalKeyboardKey.equal) { // Zoom in
+        scaleFactor *= 1.1;
         handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.keyB) {
-        if (stage.cursor.battleMenu.isVisible) {stage.cursor.battleMenu.toggleVisibility();}
+      } else if (event.logicalKey == LogicalKeyboardKey.minus) { // Zoom out
+        scaleFactor *= 0.9;
         handled = true;
-      } 
-      if (stage.cursor.battleMenu.isVisible) {
-        // Handle menu navigation
-        if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-          stage.cursor.battleMenu.pointer.moveUp();
-          handled = true;
-        } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-          stage.cursor.battleMenu.pointer.moveDown(); // Assuming 7 menu items, max index is 6
-          handled = true;
-        }
-      } else {
-        if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-          stage.cursor.move(Direction.left);
-          handled = true;
-        } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-          stage.cursor.move(Direction.right);
-          handled = true;
-        } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-          stage.cursor.move(Direction.up);
-          handled = true;
-        } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-          stage.cursor.move(Direction.down);
-          handled = true;
-        } else if (event.logicalKey == LogicalKeyboardKey.equal) { // "+" key for zooming in
-          scaleFactor *= 1.1;//.clamp(0.5, 2.0); // Zoom in and clamp between 0.5x and 2x
-          handled = true;
-        } else if (event.logicalKey == LogicalKeyboardKey.minus) { // "-" key for zooming out
-          scaleFactor *= 0.9;//.clamp(0.5, 2.0); // Zoom out and clamp
-          handled = true;
-        }
+      }
+      else {
+        bool handled = stage.keyCommandHandler(event.logicalKey);
       }
     }
-  return handled ? KeyEventResult.handled : KeyEventResult.ignored;
+    return handled ? KeyEventResult.handled : KeyEventResult.ignored;
   }
 }
 
