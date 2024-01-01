@@ -242,7 +242,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     } else if (command == LogicalKeyboardKey.arrowDown) {
       move(Direction.down);
       handled = true;
-    } else if (command == LogicalKeyboardKey.keyA) {
+    } else if (command == LogicalKeyboardKey.keyA || command == LogicalKeyboardKey.keyM) {
       select();
       handled = true;
     }
@@ -266,8 +266,26 @@ class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibilit
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
-    // Implement cursor specific command handling
-    return true; // return true if the command was handled
+    bool handled = false;
+    if (command == LogicalKeyboardKey.arrowUp) {
+      pointer.moveUp();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      pointer.moveDown();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyA) {
+      select();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
+      select();
+      handled = true;
+    }
+    return handled;
+  }
+
+  void select(){
+    Stage stage = parent as Stage;
+    stage.activeComponent = stage.cursor;
   }
 
   @override
