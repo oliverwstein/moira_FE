@@ -278,6 +278,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     // Update the pixel position of the cursor
     x = tilePosition.x * tileSize;
     y = tilePosition.y * tileSize;
+    log('Cursor position $tilePosition');
   }
   
   void select() {
@@ -291,6 +292,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
         Unit? unit = tile.unit;
         if (unit != null && unit.canAct) {
           stage.activeComponent = unit;
+          log('${unit.unitImageName} selected');
           unit.findReachableTiles();
         }
       } else {
@@ -481,9 +483,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   final int movementRange = 6; 
   late UnitTeam team = UnitTeam.blue;
   late math.Point<int> tilePosition; // The units's position in terms of tiles, not pixels
+  math.Point<int>? targetTilePosition;
   late double tileSize;
   bool canAct = true;
-  Map<math.Point<int>, List<Direction>> paths = {};
+  Queue<math.Point<int>> movementQueue = Queue<math.Point<int>>();
+  math.Point<int>? currentTarget;
+  bool isMoving = false;
+  Map<math.Point<int>, List<math.Point<int>>> paths = {};
 
   Unit(this.tilePosition, this.unitImageName) {
     // Initial size, will be updated in onLoad
@@ -495,8 +501,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
-      for(Direction dir in paths[stage.cursor.tilePosition]!){
-        move(dir);
+      for(math.Point<int> point in paths[stage.cursor.tilePosition]!){
+        enqueueMovement(point);
       }
       toggleCanAct();
       stage.activeComponent = stage.cursor;
@@ -576,42 +582,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     _animationComponent.paint = canAct ? mat.Paint() : grayscalePaint;
   }
 
-  void move(Direction direction) {
-    Stage stage = parent as Stage;
-
-    int newX = tilePosition.x;
-    int newY = tilePosition.y;
-
-    switch (direction) {
-      case Direction.left:
-        newX -= 1;
-        break;
-      case Direction.right:
-        newX += 1;
-        break;
-      case Direction.up:
-        newY -= 1;
-        break;
-      case Direction.down:
-        newY += 1;
-        break;
+  void enqueueMovement(math.Point<int> targetPoint) {
+    movementQueue.add(targetPoint);
+    if (!isMoving) {
+      isMoving = true;
+      currentTarget = movementQueue.removeFirst();
     }
-
-    // Clamp the new position to ensure it's within the bounds of the map
-    newX = newX.clamp(0, stage.mapTileWidth - 1);
-    newY = newY.clamp(0, stage.mapTileHeight - 1);
-
-    // Update tilePosition if it's within the map
-    tilePosition = math.Point(newX, newY);
-    math.Point<int> oldPosition = tilePosition;
-    stage.updateTileWithUnit(oldPosition, tilePosition, this);
-
-    // Update the pixel position of the unit
-    x = tilePosition.x * tileSize;
-    y = tilePosition.y * tileSize;
-     
   }
-
+  
   @override
   void onMount() {
     super.onMount();
@@ -622,6 +600,41 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   void onRemove() {
     gameRef.removeObserver(this);
     super.onRemove();
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    if (isMoving && currentTarget != null) {
+      // Calculate the pixel position for the target tile position
+      final targetX = currentTarget!.x * tileSize;
+      final targetY = currentTarget!.y * tileSize;
+
+      // Move towards the target position
+      // You might want to adjust the step distance depending on your game's needs
+      var moveX = (targetX - x)*.6;
+      var moveY = (targetY - y)*.6;
+
+      x += moveX;
+      y += moveY;
+
+      // Check if the unit is close enough to the target position to snap it
+      if ((x - targetX).abs() < 1 && (y - targetY).abs() < 1) {
+        x = targetX; // Snap to exact position
+        y = targetY;
+        tilePosition = currentTarget!; // Update the tilePosition to the new tile
+        
+
+        // Move to the next target if any
+        if (movementQueue.isNotEmpty) {
+          currentTarget = movementQueue.removeFirst();
+        } else {
+          currentTarget = null;
+          isMoving = false; // No more movements left
+        }
+      }
+    }
   }
   
   void onScaleChanged(double scaleFactor) {
@@ -691,12 +704,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   // Helper method to construct a path from a tile back to the unit
-  List<Direction> _constructPath(math.Point<int> targetPoint, Map<math.Point<int>, _TileMovement> visitedTiles) {
-    List<Direction> path = [];
+  List<math.Point<int>> _constructPath(math.Point<int> targetPoint, Map<math.Point<int>, _TileMovement> visitedTiles) {
+    List<math.Point<int>> path = [];
     math.Point<int>? current = targetPoint;
     while (current != null) {
-      Direction? direction = getDirection(visitedTiles[current]!.parent, current);
-      if(direction != null){path.insert(0, direction);} // Insert at the beginning to reverse the path
+      path.insert(0, current); // Insert at the beginning to reverse the path
       current = visitedTiles[current]!.parent; // Move to the parent
     }
     return path; // The path from the start to the target
