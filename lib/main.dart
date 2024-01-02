@@ -34,6 +34,41 @@ extension TerrainCost on Terrain {
 }
 
 class Tile extends PositionComponent with HasGameRef<MyGame>{
+  /// Tile represents a single tile on the game's map. It is a positional component that
+  /// can hold a unit and has different states to represent various terrains and actions,
+  /// such as movement or attack animations. The Tile class is crucial in the rendering
+  /// and logic of the game's map.
+  ///
+  /// Attributes:
+  /// - `_moveAnimationComponent`: Component for rendering movement animations.
+  /// - `_attackAnimationComponent`: Component for rendering attack animations.
+  /// - `movementSheet`: SpriteSheet for movement animations.
+  /// - `attackSheet`: SpriteSheet for attack animations.
+  /// - `gridCoord`: Coordinates of the tile on the grid.
+  /// - `tileSize`: Size of the tile in pixels, adjusted by the game's scale factor.
+  /// - `terrain`: Type of terrain represented by the tile.
+  /// - `unit`: The unit currently occupying the tile, if any.
+  /// - `state`: Current state of the tile, can be blank, move, or attack.
+  /// - `isOccupied`: Read-only property indicating whether the tile is occupied by a unit.
+  ///
+  /// Methods:
+  /// - `onLoad()`: Asynchronously loads resources necessary for the tile, such as animations.
+  /// - `setUnit(newUnit)`: Assigns a unit to the tile.
+  /// - `removeUnit()`: Removes the unit from the tile.
+  /// - `render(canvas)`: Renders the tile and its current state to the canvas.
+  /// - `onScaleChanged(scaleFactor)`: Updates the tile's size and position based on the game's scale factor.
+  ///
+  /// Constructor:
+  /// Takes the grid coordinates and terrain type and initializes the tile. The constructor also sets the tile size based on the game's scale factor.
+  ///
+  /// Usage:
+  /// Tiles are used to compose the game's map and are managed by the Stage class. Each tile holds its position, terrain type, and potentially a unit. The Tile class also manages animations and rendering based on its state.
+  ///
+  /// Connects with:
+  /// - MyGame: Inherits properties and methods from HasGameRef<MyGame> for game reference.
+  /// - Unit: May hold a reference to a Unit object representing a unit on the tile.
+  /// - Stage: Managed by and interacts with the Stage class, which holds all tiles.
+
   late final SpriteAnimationComponent _moveAnimationComponent;
   late final SpriteAnimationComponent _attackAnimationComponent;
   late final SpriteSheet movementSheet;
@@ -125,6 +160,49 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
 }
 
 class Stage extends Component with HasGameRef<MyGame>{
+  /// Stage is a primary component in the game that manages the layout of the 
+  /// game map, including tiles, units, and the cursor. It interfaces with the 
+  /// game's TiledComponent to render the map and holds the logic for the game's 
+  /// terrain, unit positioning, and active components like cursor or units.
+  ///
+  /// Attributes:
+  /// - `mapTileWidth`: Width of the map in tiles.
+  /// - `mapTileHeight`: Height of the map in tiles.
+  /// - `mapSize`: Size of the map in vector units.
+  /// - `tiles`: The TiledComponent instance that renders the map.
+  /// - `cursor`: Cursor object for user interaction and tile selection.
+  /// - `units`: List of all units present on the stage.
+  /// - `tilesize`: Size of each tile in the game.
+  /// - `tilesMap`: Map from tile coordinates to Tile objects.
+  /// - `activeComponent`: Currently active component (Cursor or Unit).
+  ///
+  /// Methods:
+  /// - `onLoad()`: Asynchronously loads the stage components including tiles,
+  ///    units, and sets up the cursor.
+  /// - `update(dt)`: Updates the stage state every game tick.
+  /// - `onMount()`: Invoked when the stage is mounted to the game, adds itself
+  ///    as an observer for scaling.
+  /// - `onRemove()`: Cleans up by removing itself from observers upon removal.
+  /// - `onScaleChanged(scaleFactor)`: Updates scaling of tiles when game scale changes.
+  /// - `updateTileWithUnit(oldPoint, newPoint, unit)`: Moves units between tiles.
+  /// - `determineTerrainType(point)`: Determines the type of terrain at a given tile.
+  /// - `_stringToTerrain(input)`: Converts a string to a Terrain enum.
+  /// - `keyCommandHandler(command)`: Delegates key commands to the active component.
+  /// - `blankAllTiles()`: Resets all tiles to the blank state.
+  ///
+  /// Constructor:
+  /// Initializes the stage with default attributes. It sets up tiles, units, and cursor.
+  ///
+  /// Usage:
+  /// The Stage is a central component of MyGame and is typically instantiated and
+  /// managed by it. It should be loaded with necessary resources and will handle
+  /// most of the gameplay logic, delegating specific actions to other components.
+  ///
+  /// Connects with:
+  /// - MyGame: As part of the Flame game framework, it is managed and updated by MyGame.
+  /// - Tile: Manages individual tiles of the game, storing their state and rendering them.
+  /// - Unit: Holds and updates units, manages their interaction with tiles.
+  /// - Cursor: Manages user interaction with the game through tile selection and commands.
   late final int mapTileWidth;
   late final int mapTileHeight;
   late final Vector2 mapSize;
@@ -232,6 +310,38 @@ class Stage extends Component with HasGameRef<MyGame>{
 }
 
 class Cursor extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+  /// Cursor represents the player's cursor in the game world. It extends the PositionComponent,
+  /// allowing it to have a position in the game world, and implements CommandHandler for handling
+  /// keyboard inputs. The Cursor navigates the game's stage, interacting with tiles and units.
+  ///
+  /// Attributes:
+  /// - `_animationComponent`: Component for rendering cursor animations.
+  /// - `cursorSheet`: SpriteSheet for cursor animations.
+  /// - `battleMenu`: BattleMenu component associated with the cursor for in-game actions.
+  /// - `tilePosition`: The cursor's position in terms of tiles, not pixels.
+  /// - `tileSize`: Size of the cursor in pixels, adjusted by the game's scale factor.
+  ///
+  /// Methods:
+  /// - `onLoad()`: Asynchronously loads resources necessary for the cursor, such as animations.
+  /// - `move(direction)`: Moves the cursor in the given direction, updating both tile and pixel positions.
+  /// - `select()`: Interacts with the tile at the cursor's current position, handling unit selection and battle menu toggling.
+  /// - `handleCommand(command)`: Implements the CommandHandler interface to handle keyboard commands.
+  /// - `onMount()`: Observes lifecycle changes, adds itself to game observers on mounting.
+  /// - `onRemove()`: Cleans up by removing itself from game observers on removal.
+  /// - `onScaleChanged(scaleFactor)`: Updates the cursor's size and position based on the game's scale factor.
+  ///
+  /// Constructor:
+  /// Initializes the cursor with a default tile position and sets up its size based on the game's scale factor.
+  ///
+  /// Usage:
+  /// The Cursor is the main interface for the player to interact with the game world, allowing them to move around the map, select units, and access menus. It is a crucial component for game navigation and interaction.
+  ///
+  /// Connects with:
+  /// - MyGame: Inherits properties and methods from HasGameRef<MyGame> for game reference.
+  /// - Stage: Interacts with and navigates within the Stage class, which holds all tiles and units.
+  /// - Tile: Interacts with tiles to select units or display menus.
+  /// - Unit: May select units on the tiles to activate them or show their possible movements.
+
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   late final BattleMenu battleMenu;
@@ -389,6 +499,34 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
 }
 
 class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibility implements CommandHandler {
+  /// BattleMenu is a component that represents the in-game menu for actions such as attack, move, etc.
+  /// It extends PositionComponent and implements CommandHandler for handling keyboard inputs,
+  /// along with HasVisibility for managing its visibility state.
+  ///
+  /// Attributes:
+  /// - `menuSprite`: The visual representation of the menu.
+  /// - `pointer`: AnimatedPointer object that indicates the current selection in the menu.
+  ///
+  /// Methods:
+  /// - `handleCommand(command)`: Handles command inputs to navigate the menu or trigger actions.
+  /// - `select()`: Handles the action of selecting a menu item, toggling menu visibility, and setting the active component.
+  /// - `onLoad()`: Asynchronously loads resources necessary for the BattleMenu and initializes its components.
+  /// - `toggleVisibility()`: Toggles the visibility of the BattleMenu.
+  /// - `render(canvas)`: Renders the BattleMenu to the provided canvas, only if it's visible.
+  ///
+  /// Constructor:
+  /// Initializes the BattleMenu component, setting up its visibility and subcomponents.
+  ///
+  /// Usage:
+  /// The BattleMenu is used to display a list of actions that a player can take during their turn,
+  /// such as moving units or attacking. It's typically brought up when a unit is selected and provides
+  /// the means to choose what action to take next.
+  ///
+  /// Connects with:
+  /// - MyGame: Inherits properties and methods from HasGameRef<MyGame> for game reference.
+  /// - AnimatedPointer: Utilizes AnimatedPointer to indicate the current selection within the menu.
+  /// - Stage: Interacts with Stage to control game flow, toggling active components based on menu selection.
+
   late final SpriteComponent menuSprite;
   late final AnimatedPointer pointer;
 
@@ -422,7 +560,6 @@ class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibilit
     // Load and position the menu sprite
     menuSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('action_menu.png'),
-        // size: Vector2(71, 122),
     );
     add(menuSprite);
 
@@ -447,6 +584,33 @@ class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibilit
 }
 
 class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
+  /// AnimatedPointer is a component that represents the selection pointer in the BattleMenu,
+  /// highlighting the current option selected by the player. It extends PositionComponent
+  /// and is used within the BattleMenu to navigate between different options.
+  ///
+  /// Attributes:
+  /// - `_animationComponent`: Component for rendering pointer animations.
+  /// - `pointerSheet`: SpriteSheet for pointer animations.
+  /// - `stepY`: The vertical distance between menu items, used to move the pointer up and down.
+  /// - `currentIndex`: The index of the current menu item selected.
+  /// - `tileSize`: Size of the pointer in pixels, can be adjusted with the game's scale factor.
+  ///
+  /// Methods:
+  /// - `onLoad()`: Asynchronously loads resources necessary for the AnimatedPointer, such as animations.
+  /// - `moveUp()`: Moves the pointer up in the menu, decreasing the currentIndex.
+  /// - `moveDown()`: Moves the pointer down in the menu, increasing the currentIndex.
+  /// - `updatePosition()`: Updates the position of the pointer based on the currentIndex.
+  ///
+  /// Constructor:
+  /// Initializes the AnimatedPointer with a default size and index.
+  ///
+  /// Usage:
+  /// The AnimatedPointer is used within the BattleMenu to visually indicate the current selection.
+  /// It moves up and down as the player navigates the menu options, providing feedback on the current choice.
+  ///
+  /// Connects with:
+  /// - BattleMenu: AnimatedPointer is a subcomponent of BattleMenu, indicating the current menu selection.
+  /// - MyGame: Inherits properties and methods from HasGameRef<MyGame> for game reference.
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet pointerSheet;
 
@@ -502,6 +666,52 @@ class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
 }
 
 class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+  /// Unit represents a character or entity in the game with the ability to move and act on the map.
+  /// It extends PositionComponent for positional attributes and implements CommandHandler
+  /// for handling keyboard commands. It's a central element in the game's mechanics, controlling
+  /// movement, actions, and interactions with other units and tiles.
+  ///
+  /// Attributes:
+  /// - `_animationComponent`: Visual representation of the unit using sprite animation.
+  /// - `unitSheet`: SpriteSheet containing animation frames for the unit.
+  /// - `battleMenu`: A reference to the BattleMenu for triggering actions.
+  /// - `unitImageName`: The file name of the unit's image, used for loading the sprite.
+  /// - `movementRange`: The number of tiles this unit can move in one turn.
+  /// - `team`: The team this unit belongs to, used for identifying allies and enemies.
+  /// - `tilePosition`: The unit's position on the grid map in terms of tiles.
+  /// - `targetTilePosition`: A target position the unit is moving towards, if any.
+  /// - `tileSize`: Size of the unit in pixels, scaled according to the game's scaleFactor.
+  /// - `canAct`: Boolean indicating whether the unit can take actions.
+  /// - `movementQueue`: Queue of points representing the unit's movement path.
+  /// - `currentTarget`: The current tile target in the unit's movement path.
+  /// - `isMoving`: Boolean indicating if the unit is currently moving.
+  /// - `paths`: Stores the paths to all reachable tiles based on the unit's movement range.
+  ///
+  /// Methods:
+  /// - `handleCommand(command)`: Handles keyboard commands for unit actions like moving or interacting.
+  /// - `onLoad()`: Loads the unit's sprite and sets up the animation component.
+  /// - `toggleCanAct()`: Toggles the unit's ability to act and visually indicates its state.
+  /// - `enqueueMovement(targetPoint)`: Adds a new target position to the movement queue.
+  /// - `update(dt)`: Updates the unit's position and handles movement towards the target tile.
+  /// - `onScaleChanged(scaleFactor)`: Updates the unit's size and position based on the game's scale factor.
+  /// - `findReachableTiles()`: Calculates and stores paths to all reachable tiles based on movement range.
+  /// - `_constructPath(targetPoint, visitedTiles)`: Constructs the path from the unit to a specified tile.
+  /// - `getDirection(point, targetPoint)`: Determines the direction from one point to another.
+  ///
+  /// Constructor:
+  /// - Initializes a Unit with a specific position on the grid and an image name for its sprite.
+  ///
+  /// Usage:
+  /// - Units are the primary actors in the game, controlled by the player or AI to move around the map,
+  ///   interact with other units, and perform actions like attacking or defending.
+  ///
+  /// Connects with:
+  /// - MyGame: Inherits properties and methods from HasGameRef<MyGame> for game reference.
+  /// - PositionComponent: Inherits position and size attributes and methods.
+  /// - CommandHandler: Implements interface to handle keyboard commands.
+  /// - Stage: Interacts with Stage for game world context, like tile access and unit positioning.
+  /// - Tile: Interacts with Tile to determine movement paths and interactions based on the terrain.
+
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
@@ -772,6 +982,40 @@ abstract class CommandHandler {
 }
 
 class MyGame extends FlameGame with KeyboardEvents {
+  /// MyGame is the core class for the tactical RPG game, extending FlameGame for 
+  /// game loop management and integrating KeyboardEvents for user interaction.
+  /// It manages the game's viewport, stage, and global state like scaling.
+  /// 
+  /// Attributes:
+  /// - `viewport`: Manages the game's viewport size and scaling.
+  /// - `stage`: The main container for all game elements, including tiles and units.
+  /// - `_scaleFactor`: A private variable managing the zoom level of the game view.
+  /// - `_observers`: A list of observers (like Stage) that listen to scale changes.
+  /// 
+  /// Methods:
+  /// - `scaleFactor`: Getter and setter for _scaleFactor, updates observers on change.
+  /// - `addObserver(observer)`: Adds an observer to be notified of scale changes.
+  /// - `removeObserver(observer)`: Removes an observer from the notification list.
+  /// - `update(dt)`: Updates the game state every tick, part of the game loop.
+  /// - `onLoad()`: Asynchronously loads game resources and initializes components.
+  /// - `onKeyEvent(event, keysPressed)`: Handles keyboard events globally.
+  /// 
+  /// Constructor:
+  /// Initializes game components, sets up the viewport, and loads the stage.
+  /// It ensures the game scales properly and the camera follows the cursor.
+  /// 
+  /// Connects with:
+  /// - Stage: Stage acts as the main interactive area of the game, containing all tiles,
+  ///   units, and managing the cursor.
+  /// - Tile, Unit: Managed by Stage, but their scaling and updates are propagated
+  ///   by MyGame through observers.
+  /// - MaxViewport: Manages how the game's view is scaled and presented.
+  /// 
+  /// Usage:
+  /// This class should be instantiated to start the game. It sets up necessary
+  /// game components and starts the game loop. User interactions are primarily
+  /// managed here and delegated to other components like Stage and Unit.
+
   late MaxViewport viewport;
   late Stage stage;
   double _scaleFactor = 2;

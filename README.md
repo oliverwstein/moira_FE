@@ -30,8 +30,7 @@ This Dart/Flutter application is designed to run a Fire Emblem-like tactical RPG
 - Holds terrain information and whether it's occupied by a unit.
 
 ### BattleMenu
-- A UI component that appears when interacting with units or specific map tiles.
-- Provides options like Move, Attack, etc.
+- A UI component that provides a menu for selecting various meta-actions like ending the turn or saving the game.
 
 ### Direction (enum)
 - Represents possible movement directions (up, down, left, right).
