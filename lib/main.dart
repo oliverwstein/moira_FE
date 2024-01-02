@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_overrides
 import 'dart:collection';
+import 'dart:developer';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 import 'package:flutter/material.dart' as mat;
@@ -25,6 +26,7 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
   Unit? unit; // Initially null, set when a unit moves into the tile
   TileState state = TileState.blank;
   int moveCost = 1;
+  bool get isOccupied => unit != null;
 
   Tile(this.gridCoord, this.terrainType){
     tileSize = 16 * MyGame().scaleFactor;
@@ -56,8 +58,6 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
     );
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
-
-  bool get isOccupied => unit != null;
 
   void setUnit(Unit newUnit) {
     unit = newUnit;
@@ -198,6 +198,11 @@ class Stage extends Component with HasGameRef<MyGame>{
     }
     return false;
   }
+  void blankAllTiles(){
+    for (Tile tile in tilesMap.values) {
+      tile.state = TileState.blank;
+    }
+  }
 }
 
 class Cursor extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
@@ -289,6 +294,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
           unit.findReachableTiles();
         }
       } else {
+        stage.blankAllTiles();
         stage.cursor.battleMenu.toggleVisibility();
         stage.activeComponent = stage.cursor.battleMenu;
       }
@@ -334,6 +340,11 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) {
+      Stage stage = parent as Stage;
+      stage.blankAllTiles();
+      stage.activeComponent = stage.cursor;
       handled = true;
     }
     return handled;
@@ -485,11 +496,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     if (command == LogicalKeyboardKey.keyA) {
       toggleCanAct();
       stage.activeComponent = stage.cursor;
+      stage.blankAllTiles();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) {
       stage.activeComponent = stage.cursor;
+      stage.blankAllTiles();
       handled = true;
     }
+    
     return handled;
   }
 
@@ -605,7 +619,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       int remainingMovement = tileMovement.remainingMovement;
 
       // Skip if a better path to this tile has already been found
-      if (visitedTiles.containsKey(currentPoint) && visitedTiles[(currentPoint.x, currentPoint.y)]!.remainingMovement >= remainingMovement) continue;
+      if (visitedTiles.containsKey(currentPoint) && visitedTiles[currentPoint]!.remainingMovement >= remainingMovement) continue;
 
       // Record the tile with its movement data
       visitedTiles[math.Point(currentPoint.x, currentPoint.y)] = tileMovement;
@@ -629,12 +643,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
             nextPoint = math.Point(currentPoint.x, currentPoint.y + 1);
             break;
         }
-        Tile? nextTile = gameRef.stage.tilesMap[(x:nextPoint.x, y:nextPoint.y)];
-
-        if (nextTile != null && !nextTile.isOccupied) {
-          var cost = gameRef.stage.tilesMap[(nextTile.x, nextTile.y)]!.moveCost;
+        Tile? nextTile = gameRef.stage.tilesMap[math.Point(nextPoint.x, nextPoint.y)];
+        if (nextTile != null) {
+          var cost = 1;//gameRef.stage.tilesMap[math.Point(nextTile.x, nextTile.y)]!.moveCost;
           var nextRemainingMovement = remainingMovement - cost;
-          if (nextRemainingMovement >= 0) {
+          if (nextRemainingMovement > 0) {
             queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
           }
         }
@@ -642,10 +655,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
 
     // Construct paths for each tile
-    for (var tilePoint in visitedTiles.keys) {
+    for (math.Point<int> tilePoint in visitedTiles.keys) {
       paths[tilePoint] = _constructPath(tilePoint, visitedTiles);
       if(team == UnitTeam.blue){
-        gameRef.stage.tilesMap[tilePosition]!.state = TileState.move;
+        gameRef.stage.tilesMap[tilePoint]!.state = TileState.move;
       }
     }
 
