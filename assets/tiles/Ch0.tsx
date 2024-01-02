@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="Chapter_0" tilewidth="16" tileheight="16" tilecount="1922" columns="62">
- <image source="Chapter_0.png" trans="ff00ff" width="992" height="496"/>
+<tileset version="1.10" tiledversion="1.10.2" name="Ch0" tilewidth="16" tileheight="16" tilecount="1922" columns="62">
+ <image source="Ch0.png" trans="ff00ff" width="992" height="496"/>
  <tile id="2">
   <properties>
    <property name="type" value="cliff"/>
