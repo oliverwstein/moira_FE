@@ -495,6 +495,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
+      for(Direction dir in paths[stage.cursor.tilePosition]!){
+        move(dir);
+      }
       toggleCanAct();
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
@@ -600,14 +603,15 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
     // Update tilePosition if it's within the map
     tilePosition = math.Point(newX, newY);
+    math.Point<int> oldPosition = tilePosition;
+    stage.updateTileWithUnit(oldPosition, tilePosition, this);
 
     // Update the pixel position of the unit
     x = tilePosition.x * tileSize;
     y = tilePosition.y * tileSize;
-    
-    math.Point<int> oldPosition = tilePosition;
-    stage.updateTileWithUnit(oldPosition, tilePosition, this);
+     
   }
+
   @override
   void onMount() {
     super.onMount();
@@ -697,6 +701,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
     return path; // The path from the start to the target
   }
+  
   Direction? getDirection(math.Point<int>? point, math.Point<int>? targetPoint){
     if(point == null || targetPoint == null){
       return null;
