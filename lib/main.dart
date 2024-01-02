@@ -495,6 +495,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
+      
       toggleCanAct();
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
@@ -503,8 +504,31 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
       handled = true;
+    } else if (command == LogicalKeyboardKey.arrowLeft) {
+      math.Point<int> newPoint = math.Point(stage.cursor.tilePosition.x - 1, stage.cursor.tilePosition.y);
+      if(stage.tilesMap[newPoint]?.state != TileState.blank){
+        stage.cursor.move(Direction.left);
+      }
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) {
+      math.Point<int> newPoint = math.Point(stage.cursor.tilePosition.x + 1, stage.cursor.tilePosition.y);
+      if(stage.tilesMap[newPoint]?.state != TileState.blank){
+        stage.cursor.move(Direction.right);
+      }
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowUp) {
+      math.Point<int> newPoint = math.Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y - 1);
+      if(stage.tilesMap[newPoint]?.state != TileState.blank){
+        stage.cursor.move(Direction.up);
+      }
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      math.Point<int> newPoint = math.Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y + 1);
+      if(stage.tilesMap[newPoint]?.state != TileState.blank){
+        stage.cursor.move(Direction.down);
+      }
+      handled = true;
     }
-    
     return handled;
   }
 
