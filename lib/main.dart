@@ -478,11 +478,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
   late final String unitImageName;
-  final int movementRange = 6;
+  final int movementRange = 6; 
   late UnitTeam team = UnitTeam.blue;
   late final math.Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   late double tileSize;
   bool canAct = true;
+  Map<math.Point<int>, List<math.Point<int>>> paths = {};
 
   Unit(this.tilePosition, this.unitImageName) {
     // Initial size, will be updated in onLoad
@@ -605,10 +606,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
   }
 
-  Map<math.Point<int>, List<math.Point<int>>> findReachableTiles() {
+  void findReachableTiles() {
     var visitedTiles = <math.Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
     var queue = Queue<_TileMovement>(); // Queue for BFS
-    var paths = <math.Point<int>, List<math.Point<int>>>{}; // Stores paths to each tile
 
     // Starting point - no parent at the beginning
     queue.add(_TileMovement(tilePosition, movementRange, null));
@@ -661,8 +661,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
         gameRef.stage.tilesMap[tilePoint]!.state = TileState.move;
       }
     }
-
-    return paths; // Return the paths to each reachable tile
   }
 
   // Helper method to construct a path from a tile back to the unit
