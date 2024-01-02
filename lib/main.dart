@@ -144,7 +144,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     units.add(Unit((x:59, y:13), 'sigurd.png'));
     for (Unit unit in units) {
       add(unit);
-      getTileAt(unit.tilePosition)?.setUnit(unit);
+      tilesMap[unit.tilePosition]?.setUnit(unit);
       gameRef.addObserver(unit);
     }
 
@@ -180,12 +180,8 @@ class Stage extends Component with HasGameRef<MyGame>{
   }
 
   void updateTileWithUnit(({int x, int y}) oldPoint, ({int x, int y}) newPoint, Unit unit) {
-    getTileAt(oldPoint)?.removeUnit();
-    getTileAt(newPoint)?.setUnit(unit);
-  }
-
-  Tile? getTileAt(({int x, int y}) point) {
-    return tilesMap[(point.x, point.y)];
+    tilesMap[oldPoint]?.removeUnit();
+    tilesMap[newPoint]?.setUnit(unit);
   }
   
   String determineTerrainType(({int x, int y}) point){
@@ -281,7 +277,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
   void select() {
   if (parent is Stage) {
     Stage stage = parent as Stage;
-    Tile? tile = stage.getTileAt(tilePosition);
+    Tile? tile = stage.tilesMap[tilePosition];
 
     if (tile != null) {
       // Proceed as normal if tile is not null
@@ -289,7 +285,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
         Unit? unit = tile.unit;
         if (unit != null && unit.canAct) {
           stage.activeComponent = unit;
-          unit.findReachableTiles();
+          // unit.findReachableTiles();
         }
       } else {
         stage.cursor.battleMenu.toggleVisibility();
@@ -613,7 +609,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       // Record the tile with its movement data
       visitedTiles[(x:currentPoint.x, y:currentPoint.y)] = tileMovement;
 
-      Tile? tile = gameRef.stage.getTileAt(currentPoint); // Accessing tiles through stage
+      Tile? tile = gameRef.stage.tilesMap[currentPoint]; // Accessing tiles through stage
       if (tile!.isOccupied && tile.unit?.team != team) continue; // Skip enemy-occupied tiles
 
       for (var direction in Direction.values) {
@@ -632,7 +628,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
             nextPoint = (x: currentPoint.x, y: currentPoint.y + 1);
             break;
         }
-        Tile? nextTile = gameRef.stage.getTileAt((x:nextPoint.x, y:nextPoint.y));
+        Tile? nextTile = gameRef.stage.tilesMap[(x:nextPoint.x, y:nextPoint.y)];
 
         if (nextTile != null && !nextTile.isOccupied) {
           var cost = gameRef.stage.tilesMap[(nextTile.x, nextTile.y)]!.moveCost;
@@ -648,7 +644,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     for (var tilePoint in visitedTiles.keys) {
       paths[tilePoint] = _constructPath(tilePoint, visitedTiles);
       if(team == UnitTeam.blue){
-        gameRef.stage.getTileAt(tilePosition)!.state = TileState.move;
+        gameRef.stage.tilesMap[tilePosition]!.state = TileState.move;
       }
     }
 
