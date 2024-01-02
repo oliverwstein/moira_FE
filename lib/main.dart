@@ -480,10 +480,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   late final String unitImageName;
   final int movementRange = 6; 
   late UnitTeam team = UnitTeam.blue;
-  late final math.Point<int> tilePosition; // The units's position in terms of tiles, not pixels
+  late math.Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   late double tileSize;
   bool canAct = true;
-  Map<math.Point<int>, List<math.Point<int>>> paths = {};
+  Map<math.Point<int>, List<Direction>> paths = {};
 
   Unit(this.tilePosition, this.unitImageName) {
     // Initial size, will be updated in onLoad
@@ -495,7 +495,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
-      
       toggleCanAct();
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
@@ -688,16 +687,30 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   // Helper method to construct a path from a tile back to the unit
-  List<math.Point<int>> _constructPath(math.Point<int> targetPoint, Map<math.Point<int>, _TileMovement> visitedTiles) {
-    List<math.Point<int>> path = [];
+  List<Direction> _constructPath(math.Point<int> targetPoint, Map<math.Point<int>, _TileMovement> visitedTiles) {
+    List<Direction> path = [];
     math.Point<int>? current = targetPoint;
-
     while (current != null) {
-      path.insert(0, current); // Insert at the beginning to reverse the path
+      Direction? direction = getDirection(visitedTiles[current]!.parent, current);
+      if(direction != null){path.insert(0, direction);} // Insert at the beginning to reverse the path
       current = visitedTiles[current]!.parent; // Move to the parent
     }
-
     return path; // The path from the start to the target
+  }
+  Direction? getDirection(math.Point<int>? point, math.Point<int>? targetPoint){
+    if(point == null || targetPoint == null){
+      return null;
+    }
+    if(point.x < targetPoint.x){
+      return Direction.right;
+    } else if(point.x > targetPoint.x){
+      return Direction.left;
+    } else if(point.y < targetPoint.y){
+      return Direction.down;
+    } else if(point.y > targetPoint.y){
+      return Direction.up;
+    }
+    return null;
   }
 }
 
