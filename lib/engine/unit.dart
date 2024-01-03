@@ -66,13 +66,18 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
       oldTile = tilePosition;
-      if(stage.tilesMap[stage.cursor.tilePosition]!.isOccupied) return false;
-
       for(Point<int> point in paths[stage.cursor.tilePosition]!){
         enqueueMovement(point);
       }
-      stage.updateTileWithUnit(tilePosition, paths[stage.cursor.tilePosition]!.last, this);
-      List<MenuOption> visibleOptions = [MenuOption.attack, MenuOption.item, MenuOption.wait];
+      var newTile = paths[stage.cursor.tilePosition]!.last;
+      stage.updateTileWithUnit(tilePosition, newTile, this);
+      stage.blankAllTiles();
+      List<Tile> attackTiles = markAttackableEnemies(newTile, combatRange.$1, combatRange.$2);
+      List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
+      if(attackTiles.isNotEmpty){
+        visibleOptions.add(MenuOption.attack);
+      }
+      
       stage.cursor.actionMenu.show(visibleOptions);
       stage.activeComponent = stage.cursor.actionMenu;
       handled = true;
@@ -285,9 +290,29 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
   
   void markAttackableTiles(List<Tile> reachableTiles) {
+    // Mark tiles attackable from the unit's current position
+    markTilesInRange(tilePosition, combatRange.$1, combatRange.$2, TileState.attack);
+    // Mark tiles attackable from each reachable tile
+    for (var tile in reachableTiles) {
+      markTilesInRange(tile.gridCoord, combatRange.$1, combatRange.$2,  TileState.attack);
+    }
+  }
 
-  // Define a helper method to mark tiles within a certain range
-  void markTilesInRange(Point<int> centerTile, int minRange, int maxRange) {
+  List<Tile> markAttackableEnemies(Point<int> centerTile, int minRange, int maxRange){
+    List<Tile> tilesInRange = markTilesInRange(centerTile, minRange, maxRange, TileState.attack);
+    List<Tile> attackTiles = [];
+    for (Tile tile in tilesInRange){
+      if (tile.unit?.team != UnitTeam.red){
+        tile.state = TileState.blank;
+      } else {
+        attackTiles.add(tile);
+      }
+    }
+    return attackTiles;
+  }
+
+  List<Tile> markTilesInRange(Point<int> centerTile, int minRange, int maxRange, TileState newState) {
+    List<Tile> tilesInRange = [];
     for (int x = centerTile.x - maxRange.toInt(); x <= centerTile.x + maxRange.toInt(); x++) {
       for (int y = centerTile.y - maxRange.toInt(); y <= centerTile.y + maxRange.toInt(); y++) {
         var tilePoint = Point<int>(x, y);
@@ -298,20 +323,16 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
             var tile = gameRef.stage.tilesMap[tilePoint];
             // Mark the tile as attackable if it's not a movement tile
             if (tile != null && tile.state == TileState.blank) {
-              tile.state = TileState.attack;
+              tile.state = newState;
+              tilesInRange.add(tile);
             }
           }
         }
       }
     }
+    return tilesInRange;
   }
-  // Mark tiles attackable from the unit's current position
-  markTilesInRange(tilePosition, combatRange.$1, combatRange.$2);
-  // Mark tiles attackable from each reachable tile
-  for (var tile in reachableTiles) {
-    markTilesInRange(tile.gridCoord, combatRange.$1, combatRange.$1);
-  }
-}
+
   Direction? getDirection(Point<int>? point, Point<int>? targetPoint){
     if(point == null || targetPoint == null){
       return null;

@@ -162,9 +162,9 @@ class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
     ActionMenu menu = parent as ActionMenu;
     if (menu.visibleOptions.isNotEmpty){
       if (dir == Direction.up) {
-          menu.selectedIndex = (menu.selectedIndex + 1) % menu.visibleOptions.length;
-      } else if (dir == Direction.down) {
           menu.selectedIndex = (menu.selectedIndex - 1) % menu.visibleOptions.length;
+      } else if (dir == Direction.down) {
+          menu.selectedIndex = (menu.selectedIndex + 1) % menu.visibleOptions.length;
       }
       updatePosition();
     }
