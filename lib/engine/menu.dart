@@ -54,7 +54,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       pointer.move(Direction.down);
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
-      dev.log('${visibleOptions}');
       select();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
@@ -84,6 +83,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       case MenuOption.save:
         break;
       case MenuOption.attack:
+        /// On selecting attack, pull up the weapon menu
         break;
       case MenuOption.item:
         break;
