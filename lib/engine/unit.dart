@@ -84,6 +84,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       for(Point<int> point in paths[stage.cursor.tilePosition]!){
         enqueueMovement(point);
       }
+      stage.updateTileWithUnit(tilePosition, paths[stage.cursor.tilePosition]!.last, this);
       toggleCanAct(false);
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
