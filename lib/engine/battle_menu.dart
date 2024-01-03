@@ -59,6 +59,23 @@ class BattleMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibilit
 
   void select(){
     Stage stage = parent!.parent as Stage;
+    switch (pointer.currentIndex) {
+      case 0: // unit
+        break;
+      case 1: // items
+        break;
+      case 2: // status
+        break;
+      case 3: // skills
+        break;
+      case 4: // options
+        break;
+      case 5: // save game
+        break;
+      case 6: // end turn
+        stage.endTurn();
+    }
+    
     stage.activeComponent = stage.cursor;
     toggleVisibility();
   }
@@ -157,12 +174,18 @@ class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
     if (currentIndex > 0) {
       currentIndex--;
       updatePosition();
+    } else {
+      currentIndex = 6;
+      updatePosition();
     }
   }
 
   void moveDown() {
-    if (currentIndex < 7) {
+    if (currentIndex < 6) {
       currentIndex++;
+      updatePosition();
+    } else {
+      currentIndex = 0;
       updatePosition();
     }
   }

@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_overrides
+
 import 'dart:collection';
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -84,7 +84,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       for(Point<int> point in paths[stage.cursor.tilePosition]!){
         enqueueMovement(point);
       }
-      toggleCanAct();
+      toggleCanAct(false);
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
       handled = true;
@@ -147,8 +147,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
         return Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
     }
 
-  void toggleCanAct() {
-    canAct = !canAct;
+  void toggleCanAct(bool state) {
+    canAct = state;
     // Define the grayscale paint
     final grayscalePaint = mat.Paint()
       ..colorFilter = const mat.ColorFilter.matrix([
