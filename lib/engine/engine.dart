@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show rootBundle;
 export 'battle_menu.dart';
 export 'cursor.dart';
 export 'game.dart';
@@ -23,4 +24,11 @@ extension TerrainCost on Terrain {
         return 1;
     }
   }
+}
+
+
+
+Future<String> loadJsonData(String jsonPath) async {
+  var jsonText = await rootBundle.loadString(jsonPath);
+  return jsonText;
 }

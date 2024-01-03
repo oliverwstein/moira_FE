@@ -1,7 +1,6 @@
 
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -22,7 +21,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   /// - `_animationComponent`: Visual representation of the unit using sprite animation.
   /// - `unitSheet`: SpriteSheet containing animation frames for the unit.
   /// - `battleMenu`: A reference to the BattleMenu for triggering actions.
-  /// - `unitImageName`: The file name of the unit's image, used for loading the sprite.
+  /// - `idleAnimationName`: The file name of the unit's image, used for loading the sprite.
   /// - `movementRange`: The number of tiles this unit can move in one turn.
   /// - `team`: The team this unit belongs to, used for identifying allies and enemies.
   /// - `data`: The tiered dictionary (Map) of the unit's data: stats, inventory, skills, etc.
@@ -60,12 +59,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   /// - Stage: Interacts with Stage for game world context, like tile access and unit positioning.
   /// - Tile: Interacts with Tile to determine movement paths and interactions based on the terrain.
 
-  late Map data;
+  late Map<String, dynamic> data;
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
-  late final String unitImageName;
-  final int movementRange = 6; 
+  late final String name;
+  late final String idleAnimationName;
+  late final int movementRange; 
   late UnitTeam team = UnitTeam.blue;
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   Point<int>? targetTilePosition;
@@ -76,10 +76,33 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   bool isMoving = false;
   Map<Point<int>, List<Point<int>>> paths = {};
 
-  Unit(this.tilePosition, this.unitImageName) {
+  Unit(this.tilePosition, this.idleAnimationName) {
     // Initial size, will be updated in onLoad
     tileSize = 16 * MyGame().scaleFactor;
   }
+
+  Unit.fromJSON(this.tilePosition, this.name, String jsonString) {
+        var unitsJson = jsonDecode(jsonString)['units'] as List;
+        Map<String, dynamic> unitData = unitsJson.firstWhere(
+            (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
+            orElse: () => throw Exception('Unit $name not found in JSON data')
+        );
+
+        movementRange = unitData['movementRange'];
+        
+        final Map<String, UnitTeam> stringToUnitTeam = {
+          for (var team in UnitTeam.values) team.toString().split('.').last: team,
+          };
+        team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+        idleAnimationName = unitData['sprites']['idle'];
+
+        // Store all other data for later use
+        data['stats'] = unitData['stats'];
+        data['skills'] = unitData['skills'];
+        data['inventory'] = unitData['inventory'];
+
+        // ... the rest of your Unit construction, possibly using other parts of the data
+    }
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
@@ -129,7 +152,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
-    ui.Image unitImage = await gameRef.images.load(unitImageName);
+    ui.Image unitImage = await gameRef.images.load(idleAnimationName);
     unitSheet = SpriteSheet.fromColumnsAndRows(
       image: unitImage,
       columns: 4,

@@ -2,6 +2,8 @@
     "units": [
         {
         "name": "Sigurd",
+        "team": "blue",
+        "movementRange": 8,
         "stats": {
             "hp": 30,
             "atk": 10,
@@ -19,6 +21,8 @@
         },
         {
         "name": "Noish",
+        "team": "blue",
+        "movementRange": 8,
         "stats": {
             "hp": 30,
             "atk": 10,
@@ -36,6 +40,8 @@
         },
         {
         "name": "alec",
+        "team": "blue",
+        "movementRange": 8,
         "stats": {
             "hp": 30,
             "atk": 10,
@@ -53,6 +59,8 @@
         },
         {
         "name": "arden",
+        "team": "blue",
+        "movementRange": 6,
         "stats": {
             "hp": 30,
             "atk": 10,

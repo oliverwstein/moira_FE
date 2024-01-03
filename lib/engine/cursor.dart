@@ -127,7 +127,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
         Unit? unit = tile.unit;
         if (unit != null && unit.canAct) {
           stage.activeComponent = unit;
-          dev.log('${unit.unitImageName} selected');
+          dev.log('${unit.idleAnimationName} selected');
           unit.findReachableTiles();
         }
       } else {
