@@ -22,6 +22,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   /// - `tilesize`: Size of each tile in the game.
   /// - `tilesMap`: Map from tile coordinates to Tile objects.
   /// - `activeComponent`: Currently active component (Cursor or Unit).
+  /// - `turn`: Integer that stores the turn.
   ///
   /// Methods:
   /// - `onLoad()`: Asynchronously loads the stage components including tiles,
@@ -59,6 +60,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   final Vector2 tilesize = Vector2.all(16);
   late Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
+  int turn = 1;
   Stage();
 
   @override
@@ -79,8 +81,6 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    
-
     units.add(Unit(const Point(59, 10), 'arden.png'));
     units.add(Unit(const Point(60, 12), 'alec.png'));
     units.add(Unit(const Point(58, 12), 'noish.png'));
@@ -125,6 +125,13 @@ class Stage extends Component with HasGameRef<MyGame>{
   void updateTileWithUnit(Point<int> oldPoint, Point<int> newPoint, Unit unit) {
     tilesMap[oldPoint]?.removeUnit();
     tilesMap[newPoint]?.setUnit(unit);
+  }
+
+  void endTurn() {
+    for (var unit in units) {
+      unit.toggleCanAct(true);
+    }
+    turn++;
   }
   
   Terrain determineTerrainType(Point<int> point){
