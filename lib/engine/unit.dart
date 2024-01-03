@@ -1,7 +1,10 @@
 
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
+
 
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
@@ -19,9 +22,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   /// - `_animationComponent`: Visual representation of the unit using sprite animation.
   /// - `unitSheet`: SpriteSheet containing animation frames for the unit.
   /// - `battleMenu`: A reference to the BattleMenu for triggering actions.
-  /// - `unitImageName`: The file name of the unit's image, used for loading the sprite.
+  /// - `idleAnimationName`: The file name of the unit's image, used for loading the sprite.
   /// - `movementRange`: The number of tiles this unit can move in one turn.
   /// - `team`: The team this unit belongs to, used for identifying allies and enemies.
+  /// - `data`: The tiered dictionary (Map) of the unit's data: stats, inventory, skills, etc.
   /// - `tilePosition`: The unit's position on the grid map in terms of tiles.
   /// - `targetTilePosition`: A target position the unit is moving towards, if any.
   /// - `tileSize`: Size of the unit in pixels, scaled according to the game's scaleFactor.
@@ -56,11 +60,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   /// - Stage: Interacts with Stage for game world context, like tile access and unit positioning.
   /// - Tile: Interacts with Tile to determine movement paths and interactions based on the terrain.
 
+  Map<String, dynamic> data = {};
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
-  late final String unitImageName;
-  final int movementRange = 6; 
+  late final String name;
+  late final String idleAnimationName;
+  late final int movementRange; 
   late UnitTeam team = UnitTeam.blue;
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   Point<int>? targetTilePosition;
@@ -71,9 +77,31 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   bool isMoving = false;
   Map<Point<int>, List<Point<int>>> paths = {};
 
-  Unit(this.tilePosition, this.unitImageName) {
+  Unit(this.tilePosition, this.idleAnimationName) {
     // Initial size, will be updated in onLoad
     tileSize = 16 * MyGame().scaleFactor;
+  }
+
+  Unit.fromJSON(this.tilePosition, this.name, String jsonString) {
+    tileSize = 16 * MyGame().scaleFactor;
+    var unitsJson = jsonDecode(jsonString)['units'] as List;
+    Map<String, dynamic> unitData = unitsJson.firstWhere(
+        (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
+        orElse: () => throw Exception('Unit $name not found in JSON data')
+    );
+
+    movementRange = unitData['movementRange'];
+    
+    final Map<String, UnitTeam> stringToUnitTeam = {
+      for (var team in UnitTeam.values) team.toString().split('.').last: team,
+      };
+    team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+    idleAnimationName = unitData['sprites']['idle'];
+
+    // Store all other data for later use
+    data['stats'] = unitData['stats'];
+    data['skills'] = unitData['skills'];
+    data['inventory'] = unitData['inventory'];
   }
 
   @override
@@ -81,9 +109,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
+      if(stage.tilesMap[stage.cursor.tilePosition]!.isOccupied) return false;
       for(Point<int> point in paths[stage.cursor.tilePosition]!){
         enqueueMovement(point);
       }
+      stage.updateTileWithUnit(tilePosition, paths[stage.cursor.tilePosition]!.last, this);
       toggleCanAct(false);
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
@@ -94,27 +124,19 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowLeft) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x - 1, stage.cursor.tilePosition.y);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.left);
-      }
+      stage.cursor.move(Direction.left);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowRight) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x + 1, stage.cursor.tilePosition.y);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.right);
-      }
+      stage.cursor.move(Direction.right);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y - 1);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.up);
-      }
+      stage.cursor.move(Direction.up);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y + 1);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.down);
-      }
+      stage.cursor.move(Direction.down);
       handled = true;
     }
     return handled;
@@ -123,7 +145,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
-    ui.Image unitImage = await gameRef.images.load(unitImageName);
+    ui.Image unitImage = await gameRef.images.load(idleAnimationName);
     unitSheet = SpriteSheet.fromColumnsAndRows(
       image: unitImage,
       columns: 4,
@@ -244,7 +266,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
       Tile? tile = gameRef.stage.tilesMap[currentPoint]; // Accessing tiles through stage
       if (tile!.isOccupied && tile.unit?.team != team) continue; // Skip enemy-occupied tiles
-
       for (var direction in Direction.values) {
         Point<int> nextPoint;
         switch (direction) {
@@ -262,7 +283,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
             break;
         }
         Tile? nextTile = gameRef.stage.tilesMap[Point(nextPoint.x, nextPoint.y)];
-        if (nextTile != null) {
+        if (nextTile != null && !(nextTile.isOccupied  && nextTile.unit?.team != team)) {
           double cost = gameRef.stage.tilesMap[nextTile.gridCoord]!.terrain.cost;
           double nextRemainingMovement = remainingMovement - cost;
           if (nextRemainingMovement > 0) {

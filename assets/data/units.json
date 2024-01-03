@@ -1,0 +1,96 @@
+{
+"units": [
+    {
+    "name": "Sigurd",
+    "team": "blue",
+    "movementRange": 8,
+    "stats": {
+        "hp": 30,
+        "atk": 10,
+        "def": 10,
+        "dex": 10,
+        "int": 10,
+        "res": 10,
+        "wis": 10
+    },
+    "skills": ["canto"],
+    "inventory": ["salve", "longsword"],
+    "sprites": {
+        "idle": "sigurd.png"
+    }},
+    {
+    "name": "Noish",
+    "team": "blue",
+    "movementRange": 8,
+    "stats": {
+        "hp": 30,
+        "atk": 10,
+        "def": 10,
+        "dex": 10,
+        "int": 10,
+        "res": 10,
+        "wis": 10
+    },
+    "skills": ["canto"],
+    "inventory": ["salve", "longsword"],
+    "sprites": {
+        "idle": "noish.png"
+    }},
+    {
+    "name": "alec",
+    "team": "blue",
+    "movementRange": 8,
+    "stats": {
+        "hp": 30,
+        "atk": 10,
+        "def": 10,
+        "dex": 10,
+        "int": 10,
+        "res": 10,
+        "wis": 10
+    },
+    "skills": ["canto"],
+    "inventory": ["salve", "longsword"],
+    "sprites": {
+        "idle": "alec.png"
+    }},
+    {
+        "name": "arden",
+        "team": "blue",
+        "movementRange": 6,
+        "stats": {
+            "hp": 30,
+            "atk": 10,
+            "def": 10,
+            "dex": 10,
+            "int": 10,
+            "res": 10,
+            "wis": 10
+        },
+        "skills": ["pavise"],
+        "inventory": ["salve", "longsword"],
+        "sprites": {
+            "idle": "arden.png"
+        }
+        },
+        {
+            "name": "brigand",
+            "team": "red",
+            "movementRange": 6,
+            "stats": {
+                "hp": 30,
+                "atk": 10,
+                "def": 10,
+                "dex": 10,
+                "int": 10,
+                "res": 10,
+                "wis": 10
+            },
+            "skills": [],
+            "inventory": ["axe"],
+            "sprites": {
+                "idle": "brigand_idle.png"
+            }
+            }
+]
+}

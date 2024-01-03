@@ -24,5 +24,6 @@ flutter:
   assets:
     - assets/images/
     - assets/tiles/
+    - assets/data/units.json
   uses-material-design: true
 
