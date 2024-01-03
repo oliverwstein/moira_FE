@@ -1,6 +1,7 @@
 
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -108,6 +109,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
+      if(stage.tilesMap[stage.cursor.tilePosition]!.isOccupied) return false;
       for(Point<int> point in paths[stage.cursor.tilePosition]!){
         enqueueMovement(point);
       }
@@ -122,27 +124,19 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowLeft) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x - 1, stage.cursor.tilePosition.y);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.left);
-      }
+      stage.cursor.move(Direction.left);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowRight) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x + 1, stage.cursor.tilePosition.y);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.right);
-      }
+      stage.cursor.move(Direction.right);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y - 1);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.up);
-      }
+      stage.cursor.move(Direction.up);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
       Point<int> newPoint = Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y + 1);
-      if(stage.tilesMap[newPoint]?.state != TileState.blank){
-        stage.cursor.move(Direction.down);
-      }
+      stage.cursor.move(Direction.down);
       handled = true;
     }
     return handled;
@@ -272,7 +266,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
       Tile? tile = gameRef.stage.tilesMap[currentPoint]; // Accessing tiles through stage
       if (tile!.isOccupied && tile.unit?.team != team) continue; // Skip enemy-occupied tiles
-
       for (var direction in Direction.values) {
         Point<int> nextPoint;
         switch (direction) {
@@ -290,7 +283,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
             break;
         }
         Tile? nextTile = gameRef.stage.tilesMap[Point(nextPoint.x, nextPoint.y)];
-        if (nextTile != null) {
+        if (nextTile != null && !(nextTile.isOccupied  && nextTile.unit?.team != team)) {
           double cost = gameRef.stage.tilesMap[nextTile.gridCoord]!.terrain.cost;
           double nextRemainingMovement = remainingMovement - cost;
           if (nextRemainingMovement > 0) {
