@@ -16,7 +16,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
   /// Attributes:
   /// - `_animationComponent`: Component for rendering cursor animations.
   /// - `cursorSheet`: SpriteSheet for cursor animations.
-  /// - `battleMenu`: BattleMenu component associated with the cursor for in-game actions.
+  /// - `ActionMenu`: ActionMenu component associated with the cursor for in-game actions.
   /// - `tilePosition`: The cursor's position in terms of tiles, not pixels.
   /// - `tileSize`: Size of the cursor in pixels, adjusted by the game's scale factor.
   ///
@@ -43,7 +43,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
 
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
-  late final BattleMenu battleMenu;
+  late final ActionMenu actionMenu;
   Point<int> tilePosition = const Point(59, 12); // The cursor's position in terms of tiles, not pixels
   late double tileSize;
 
@@ -69,8 +69,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
 
     // Add the animation component as a child
     add(_animationComponent);
-    battleMenu = BattleMenu();
-    add(battleMenu);
+    actionMenu = ActionMenu();
+    add(actionMenu);
 
     // Set the initial size and position of the cursor
     size = Vector2.all(tileSize);
@@ -123,17 +123,19 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
 
     if (tile != null) {
       // Proceed as normal if tile is not null
-      if (tile.isOccupied) {
+      if (tile.isOccupied) { // Chosen tile has a unit on it
         Unit? unit = tile.unit;
-        if (unit != null && unit.canAct) {
+        if (unit != null && unit.canAct) { // Unit can act
           stage.activeComponent = unit;
           dev.log('${unit.idleAnimationName} selected');
-          unit.findReachableTiles();
+          List<Tile> moveSet = unit.findReachableTiles();
+          unit.markAttackableTiles(moveSet);
         }
       } else {
         stage.blankAllTiles();
-        stage.cursor.battleMenu.toggleVisibility();
-        stage.activeComponent = stage.cursor.battleMenu;
+        List<MenuOption> visibleOptions = [MenuOption.endTurn, MenuOption.save];
+        stage.cursor.actionMenu.show(visibleOptions);
+        stage.activeComponent = stage.cursor.actionMenu;
       }
     } else {
       // Throw an exception if tile is null

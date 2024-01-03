@@ -13,61 +13,15 @@ import 'package:flutter/services.dart';
 
 import 'engine.dart';
 class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
-  /// Unit represents a character or entity in the game with the ability to move and act on the map.
-  /// It extends PositionComponent for positional attributes and implements CommandHandler
-  /// for handling keyboard commands. It's a central element in the game's mechanics, controlling
-  /// movement, actions, and interactions with other units and tiles.
-  ///
-  /// Attributes:
-  /// - `_animationComponent`: Visual representation of the unit using sprite animation.
-  /// - `unitSheet`: SpriteSheet containing animation frames for the unit.
-  /// - `battleMenu`: A reference to the BattleMenu for triggering actions.
-  /// - `idleAnimationName`: The file name of the unit's image, used for loading the sprite.
-  /// - `movementRange`: The number of tiles this unit can move in one turn.
-  /// - `team`: The team this unit belongs to, used for identifying allies and enemies.
-  /// - `data`: The tiered dictionary (Map) of the unit's data: stats, inventory, skills, etc.
-  /// - `tilePosition`: The unit's position on the grid map in terms of tiles.
-  /// - `targetTilePosition`: A target position the unit is moving towards, if any.
-  /// - `tileSize`: Size of the unit in pixels, scaled according to the game's scaleFactor.
-  /// - `canAct`: Boolean indicating whether the unit can take actions.
-  /// - `movementQueue`: Queue of points representing the unit's movement path.
-  /// - `currentTarget`: The current tile target in the unit's movement path.
-  /// - `isMoving`: Boolean indicating if the unit is currently moving.
-  /// - `paths`: Stores the paths to all reachable tiles based on the unit's movement range.
-  ///
-  /// Methods:
-  /// - `handleCommand(command)`: Handles keyboard commands for unit actions like moving or interacting.
-  /// - `onLoad()`: Loads the unit's sprite and sets up the animation component.
-  /// - `toggleCanAct()`: Toggles the unit's ability to act and visually indicates its state.
-  /// - `enqueueMovement(targetPoint)`: Adds a new target position to the movement queue.
-  /// - `update(dt)`: Updates the unit's position and handles movement towards the target tile.
-  /// - `onScaleChanged(scaleFactor)`: Updates the unit's size and position based on the game's scale factor.
-  /// - `findReachableTiles()`: Calculates and stores paths to all reachable tiles based on movement range.
-  /// - `_constructPath(targetPoint, visitedTiles)`: Constructs the path from the unit to a specified tile.
-  /// - `getDirection(point, targetPoint)`: Determines the direction from one point to another.
-  ///
-  /// Constructor:
-  /// - Initializes a Unit with a specific position on the grid and an image name for its sprite.
-  ///
-  /// Usage:
-  /// - Units are the primary actors in the game, controlled by the player or AI to move around the map,
-  ///   interact with other units, and perform actions like attacking or defending.
-  ///
-  /// Connects with:
-  /// - MyGame: Inherits properties and methods from HasGameRef<MyGame> for game reference.
-  /// - PositionComponent: Inherits position and size attributes and methods.
-  /// - CommandHandler: Implements interface to handle keyboard commands.
-  /// - Stage: Interacts with Stage for game world context, like tile access and unit positioning.
-  /// - Tile: Interacts with Tile to determine movement paths and interactions based on the terrain.
-
   Map<String, dynamic> data = {};
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
-  late final BattleMenu battleMenu;
+  late final ActionMenu actionMenu;
   late final String name;
   late final String idleAnimationName;
   late final int movementRange; 
   late UnitTeam team = UnitTeam.blue;
+  late final (int, int) combatRange = (1, 1);
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   Point<int>? targetTilePosition;
   late double tileSize;
@@ -76,22 +30,24 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Point<int>? currentTarget;
   bool isMoving = false;
   Map<Point<int>, List<Point<int>>> paths = {};
+  late Point<int> oldTile;
+  
 
   Unit(this.tilePosition, this.idleAnimationName) {
     // Initial size, will be updated in onLoad
     tileSize = 16 * MyGame().scaleFactor;
+    oldTile = tilePosition;
   }
 
   Unit.fromJSON(this.tilePosition, this.name, String jsonString) {
+    oldTile = tilePosition;
     tileSize = 16 * MyGame().scaleFactor;
     var unitsJson = jsonDecode(jsonString)['units'] as List;
     Map<String, dynamic> unitData = unitsJson.firstWhere(
         (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
         orElse: () => throw Exception('Unit $name not found in JSON data')
     );
-
     movementRange = unitData['movementRange'];
-    
     final Map<String, UnitTeam> stringToUnitTeam = {
       for (var team in UnitTeam.values) team.toString().split('.').last: team,
       };
@@ -109,33 +65,36 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
-      if(stage.tilesMap[stage.cursor.tilePosition]!.isOccupied) return false;
+      oldTile = tilePosition;
       for(Point<int> point in paths[stage.cursor.tilePosition]!){
         enqueueMovement(point);
       }
-      stage.updateTileWithUnit(tilePosition, paths[stage.cursor.tilePosition]!.last, this);
-      toggleCanAct(false);
-      stage.activeComponent = stage.cursor;
+      var newTile = paths[stage.cursor.tilePosition]!.last;
+      stage.updateTileWithUnit(tilePosition, newTile, this);
       stage.blankAllTiles();
+      List<Tile> attackTiles = markAttackableEnemies(newTile, combatRange.$1, combatRange.$2);
+      List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
+      if(attackTiles.isNotEmpty){
+        visibleOptions.add(MenuOption.attack);
+      }
+      
+      stage.cursor.actionMenu.show(visibleOptions);
+      stage.activeComponent = stage.cursor.actionMenu;
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) {
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowLeft) {
-      Point<int> newPoint = Point(stage.cursor.tilePosition.x - 1, stage.cursor.tilePosition.y);
       stage.cursor.move(Direction.left);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowRight) {
-      Point<int> newPoint = Point(stage.cursor.tilePosition.x + 1, stage.cursor.tilePosition.y);
       stage.cursor.move(Direction.right);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
-      Point<int> newPoint = Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y - 1);
       stage.cursor.move(Direction.up);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
-      Point<int> newPoint = Point(stage.cursor.tilePosition.x, stage.cursor.tilePosition.y + 1);
       stage.cursor.move(Direction.down);
       handled = true;
     }
@@ -204,6 +163,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     super.onRemove();
   }
 
+  void snapToTile(Point<int> point){
+    x = point.x * tileSize;
+    y = point.x * tileSize;
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -236,7 +200,15 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
           isMoving = false; // No more movements left
         }
       }
+    } else {
+    // Check if the tilePosition has changed without the animation
+    // and update the sprite's position accordingly
+    final expectedX = tilePosition.x * tileSize;
+    final expectedY = tilePosition.y * tileSize;
+    if (x != expectedX || y != expectedY) {
+      position = Vector2(expectedX, expectedY); // Snap sprite to the new tile position
     }
+  }
   }
   
   void onScaleChanged(double scaleFactor) {
@@ -248,7 +220,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
   }
 
-  void findReachableTiles() {
+  List<Tile> findReachableTiles() {
+    List<Tile>reachableTiles = [];
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
     var queue = Queue<_TileMovement>(); // Queue for BFS
 
@@ -291,6 +264,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
           }
         }
       }
+
     }
 
     // Construct paths for each tile
@@ -298,8 +272,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       paths[tilePoint] = _constructPath(tilePoint, visitedTiles);
       if(team == UnitTeam.blue){
         gameRef.stage.tilesMap[tilePoint]!.state = TileState.move;
+        reachableTiles.add(gameRef.stage.tilesMap[tilePoint]!);
       }
     }
+    return reachableTiles;
   }
 
   // Helper method to construct a path from a tile back to the unit
@@ -313,6 +289,50 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return path; // The path from the start to the target
   }
   
+  void markAttackableTiles(List<Tile> reachableTiles) {
+    // Mark tiles attackable from the unit's current position
+    markTilesInRange(tilePosition, combatRange.$1, combatRange.$2, TileState.attack);
+    // Mark tiles attackable from each reachable tile
+    for (var tile in reachableTiles) {
+      markTilesInRange(tile.gridCoord, combatRange.$1, combatRange.$2,  TileState.attack);
+    }
+  }
+
+  List<Tile> markAttackableEnemies(Point<int> centerTile, int minRange, int maxRange){
+    List<Tile> tilesInRange = markTilesInRange(centerTile, minRange, maxRange, TileState.attack);
+    List<Tile> attackTiles = [];
+    for (Tile tile in tilesInRange){
+      if (tile.unit?.team != UnitTeam.red){
+        tile.state = TileState.blank;
+      } else {
+        attackTiles.add(tile);
+      }
+    }
+    return attackTiles;
+  }
+
+  List<Tile> markTilesInRange(Point<int> centerTile, int minRange, int maxRange, TileState newState) {
+    List<Tile> tilesInRange = [];
+    for (int x = centerTile.x - maxRange.toInt(); x <= centerTile.x + maxRange.toInt(); x++) {
+      for (int y = centerTile.y - maxRange.toInt(); y <= centerTile.y + maxRange.toInt(); y++) {
+        var tilePoint = Point<int>(x, y);
+        var distance = centerTile.distanceTo(tilePoint);
+        if (distance >= minRange && distance <= maxRange) {
+          // Check if the tile is within the game bounds
+          if (x >= 0 && x < gameRef.stage.mapTileWidth && y >= 0 && y < gameRef.stage.mapTileHeight) {
+            var tile = gameRef.stage.tilesMap[tilePoint];
+            // Mark the tile as attackable if it's not a movement tile
+            if (tile != null && tile.state == TileState.blank) {
+              tile.state = newState;
+              tilesInRange.add(tile);
+            }
+          }
+        }
+      }
+    }
+    return tilesInRange;
+  }
+
   Direction? getDirection(Point<int>? point, Point<int>? targetPoint){
     if(point == null || targetPoint == null){
       return null;
