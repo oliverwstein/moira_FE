@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart' show rootBundle;
-export 'menus.dart';
+export 'menu.dart';
 export 'cursor.dart';
 export 'game.dart';
 export 'stage.dart';

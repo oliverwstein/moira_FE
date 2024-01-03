@@ -128,7 +128,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
         if (unit != null && unit.canAct) { // Unit can act
           stage.activeComponent = unit;
           dev.log('${unit.idleAnimationName} selected');
-          unit.findReachableTiles();
+          List<Tile> moveSet = unit.findReachableTiles();
+          unit.markAttackableTiles(moveSet);
         }
       } else {
         stage.blankAllTiles();

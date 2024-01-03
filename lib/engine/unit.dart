@@ -21,6 +21,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   late final String idleAnimationName;
   late final int movementRange; 
   late UnitTeam team = UnitTeam.blue;
+  late final (int, int) combatRange = (1, 1);
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   Point<int>? targetTilePosition;
   late double tileSize;
@@ -30,6 +31,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   bool isMoving = false;
   Map<Point<int>, List<Point<int>>> paths = {};
   late Point<int> oldTile;
+  
 
   Unit(this.tilePosition, this.idleAnimationName) {
     // Initial size, will be updated in onLoad
@@ -213,7 +215,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
   }
 
-  void findReachableTiles() {
+  List<Tile> findReachableTiles() {
+    List<Tile>reachableTiles = [];
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
     var queue = Queue<_TileMovement>(); // Queue for BFS
 
@@ -256,6 +259,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
           }
         }
       }
+
     }
 
     // Construct paths for each tile
@@ -263,8 +267,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       paths[tilePoint] = _constructPath(tilePoint, visitedTiles);
       if(team == UnitTeam.blue){
         gameRef.stage.tilesMap[tilePoint]!.state = TileState.move;
+        reachableTiles.add(gameRef.stage.tilesMap[tilePoint]!);
       }
     }
+    return reachableTiles;
   }
 
   // Helper method to construct a path from a tile back to the unit
@@ -278,6 +284,34 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return path; // The path from the start to the target
   }
   
+  void markAttackableTiles(List<Tile> reachableTiles) {
+
+  // Define a helper method to mark tiles within a certain range
+  void markTilesInRange(Point<int> centerTile, int minRange, int maxRange) {
+    for (int x = centerTile.x - maxRange.toInt(); x <= centerTile.x + maxRange.toInt(); x++) {
+      for (int y = centerTile.y - maxRange.toInt(); y <= centerTile.y + maxRange.toInt(); y++) {
+        var tilePoint = Point<int>(x, y);
+        var distance = centerTile.distanceTo(tilePoint);
+        if (distance >= minRange && distance <= maxRange) {
+          // Check if the tile is within the game bounds
+          if (x >= 0 && x < gameRef.stage.mapTileWidth && y >= 0 && y < gameRef.stage.mapTileHeight) {
+            var tile = gameRef.stage.tilesMap[tilePoint];
+            // Mark the tile as attackable if it's not a movement tile
+            if (tile != null && tile.state == TileState.blank) {
+              tile.state = TileState.attack;
+            }
+          }
+        }
+      }
+    }
+  }
+  // Mark tiles attackable from the unit's current position
+  markTilesInRange(tilePosition, combatRange.$1, combatRange.$2);
+  // Mark tiles attackable from each reachable tile
+  for (var tile in reachableTiles) {
+    markTilesInRange(tile.gridCoord, combatRange.$1, combatRange.$1);
+  }
+}
   Direction? getDirection(Point<int>? point, Point<int>? targetPoint){
     if(point == null || targetPoint == null){
       return null;
