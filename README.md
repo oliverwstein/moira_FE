@@ -29,7 +29,7 @@ This Dart/Flutter application is designed to run a Fire Emblem-like tactical RPG
 - Represents a single square on the grid map.
 - Holds terrain information and whether it's occupied by a unit.
 
-### BattleMenu
+### ActionMenu
 - A UI component that provides a menu for selecting various meta-actions like ending the turn or saving the game.
 
 ### Direction (enum)

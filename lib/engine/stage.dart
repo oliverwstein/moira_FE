@@ -162,6 +162,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     }
     return false;
   }
+  
   void blankAllTiles(){
     for (Tile tile in tilesMap.values) {
       tile.state = TileState.blank;
