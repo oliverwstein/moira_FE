@@ -18,7 +18,7 @@ extension TerrainCost on Terrain {
       case Terrain.water:
         return 100;
       case Terrain.path:
-        return .5;
+        return .7;
       default:
         return 1;
     }

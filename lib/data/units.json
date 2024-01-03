@@ -1,0 +1,72 @@
+{
+    "units": [
+        {
+        "name": "Sigurd",
+        "stats": {
+            "hp": 30,
+            "atk": 10,
+            "def": 10,
+            "dex": 10,
+            "int": 10,
+            "res": 10,
+            "wis": 10
+        },
+        "skills": ["canto"],
+        "inventory": ["salve", "longsword"],
+        "sprites": {
+            "idle": "sigurd.png"
+        }
+        },
+        {
+        "name": "Noish",
+        "stats": {
+            "hp": 30,
+            "atk": 10,
+            "def": 10,
+            "dex": 10,
+            "int": 10,
+            "res": 10,
+            "wis": 10
+        },
+        "skills": ["canto"],
+        "inventory": ["salve", "longsword"],
+        "sprites": {
+            "idle": "noish.png"
+        }
+        },
+        {
+        "name": "alec",
+        "stats": {
+            "hp": 30,
+            "atk": 10,
+            "def": 10,
+            "dex": 10,
+            "int": 10,
+            "res": 10,
+            "wis": 10
+        },
+        "skills": ["canto"],
+        "inventory": ["salve", "longsword"],
+        "sprites": {
+            "idle": "alec.png"
+        }
+        },
+        {
+        "name": "arden",
+        "stats": {
+            "hp": 30,
+            "atk": 10,
+            "def": 10,
+            "dex": 10,
+            "int": 10,
+            "res": 10,
+            "wis": 10
+        },
+        "skills": ["pavise"],
+        "inventory": ["salve", "longsword"],
+        "sprites": {
+            "idle": "arden.png"
+        }
+        }
+    ]
+}

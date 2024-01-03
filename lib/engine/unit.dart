@@ -1,7 +1,10 @@
 
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
+
 
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
@@ -22,6 +25,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   /// - `unitImageName`: The file name of the unit's image, used for loading the sprite.
   /// - `movementRange`: The number of tiles this unit can move in one turn.
   /// - `team`: The team this unit belongs to, used for identifying allies and enemies.
+  /// - `data`: The tiered dictionary (Map) of the unit's data: stats, inventory, skills, etc.
   /// - `tilePosition`: The unit's position on the grid map in terms of tiles.
   /// - `targetTilePosition`: A target position the unit is moving towards, if any.
   /// - `tileSize`: Size of the unit in pixels, scaled according to the game's scaleFactor.
@@ -56,6 +60,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   /// - Stage: Interacts with Stage for game world context, like tile access and unit positioning.
   /// - Tile: Interacts with Tile to determine movement paths and interactions based on the terrain.
 
+  late Map data;
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
