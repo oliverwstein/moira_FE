@@ -59,7 +59,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   /// - Stage: Interacts with Stage for game world context, like tile access and unit positioning.
   /// - Tile: Interacts with Tile to determine movement paths and interactions based on the terrain.
 
-  late Map<String, dynamic> data;
+  Map<String, dynamic> data = {};
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final BattleMenu battleMenu;
@@ -82,27 +82,26 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   Unit.fromJSON(this.tilePosition, this.name, String jsonString) {
-        var unitsJson = jsonDecode(jsonString)['units'] as List;
-        Map<String, dynamic> unitData = unitsJson.firstWhere(
-            (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
-            orElse: () => throw Exception('Unit $name not found in JSON data')
-        );
+    tileSize = 16 * MyGame().scaleFactor;
+    var unitsJson = jsonDecode(jsonString)['units'] as List;
+    Map<String, dynamic> unitData = unitsJson.firstWhere(
+        (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
+        orElse: () => throw Exception('Unit $name not found in JSON data')
+    );
 
-        movementRange = unitData['movementRange'];
-        
-        final Map<String, UnitTeam> stringToUnitTeam = {
-          for (var team in UnitTeam.values) team.toString().split('.').last: team,
-          };
-        team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
-        idleAnimationName = unitData['sprites']['idle'];
+    movementRange = unitData['movementRange'];
+    
+    final Map<String, UnitTeam> stringToUnitTeam = {
+      for (var team in UnitTeam.values) team.toString().split('.').last: team,
+      };
+    team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+    idleAnimationName = unitData['sprites']['idle'];
 
-        // Store all other data for later use
-        data['stats'] = unitData['stats'];
-        data['skills'] = unitData['skills'];
-        data['inventory'] = unitData['inventory'];
-
-        // ... the rest of your Unit construction, possibly using other parts of the data
-    }
+    // Store all other data for later use
+    data['stats'] = unitData['stats'];
+    data['skills'] = unitData['skills'];
+    data['inventory'] = unitData['inventory'];
+  }
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
