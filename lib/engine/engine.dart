@@ -7,6 +7,7 @@ export 'game.dart';
 export 'stage.dart';
 export 'tile.dart';
 export 'unit.dart';
+export 'item.dart';
 enum Direction {up, down, left, right}
 enum UnitTeam {blue, red, green, yellow}
 enum TileState {blank, move, attack}

@@ -1,0 +1,31 @@
+{
+    "attacks": [
+      {
+        "name": "Mighty Swing",
+        "might": 15,
+        "hit": 80,
+        "fatigue": 5,
+        "combatRange": [1, 1],
+        "magic": false,
+        "damages": ["smash"]
+      },
+      {
+        "name": "Fireball",
+        "might": 12,
+        "hit": 70,
+        "fatigue": 4,
+        "combatRange": [1, 2],
+        "magic": true,
+        "damages": ["blast"]
+      },
+      {
+        "name": "Shot",
+        "might": 10,
+        "hit": 85,
+        "fatigue": 3,
+        "combatRange": [2, 3],
+        "magic": false,
+        "damages": ["shot"]
+      }
+    ]
+  }

@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 import 'dart:developer' as dev;
 
 import 'package:flame/components.dart';
-import 'package:flame/layout.dart';
 import 'package:flame/sprite.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
@@ -202,3 +201,4 @@ TextStyle menuTextStyle = const TextStyle(
     ),
   ],
 );
+

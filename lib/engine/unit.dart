@@ -19,9 +19,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   late final ActionMenu actionMenu;
   late final String name;
   late final String idleAnimationName;
-  late final int movementRange; 
+  late int movementRange; 
+  late List<Item> inventory;
+  Map<ItemType, Item> equippedItems = {};
   late UnitTeam team = UnitTeam.blue;
-  late final (int, int) combatRange = (1, 1);
+  late (int, int) combatRange;
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   Point<int>? targetTilePosition;
   late double tileSize;
@@ -60,6 +62,17 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     data['inventory'] = unitData['inventory'];
   }
 
+  void equipItem(Item item) {
+    equippedItems[item.type] = item;  // Equips the item, replacing any item of the same type.
+  }
+
+  void unequipItem(ItemType itemType) {
+    equippedItems.remove(itemType);  // Removes the item of the specified type.
+  }
+
+  Item? getEquippedItem(ItemType itemType) {
+    return equippedItems[itemType];  // Retrieves the equipped item of the specified type, if any.
+  }
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
@@ -72,12 +85,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       var newTile = paths[stage.cursor.tilePosition]!.last;
       stage.updateTileWithUnit(tilePosition, newTile, this);
       stage.blankAllTiles();
+
       List<Tile> attackTiles = markAttackableEnemies(newTile, combatRange.$1, combatRange.$2);
       List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
       if(attackTiles.isNotEmpty){
         visibleOptions.add(MenuOption.attack);
       }
-      
       stage.cursor.actionMenu.show(visibleOptions);
       stage.activeComponent = stage.cursor.actionMenu;
       handled = true;

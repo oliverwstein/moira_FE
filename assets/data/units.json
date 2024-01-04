@@ -6,6 +6,7 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
+        "nrg": 20,
         "atk": 10,
         "def": 10,
         "dex": 10,
@@ -14,7 +15,7 @@
         "wis": 10
     },
     "skills": ["canto"],
-    "inventory": ["salve", "longsword"],
+    "inventory": ["Longsword"],
     "sprites": {
         "idle": "sigurd.png"
     }},
@@ -24,6 +25,7 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
+        "nrg": 20,
         "atk": 10,
         "def": 10,
         "dex": 10,
@@ -32,7 +34,7 @@
         "wis": 10
     },
     "skills": ["canto"],
-    "inventory": ["salve", "longsword"],
+    "inventory": ["Longsword"],
     "sprites": {
         "idle": "noish.png"
     }},
@@ -42,6 +44,7 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
+        "nrg": 20,
         "atk": 10,
         "def": 10,
         "dex": 10,
@@ -50,7 +53,7 @@
         "wis": 10
     },
     "skills": ["canto"],
-    "inventory": ["salve", "longsword"],
+    "inventory": ["Longsword"],
     "sprites": {
         "idle": "alec.png"
     }},
@@ -60,6 +63,7 @@
         "movementRange": 6,
         "stats": {
             "hp": 30,
+            "nrg": 20,
             "atk": 10,
             "def": 10,
             "dex": 10,
@@ -67,8 +71,8 @@
             "res": 10,
             "wis": 10
         },
-        "skills": ["pavise"],
-        "inventory": ["salve", "longsword"],
+        "skills": ["pavise", "counter"],
+        "inventory": ["Longsword"],
         "sprites": {
             "idle": "arden.png"
         }
@@ -79,6 +83,7 @@
             "movementRange": 6,
             "stats": {
                 "hp": 30,
+                "nrg": 20,
                 "atk": 10,
                 "def": 10,
                 "dex": 10,
@@ -87,7 +92,7 @@
                 "wis": 10
             },
             "skills": [],
-            "inventory": ["axe"],
+            "inventory": ["Wood Axe"],
             "sprites": {
                 "idle": "brigand_idle.png"
             }
