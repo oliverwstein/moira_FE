@@ -42,7 +42,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Item? main;
   Item? treasure;
   Item? gear;
-  List<Item> inventory = [];
+  Map<String, Item> inventory = {};
   List<Attack> attackSet = [];
   List<Effect> effects = [];
   List<Skill> skills = [];
@@ -71,7 +71,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
     idleAnimationName = unitData['sprites']['idle'];
     for(String itemName in unitData['inventory']){
-      if (itemBank[itemName] != null) inventory.add(itemBank[itemName]!);
+      if (itemBank[itemName] != null) inventory[itemName] = itemBank[itemName]!;
     }
   }
 
@@ -133,7 +133,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.activeComponent = stage.cursor;
     stage.blankAllTiles();
   }
-  
+
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component

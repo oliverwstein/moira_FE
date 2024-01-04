@@ -55,6 +55,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
+      close();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
       Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
@@ -83,9 +84,12 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       case MenuOption.item:
         // On selecting item, pull up the item menu.
         Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
-        List<Item> inventory = unit!.inventory;
+        Map<String, Item> inventory = unit!.inventory;
         dev.log('$inventory');
-        unit.wait();
+        ItemMenu itemMenu = ItemMenu(unit);
+        stage.cursor.add(itemMenu);
+        stage.activeComponent = itemMenu;
+        dev.log('Active component is ${stage.activeComponent}');
         break;
       case MenuOption.wait:
         Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
@@ -199,31 +203,101 @@ TextStyle menuTextStyle = const TextStyle(
   ],
 );
 
-class ItemMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibility implements CommandHandler {
+class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+  Unit unit;
   late final SpriteComponent menuSprite;
-  late final AnimatedPointer pointer;
+  late final ItemPointer pointer;
+  late Map<String, Item> inventory;
+  Map<int, TextComponent> indexMap = {};
+  int selectedIndex = 0;
+  static const double scaleFactor = 2;
+
+  ItemMenu(this.unit){
+    inventory = unit.inventory;
+    double count = 0;
+    for (String itemName in unit.inventory.keys) {
+      var textComponent = TextComponent(
+        text: itemName,
+        textRenderer: TextPaint(style: menuTextStyle),
+        position: Vector2(14, 16*(count+1))
+      );
+      add(textComponent);
+      indexMap[count.toInt()] = textComponent;
+      count++;
+    }
+    pointer = ItemPointer(16);
+    indexMap[0]!.add(pointer);
+  }
+
+  @override
+  Future<void> onLoad() async {
+    menuSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('item_table_titled.png'),
+    );
+    add(menuSprite);
+  }
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     Stage stage = parent!.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.arrowUp) {
-      pointer.move(Direction.up);
+      pointer.removeFromParent();
+      selectedIndex = (selectedIndex + 1) % inventory.length;
+      indexMap[selectedIndex]!.add(pointer);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
-      pointer.move(Direction.down);
+      pointer.removeFromParent();
+      selectedIndex = (selectedIndex - 1) % inventory.length;
+      indexMap[selectedIndex]!.add(pointer);
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
-      Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
-      if (unit != null){
-        unit.undoMove();
-      }
+      unit.undoMove();
       close();
       handled = true;
     }
     return handled;
   }
+
+  void select(){
+    close();
+  }
+  
+  void close(){
+    removeAll(children);
+    Stage stage = unit.parent as Stage;
+    stage.activeComponent = stage.cursor;
+  }
+}
+
+class ItemPointer extends PositionComponent with HasGameRef<MyGame> {
+  late final SpriteAnimationComponent _animationComponent;
+  late final SpriteSheet pointerSheet;
+  late final double stepY;
+  late double tileSize;
+
+  ItemPointer(this.stepY) {
+    tileSize = 16;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    // Load the cursor image and create the animation component
+    ui.Image pointerImage = await gameRef.images.load('dancing_selector.png');
+    pointerSheet = SpriteSheet.fromColumnsAndRows(
+      image: pointerImage,
+      columns: 3,
+      rows: 1,
+    );
+
+    _animationComponent = SpriteAnimationComponent(
+      animation: pointerSheet.createAnimation(row: 0, stepTime: .2),
+      position: Vector2(0, 0),
+    );
+    _animationComponent.scale = Vector2.all(ItemMenu.scaleFactor);
+    add(_animationComponent);
+    }
 }
