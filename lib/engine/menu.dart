@@ -58,14 +58,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
       Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
-      if (unit != null){
-        unit.snapToTile(unit.oldTile);
-        stage.updateTileWithUnit(unit.tilePosition, unit.oldTile, unit);
-        unit.tilePosition = unit.oldTile;
-        
-        stage.activeComponent = stage.cursor;
-        stage.blankAllTiles();
-      }
+      if (unit != null) unit.undoMove();
       close();
       handled = true;
     }
@@ -83,17 +76,20 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       case MenuOption.save:
         break;
       case MenuOption.attack:
-        /// On selecting attack, pull up the weapon menu
+        // On selecting attack, pull up the weapon menu. For now, just wait.
+        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        unit!.wait();
         break;
       case MenuOption.item:
+        // On selecting item, pull up the item menu.
+        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        List<Item> inventory = unit!.inventory;
+        dev.log('$inventory');
+        unit.wait();
         break;
       case MenuOption.wait:
         Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
-        unit!.toggleCanAct(false);
-        stage.activeComponent = stage.cursor;
-        stage.blankAllTiles();
-        stage.updateTileWithUnit(unit.oldTile, unit.tilePosition, unit);
-        unit.oldTile = unit.tilePosition;
+        unit!.wait();
         
       default:
         stage.activeComponent = stage.cursor;
@@ -202,3 +198,32 @@ TextStyle menuTextStyle = const TextStyle(
     ),
   ],
 );
+
+class ItemMenu extends PositionComponent with HasGameRef<MyGame>, HasVisibility implements CommandHandler {
+  late final SpriteComponent menuSprite;
+  late final AnimatedPointer pointer;
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Stage stage = parent!.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.arrowUp) {
+      pointer.move(Direction.up);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      pointer.move(Direction.down);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyA) {
+      select();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
+      Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+      if (unit != null){
+        unit.undoMove();
+      }
+      close();
+      handled = true;
+    }
+    return handled;
+  }
+}

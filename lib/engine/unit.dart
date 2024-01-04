@@ -13,24 +13,41 @@ import 'package:flutter/services.dart';
 
 import 'engine.dart';
 class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
-  Map<String, dynamic> data = {};
-  late final SpriteAnimationComponent _animationComponent;
-  late final SpriteSheet unitSheet;
-  late final ActionMenu actionMenu;
+  // Identifiers and Descriptive Information
   late final String name;
   late final String idleAnimationName;
   late final int movementRange; 
   late UnitTeam team = UnitTeam.blue;
   late final (int, int) combatRange = (1, 1);
+  late double tileSize;
+
+  // Status and State Variables
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
   Point<int>? targetTilePosition;
-  late double tileSize;
   bool canAct = true;
+  bool isMoving = false;
+  late Point<int> oldTile;
+
+  // Collections and Complex Structures
   Queue<Point<int>> movementQueue = Queue<Point<int>>();
   Point<int>? currentTarget;
-  bool isMoving = false;
   Map<Point<int>, List<Point<int>>> paths = {};
-  late Point<int> oldTile;
+
+  // Components and External References
+  late final SpriteAnimationComponent _animationComponent;
+  late final SpriteSheet unitSheet;
+  late final ActionMenu actionMenu;
+
+  // Unit Attributes & Components
+  Item? main;
+  Item? treasure;
+  Item? gear;
+  List<Item> inventory = [];
+  List<Attack> attackSet = [];
+  List<Effect> effects = [];
+  List<Skill> skills = [];
+
+
   
 
   Unit(this.tilePosition, this.idleAnimationName) {
@@ -53,11 +70,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       };
     team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
     idleAnimationName = unitData['sprites']['idle'];
-
-    // Store all other data for later use
-    data['stats'] = unitData['stats'];
-    data['skills'] = unitData['skills'];
-    data['inventory'] = unitData['inventory'];
+    for(String itemName in unitData['inventory']){
+      if (itemBank[itemName] != null) inventory.add(itemBank[itemName]!);
+    }
   }
 
   @override
@@ -101,6 +116,24 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return handled;
   }
 
+  void wait(){
+    Stage stage = parent as Stage;
+    toggleCanAct(false);
+    stage.activeComponent = stage.cursor;
+    stage.blankAllTiles();
+    stage.updateTileWithUnit(oldTile, tilePosition, this);
+    oldTile = tilePosition;
+  }
+
+  void undoMove(){
+    Stage stage = parent as Stage;
+    snapToTile(oldTile);
+    stage.updateTileWithUnit(tilePosition, oldTile, this);
+    tilePosition = oldTile;
+    stage.activeComponent = stage.cursor;
+    stage.blankAllTiles();
+  }
+  
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
