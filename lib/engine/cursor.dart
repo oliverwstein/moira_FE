@@ -17,7 +17,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
   /// - `_animationComponent`: Component for rendering cursor animations.
   /// - `cursorSheet`: SpriteSheet for cursor animations.
   /// - `ActionMenu`: ActionMenu component associated with the cursor for in-game actions.
-  /// - `tilePosition`: The cursor's position in terms of tiles, not pixels.
+  /// - `gridCoord`: The cursor's position in terms of tiles, not pixels.
   /// - `tileSize`: Size of the cursor in pixels, adjusted by the game's scale factor.
   ///
   /// Methods:
@@ -44,7 +44,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   late final ActionMenu actionMenu;
-  Point<int> tilePosition = const Point(59, 12); // The cursor's position in terms of tiles, not pixels
+  Point<int> gridCoord = const Point(59, 12); // The cursor's position in terms of tiles, not pixels
   late double tileSize;
 
   Cursor() {
@@ -74,19 +74,19 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
 
     // Set the initial size and position of the cursor
     size = Vector2.all(tileSize);
-    position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
+    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 
   Vector2 get worldPosition {
-        return Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
+        return Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
     }
 
   void move(Direction direction) {
     // Assuming parent is always a Stage which is the case in this architecture
     Stage stage = parent as Stage;
 
-    int newX = tilePosition.x;
-    int newY = tilePosition.y;
+    int newX = gridCoord.x;
+    int newY = gridCoord.y;
 
     switch (direction) {
       case Direction.left:
@@ -107,19 +107,19 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     newX = newX.clamp(0, stage.mapTileWidth - 1);
     newY = newY.clamp(0, stage.mapTileHeight - 1);
 
-    // Update tilePosition if it's within the map
-    tilePosition = Point(newX, newY);
+    // Update gridCoord if it's within the map
+    gridCoord = Point(newX, newY);
 
     // Update the pixel position of the cursor
-    x = tilePosition.x * tileSize;
-    y = tilePosition.y * tileSize;
-    dev.log('Cursor @ $tilePosition, ${stage.tilesMap[tilePosition]!.terrain}, isOccupied = ${stage.tilesMap[tilePosition]!.isOccupied}, ${stage.tilesMap[tilePosition]!.unit}');
+    x = gridCoord.x * tileSize;
+    y = gridCoord.y * tileSize;
+    dev.log('Cursor @ $gridCoord, ${stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${stage.tilesMap[gridCoord]!.isOccupied}, ${stage.tilesMap[gridCoord]!.unit}');
   }
   
   void select() {
   if (parent is Stage) {
     Stage stage = parent as Stage;
-    Tile? tile = stage.tilesMap[tilePosition];
+    Tile? tile = stage.tilesMap[gridCoord];
 
     if (tile != null) {
       // Proceed as normal if tile is not null
@@ -144,8 +144,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
       }
     } else {
       // Throw an exception if tile is null
-      var x = tilePosition.x;
-      var y = tilePosition.y;
+      var x = gridCoord.x;
+      var y = gridCoord.y;
       bool inMap = stage.tilesMap.containsKey((x:57.0, y:12.0));
       throw Exception('Attempted to select a null tile at position ($x, $y). Point found = $inMap. $tile');
     }
@@ -200,6 +200,6 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     _animationComponent.size = Vector2.all(tileSize); // Update animation component size
 
     // Update position based on new tileSize
-    position = Vector2(tilePosition.x * tileSize, tilePosition.y * tileSize);
+    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 }

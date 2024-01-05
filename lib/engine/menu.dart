@@ -87,7 +87,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       close();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
-      Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+      Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
       if (unit != null) unit.undoMove();
       close();
       handled = true;
@@ -109,19 +109,19 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         break;
       case MenuOption.attack:
         // On selecting attack, pull up the weapon menu. For now, just wait.
-        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         unit!.wait();
         break;
       case MenuOption.item:
         // On selecting item, pull up the item menu.
-        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         assert(unit != null);
         ItemMenu itemMenu = ItemMenu(unit!);
         stage.cursor.add(itemMenu);
         stage.activeComponent = itemMenu;
         break;
       case MenuOption.wait:
-        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         unit!.wait();
         
       default:
