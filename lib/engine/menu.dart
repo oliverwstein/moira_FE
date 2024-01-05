@@ -76,6 +76,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       case MenuOption.unitList:
         break;
       case MenuOption.save:
+        stage.activeComponent = stage.cursor;
         break;
       case MenuOption.attack:
         // On selecting attack, pull up the weapon menu. For now, just wait.
@@ -203,6 +204,19 @@ TextStyle menuTextStyle = const TextStyle(
   ],
 );
 
+TextStyle selectedTextStyle = const TextStyle(
+  color: ui.Color.fromARGB(255, 94, 50, 205), // Gold-like color
+  fontSize: 8, // Adjust the font size as needed
+  fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+  shadows: <ui.Shadow>[
+    ui.Shadow(
+      offset: ui.Offset(1.0, 1.0),
+      blurRadius: 3.0,
+      color: ui.Color(0xFF000000),
+    ),
+  ],
+);
+
 class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Unit unit;
   late final SpriteComponent menuSprite;
@@ -219,7 +233,8 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
       var textComponent = TextComponent(
         text: itemName,
         textRenderer: TextPaint(style: menuTextStyle),
-        position: Vector2(14, 16*(count+1))
+        position: Vector2(16, 16*(count+1)),
+        priority: 20,
       );
       add(textComponent);
       indexMap[count.toInt()] = textComponent;
@@ -236,19 +251,41 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     );
     add(menuSprite);
   }
-
+  TextPaint selectedTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 94, 50, 205),
+          fontSize: 8, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          
+          // Include any other styles you need
+          ),
+      );
+  TextPaint basicTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 200, 205, 50),
+          fontSize: 8, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          
+          // Include any other styles you need
+          ),
+      );
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     Stage stage = parent!.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.arrowUp) {
+      indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
       pointer.removeFromParent();
       selectedIndex = (selectedIndex + 1) % inventory.length;
+      indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
       indexMap[selectedIndex]!.add(pointer);
+
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
+      indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
       pointer.removeFromParent();
       selectedIndex = (selectedIndex - 1) % inventory.length;
+      indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
       indexMap[selectedIndex]!.add(pointer);
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
@@ -295,7 +332,7 @@ class ItemPointer extends PositionComponent with HasGameRef<MyGame> {
 
     _animationComponent = SpriteAnimationComponent(
       animation: pointerSheet.createAnimation(row: 0, stepTime: .2),
-      position: Vector2(0, 0),
+      position: Vector2(-128, -8),
     );
     _animationComponent.scale = Vector2.all(ItemMenu.scaleFactor);
     add(_animationComponent);
