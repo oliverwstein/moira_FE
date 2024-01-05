@@ -21,7 +21,7 @@ class Item extends Component {
     description = itemData['description'];
     type = itemData['type'];
     String weaponName = itemData['weapon'];
-    weapon = Weapon.fromJson(weaponName, "moira/assets/data/weapons.json");
+    weapon = Weapon.fromJson(weaponName, "assets/data/weapons.json");
   }
 
   void equip(Unit unit){
