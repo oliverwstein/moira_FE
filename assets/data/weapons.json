@@ -1,5 +1,5 @@
 {
-    "weapon": 
+    "weapons": 
         {
         "Sword":
             {
@@ -9,7 +9,7 @@
                 "fatigue": 1,
                 "magic": false,
                 "effects": [],
-                "specialAttack": ""
+                "specialAttack": "Slash"
             },
         "Axe":
             {
@@ -19,12 +19,7 @@
                 "fatigue": 1,
                 "magic": false,
                 "effects": [],
-                "specialAttack": ""
-            },
-        "Magic Axe":
-            {
-                "weaponType" : "Axe",
-                "magic": true
+                "specialAttack": "Smash"
             },
         "Lance":
             {
@@ -34,7 +29,12 @@
                 "fatigue": 1,
                 "magic": false,
                 "effects": [],
-                "specialAttack": ""
+                "specialAttack": "Stab"
+            },
+            "Magic Axe":
+            {
+                "weaponType" : "Axe",
+                "magic": true
             }
         }
  }

@@ -15,6 +15,7 @@
     },
     "skills": ["canto"],
     "inventory": ["salve", "salve", "longsword"],
+    "attacks": ["Trample"],
     "sprites": {
         "idle": "sigurd.png"
     }},
@@ -33,6 +34,7 @@
     },
     "skills": ["canto"],
     "inventory": ["salve", "longsword"],
+    "attacks": ["Trample"],
     "sprites": {
         "idle": "noish.png"
     }},
@@ -51,6 +53,7 @@
     },
     "skills": ["canto"],
     "inventory": ["salve", "longsword"],
+    "attacks": ["Trample"],
     "sprites": {
         "idle": "alec.png"
     }},
@@ -69,6 +72,7 @@
         },
         "skills": ["pavise"],
         "inventory": ["salve", "longsword"],
+        "attacks": [],
         "sprites": {
             "idle": "arden.png"
         }
@@ -88,6 +92,7 @@
             },
             "skills": [],
             "inventory": ["axe"],
+            "attacks": [],
             "sprites": {
                 "idle": "brigand_idle.png"
             }

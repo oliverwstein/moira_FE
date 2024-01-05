@@ -48,6 +48,18 @@
                 "magic": false,
                 "range": [1, 1],
                 "effects": []
+            },
+        "Smash":
+            {
+                "description" : "Have at thee.",
+                "scaling" : [1, 2, 0, 0],
+                "weaponType" : ["axe"],
+                "might": 5,
+                "hit": 10,
+                "fatigue": 1,
+                "magic": false,
+                "range": [1, 1],
+                "effects": []
             }
         }
 }
