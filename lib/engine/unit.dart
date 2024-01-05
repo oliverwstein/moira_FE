@@ -72,8 +72,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
   }
 
-  Point<int> move(){
-    Stage stage = parent as Stage;
+  void move(Stage stage){
     oldTile = tilePosition; // Store the position of the unit in case the command gets cancelled
     for(Point<int> point in paths[stage.cursor.tilePosition]!){
       enqueueMovement(point);
@@ -81,7 +80,16 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     Point<int> newTile = paths[stage.cursor.tilePosition]!.last;
     stage.updateTileWithUnit(tilePosition, newTile, this);
     stage.blankAllTiles();
-    return newTile;
+  }
+
+  void openActionMenu(Stage stage){
+    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.tilePosition, combatRange.$1, combatRange.$2);
+    List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
+    if(attackTiles.isNotEmpty){
+      visibleOptions.add(MenuOption.attack);
+    }
+    stage.cursor.actionMenu.show(visibleOptions);
+    stage.activeComponent = stage.cursor.actionMenu;
   }
 
   @override
@@ -89,15 +97,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
-      Point<int> newTile = move();
-      List<Tile> attackTiles = markAttackableEnemies(newTile, combatRange.$1, combatRange.$2);
-      List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
-      if(attackTiles.isNotEmpty){
-        visibleOptions.add(MenuOption.attack);
-      }
-      
-      stage.cursor.actionMenu.show(visibleOptions);
-      stage.activeComponent = stage.cursor.actionMenu;
+      move(stage);
+      openActionMenu(stage);
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) {
       stage.activeComponent = stage.cursor;
