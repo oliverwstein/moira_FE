@@ -10,7 +10,36 @@ import 'package:flame/text.dart';
 import 'package:flutter/services.dart';
 
 import 'engine.dart';
-
+TextPaint selectedTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 235, 219, 214),
+          fontSize: 10, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 3.0,
+              color: ui.Color.fromARGB(255, 18, 5, 49),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
+TextPaint basicTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 239, 221, 216),
+          fontSize: 8, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
 class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Map<MenuOption, PositionComponent> options = {};
   late int selectedIndex;
@@ -86,12 +115,10 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       case MenuOption.item:
         // On selecting item, pull up the item menu.
         Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
-        Map<String, Item> inventory = unit!.inventory;
-        dev.log('$inventory');
-        ItemMenu itemMenu = ItemMenu(unit);
+        assert(unit != null);
+        ItemMenu itemMenu = ItemMenu(unit!);
         stage.cursor.add(itemMenu);
         stage.activeComponent = itemMenu;
-        dev.log('Active component is ${stage.activeComponent}');
         break;
       case MenuOption.wait:
         Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
@@ -220,7 +247,7 @@ TextStyle selectedTextStyle = const TextStyle(
 class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Unit unit;
   late final SpriteComponent menuSprite;
-  late Map<String, Item> inventory;
+  late List<Item> inventory;
   Map<int, TextComponent> indexMap = {};
   int selectedIndex = 0;
   static const double scaleFactor = 2;
@@ -228,9 +255,9 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   ItemMenu(this.unit){
     inventory = unit.inventory;
     double count = 0;
-    for (String itemName in unit.inventory.keys) {
+    for (Item i in unit.inventory){
       var textComponent = TextComponent(
-        text: itemName,
+        text: i.name,
         textRenderer: basicTextRenderer,
         position: Vector2(8, 16*(count+1)),
         priority: 20,
@@ -249,53 +276,25 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     );
     add(menuSprite);
   }
-  TextPaint selectedTextRenderer = TextPaint(
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 235, 219, 214),
-          fontSize: 10, // Adjust the font size as needed
-          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          shadows: <ui.Shadow>[
-            ui.Shadow(
-              offset: ui.Offset(1.0, 1.0),
-              blurRadius: 3.0,
-              color: ui.Color.fromARGB(255, 18, 5, 49),
-            ),
-          ],
-          // Include any other styles you need
-          ),
-      );
-  TextPaint basicTextRenderer = TextPaint(
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 239, 221, 216),
-          fontSize: 8, // Adjust the font size as needed
-          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          shadows: <ui.Shadow>[
-            ui.Shadow(
-              offset: ui.Offset(1.0, 1.0),
-              blurRadius: 1.0,
-              color: ui.Color.fromARGB(255, 20, 11, 48),
-            ),
-          ],
-          // Include any other styles you need
-          ),
-      );
+  
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     Stage stage = parent!.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.arrowUp) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      selectedIndex = (selectedIndex + 1) % inventory.length;
+      selectedIndex = (selectedIndex - 1) % inventory.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
 
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      selectedIndex = (selectedIndex - 1) % inventory.length;
+      selectedIndex = (selectedIndex + 1) % inventory.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
+      unit.wait();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
       unit.undoMove();

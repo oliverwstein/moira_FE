@@ -23,7 +23,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   // Status and State Variables
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
-  Point<int>? targetTilePosition;
   bool canAct = true;
   bool isMoving = false;
   late Point<int> oldTile;
@@ -42,7 +41,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Item? main;
   Item? treasure;
   Item? gear;
-  Map<String, Item> inventory = {};
+  List<Item> inventory = [];
   List<Attack> attackSet = [];
   List<Effect> effects = [];
   List<Skill> skills = [];
@@ -70,8 +69,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       };
     team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
     idleAnimationName = unitData['sprites']['idle'];
-    for(String itemName in unitData['inventory']){
-      if (itemBank[itemName] != null) inventory[itemName] = itemBank[itemName]!;
+    for(String item in unitData['inventory']){
+      assert(item != null);
+      inventory.add(itemBank[item]!);
     }
   }
 
