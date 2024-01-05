@@ -46,7 +46,7 @@ class Weapon extends Component {
     magic = jsonMap['magic'] ?? defaults['magic'] ?? false;
     effects = jsonMap['effects'] ?? defaults['effects'] ?? [];
     String specialAttackName = jsonMap['specialAttack'] ?? defaults['specialAttack'];
-    specialAttack = Attack.fromJson(specialAttackName, 'assets/data/attacks.json');
+    specialAttack = Attack.fromJson(specialAttackName, "assets/data/attacks.json");
 
   }
 }
