@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flame/components.dart';
 import 'engine.dart';
 
-enum WeaponType {sword, axe, lance, knife, staff, book, none}
-
 class Attack extends Component {
   final String name; // The Attack name
   late String description; // A description of the attack
