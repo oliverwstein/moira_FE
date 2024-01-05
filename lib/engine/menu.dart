@@ -120,7 +120,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         ItemMenu itemMenu = ItemMenu(unit);
         stage.cursor.add(itemMenu);
         stage.activeComponent = itemMenu;
-        dev.log('Active component is ${stage.activeComponent}');
         break;
       case MenuOption.wait:
         Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
@@ -296,6 +295,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
+      unit.wait();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
       unit.undoMove();
