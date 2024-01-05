@@ -1,16 +1,20 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:moira/main.dart';
 export 'menu.dart';
 export 'cursor.dart';
 export 'game.dart';
 export 'stage.dart';
 export 'tile.dart';
 export 'unit.dart';
+export 'item.dart';
+
 enum Direction {up, down, left, right}
 enum UnitTeam {blue, red, green, yellow}
 enum TileState {blank, move, attack}
 enum Terrain {forest, path, cliff, water, neutral}
+enum ItemType {main, gear, treasure}
 extension TerrainCost on Terrain {
   double get cost {
     switch (this) {

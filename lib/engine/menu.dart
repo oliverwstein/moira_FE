@@ -55,17 +55,11 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
+      close();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
       Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
-      if (unit != null){
-        unit.snapToTile(unit.oldTile);
-        stage.updateTileWithUnit(unit.tilePosition, unit.oldTile, unit);
-        unit.tilePosition = unit.oldTile;
-        
-        stage.activeComponent = stage.cursor;
-        stage.blankAllTiles();
-      }
+      if (unit != null) unit.undoMove();
       close();
       handled = true;
     }
@@ -78,29 +72,36 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
     switch (visibleOptions[selectedIndex]) {
       case MenuOption.endTurn:
         stage.endTurn();
+        stage.activeComponent = stage.cursor;
       case MenuOption.unitList:
         break;
       case MenuOption.save:
+        stage.activeComponent = stage.cursor;
         break;
       case MenuOption.attack:
-        /// On selecting attack, pull up the weapon menu
+        // On selecting attack, pull up the weapon menu. For now, just wait.
+        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        unit!.wait();
         break;
       case MenuOption.item:
+        // On selecting item, pull up the item menu.
+        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        Map<String, Item> inventory = unit!.inventory;
+        dev.log('$inventory');
+        ItemMenu itemMenu = ItemMenu(unit);
+        stage.cursor.add(itemMenu);
+        stage.activeComponent = itemMenu;
+        dev.log('Active component is ${stage.activeComponent}');
         break;
       case MenuOption.wait:
         Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
-        unit!.toggleCanAct(false);
-        stage.activeComponent = stage.cursor;
-        stage.blankAllTiles();
-        stage.updateTileWithUnit(unit.oldTile, unit.tilePosition, unit);
-        unit.oldTile = unit.tilePosition;
+        unit!.wait();
         
       default:
         stage.activeComponent = stage.cursor;
         break;
     }
     close();
-    stage.activeComponent = stage.cursor;
   }
   void show(List<MenuOption> shownOptions) {
     visibleOptions = shownOptions;
@@ -202,3 +203,115 @@ TextStyle menuTextStyle = const TextStyle(
     ),
   ],
 );
+
+TextStyle selectedTextStyle = const TextStyle(
+  color: ui.Color.fromARGB(255, 94, 50, 205), // Gold-like color
+  fontSize: 8, // Adjust the font size as needed
+  fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+  shadows: <ui.Shadow>[
+    ui.Shadow(
+      offset: ui.Offset(1.0, 1.0),
+      blurRadius: 3.0,
+      color: ui.Color(0xFF000000),
+    ),
+  ],
+);
+
+class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+  Unit unit;
+  late final SpriteComponent menuSprite;
+  late Map<String, Item> inventory;
+  Map<int, TextComponent> indexMap = {};
+  int selectedIndex = 0;
+  static const double scaleFactor = 2;
+
+  ItemMenu(this.unit){
+    inventory = unit.inventory;
+    double count = 0;
+    for (String itemName in unit.inventory.keys) {
+      var textComponent = TextComponent(
+        text: itemName,
+        textRenderer: basicTextRenderer,
+        position: Vector2(8, 16*(count+1)),
+        priority: 20,
+      );
+      add(textComponent);
+      indexMap[count.toInt()] = textComponent;
+      count++;
+    }
+    indexMap[0]!.textRenderer = selectedTextRenderer;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    menuSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('item_table_titled.png'),
+    );
+    add(menuSprite);
+  }
+  TextPaint selectedTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 235, 219, 214),
+          fontSize: 10, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 3.0,
+              color: ui.Color.fromARGB(255, 18, 5, 49),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
+  TextPaint basicTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 239, 221, 216),
+          fontSize: 8, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Stage stage = parent!.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.arrowUp) {
+      indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
+      selectedIndex = (selectedIndex + 1) % inventory.length;
+      indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
+
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
+      selectedIndex = (selectedIndex - 1) % inventory.length;
+      indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyA) {
+      select();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
+      unit.undoMove();
+      close();
+      handled = true;
+    }
+    return handled;
+  }
+
+  void select(){
+    close();
+  }
+
+  void close(){
+    removeAll(children);
+    Stage stage = unit.parent as Stage;
+    stage.activeComponent = stage.cursor;
+  }
+}
