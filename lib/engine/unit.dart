@@ -1,4 +1,6 @@
 
+// ignore_for_file: unused_import
+
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer' as dev;
@@ -67,40 +69,20 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
     idleAnimationName = unitData['sprites']['idle'];
     for(String item in unitData['inventory']){
-      assert(item != null);
+      assert(itemBank[item] != null);
       inventory.add(itemBank[item]!);
     }
-  }
-
-  void move(Stage stage){
-    oldTile = tilePosition; // Store the position of the unit in case the command gets cancelled
-    for(Point<int> point in paths[stage.cursor.tilePosition]!){
-      enqueueMovement(point);
-    }
-    Point<int> newTile = paths[stage.cursor.tilePosition]!.last;
-    stage.updateTileWithUnit(tilePosition, newTile, this);
-    stage.blankAllTiles();
-  }
-
-  void openActionMenu(Stage stage){
-    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.tilePosition, combatRange.$1, combatRange.$2);
-    List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
-    if(attackTiles.isNotEmpty){
-      visibleOptions.add(MenuOption.attack);
-    }
-    stage.cursor.actionMenu.show(visibleOptions);
-    stage.activeComponent = stage.cursor.actionMenu;
   }
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
     Stage stage = parent as Stage;
-    if (command == LogicalKeyboardKey.keyA) {
+    if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
       move(stage);
       openActionMenu(stage);
       handled = true;
-    } else if (command == LogicalKeyboardKey.keyB) {
+    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       stage.activeComponent = stage.cursor;
       stage.blankAllTiles();
       handled = true;
@@ -120,13 +102,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return handled;
   }
 
-  void wait(){
-    Stage stage = parent as Stage;
-    toggleCanAct(false);
-    stage.activeComponent = stage.cursor;
+  void move(Stage stage){
+    oldTile = tilePosition; // Store the position of the unit in case the command gets cancelled
+    for(Point<int> point in paths[stage.cursor.tilePosition]!){
+      enqueueMovement(point);
+    }
+    Point<int> newTile = paths[stage.cursor.tilePosition]!.last;
+    stage.updateTileWithUnit(tilePosition, newTile, this);
     stage.blankAllTiles();
-    stage.updateTileWithUnit(oldTile, tilePosition, this);
-    oldTile = tilePosition;
   }
 
   void undoMove(){
@@ -136,6 +119,25 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     tilePosition = oldTile;
     stage.activeComponent = stage.cursor;
     stage.blankAllTiles();
+  }
+
+  void openActionMenu(Stage stage){
+    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.tilePosition, combatRange.$1, combatRange.$2);
+    List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
+    if(attackTiles.isNotEmpty){
+      visibleOptions.add(MenuOption.attack);
+    }
+    stage.cursor.actionMenu.show(visibleOptions);
+    stage.activeComponent = stage.cursor.actionMenu;
+  }
+
+  void wait(){
+    Stage stage = parent as Stage;
+    toggleCanAct(false);
+    stage.activeComponent = stage.cursor;
+    stage.blankAllTiles();
+    stage.updateTileWithUnit(oldTile, tilePosition, this);
+    oldTile = tilePosition;
   }
 
   @override

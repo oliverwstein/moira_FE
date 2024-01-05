@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'dart:developer' as dev;
 import 'package:flame/components.dart';
 import 'engine.dart';
