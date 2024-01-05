@@ -23,7 +23,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   // Status and State Variables
   late Point<int> tilePosition; // The units's position in terms of tiles, not pixels
-  Point<int>? targetTilePosition;
   bool canAct = true;
   bool isMoving = false;
   late Point<int> oldTile;

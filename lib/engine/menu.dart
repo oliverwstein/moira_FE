@@ -10,7 +10,36 @@ import 'package:flame/text.dart';
 import 'package:flutter/services.dart';
 
 import 'engine.dart';
-
+TextPaint selectedTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 235, 219, 214),
+          fontSize: 10, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 3.0,
+              color: ui.Color.fromARGB(255, 18, 5, 49),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
+  TextPaint basicTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 239, 221, 216),
+          fontSize: 8, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
 class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Map<MenuOption, PositionComponent> options = {};
   late int selectedIndex;
@@ -249,36 +278,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     );
     add(menuSprite);
   }
-  TextPaint selectedTextRenderer = TextPaint(
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 235, 219, 214),
-          fontSize: 10, // Adjust the font size as needed
-          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          shadows: <ui.Shadow>[
-            ui.Shadow(
-              offset: ui.Offset(1.0, 1.0),
-              blurRadius: 3.0,
-              color: ui.Color.fromARGB(255, 18, 5, 49),
-            ),
-          ],
-          // Include any other styles you need
-          ),
-      );
-  TextPaint basicTextRenderer = TextPaint(
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 239, 221, 216),
-          fontSize: 8, // Adjust the font size as needed
-          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          shadows: <ui.Shadow>[
-            ui.Shadow(
-              offset: ui.Offset(1.0, 1.0),
-              blurRadius: 1.0,
-              color: ui.Color.fromARGB(255, 20, 11, 48),
-            ),
-          ],
-          // Include any other styles you need
-          ),
-      );
+  
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     Stage stage = parent!.parent as Stage;
