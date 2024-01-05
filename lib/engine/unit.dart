@@ -68,9 +68,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       };
     team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
     idleAnimationName = unitData['sprites']['idle'];
-    for(String item in unitData['inventory']){
-      assert(itemBank[item] != null);
-      inventory.add(itemBank[item]!);
+    for(String itemName in unitData['inventory']){
+      inventory.add(Item.fromJson(itemName, "moira/assets/data/items.json"));
     }
   }
 
