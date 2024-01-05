@@ -72,6 +72,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
     switch (visibleOptions[selectedIndex]) {
       case MenuOption.endTurn:
         stage.endTurn();
+        stage.activeComponent = stage.cursor;
       case MenuOption.unitList:
         break;
       case MenuOption.save:
@@ -100,7 +101,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         break;
     }
     close();
-    stage.activeComponent = stage.cursor;
   }
   void show(List<MenuOption> shownOptions) {
     visibleOptions = shownOptions;
@@ -265,7 +265,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   void select(){
     close();
   }
-  
+
   void close(){
     removeAll(children);
     Stage stage = unit.parent as Stage;
