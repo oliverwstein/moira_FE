@@ -11,46 +11,6 @@ class Stage extends Component with HasGameRef<MyGame>{
   /// game map, including tiles, units, and the cursor. It interfaces with the 
   /// game's TiledComponent to render the map and holds the logic for the game's 
   /// terrain, unit positioning, and active components like cursor or units.
-  ///
-  /// Attributes:
-  /// - `mapTileWidth`: Width of the map in tiles.
-  /// - `mapTileHeight`: Height of the map in tiles.
-  /// - `mapSize`: Size of the map in vector units.
-  /// - `tiles`: The TiledComponent instance that renders the map.
-  /// - `cursor`: Cursor object for user interaction and tile selection.
-  /// - `units`: List of all units present on the stage.
-  /// - `tilesize`: Size of each tile in the game.
-  /// - `tilesMap`: Map from tile coordinates to Tile objects.
-  /// - `activeComponent`: Currently active component (Cursor or Unit).
-  /// - `turn`: Integer that stores the turn.
-  ///
-  /// Methods:
-  /// - `onLoad()`: Asynchronously loads the stage components including tiles,
-  ///    units, and sets up the cursor.
-  /// - `update(dt)`: Updates the stage state every game tick.
-  /// - `onMount()`: Invoked when the stage is mounted to the game, adds itself
-  ///    as an observer for scaling.
-  /// - `onRemove()`: Cleans up by removing itself from observers upon removal.
-  /// - `onScaleChanged(scaleFactor)`: Updates scaling of tiles when game scale changes.
-  /// - `updateTileWithUnit(oldPoint, newPoint, unit)`: Moves units between tiles.
-  /// - `determineTerrainType(point)`: Determines the type of terrain at a given tile.
-  /// - `_stringToTerrain(input)`: Converts a string to a Terrain enum.
-  /// - `keyCommandHandler(command)`: Delegates key commands to the active component.
-  /// - `blankAllTiles()`: Resets all tiles to the blank state.
-  ///
-  /// Constructor:
-  /// Initializes the stage with default attributes. It sets up tiles, units, and cursor.
-  ///
-  /// Usage:
-  /// The Stage is a central component of MyGame and is typically instantiated and
-  /// managed by it. It should be loaded with necessary resources and will handle
-  /// most of the gameplay logic, delegating specific actions to other components.
-  ///
-  /// Connects with:
-  /// - MyGame: As part of the Flame game framework, it is managed and updated by MyGame.
-  /// - Tile: Manages individual tiles of the game, storing their state and rendering them.
-  /// - Unit: Holds and updates units, manages their interaction with tiles.
-  /// - Cursor: Manages user interaction with the game through tile selection and commands.
   late final int mapTileWidth;
   late final int mapTileHeight;
   late final Vector2 mapSize;
@@ -74,7 +34,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     for (int x = 0; x < mapTileWidth; x++) {
       for (int y = 0; y < mapTileHeight; y++) {
         Point<int> gridCoord = Point(x, y);
-        Terrain terrain = determineTerrainType(gridCoord); // Implement this based on your Tiled map properties
+        Terrain terrain = determineTerrainType(gridCoord);
         Tile tile = Tile(gridCoord, terrain);
         add(tile);
         gameRef.addObserver(tile);
@@ -93,7 +53,7 @@ class Stage extends Component with HasGameRef<MyGame>{
      
     for (Unit unit in units) {
       add(unit);
-      tilesMap[unit.tilePosition]?.setUnit(unit);
+      tilesMap[unit.gridCoord]?.setUnit(unit);
       gameRef.addObserver(unit);
     }
 

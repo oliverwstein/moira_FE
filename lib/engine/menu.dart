@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_overrides
+// ignore_for_file: unnecessary_overrides, unused_import
 import 'dart:ui' as ui;
 import 'dart:developer' as dev;
 
@@ -62,7 +62,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       boxComponent.add(SpriteComponent(sprite: blankWindowSprite.sprite));
       var textComponent = TextComponent(
         text: option.label,
-        textRenderer: TextPaint(style: menuTextStyle),
+        textRenderer: basicTextRenderer,
         position: Vector2(8, 2)
       );
       boxComponent.add(textComponent);
@@ -87,7 +87,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       close();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
-      Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+      Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
       if (unit != null) unit.undoMove();
       close();
       handled = true;
@@ -109,19 +109,19 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         break;
       case MenuOption.attack:
         // On selecting attack, pull up the weapon menu. For now, just wait.
-        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         unit!.wait();
         break;
       case MenuOption.item:
         // On selecting item, pull up the item menu.
-        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         assert(unit != null);
         ItemMenu itemMenu = ItemMenu(unit!);
         stage.cursor.add(itemMenu);
         stage.activeComponent = itemMenu;
         break;
       case MenuOption.wait:
-        Unit? unit = stage.tilesMap[stage.cursor.tilePosition]!.unit;
+        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         unit!.wait();
         
       default:
@@ -218,32 +218,6 @@ enum MenuOption {
   final int priority;
 }
 
-TextStyle menuTextStyle = const TextStyle(
-  color: ui.Color(0xFFF3E5AB), // Gold-like color
-  fontSize: 8, // Adjust the font size as needed
-  fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-  shadows: <ui.Shadow>[
-    ui.Shadow(
-      offset: ui.Offset(1.0, 1.0),
-      blurRadius: 3.0,
-      color: ui.Color(0xFF000000),
-    ),
-  ],
-);
-
-TextStyle selectedTextStyle = const TextStyle(
-  color: ui.Color.fromARGB(255, 94, 50, 205), // Gold-like color
-  fontSize: 8, // Adjust the font size as needed
-  fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-  shadows: <ui.Shadow>[
-    ui.Shadow(
-      offset: ui.Offset(1.0, 1.0),
-      blurRadius: 3.0,
-      color: ui.Color(0xFF000000),
-    ),
-  ],
-);
-
 class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Unit unit;
   late final SpriteComponent menuSprite;
@@ -279,7 +253,6 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   
   @override
   bool handleCommand(LogicalKeyboardKey command) {
-    Stage stage = parent!.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.arrowUp) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
