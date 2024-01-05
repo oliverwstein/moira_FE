@@ -101,51 +101,16 @@ class Equip extends Component {
   }
 }
 
-class Attack extends Component {
-  String name;
-  int might;
-  int hit;
-  (int, int) combatRange = (1,1);
-  bool magic = false;
-  List<Damage> damages;
-  late Item? item;
-
-  Attack(this.name, this.might, this.hit, this.combatRange, this.magic, this.damages);
-  Attack.melee(this.name, this.might, this.hit, this.damages, {combatRange = (1, 1), magic = false});
-  Attack.magic(this.name, this.might, this.hit, this.damages, {combatRange = (1, 3), magic = true});
-}
-
-final Attack longswordAttack = Attack.melee(
-  'Slash',
-  6, // might
-  75, // hit
-  [Damage.slash], // damages
-);
-
-final Attack axeAttack = Attack.melee(
-  'Smash',
-  8, // might
-  60, // hit
-  [Damage.smash], // damages
-);
-
-final Attack magicFireAttack = Attack.magic(
-  'Fireball',
-  5, // might
-  80, // hit
-  [Damage.blast], // damages
-);
-
 final Item longsword = Item(
   name: 'Longsword',
   type: ItemType.main,
-  attacks: [longswordAttack],
+  attacks: [],
 );
 
 final Item axe = Item(
   name: 'Axe',
   type: ItemType.main,
-  attacks: [axeAttack],
+  attacks: [],
 );
 
 final Item salve = Item(

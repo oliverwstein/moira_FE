@@ -11,6 +11,7 @@ export 'stage.dart';
 export 'tile.dart';
 export 'unit.dart';
 export 'item.dart';
+export 'attack.dart';
 
 enum Direction {up, down, left, right}
 enum UnitTeam {blue, red, green, yellow}
