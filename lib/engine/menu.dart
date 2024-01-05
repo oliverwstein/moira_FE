@@ -283,13 +283,13 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     bool handled = false;
     if (command == LogicalKeyboardKey.arrowUp) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      selectedIndex = (selectedIndex + 1) % inventory.length;
+      selectedIndex = (selectedIndex - 1) % inventory.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
 
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      selectedIndex = (selectedIndex - 1) % inventory.length;
+      selectedIndex = (selectedIndex + 1) % inventory.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
