@@ -220,7 +220,6 @@ TextStyle selectedTextStyle = const TextStyle(
 class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Unit unit;
   late final SpriteComponent menuSprite;
-  late final ItemPointer pointer;
   late Map<String, Item> inventory;
   Map<int, TextComponent> indexMap = {};
   int selectedIndex = 0;
@@ -232,16 +231,15 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     for (String itemName in unit.inventory.keys) {
       var textComponent = TextComponent(
         text: itemName,
-        textRenderer: TextPaint(style: menuTextStyle),
-        position: Vector2(16, 16*(count+1)),
+        textRenderer: basicTextRenderer,
+        position: Vector2(8, 16*(count+1)),
         priority: 20,
       );
       add(textComponent);
       indexMap[count.toInt()] = textComponent;
       count++;
     }
-    pointer = ItemPointer(16);
-    indexMap[0]!.add(pointer);
+    indexMap[0]!.textRenderer = selectedTextRenderer;
   }
 
   @override
@@ -253,19 +251,31 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   }
   TextPaint selectedTextRenderer = TextPaint(
         style: const TextStyle(
-          color: ui.Color.fromARGB(255, 94, 50, 205),
-          fontSize: 8, // Adjust the font size as needed
+          color: ui.Color.fromARGB(255, 235, 219, 214),
+          fontSize: 10, // Adjust the font size as needed
           fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 3.0,
+              color: ui.Color.fromARGB(255, 18, 5, 49),
+            ),
+          ],
           // Include any other styles you need
           ),
       );
   TextPaint basicTextRenderer = TextPaint(
         style: const TextStyle(
-          color: ui.Color.fromARGB(255, 200, 205, 50),
+          color: ui.Color.fromARGB(255, 239, 221, 216),
           fontSize: 8, // Adjust the font size as needed
           fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
           // Include any other styles you need
           ),
       );
@@ -275,18 +285,14 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     bool handled = false;
     if (command == LogicalKeyboardKey.arrowUp) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      pointer.removeFromParent();
       selectedIndex = (selectedIndex + 1) % inventory.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
-      indexMap[selectedIndex]!.add(pointer);
 
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      pointer.removeFromParent();
       selectedIndex = (selectedIndex - 1) % inventory.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
-      indexMap[selectedIndex]!.add(pointer);
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
@@ -308,33 +314,4 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     Stage stage = unit.parent as Stage;
     stage.activeComponent = stage.cursor;
   }
-}
-
-class ItemPointer extends PositionComponent with HasGameRef<MyGame> {
-  late final SpriteAnimationComponent _animationComponent;
-  late final SpriteSheet pointerSheet;
-  late final double stepY;
-  late double tileSize;
-
-  ItemPointer(this.stepY) {
-    tileSize = 16;
-  }
-
-  @override
-  Future<void> onLoad() async {
-    // Load the cursor image and create the animation component
-    ui.Image pointerImage = await gameRef.images.load('dancing_selector.png');
-    pointerSheet = SpriteSheet.fromColumnsAndRows(
-      image: pointerImage,
-      columns: 3,
-      rows: 1,
-    );
-
-    _animationComponent = SpriteAnimationComponent(
-      animation: pointerSheet.createAnimation(row: 0, stepTime: .2),
-      position: Vector2(-128, -8),
-    );
-    _animationComponent.scale = Vector2.all(ItemMenu.scaleFactor);
-    add(_animationComponent);
-    }
 }
