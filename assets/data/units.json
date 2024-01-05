@@ -14,7 +14,7 @@
         "wis": 10
     },
     "skills": ["canto"],
-    "inventory": ["salve", "longsword"],
+    "inventory": ["salve", "salve", "longsword"],
     "sprites": {
         "idle": "sigurd.png"
     }},
