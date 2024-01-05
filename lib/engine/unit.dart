@@ -46,15 +46,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   List<Effect> effects = [];
   List<Skill> skills = [];
 
-
-  
-
+  // Constructors
   Unit(this.tilePosition, this.idleAnimationName) {
     // Initial size, will be updated in onLoad
     tileSize = 16 * MyGame().scaleFactor;
     oldTile = tilePosition;
   }
-
   Unit.fromJSON(this.tilePosition, this.name, String jsonString) {
     oldTile = tilePosition;
     tileSize = 16 * MyGame().scaleFactor;
@@ -75,18 +72,24 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
   }
 
+  Point<int> move(){
+    Stage stage = parent as Stage;
+    oldTile = tilePosition; // Store the position of the unit in case the command gets cancelled
+    for(Point<int> point in paths[stage.cursor.tilePosition]!){
+      enqueueMovement(point);
+    }
+    Point<int> newTile = paths[stage.cursor.tilePosition]!.last;
+    stage.updateTileWithUnit(tilePosition, newTile, this);
+    stage.blankAllTiles();
+    return newTile;
+  }
+
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) {
-      oldTile = tilePosition;
-      for(Point<int> point in paths[stage.cursor.tilePosition]!){
-        enqueueMovement(point);
-      }
-      var newTile = paths[stage.cursor.tilePosition]!.last;
-      stage.updateTileWithUnit(tilePosition, newTile, this);
-      stage.blankAllTiles();
+      Point<int> newTile = move();
       List<Tile> attackTiles = markAttackableEnemies(newTile, combatRange.$1, combatRange.$2);
       List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
       if(attackTiles.isNotEmpty){
