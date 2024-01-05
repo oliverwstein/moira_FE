@@ -217,7 +217,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       final targetY = currentTarget!.y * tileSize;
 
       // Move towards the target position
-      // You might want to adjust the step distance depending on your game's needs
       var moveX = (targetX - x)*.6;
       var moveY = (targetY - y)*.6;
 
@@ -236,7 +235,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
           currentTarget = movementQueue.removeFirst();
         } else {
           currentTarget = null;
-          isMoving = false; // No more movements left
+          isMoving = false;
         }
       }
     } else {

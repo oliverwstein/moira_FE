@@ -34,7 +34,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     for (int x = 0; x < mapTileWidth; x++) {
       for (int y = 0; y < mapTileHeight; y++) {
         Point<int> gridCoord = Point(x, y);
-        Terrain terrain = determineTerrainType(gridCoord); // Implement this based on your Tiled map properties
+        Terrain terrain = determineTerrainType(gridCoord);
         Tile tile = Tile(gridCoord, terrain);
         add(tile);
         gameRef.addObserver(tile);
