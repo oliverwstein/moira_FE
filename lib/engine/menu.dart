@@ -219,24 +219,30 @@ enum MenuOption {
 class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Unit unit;
   late final SpriteComponent menuSprite;
+  late final SpriteComponent equipMainSprite;
   late List<Item> inventory;
   Map<int, TextComponent> indexMap = {};
   int selectedIndex = 0;
+  int mainEquippedIndex = -1;
   static const double scaleFactor = 2;
 
   ItemMenu(this.unit){
     inventory = unit.inventory;
-    double count = 0;
-    for (Item i in unit.inventory){
+    for (int i = 0; i < inventory.length; i++){
       var textComponent = TextComponent(
-        text: i.name,
+        text: inventory[i].name,
         textRenderer: basicTextRenderer,
-        position: Vector2(8, 16*(count+1)),
+        position: Vector2(20, 16*(i+1)),
         priority: 20,
       );
       add(textComponent);
-      indexMap[count.toInt()] = textComponent;
-      count++;
+      if(unit.main != null){
+        if (inventory[i] == unit.main){
+          mainEquippedIndex = i;
+        }
+      }
+      indexMap[i] = textComponent;
+      
     }
     indexMap[0]!.textRenderer = selectedTextRenderer;
   }
@@ -246,7 +252,16 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     menuSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('item_table_titled.png'),
     );
+    equipMainSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('hand_icon.png'),
+        position: Vector2(-12, 2),
+        size: Vector2.all(8)
+    );
     add(menuSprite);
+    if(indexMap[mainEquippedIndex]!= null){
+      indexMap[mainEquippedIndex]!.add(equipMainSprite);
+    }
+    
   }
   
   @override
@@ -265,26 +280,30 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
-      unit.wait();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
-      unit.undoMove();
       close();
       handled = true;
     }
     return handled;
   }
 
+  void equipItem(){
+    equipMainSprite.removeFromParent();
+    inventory[selectedIndex].equip(unit);
+    assert(indexMap[selectedIndex] != null);
+    indexMap[selectedIndex]!.add(equipMainSprite);
+    mainEquippedIndex = selectedIndex;
+  }
+
   void select(){
-    if (inventory[selectedIndex].equipCond?.check(unit) ?? true){
-      inventory[selectedIndex].equip(unit);
-    }
+    Stage stage = unit.parent as Stage;
+    if (inventory[selectedIndex].equipCond?.check(unit) ?? true){equipItem();}
     close();
+    unit.openActionMenu(stage);
   }
 
   void close(){
     removeAll(children);
-    Stage stage = unit.parent as Stage;
-    stage.activeComponent = stage.cursor;
   }
 }
