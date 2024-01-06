@@ -69,7 +69,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
     idleAnimationName = unitData['sprites']['idle'];
     for(String itemName in unitData['inventory']){
-      inventory.add(Item.fromJson(itemName, "assets/data/items.json"));
+      // inventory.add(Item.fromJson(itemName, "assets/data/items.json"));
     }
   }
 
@@ -122,10 +122,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   void openActionMenu(Stage stage){
     List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, combatRange.$1, combatRange.$2);
-    List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
+    List<MenuOption> visibleOptions = [MenuOption.wait];
     if(attackTiles.isNotEmpty){
       visibleOptions.add(MenuOption.attack);
     }
+    if (inventory.isNotEmpty) visibleOptions.add(MenuOption.item);
     stage.cursor.actionMenu.show(visibleOptions);
     stage.activeComponent = stage.cursor.actionMenu;
   }
