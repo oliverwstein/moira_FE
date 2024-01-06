@@ -18,9 +18,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   // Identifiers and Descriptive Information
   final String name;
   final String idleAnimationName;
-  int movementRange; 
+  int movementRange;
+  (int, int) combatRange;
   UnitTeam team = UnitTeam.blue;
-  (int, int) combatRange = (1, 1);
   double tileSize;
 
   // Status and State Variables
@@ -49,7 +49,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   List<Skill> skills = [];
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet);
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange);
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -78,12 +78,16 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       inventory.add(Item.fromJson(itemName));
     }
     Map<String, Attack> attackMap = {};
+    int minCombatRange = 0;
+    int maxCombatRange = 0;
     for(String attackName in unitData['attacks']){
       attackMap[attackName] = Attack.fromJson(attackName);
+      minCombatRange = min(minCombatRange, attackMap[attackName]!.range.$1);
+      maxCombatRange = max(maxCombatRange, attackMap[attackName]!.range.$2);
     }
-
+    (int, int) combatRange = (minCombatRange, maxCombatRange);
     // Return a new Unit instance
-    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap);
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange);
   }
 
   @override
