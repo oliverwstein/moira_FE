@@ -1,0 +1,28 @@
+{
+"items": 
+    {
+    "Sword":
+        {
+            "weapon": "Sword",
+            "description": "A sword.",
+            "type": "main"
+        },
+    "Lance":
+        {
+            "weapon": "Lance",
+            "description": "A lance.",
+            "type": "main"
+        },
+    "Axe":
+        {
+            "weapon": "Axe",
+            "description": "An axe.",
+            "type": "main"
+        },
+    "Salve":
+        {
+            "description": "A healing salve.",
+            "type": "basic"
+        }
+    }
+}

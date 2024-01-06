@@ -1,0 +1,65 @@
+{
+   "attacks": 
+        {
+        "Strike":
+            {
+                "description" : "A simple blow.",
+                "scaling" : [1.0, 1.0, 0.0, 0.0],
+                "weaponType" : [],
+                "might": 0,
+                "hit": 0,
+                "fatigue": 1,
+                "magic": false,
+                "range": [1, 1],
+                "effects": []
+            },
+        "Trample":
+            {
+                "description" : "Just a bit of horsing around.",
+                "scaling" : [1.0, 0.0, 0.0, 0.0],
+                "weaponType" : [],
+                "might": 5,
+                "hit": 0,
+                "fatigue": 1,
+                "magic": false,
+                "range": [1, 1],
+                "effects": []
+            },
+        "Slash":
+            {
+                "description" : "Have at thee.",
+                "scaling" : [1.0, 2.0, 0.0, 0.0],
+                "weaponType" : ["Sword", "Axe", "Knife"],
+                "might": 3,
+                "hit": 25,
+                "fatigue": 1,
+                "magic": false,
+                "range": [1, 1],
+                "effects": []
+            },
+        "Stab":
+            {
+                "description" : "Have at thee.",
+                "scaling" : [1.0, 2.0, 0.0, 0.0],
+                "weaponType" : ["Sword", "Lance", "Knife"],
+                "might": 5,
+                "hit": 10,
+                "fatigue": 1,
+                "magic": false,
+                "range": [1, 1],
+                "effects": []
+            },
+        "Smash":
+            {
+                "description" : "Have at thee.",
+                "scaling" : [1.0, 2.0, 0.0, 0.0],
+                "weaponType" : ["Axe"],
+                "might": 5,
+                "hit": 10,
+                "fatigue": 1,
+                "magic": false,
+                "range": [1, 1],
+                "effects": []
+            }
+        }
+}

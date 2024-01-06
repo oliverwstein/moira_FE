@@ -1,4 +1,6 @@
 // ignore_for_file: unnecessary_overrides
+import 'dart:convert';
+
 import 'package:flame/camera.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
@@ -45,6 +47,31 @@ class MyGame extends FlameGame with KeyboardEvents {
   double _scaleFactor = 2;
   final List _observers = [];
   double get scaleFactor => _scaleFactor;
+  static late Map<String, dynamic> unitMap;
+  static late Map<String, dynamic> itemMap;
+  static late Map<String, dynamic> weaponMap;
+  static late Map<String, dynamic> attackMap;
+
+  // Static methods to load data from JSON
+  static Future<Map<String, dynamic>> loadUnitData() async {
+    String jsonString = await rootBundle.loadString('assets/data/units.json');
+    return jsonDecode(jsonString);
+  }
+
+  static Future<Map<String, dynamic>> loadItemsData() async {
+    String jsonString = await rootBundle.loadString('assets/data/items.json');
+    return jsonDecode(jsonString);
+  }
+
+  static Future<Map<String, dynamic>> loadWeaponsData() async {
+    String jsonString = await rootBundle.loadString('assets/data/weapons.json');
+    return jsonDecode(jsonString);
+  }
+
+  static Future<Map<String, dynamic>> loadAttacksData() async {
+    String jsonString = await rootBundle.loadString('assets/data/attacks.json');
+    return jsonDecode(jsonString);
+  }
 
   set scaleFactor(double value) {
     if (_scaleFactor != value) {
@@ -70,9 +97,11 @@ class MyGame extends FlameGame with KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
-    
     await super.onLoad();
-    // Your existing onLoad implementation
+    unitMap = await loadUnitData();
+    itemMap = await loadItemsData();
+    weaponMap = await loadWeaponsData();
+    attackMap = await loadAttacksData();
     viewport = MaxViewport();
     camera.viewport = viewport;
     stage = Stage();

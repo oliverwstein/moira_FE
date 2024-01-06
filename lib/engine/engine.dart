@@ -11,12 +11,14 @@ export 'stage.dart';
 export 'tile.dart';
 export 'unit.dart';
 export 'item.dart';
+export 'attack.dart';
+export 'weapon.dart';
 
 enum Direction {up, down, left, right}
 enum UnitTeam {blue, red, green, yellow}
 enum TileState {blank, move, attack}
 enum Terrain {forest, path, cliff, water, neutral}
-enum ItemType {main, gear, treasure}
+enum ItemType {main, gear, treasure, basic}
 extension TerrainCost on Terrain {
   double get cost {
     switch (this) {

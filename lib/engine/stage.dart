@@ -18,7 +18,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   late final Cursor cursor;
   List<Unit> units = [];
   final Vector2 tilesize = Vector2.all(16);
-  late Map<Point<int>, Tile> tilesMap = {};
+  Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
   int turn = 1;
   Stage();
@@ -41,15 +41,14 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    String unitDataJsonString = await loadJsonData('assets/data/units.json');
-    units.add(Unit.fromJSON(const Point(59, 10), 'arden', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(60, 12), 'alec', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(58, 12), 'noish', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(59, 13), 'sigurd', unitDataJsonString));
+    units.add(Unit.fromJSON(const Point(59, 10), 'arden'));
+    units.add(Unit.fromJSON(const Point(60, 12), 'alec'));
+    units.add(Unit.fromJSON(const Point(58, 12), 'noish'));
+    units.add(Unit.fromJSON(const Point(59, 13), 'sigurd'));
 
-    units.add(Unit.fromJSON(const Point(56, 12), 'brigand', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(55, 13), 'brigand', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(55, 11), 'brigand', unitDataJsonString));
+    units.add(Unit.fromJSON(const Point(56, 12), 'brigand'));
+    units.add(Unit.fromJSON(const Point(55, 13), 'brigand'));
+    units.add(Unit.fromJSON(const Point(55, 11), 'brigand'));
      
     for (Unit unit in units) {
       add(unit);
@@ -91,6 +90,17 @@ class Stage extends Component with HasGameRef<MyGame>{
   void updateTileWithUnit(Point<int> oldPoint, Point<int> newPoint, Unit unit) {
     tilesMap[oldPoint]?.removeUnit();
     tilesMap[newPoint]?.setUnit(unit);
+  }
+
+  List<Unit> getTargets(){
+    List<Unit> targetList = [];
+    for (Tile tile in tilesMap.values){
+      if(tile.state == TileState.attack){
+        assert(tile.isOccupied);
+        targetList.add(tile.unit!);
+      }
+    }
+    return targetList;
   }
 
   void endTurn() {

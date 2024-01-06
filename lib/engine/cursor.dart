@@ -81,6 +81,10 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
         return Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
     }
 
+  void goToUnit(Unit unit){
+    position = Vector2(unit.x, unit.y);
+    gridCoord = Point(unit.x ~/ unit.tileSize, unit.y ~/ unit.tileSize);
+  }
   void move(Direction direction) {
     // Assuming parent is always a Stage which is the case in this architecture
     Stage stage = parent as Stage;
@@ -194,6 +198,10 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     return handled;
   }
   
+  void snapToTile(Point<int> point){
+    x = point.x * tileSize;
+    y = point.x * tileSize;
+  }
   void onScaleChanged(double scaleFactor) {
     tileSize = 16 * scaleFactor; // Update tileSize
     size = Vector2.all(tileSize); // Update the size of the cursor itself

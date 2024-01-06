@@ -1,4 +1,5 @@
 // ignore_for_file: unnecessary_overrides, unused_import
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:developer' as dev;
 
@@ -55,7 +56,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
     blankWindowSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('action_menu_narrow.png'),
     );
-    dev.log('${MenuOption.values}');
     for (var option in MenuOption.values) {
       var boxComponent = PositionComponent(
       );
@@ -97,7 +97,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
 
   void select(){
     Stage stage = parent!.parent as Stage;
-    dev.log('${visibleOptions[selectedIndex]}');
     switch (visibleOptions[selectedIndex]) {
       case MenuOption.endTurn:
         stage.endTurn();
@@ -108,9 +107,12 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         stage.activeComponent = stage.cursor;
         break;
       case MenuOption.attack:
-        // On selecting attack, pull up the weapon menu. For now, just wait.
         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
-        unit!.wait();
+        assert(unit != null);
+        TargetSelector selector = TargetSelector(stage.getTargets());
+        unit!.add(selector);
+        stage.activeComponent = selector;
+        dev.log("$unit's attacks are: ${unit.attackSet}");
         break;
       case MenuOption.item:
         // On selecting item, pull up the item menu.
@@ -221,24 +223,34 @@ enum MenuOption {
 class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Unit unit;
   late final SpriteComponent menuSprite;
+  late final SpriteComponent mainEquipSprite;
+  late final SpriteComponent gearEquipSprite;
+  late final SpriteComponent treasureEquipSprite;
   late List<Item> inventory;
   Map<int, TextComponent> indexMap = {};
   int selectedIndex = 0;
+  int mainEquippedIndex = -1;
+  int gearEquippedIndex = -1;
+  int treasureEquippedIndex = -1;
   static const double scaleFactor = 2;
 
   ItemMenu(this.unit){
     inventory = unit.inventory;
-    double count = 0;
-    for (Item i in unit.inventory){
+    for (int i = 0; i < inventory.length; i++){
       var textComponent = TextComponent(
-        text: i.name,
+        text: inventory[i].name,
         textRenderer: basicTextRenderer,
-        position: Vector2(8, 16*(count+1)),
+        position: Vector2(20, 16*(i+1)),
         priority: 20,
       );
       add(textComponent);
-      indexMap[count.toInt()] = textComponent;
-      count++;
+      if(unit.main != null){
+        if (inventory[i] == unit.main){
+          mainEquippedIndex = i;
+        }
+      }
+      indexMap[i] = textComponent;
+      
     }
     indexMap[0]!.textRenderer = selectedTextRenderer;
   }
@@ -248,7 +260,26 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     menuSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('item_table_titled.png'),
     );
+    mainEquipSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('main_icon.png'),
+        position: Vector2(-12, 2),
+        size: Vector2.all(8)
+    );
+     gearEquipSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('gear_icon.png'),
+        position: Vector2(-12, 2),
+        size: Vector2.all(8)
+    );
+    treasureEquipSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('treasure_icon.png'),
+        position: Vector2(-12, 2),
+        size: Vector2.all(8)
+    );
     add(menuSprite);
+    if(indexMap[mainEquippedIndex]!= null) indexMap[mainEquippedIndex]!.add(mainEquipSprite);
+    if(indexMap[gearEquippedIndex]!= null) indexMap[gearEquippedIndex]!.add(gearEquipSprite);
+    if(indexMap[treasureEquippedIndex]!= null) indexMap[treasureEquippedIndex]!.add(treasureEquipSprite);
+    
   }
   
   @override
@@ -267,23 +298,171 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
-      unit.wait();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
-      unit.undoMove();
       close();
       handled = true;
     }
     return handled;
   }
 
+  void equipItem(){
+    
+    switch (inventory[selectedIndex].type) {
+      case ItemType.main:
+        if (unit.main == inventory[selectedIndex]){
+          mainEquipSprite.removeFromParent();
+          unit.unequip(ItemType.main);
+        } else{
+          mainEquipSprite.removeFromParent();
+          unit.equip(inventory[selectedIndex]);
+          indexMap[selectedIndex]!.add(mainEquipSprite);
+          mainEquippedIndex = selectedIndex;
+        }
+        
+        break;
+      case ItemType.gear:
+        if (unit.gear == inventory[selectedIndex]){
+          gearEquipSprite.removeFromParent();
+          unit.unequip(ItemType.gear);
+        } else{
+          gearEquipSprite.removeFromParent();
+          unit.equip(inventory[selectedIndex]);
+          indexMap[selectedIndex]!.add(gearEquipSprite);
+          gearEquippedIndex = selectedIndex;
+        }
+        break;
+      case ItemType.treasure:
+      if (unit.treasure == inventory[selectedIndex]){
+          treasureEquipSprite.removeFromParent();
+          unit.unequip(ItemType.treasure);
+        } else{
+          treasureEquipSprite.removeFromParent();
+          unit.equip(inventory[selectedIndex]);
+          indexMap[selectedIndex]!.add(treasureEquipSprite);
+          treasureEquippedIndex = selectedIndex;
+          }
+        break;
+      default:
+        break;
+    }
+    
+  }
+
   void select(){
+    if (inventory[selectedIndex].equipCond?.check(unit) ?? true){equipItem();}
     close();
   }
 
   void close(){
-    removeAll(children);
     Stage stage = unit.parent as Stage;
-    stage.activeComponent = stage.cursor;
+    removeAll(children);
+    unit.openActionMenu(stage);
+
   }
 }
+
+class TargetSelector extends Component implements CommandHandler {
+  List<Unit> targets;
+  TargetSelector(this.targets);
+  int targetIndex = 0;
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Unit unit = parent! as Unit;
+    Stage stage = unit.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.keyA) { // Confirm the selection.
+      if(stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
+        if(stage.tilesMap[stage.cursor.gridCoord]!.unit!.team == UnitTeam.red){
+          Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
+          CombatUI combatUI = CombatUI(unit, target);
+          dev.log("${combatUI.getValidAttacks()}");
+          stage.activeComponent = combatUI;
+        }
+
+      }
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
+      stage.cursor.goToUnit(unit);
+      unit.openActionMenu(stage);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowUp) {
+      targetIndex = (targetIndex + 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      targetIndex = (targetIndex - 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowLeft) {
+      targetIndex = (targetIndex + 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) {
+      targetIndex = (targetIndex - 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
+      handled = true;
+    }
+    return handled;
+  }
+}
+
+class CombatUI extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+  /// Combat UI should take a unit and a target and create three things:
+  /// A box that lists the weapon to use
+  /// A box that lists the combat art to use
+  /// A table that shows the damage and hit chance of the weapon/combat art combo.
+  Unit attacker;
+  Unit defender;
+  List<String> attackList = [];
+  late final SpriteComponent weaponBoxSprite;
+  late final SpriteComponent attackBoxSprite;
+  CombatUI(this.attacker, this.defender){
+    attackList = attacker.attackSet.keys.toList();
+  }
+
+  @override
+  Future<void> onLoad() async {
+    weaponBoxSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('combat_box.png'),
+    );
+    attackBoxSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('combat_box.png'),
+        position: Vector2(0, 32),
+        // size: Vector2.all(8)
+    );
+  }
+
+  int getCombatDistance(){
+    return (attacker.gridCoord.x - defender.gridCoord.x).abs() + (attacker.gridCoord.y - defender.gridCoord.y).abs();
+  }
+
+  List<String> getValidAttacks(){
+    int combatDistance = getCombatDistance();
+    List<String> attackList = [];
+    for (String attack in attacker.attackSet.keys){
+      if(attacker.attackSet[attack]!.range.$1 <= combatDistance && combatDistance <= attacker.attackSet[attack]!.range.$1){
+        attackList.add(attack);
+      }
+    }
+    return attackList;
+  }
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Stage stage = attacker.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.keyA) { // Make the attack.
+      dev.log("${attacker.name} attacked ${defender.name}");
+      attacker.wait();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
+      dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
+      stage.cursor.goToUnit(attacker);
+      attacker.openActionMenu(stage);
+      handled = true;
+    } 
+    return handled;
+  }
+}
+

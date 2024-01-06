@@ -25,5 +25,8 @@ flutter:
     - assets/images/
     - assets/tiles/
     - assets/data/units.json
+    - assets/data/items.json
+    - assets/data/weapons.json
+    - assets/data/attacks.json
   uses-material-design: true
 

@@ -16,18 +16,18 @@ import 'package:flutter/services.dart';
 import 'engine.dart';
 class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   // Identifiers and Descriptive Information
-  late final String name;
-  late final String idleAnimationName;
-  late final int movementRange; 
-  late UnitTeam team = UnitTeam.blue;
-  late final (int, int) combatRange = (1, 1);
-  late double tileSize;
+  final String name;
+  final String idleAnimationName;
+  int movementRange;
+  (int, int) combatRange;
+  UnitTeam team = UnitTeam.blue;
+  double tileSize;
 
   // Status and State Variables
-  late Point<int> gridCoord; // The units's position in terms of tiles, not pixels
+  Point<int> gridCoord; // The units's position in terms of tiles, not pixels
   bool canAct = true;
   bool isMoving = false;
-  late Point<int> oldTile;
+  Point<int> oldTile;
 
   // Collections and Complex Structures
   Queue<Point<int>> movementQueue = Queue<Point<int>>();
@@ -44,34 +44,50 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Item? treasure;
   Item? gear;
   List<Item> inventory = [];
-  List<Attack> attackSet = [];
+  Map<String, Attack> attackSet = {};
   List<Effect> effects = [];
   List<Skill> skills = [];
 
-  // Constructors
-  Unit(this.gridCoord, this.idleAnimationName) {
-    // Initial size, will be updated in onLoad
-    tileSize = 16 * MyGame().scaleFactor;
-    oldTile = gridCoord;
-  }
-  Unit.fromJSON(this.gridCoord, this.name, String jsonString) {
-    oldTile = gridCoord;
-    tileSize = 16 * MyGame().scaleFactor;
-    var unitsJson = jsonDecode(jsonString)['units'] as List;
+  // Private constructor for creating instances
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange);
+
+  // Factory constructor
+  factory Unit.fromJSON(Point<int> gridCoord, String name) {
+    // Use gridCoord and scaleFactor to set oldTile and tileSize
+    Point<int> oldTile = gridCoord;
+    double tileSize = 16 * MyGame().scaleFactor; // This assumes scaleFactor is available from an instance of MyGame. If not, adjust accordingly.
+
+    // Extract unit data from the static map in MyGame
+    var unitsJson = MyGame.unitMap['units'] as List;
     Map<String, dynamic> unitData = unitsJson.firstWhere(
         (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
         orElse: () => throw Exception('Unit $name not found in JSON data')
     );
-    movementRange = unitData['movementRange'];
+
+    // Extract other properties from unitData
+    int movementRange = unitData['movementRange'];
     final Map<String, UnitTeam> stringToUnitTeam = {
       for (var team in UnitTeam.values) team.toString().split('.').last: team,
-      };
-    team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
-    idleAnimationName = unitData['sprites']['idle'];
-    for(String item in unitData['inventory']){
-      assert(itemBank[item] != null);
-      inventory.add(itemBank[item]!);
+    };
+    UnitTeam team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+    String idleAnimationName = unitData['sprites']['idle'];
+
+    // Create items for inventory
+    List<Item> inventory = [];
+    for(String itemName in unitData['inventory']){
+      inventory.add(Item.fromJson(itemName));
     }
+    Map<String, Attack> attackMap = {};
+    int minCombatRange = 0;
+    int maxCombatRange = 0;
+    for(String attackName in unitData['attacks']){
+      attackMap[attackName] = Attack.fromJson(attackName);
+      minCombatRange = min(minCombatRange, attackMap[attackName]!.range.$1);
+      maxCombatRange = max(maxCombatRange, attackMap[attackName]!.range.$2);
+    }
+    (int, int) combatRange = (minCombatRange, maxCombatRange);
+    // Return a new Unit instance
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange);
   }
 
   @override
@@ -102,6 +118,51 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return handled;
   }
 
+  void equip(Item item){
+    switch (item.type) {
+      case ItemType.main:
+        main = item;
+        if(main?.weapon?.specialAttack != null) {
+          attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
+        }
+        dev.log("$name equipped $name as ${item.type}");
+        break;
+      case ItemType.gear:
+        gear = item;
+        dev.log("$name equipped $name as ${item.type}");
+        break;
+      case ItemType.treasure:
+        treasure = item;
+        dev.log("$name equipped $name as ${item.type}");
+        break;
+      default:
+        dev.log("${name} can't equip $item");
+        break;
+    }
+  }
+
+  void unequip(ItemType type){
+    switch (type) {
+      case ItemType.main:
+        dev.log("$name unequipped $main as $type");
+        if(main?.weapon?.specialAttack != null) {
+          attackSet.remove(main!.weapon!.specialAttack!.name);
+        }
+        main = null;
+        break;
+      case ItemType.gear:
+        dev.log("$name unequipped $gear as $type");
+        gear = null;
+        break;
+      case ItemType.treasure:
+        dev.log("$name unequipped $treasure as $type");
+        treasure = null;
+        break;
+      default:
+        break;
+    }
+  }
+
   void move(Stage stage){
     oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
     for(Point<int> point in paths[stage.cursor.gridCoord]!){
@@ -123,10 +184,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   void openActionMenu(Stage stage){
     List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, combatRange.$1, combatRange.$2);
-    List<MenuOption> visibleOptions = [MenuOption.item, MenuOption.wait];
+    List<MenuOption> visibleOptions = [MenuOption.wait];
     if(attackTiles.isNotEmpty){
       visibleOptions.add(MenuOption.attack);
     }
+    if (inventory.isNotEmpty) visibleOptions.add(MenuOption.item);
     stage.cursor.actionMenu.show(visibleOptions);
     stage.activeComponent = stage.cursor.actionMenu;
   }
@@ -360,7 +422,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
           if (x >= 0 && x < gameRef.stage.mapTileWidth && y >= 0 && y < gameRef.stage.mapTileHeight) {
             var tile = gameRef.stage.tilesMap[tilePoint];
             // Mark the tile as attackable if it's not a movement tile
-            if (tile != null && tile.state == TileState.blank) {
+            if (tile != null && tile.state != TileState.move) {
               tile.state = newState;
               tilesInRange.add(tile);
             }
@@ -386,6 +448,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
     return null;
   }
+  
 }
 
 class _TileMovement {

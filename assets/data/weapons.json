@@ -1,0 +1,40 @@
+{
+    "weapons": 
+        {
+        "Sword":
+            {
+                "weaponType" : "Sword",
+                "might": 5,
+                "hit": 50,
+                "fatigue": 1,
+                "magic": false,
+                "effects": [],
+                "specialAttack": "Slash"
+            },
+        "Axe":
+            {
+                "weaponType" : "Axe",
+                "might": 9,
+                "hit": 0,
+                "fatigue": 1,
+                "magic": false,
+                "effects": [],
+                "specialAttack": "Smash"
+            },
+        "Lance":
+            {
+                "weaponType" : "Lance",
+                "might": 7,
+                "hit": 25,
+                "fatigue": 1,
+                "magic": false,
+                "effects": [],
+                "specialAttack": "Stab"
+            },
+            "Magic Axe":
+            {
+                "weaponType" : "Axe",
+                "magic": true
+            }
+        }
+ }
