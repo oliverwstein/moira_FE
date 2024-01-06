@@ -60,6 +60,18 @@
                 "magic": false,
                 "range": [1, 1],
                 "effects": []
+            },
+        "Fire Axe":
+            {
+                "description" : "Burn, baby.",
+                "scaling" : [2.0, 1.0, 0.0, 0.0],
+                "weaponType" : ["Axe"],
+                "might": 5,
+                "hit": 10,
+                "fatigue": 1,
+                "magic": true,
+                "range": [1, 2],
+                "effects": []
             }
         }
 }

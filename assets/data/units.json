@@ -7,13 +7,14 @@
     "stats": {
         "hp": 30,
         "sta": 20,
-        "atk": 10,
+        "str": 10,
         "def": 10,
         "dex": 10,
         "spe": 10,
         "int": 10,
         "res": 10,
-        "wis": 10
+        "wis": 10,
+        "lck": 10
     },
     "skills": ["Canto"],
     "inventory": ["Salve", "Salve", "Sword"],
@@ -28,13 +29,14 @@
     "stats": {
         "hp": 30,
         "sta": 20,
-        "atk": 10,
+        "str": 10,
         "def": 10,
         "dex": 10,
         "spe": 10,
         "int": 10,
         "res": 10,
-        "wis": 10
+        "wis": 10,
+        "lck": 10
     },
     "skills": ["Canto"],
     "inventory": ["Salve", "Sword"],
@@ -49,13 +51,14 @@
     "stats": {
         "hp": 30,
         "sta": 20,
-        "atk": 10,
+        "str": 10,
         "def": 10,
         "dex": 10,
         "spe": 10,
         "int": 10,
         "res": 10,
-        "wis": 10
+        "wis": 10,
+        "lck": 10
     },
     "skills": ["Canto"],
     "inventory": ["Salve", "Sword"],
@@ -70,13 +73,14 @@
         "stats": {
             "hp": 30,
             "sta": 20,
-            "atk": 10,
+            "str": 10,
             "def": 10,
             "dex": 10,
             "spe": 10,
             "int": 10,
             "res": 10,
-            "wis": 10
+            "wis": 10,
+            "lck": 10
         },
         "skills": ["Pavise"],
         "inventory": ["Salve", "Sword"],
@@ -92,13 +96,14 @@
             "stats": {
                 "hp": 30,
                 "sta": 20,
-                "atk": 10,
+                "str": 10,
                 "def": 10,
                 "dex": 10,
                 "spe": 10,
                 "int": 10,
                 "res": 10,
-                "wis": 10
+                "wis": 10,
+                "lck": 10
             },
             "skills": [],
             "inventory": ["Axe"],

@@ -192,12 +192,31 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.blankAllTiles();
   }
 
-  void attack(Attack attack, target){
+  (int, int, int) attackCalc(Attack attack, target){
     ///In combat, the relevant stats for *damage* calculations are are:
     /// the attacker’s might, hit, attack.magic, and (attack) type against the defender’s stats.
     /// damage = weapon.might + attack.might + sum((unit.atk, unit.dex, unit.int, unit.wis)*attack.type.values) - (attack.magic*targ.res + (1-attack.magic)*targ.def)
     /// accuracy is weapon.hit + attack.hit + unit.hit - (attack.magic*targ.magAvo + (1-attack.magic)*targ.phyAvo)
-    
+    Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats['int']!.toDouble(), stats['wis']!.toDouble());
+    int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
+    int hit = attack.hit + stats['lck']!;
+    int crit = attack.crit + stats['lck']!;
+    if(main?.weapon != null) {
+      if(attack.magic) {
+        hit += stats['wis']!*2;
+        crit += stats['wis']!~/2;
+      } else {
+        hit += stats['dex']!*2;
+        crit += stats['dex']!~/2;
+      }
+      might += main!.weapon!.might;
+      hit += main!.weapon!.hit;
+      crit += main!.weapon!.crit;
+      }
+    int damage = (might - ((attack.magic ? 1 : 0)*target['stats']['res'] + (1-(attack.magic ? 1 : 0))*target['stats']['def'])).toInt().clamp(0, 100);
+    int accuracy = (hit - target['stats']['lck'] - ((attack.magic ? 1 : 0)*target['stats']['wis'] + (1-(attack.magic ? 1 : 0))*target['stats']['dex'])).toInt().clamp(1, 99);
+    int critRate = (crit - target['stats']['lck']).toInt().clamp(1, 99);
+    return (damage, accuracy, critRate);
 
   }
   void openActionMenu(Stage stage){
