@@ -370,7 +370,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
           if (x >= 0 && x < gameRef.stage.mapTileWidth && y >= 0 && y < gameRef.stage.mapTileHeight) {
             var tile = gameRef.stage.tilesMap[tilePoint];
             // Mark the tile as attackable if it's not a movement tile
-            if (tile != null && tile.state == TileState.blank) {
+            if (tile != null && tile.state != TileState.move) {
               tile.state = newState;
               tilesInRange.add(tile);
             }
