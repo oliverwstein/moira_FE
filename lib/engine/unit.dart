@@ -54,10 +54,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     tileSize = 16 * MyGame().scaleFactor;
     oldTile = gridCoord;
   }
-  Unit.fromJSON(this.gridCoord, this.name, String jsonString) {
+  Unit.fromJSON(this.gridCoord, this.name) {
     oldTile = gridCoord;
     tileSize = 16 * MyGame().scaleFactor;
-    var unitsJson = jsonDecode(jsonString)['units'] as List;
+    var unitsJson = MyGame.unitMap['units'] as List;
     Map<String, dynamic> unitData = unitsJson.firstWhere(
         (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
         orElse: () => throw Exception('Unit $name not found in JSON data')
@@ -69,7 +69,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
     idleAnimationName = unitData['sprites']['idle'];
     for(String itemName in unitData['inventory']){
-      // inventory.add(Item.fromJson(itemName, "assets/data/items.json"));
+      inventory.add(Item.fromJson(itemName));
     }
   }
 

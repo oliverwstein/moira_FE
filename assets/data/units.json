@@ -14,7 +14,7 @@
         "wis": 10
     },
     "skills": ["canto"],
-    "inventory": ["salve", "salve", "longsword"],
+    "inventory": ["Salve", "Salve", "Sword"],
     "attacks": ["Trample"],
     "sprites": {
         "idle": "sigurd.png"
@@ -33,7 +33,7 @@
         "wis": 10
     },
     "skills": ["canto"],
-    "inventory": ["salve", "longsword"],
+    "inventory": ["Salve", "Sword"],
     "attacks": ["Trample"],
     "sprites": {
         "idle": "noish.png"
@@ -52,7 +52,7 @@
         "wis": 10
     },
     "skills": ["canto"],
-    "inventory": ["salve", "longsword"],
+    "inventory": ["Salve", "Sword"],
     "attacks": ["Trample"],
     "sprites": {
         "idle": "alec.png"
@@ -71,7 +71,7 @@
             "wis": 10
         },
         "skills": ["pavise"],
-        "inventory": ["salve", "longsword"],
+        "inventory": ["Salve", "Sword"],
         "attacks": [],
         "sprites": {
             "idle": "arden.png"
@@ -91,7 +91,7 @@
                 "wis": 10
             },
             "skills": [],
-            "inventory": ["axe"],
+            "inventory": ["Axe"],
             "attacks": [],
             "sprites": {
                 "idle": "brigand_idle.png"

@@ -18,6 +18,11 @@
             "weapon": "Axe",
             "description": "An axe.",
             "type": "main"
+        },
+    "Salve":
+        {
+            "description": "A healing salve.",
+            "type": "basic"
         }
     }
 }

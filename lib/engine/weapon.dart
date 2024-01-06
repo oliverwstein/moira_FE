@@ -2,11 +2,12 @@
 import 'dart:convert';
 
 import 'package:flame/components.dart';
+import 'package:flutter/services.dart';
 import 'engine.dart';
 // ignore: constant_identifier_names
 enum WeaponType {Sword, Axe, Lance, Knife, Staff, Book, None}
 
-class Weapon extends Component {
+class Weapon extends Component with HasGameRef<MyGame>{
   late WeaponType weaponType; // The type of the weapon. 
   late int might; // The base power of the weapon. 
   late int hit; // The base accuracy of the weapon. 
@@ -14,39 +15,41 @@ class Weapon extends Component {
   bool magic = false; // Whether the weapon does magical or physical damage.
   late List<CombatEffect>? effects; // The special effects of the weapon. 
   late Attack? specialAttack; // The special attack that can be performed with the weapon, if any. 
+  
+  // Internal constructor for creating instances
+  Weapon._internal(this.weaponType, this.might, this.hit, this.fatigue, this.magic, this.effects, this.specialAttack);
 
-  Weapon.fromJson(String name, String jsonString) {
-    // Define default values
-    Map<String, dynamic> weaponData = {
-      "might": 0,
-      "hit": 0,
-      "fatigue": 0,
-      "magic": false,
-      "effects": [],
-      "specialAttack": null,
-    };
-    Map<String, dynamic> jsonMap = jsonDecode(jsonString);
-    if (jsonMap['weapons'].contains_key(name)){
-      weaponData = jsonMap['weapons'][name];
+  // Factory constructor
+  factory Weapon.fromJson(String name) {
+    Map<String, dynamic> weaponData;
+
+    // Check if the weapon exists in the map and retrieve its data
+    if (MyGame.weaponMap['weapons'].containsKey(name)) {
+      weaponData = MyGame.weaponMap['weapons'][name];
     } else {
-      weaponData['weaponType'] = "none";
+      // Define default values for a weapon that doesn't exist in the map
+      weaponData = {
+        "weaponType": "none",
+        "might": 0,
+        "hit": 0,
+        "fatigue": 0,
+        "magic": false,
+        "effects": [],
+        "specialAttack": null,
+      };
     }
 
-    // Get the weapon type first
-    var weaponTypeString = weaponData['weaponType']; // Ensure this key exists or have error handling
-    weaponType = WeaponType.values.firstWhere((wt) => wt.toString().split('.').last == weaponTypeString);
+    // Extract values from weaponData or use default values
+    String weaponTypeString = weaponData['weaponType'] ?? "none";
+    WeaponType weaponType = WeaponType.values.firstWhere((wt) => wt.toString().split('.').last == weaponTypeString);
+    int might = weaponData['might'] ?? 0;
+    int hit = weaponData['hit'] ?? 0;
+    int fatigue = weaponData['fatigue'] ?? 0;
+    bool magic = weaponData['magic'] ?? false;
+    // List<CombatEffect> effects = weaponData['effects'] ?? []; // Replace with actual type if you have a specific Effect class
+    Attack specialAttack = Attack.fromJson(weaponData['specialAttack']); // Replace with actual type
 
-    // Use the weapon type to retrieve the default values for this weapon type
-    var defaults = weaponData[weaponTypeString] ?? {};
-
-    // Assign values from JSON or use defaults
-    might = jsonMap['might'] ?? defaults['might'] ?? 0;
-    hit = jsonMap['hit'] ?? defaults['hit'] ?? 0;
-    fatigue = jsonMap['fatigue'] ?? defaults['fatigue'] ?? 0;
-    magic = jsonMap['magic'] ?? defaults['magic'] ?? false;
-    effects = jsonMap['effects'] ?? defaults['effects'] ?? [];
-    String specialAttackName = jsonMap['specialAttack'] ?? defaults['specialAttack'];
-    specialAttack = Attack.fromJson(specialAttackName, "assets/data/attacks.json");
-
+    // Return a new Weapon instance
+    return Weapon._internal(weaponType, might, hit, fatigue, magic, null, specialAttack);
   }
 }

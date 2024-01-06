@@ -41,15 +41,14 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    String unitDataJsonString = await loadJsonData("assets/data/units.json");
-    units.add(Unit.fromJSON(const Point(59, 10), 'arden', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(60, 12), 'alec', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(58, 12), 'noish', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(59, 13), 'sigurd', unitDataJsonString));
+    units.add(Unit.fromJSON(const Point(59, 10), 'arden'));
+    units.add(Unit.fromJSON(const Point(60, 12), 'alec'));
+    units.add(Unit.fromJSON(const Point(58, 12), 'noish'));
+    units.add(Unit.fromJSON(const Point(59, 13), 'sigurd'));
 
-    units.add(Unit.fromJSON(const Point(56, 12), 'brigand', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(55, 13), 'brigand', unitDataJsonString));
-    units.add(Unit.fromJSON(const Point(55, 11), 'brigand', unitDataJsonString));
+    units.add(Unit.fromJSON(const Point(56, 12), 'brigand'));
+    units.add(Unit.fromJSON(const Point(55, 13), 'brigand'));
+    units.add(Unit.fromJSON(const Point(55, 11), 'brigand'));
      
     for (Unit unit in units) {
       add(unit);
