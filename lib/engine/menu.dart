@@ -329,14 +329,42 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   }
 
   void select(){
-    Stage stage = unit.parent as Stage;
     if (inventory[selectedIndex].equipCond?.check(unit) ?? true){equipItem();}
     close();
-    unit.openActionMenu(stage);
   }
 
   void close(){
+    Stage stage = unit.parent as Stage;
     removeAll(children);
+    unit.openActionMenu(stage);
+
   }
 }
 
+class TargetSelector extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Stage stage = parent!.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
+      stage.activeComponent = stage.cursor;
+      stage.blankAllTiles();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowLeft) {
+      stage.cursor.move(Direction.left);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) {
+      stage.cursor.move(Direction.right);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowUp) {
+      stage.cursor.move(Direction.up);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      stage.cursor.move(Direction.down);
+      handled = true;
+    }
+    return handled;
+  }
+}
