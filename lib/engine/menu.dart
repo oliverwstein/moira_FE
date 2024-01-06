@@ -375,9 +375,9 @@ class TargetSelector extends Component implements CommandHandler {
       if(stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
         if(stage.tilesMap[stage.cursor.gridCoord]!.unit!.team == UnitTeam.red){
           Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
-          CombatUI combatUI = CombatUI(unit, target);
-          dev.log("${combatUI.getValidAttacks()}");
-          stage.activeComponent = combatUI;
+          CombatBox combatBox = CombatBox(unit, target);
+          dev.log("${combatBox.getValidAttacks()}");
+          stage.activeComponent = combatBox;
         }
 
       }
@@ -407,7 +407,7 @@ class TargetSelector extends Component implements CommandHandler {
   }
 }
 
-class CombatUI extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+class CombatBox extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   /// Combat UI should take a unit and a target and create three things:
   /// A box that lists the weapon to use
   /// A box that lists the combat art to use
@@ -417,7 +417,7 @@ class CombatUI extends PositionComponent with HasGameRef<MyGame> implements Comm
   List<String> attackList = [];
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
-  CombatUI(this.attacker, this.defender){
+  CombatBox(this.attacker, this.defender){
     attackList = attacker.attackSet.keys.toList();
   }
 

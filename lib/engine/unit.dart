@@ -182,6 +182,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.blankAllTiles();
   }
 
+  void attack(Attack attack, target){
+    ///In combat, the relevant stats for *damage* calculations are are:
+    /// the attacker’s might, hit, attack.magic, and (attack) type against the defender’s stats.
+    /// damage = weapon.might + attack.might + sum((unit.atk, unit.dex, unit.int, unit.wis)*attack.type.values) - (attack.magic*targ.res + (1-attack.magic)*targ.def)
+    /// accuracy is weapon.hit + attack.hit + unit.hit - (attack.magic*targ.magAvo + (1-attack.magic)*targ.phyAvo)
+    
+
+  }
   void openActionMenu(Stage stage){
     List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, combatRange.$1, combatRange.$2);
     List<MenuOption> visibleOptions = [MenuOption.wait];
