@@ -13,7 +13,7 @@
         "res": 10,
         "wis": 10
     },
-    "skills": ["canto"],
+    "skills": ["Canto"],
     "inventory": ["Salve", "Salve", "Sword"],
     "attacks": ["Trample"],
     "sprites": {
@@ -32,7 +32,7 @@
         "res": 10,
         "wis": 10
     },
-    "skills": ["canto"],
+    "skills": ["Canto"],
     "inventory": ["Salve", "Sword"],
     "attacks": ["Trample"],
     "sprites": {
@@ -51,7 +51,7 @@
         "res": 10,
         "wis": 10
     },
-    "skills": ["canto"],
+    "skills": ["Canto"],
     "inventory": ["Salve", "Sword"],
     "attacks": ["Trample"],
     "sprites": {
@@ -70,7 +70,7 @@
             "res": 10,
             "wis": 10
         },
-        "skills": ["pavise"],
+        "skills": ["Pavise"],
         "inventory": ["Salve", "Sword"],
         "attacks": [],
         "sprites": {

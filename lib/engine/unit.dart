@@ -44,12 +44,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Item? treasure;
   Item? gear;
   List<Item> inventory = [];
-  List<Attack> attackSet = [];
+  Map<String, Attack> attackSet = {};
   List<Effect> effects = [];
   List<Skill> skills = [];
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory);
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet);
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -77,9 +77,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     for(String itemName in unitData['inventory']){
       inventory.add(Item.fromJson(itemName));
     }
+    Map<String, Attack> attackMap = {};
+    for(String attackName in unitData['attacks']){
+      attackMap[attackName] = Attack.fromJson(attackName);
+    }
 
     // Return a new Unit instance
-    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory);
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap);
   }
 
   @override
