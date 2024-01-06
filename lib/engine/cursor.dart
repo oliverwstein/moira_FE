@@ -194,6 +194,10 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     return handled;
   }
   
+  void snapToTile(Point<int> point){
+    x = point.x * tileSize;
+    y = point.x * tileSize;
+  }
   void onScaleChanged(double scaleFactor) {
     tileSize = 16 * scaleFactor; // Update tileSize
     size = Vector2.all(tileSize); // Update the size of the cursor itself
