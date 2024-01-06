@@ -18,7 +18,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   late final Cursor cursor;
   List<Unit> units = [];
   final Vector2 tilesize = Vector2.all(16);
-  late Map<Point<int>, Tile> tilesMap = {};
+  Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
   int turn = 1;
   Stage();

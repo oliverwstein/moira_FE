@@ -55,7 +55,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
     blankWindowSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('action_menu_narrow.png'),
     );
-    dev.log('${MenuOption.values}');
     for (var option in MenuOption.values) {
       var boxComponent = PositionComponent(
       );
@@ -97,7 +96,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
 
   void select(){
     Stage stage = parent!.parent as Stage;
-    dev.log('${visibleOptions[selectedIndex]}');
     switch (visibleOptions[selectedIndex]) {
       case MenuOption.endTurn:
         stage.endTurn();
@@ -278,6 +276,9 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   }
 
   void select(){
+    if (inventory[selectedIndex].equipCond?.check(unit) ?? true){
+      inventory[selectedIndex].equip(unit);
+    }
     close();
   }
 

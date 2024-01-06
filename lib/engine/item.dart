@@ -9,7 +9,7 @@ import 'dart:io';
 
 class Item extends Component with HasGameRef<MyGame>{
   final String name;
-  late String description;
+  String description;
   ItemType? type;
   Equip? equipCond;
   Use? use;
@@ -19,7 +19,6 @@ class Item extends Component with HasGameRef<MyGame>{
   // Factory constructor
   factory Item.fromJson(String name) {
     var itemData = MyGame.itemMap['items'][name];
-    dev.log(itemData.toString());
 
     if (itemData == null) {
       // Handle the case where itemData does not exist for the given name
@@ -32,38 +31,35 @@ class Item extends Component with HasGameRef<MyGame>{
       
       if (itemData.containsKey("weapon")) {
         Weapon weapon = Weapon.fromJson(itemData['weapon']);
-        return Item._internal(name, description, type, weapon);
+        return Item._internal(name, description, type, weapon, Equip());
       } else {
-        return Item._internal(name, description, type, null);
+        return Item._internal(name, description, type, null, null);
       }
     }
   }
 
   // Internal constructor for creating instances from factory constructor
-  Item._internal(this.name, this.description, this.type, this.weapon);
+  Item._internal(this.name, this.description, this.type, this.weapon, this.equipCond);
 
   void equip(Unit unit){
-    if (equipCond !=null) {
-      if(equipCond!.check(unit)){
-        switch (type) {
-                  case ItemType.main:
-                    unit.main = this;
-                    dev.log("${unit.name} equipped $name as $type");
-                    break;
-                  case ItemType.gear:
-                    unit.gear = this;
-                    dev.log("${unit.name} equipped $name as $type");
-                    break;
-                  case ItemType.treasure:
-                    unit.treasure = this;
-                    dev.log("${unit.name} equipped $name as $type");
-                    break;
-                  default:
-                    break;
-        }
-      }
+    switch (type) {
+      case ItemType.main:
+        unit.main = this;
+        dev.log("${unit.name} equipped $name as $type");
+        break;
+      case ItemType.gear:
+        unit.gear = this;
+        dev.log("${unit.name} equipped $name as $type");
+        break;
+      case ItemType.treasure:
+        unit.treasure = this;
+        dev.log("${unit.name} equipped $name as $type");
+        break;
+      default:
+        dev.log("${unit.name} can't equip $name");
+        // TODO: if the item can't be equipped, try to use it. 
+        break;
     }
-    dev.log("${unit.name} can't equip $name");
   }
 }
 
