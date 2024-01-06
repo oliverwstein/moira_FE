@@ -48,29 +48,38 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   List<Effect> effects = [];
   List<Skill> skills = [];
 
-  // Constructors
-  Unit(this.gridCoord, this.idleAnimationName) {
-    // Initial size, will be updated in onLoad
-    tileSize = 16 * MyGame().scaleFactor;
-    oldTile = gridCoord;
-  }
-  Unit.fromJSON(this.gridCoord, this.name) {
-    oldTile = gridCoord;
-    tileSize = 16 * MyGame().scaleFactor;
+  // Private constructor for creating instances
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory);
+
+  // Factory constructor
+  factory Unit.fromJSON(Point<int> gridCoord, String name) {
+    // Use gridCoord and scaleFactor to set oldTile and tileSize
+    Point<int> oldTile = gridCoord;
+    double tileSize = 16 * MyGame().scaleFactor; // This assumes scaleFactor is available from an instance of MyGame. If not, adjust accordingly.
+
+    // Extract unit data from the static map in MyGame
     var unitsJson = MyGame.unitMap['units'] as List;
     Map<String, dynamic> unitData = unitsJson.firstWhere(
         (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
         orElse: () => throw Exception('Unit $name not found in JSON data')
     );
-    movementRange = unitData['movementRange'];
+
+    // Extract other properties from unitData
+    int movementRange = unitData['movementRange'];
     final Map<String, UnitTeam> stringToUnitTeam = {
       for (var team in UnitTeam.values) team.toString().split('.').last: team,
-      };
-    team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
-    idleAnimationName = unitData['sprites']['idle'];
+    };
+    UnitTeam team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+    String idleAnimationName = unitData['sprites']['idle'];
+
+    // Create items for inventory
+    List<Item> inventory = [];
     for(String itemName in unitData['inventory']){
       inventory.add(Item.fromJson(itemName));
     }
+
+    // Return a new Unit instance
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory);
   }
 
   @override
