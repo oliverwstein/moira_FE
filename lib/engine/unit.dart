@@ -16,18 +16,18 @@ import 'package:flutter/services.dart';
 import 'engine.dart';
 class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   // Identifiers and Descriptive Information
-  late final String name;
-  late final String idleAnimationName;
-  late final int movementRange; 
-  late UnitTeam team = UnitTeam.blue;
-  late final (int, int) combatRange = (1, 1);
-  late double tileSize;
+  final String name;
+  final String idleAnimationName;
+  int movementRange; 
+  UnitTeam team = UnitTeam.blue;
+  (int, int) combatRange = (1, 1);
+  double tileSize;
 
   // Status and State Variables
-  late Point<int> gridCoord; // The units's position in terms of tiles, not pixels
+  Point<int> gridCoord; // The units's position in terms of tiles, not pixels
   bool canAct = true;
   bool isMoving = false;
-  late Point<int> oldTile;
+  Point<int> oldTile;
 
   // Collections and Complex Structures
   Queue<Point<int>> movementQueue = Queue<Point<int>>();
