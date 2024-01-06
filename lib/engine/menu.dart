@@ -345,16 +345,14 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   }
 }
 
-class TargetSelector extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
-
-  TargetSelector();
-
+class TargetSelector extends Component implements CommandHandler {
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     Unit unit = parent! as Unit;
     Stage stage = unit.parent as Stage;
     bool handled = false;
-    if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
+    if (command == LogicalKeyboardKey.keyA) { // Confirm the selection.
+
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       unit.openActionMenu(stage);
@@ -375,3 +373,47 @@ class TargetSelector extends PositionComponent with HasGameRef<MyGame> implement
     return handled;
   }
 }
+
+class CombatUI extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+  /// Combat UI should take a unit and a target and create three things:
+  /// A box that lists the weapon to use
+  /// A box that lists the combat art to use
+  /// A table that shows the damage and hit chance of the weapon/combat art combo.
+  Unit attacker;
+  Unit defender;
+  late final SpriteComponent weaponBoxSprite;
+  late final SpriteComponent attackBoxSprite;
+  CombatUI(this.attacker, this.defender);
+
+  @override
+  Future<void> onLoad() async {
+    weaponBoxSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('combat_box.png'),
+    );
+    attackBoxSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('combat_box.png'),
+        position: Vector2(0, 32),
+        // size: Vector2.all(8)
+    );
+  }
+
+  int getCombatDistance(){
+    return (attacker.gridCoord.x - defender.gridCoord.x).abs() + (attacker.gridCoord.y - defender.gridCoord.y).abs();
+  }
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Unit unit = parent! as Unit;
+    Stage stage = unit.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.keyA) { // Make the attack.
+
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
+      unit.openActionMenu(stage);
+      handled = true;
+    } 
+    return handled;
+  }
+}
+
