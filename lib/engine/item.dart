@@ -41,26 +41,6 @@ class Item extends Component with HasGameRef<MyGame>{
   // Internal constructor for creating instances from factory constructor
   Item._internal(this.name, this.description, this.type, this.weapon, this.equipCond);
 
-  void equip(Unit unit){
-    switch (type) {
-      case ItemType.main:
-        unit.main = this;
-        dev.log("${unit.name} equipped $name as $type");
-        break;
-      case ItemType.gear:
-        unit.gear = this;
-        dev.log("${unit.name} equipped $name as $type");
-        break;
-      case ItemType.treasure:
-        unit.treasure = this;
-        dev.log("${unit.name} equipped $name as $type");
-        break;
-      default:
-        dev.log("${unit.name} can't equip $name");
-        // TODO: if the item can't be equipped, try to use it. 
-        break;
-    }
-  }
 }
 
 class Equip extends Component {

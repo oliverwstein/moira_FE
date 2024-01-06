@@ -310,19 +310,19 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     switch (inventory[selectedIndex].type) {
       case ItemType.main:
         mainEquipSprite.removeFromParent();
-        inventory[selectedIndex].equip(unit);
+        unit.equip(inventory[selectedIndex]);
         indexMap[selectedIndex]!.add(mainEquipSprite);
         mainEquippedIndex = selectedIndex;
         break;
       case ItemType.gear:
         gearEquipSprite.removeFromParent();
-        inventory[selectedIndex].equip(unit);
+        unit.equip(inventory[selectedIndex]);
         indexMap[selectedIndex]!.add(gearEquipSprite);
         gearEquippedIndex = selectedIndex;
         break;
       case ItemType.treasure:
         treasureEquipSprite.removeFromParent();
-        inventory[selectedIndex].equip(unit);
+        unit.equip(inventory[selectedIndex]);
         indexMap[selectedIndex]!.add(treasureEquipSprite);
         treasureEquippedIndex = selectedIndex;
         break;
@@ -381,9 +381,12 @@ class CombatUI extends PositionComponent with HasGameRef<MyGame> implements Comm
   /// A table that shows the damage and hit chance of the weapon/combat art combo.
   Unit attacker;
   Unit defender;
+  List<String> attackList = [];
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
-  CombatUI(this.attacker, this.defender);
+  CombatUI(this.attacker, this.defender){
+    attackList = attacker.attackSet.keys.toList();
+  }
 
   @override
   Future<void> onLoad() async {
@@ -399,6 +402,17 @@ class CombatUI extends PositionComponent with HasGameRef<MyGame> implements Comm
 
   int getCombatDistance(){
     return (attacker.gridCoord.x - defender.gridCoord.x).abs() + (attacker.gridCoord.y - defender.gridCoord.y).abs();
+  }
+
+  List<String> getValidAttacks(){
+    int combatDistance = getCombatDistance();
+    List<String> attackList = [];
+    for (String attack in attacker.attackSet.keys){
+      if(attacker.attackSet[attack]!.range.$1 <= combatDistance && combatDistance <= attacker.attackSet[attack]!.range.$1){
+        attackList.add(attack);
+      }
+    }
+    return attackList;
   }
 
   @override

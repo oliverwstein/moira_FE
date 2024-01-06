@@ -118,6 +118,26 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return handled;
   }
 
+  void equip(Item item){
+    switch (item.type) {
+      case ItemType.main:
+        main = item;
+        dev.log("$name equipped $name as ${item.type}");
+        break;
+      case ItemType.gear:
+        gear = item;
+        dev.log("$name equipped $name as ${item.type}");
+        break;
+      case ItemType.treasure:
+        treasure = item;
+        dev.log("$name equipped $name as ${item.type}");
+        break;
+      default:
+        dev.log("${name} can't equip $item");
+        break;
+    }
+  }
+
   void move(Stage stage){
     oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
     for(Point<int> point in paths[stage.cursor.gridCoord]!){
