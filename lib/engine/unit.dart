@@ -122,6 +122,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     switch (item.type) {
       case ItemType.main:
         main = item;
+        if(main?.weapon?.specialAttack != null) {
+          attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
+        }
         dev.log("$name equipped $name as ${item.type}");
         break;
       case ItemType.gear:
@@ -137,10 +140,18 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
         break;
     }
   }
+
+  void updateAttacks() {
+    
+  }
+
   void unequip(ItemType type){
     switch (type) {
       case ItemType.main:
         dev.log("$name unequipped $main as $type");
+        if(main?.weapon?.specialAttack != null) {
+          attackSet.remove(main!.weapon!.specialAttack!.name);
+        }
         main = null;
         break;
       case ItemType.gear:
@@ -441,6 +452,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
     return null;
   }
+  
 }
 
 class _TileMovement {

@@ -111,7 +111,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         TargetSelector selector = TargetSelector();
         unit!.add(selector);
         stage.activeComponent = selector;
-        // unit!.wait(); //Placeholder. Remove once the CombatUI is in place. 
+        dev.log("$unit's attacks are: ${unit.attackSet}");
         break;
       case MenuOption.item:
         // On selecting item, pull up the item menu.
@@ -311,7 +311,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
       case ItemType.main:
         if (unit.main == inventory[selectedIndex]){
           mainEquipSprite.removeFromParent();
-          unit.main = null;
+          unit.unequip(ItemType.main);
         } else{
           mainEquipSprite.removeFromParent();
           unit.equip(inventory[selectedIndex]);
@@ -323,7 +323,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
       case ItemType.gear:
         if (unit.gear == inventory[selectedIndex]){
           gearEquipSprite.removeFromParent();
-          unit.gear = null;
+          unit.unequip(ItemType.gear);
         } else{
           gearEquipSprite.removeFromParent();
           unit.equip(inventory[selectedIndex]);
@@ -334,7 +334,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
       case ItemType.treasure:
       if (unit.treasure == inventory[selectedIndex]){
           treasureEquipSprite.removeFromParent();
-          unit.treasure = null;
+          unit.unequip(ItemType.treasure);
         } else{
           treasureEquipSprite.removeFromParent();
           unit.equip(inventory[selectedIndex]);
