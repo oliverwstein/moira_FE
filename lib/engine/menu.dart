@@ -394,6 +394,14 @@ class TargetSelector extends Component implements CommandHandler {
       targetIndex = (targetIndex - 1) % targets.length;
       stage.cursor.goToUnit(targets[targetIndex]);
       handled = true;
+    } else if (command == LogicalKeyboardKey.arrowLeft) {
+      targetIndex = (targetIndex + 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) {
+      targetIndex = (targetIndex - 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
+      handled = true;
     }
     return handled;
   }
