@@ -309,22 +309,38 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     
     switch (inventory[selectedIndex].type) {
       case ItemType.main:
-        mainEquipSprite.removeFromParent();
-        unit.equip(inventory[selectedIndex]);
-        indexMap[selectedIndex]!.add(mainEquipSprite);
-        mainEquippedIndex = selectedIndex;
+        if (unit.main == inventory[selectedIndex]){
+          mainEquipSprite.removeFromParent();
+          unit.main = null;
+        } else{
+          mainEquipSprite.removeFromParent();
+          unit.equip(inventory[selectedIndex]);
+          indexMap[selectedIndex]!.add(mainEquipSprite);
+          mainEquippedIndex = selectedIndex;
+        }
+        
         break;
       case ItemType.gear:
-        gearEquipSprite.removeFromParent();
-        unit.equip(inventory[selectedIndex]);
-        indexMap[selectedIndex]!.add(gearEquipSprite);
-        gearEquippedIndex = selectedIndex;
+        if (unit.gear == inventory[selectedIndex]){
+          gearEquipSprite.removeFromParent();
+          unit.gear = null;
+        } else{
+          gearEquipSprite.removeFromParent();
+          unit.equip(inventory[selectedIndex]);
+          indexMap[selectedIndex]!.add(gearEquipSprite);
+          gearEquippedIndex = selectedIndex;
+        }
         break;
       case ItemType.treasure:
-        treasureEquipSprite.removeFromParent();
-        unit.equip(inventory[selectedIndex]);
-        indexMap[selectedIndex]!.add(treasureEquipSprite);
-        treasureEquippedIndex = selectedIndex;
+      if (unit.treasure == inventory[selectedIndex]){
+          treasureEquipSprite.removeFromParent();
+          unit.treasure = null;
+        } else{
+          treasureEquipSprite.removeFromParent();
+          unit.equip(inventory[selectedIndex]);
+          indexMap[selectedIndex]!.add(treasureEquipSprite);
+          treasureEquippedIndex = selectedIndex;
+          }
         break;
       default:
         break;
