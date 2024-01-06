@@ -1,4 +1,5 @@
 // ignore_for_file: unnecessary_overrides, unused_import
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:developer' as dev;
 
@@ -373,6 +374,7 @@ class TargetSelector extends Component implements CommandHandler {
           Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
           CombatUI combatUI = CombatUI(unit, target);
           dev.log("${combatUI.getValidAttacks()}");
+          stage.activeComponent = combatUI;
         }
 
       }
@@ -440,14 +442,16 @@ class CombatUI extends PositionComponent with HasGameRef<MyGame> implements Comm
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
-    Unit unit = parent! as Unit;
-    Stage stage = unit.parent as Stage;
+    Stage stage = attacker.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.keyA) { // Make the attack.
-      
+      dev.log("${attacker.name} attacked ${defender.name}");
+      attacker.wait();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
-      unit.openActionMenu(stage);
+      dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
+      stage.cursor.goToUnit(attacker);
+      attacker.openActionMenu(stage);
       handled = true;
     } 
     return handled;
