@@ -131,7 +131,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   void openActionMenu(Stage stage){
     List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, combatRange.$1, combatRange.$2);
-    dev.log('Number of attack tiles: ${attackTiles.length}, Cursor.gridCoord: ${stage.cursor.gridCoord}');
     List<MenuOption> visibleOptions = [MenuOption.wait];
     if(attackTiles.isNotEmpty){
       visibleOptions.add(MenuOption.attack);

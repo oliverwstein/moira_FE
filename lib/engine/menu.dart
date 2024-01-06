@@ -219,11 +219,15 @@ enum MenuOption {
 class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   Unit unit;
   late final SpriteComponent menuSprite;
-  late final SpriteComponent equipMainSprite;
+  late final SpriteComponent mainEquipSprite;
+  late final SpriteComponent gearEquipSprite;
+  late final SpriteComponent treasureEquipSprite;
   late List<Item> inventory;
   Map<int, TextComponent> indexMap = {};
   int selectedIndex = 0;
   int mainEquippedIndex = -1;
+  int gearEquippedIndex = -1;
+  int treasureEquippedIndex = -1;
   static const double scaleFactor = 2;
 
   ItemMenu(this.unit){
@@ -252,15 +256,25 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     menuSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('item_table_titled.png'),
     );
-    equipMainSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('hand_icon.png'),
+    mainEquipSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('main_icon.png'),
+        position: Vector2(-12, 2),
+        size: Vector2.all(8)
+    );
+     gearEquipSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('gear_icon.png'),
+        position: Vector2(-12, 2),
+        size: Vector2.all(8)
+    );
+    treasureEquipSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('treasure_icon.png'),
         position: Vector2(-12, 2),
         size: Vector2.all(8)
     );
     add(menuSprite);
-    if(indexMap[mainEquippedIndex]!= null){
-      indexMap[mainEquippedIndex]!.add(equipMainSprite);
-    }
+    if(indexMap[mainEquippedIndex]!= null) indexMap[mainEquippedIndex]!.add(mainEquipSprite);
+    if(indexMap[gearEquippedIndex]!= null) indexMap[gearEquippedIndex]!.add(gearEquipSprite);
+    if(indexMap[treasureEquippedIndex]!= null) indexMap[treasureEquippedIndex]!.add(treasureEquipSprite);
     
   }
   
@@ -289,11 +303,30 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   }
 
   void equipItem(){
-    equipMainSprite.removeFromParent();
-    inventory[selectedIndex].equip(unit);
-    assert(indexMap[selectedIndex] != null);
-    indexMap[selectedIndex]!.add(equipMainSprite);
-    mainEquippedIndex = selectedIndex;
+    
+    switch (inventory[selectedIndex].type) {
+      case ItemType.main:
+        mainEquipSprite.removeFromParent();
+        inventory[selectedIndex].equip(unit);
+        indexMap[selectedIndex]!.add(mainEquipSprite);
+        mainEquippedIndex = selectedIndex;
+        break;
+      case ItemType.gear:
+        gearEquipSprite.removeFromParent();
+        inventory[selectedIndex].equip(unit);
+        indexMap[selectedIndex]!.add(gearEquipSprite);
+        gearEquippedIndex = selectedIndex;
+        break;
+      case ItemType.treasure:
+        equipTreasureSprite.removeFromParent();
+        inventory[selectedIndex].equip(unit);
+        indexMap[selectedIndex]!.add(equipTreasureSprite);
+        treasureEquippedIndex = selectedIndex;
+        break;
+      default:
+        break;
+    }
+    
   }
 
   void select(){
