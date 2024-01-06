@@ -141,10 +141,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
   }
 
-  void updateAttacks() {
-    
-  }
-
   void unequip(ItemType type){
     switch (type) {
       case ItemType.main:

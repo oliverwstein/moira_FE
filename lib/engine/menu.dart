@@ -368,7 +368,14 @@ class TargetSelector extends Component implements CommandHandler {
     Stage stage = unit.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the selection.
+      if(stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
+        if(stage.tilesMap[stage.cursor.gridCoord]!.unit!.team == UnitTeam.red){
+          Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
+          CombatUI combatUI = CombatUI(unit, target);
+          dev.log("${combatUI.getValidAttacks()}");
+        }
 
+      }
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       unit.openActionMenu(stage);
@@ -437,7 +444,7 @@ class CombatUI extends PositionComponent with HasGameRef<MyGame> implements Comm
     Stage stage = unit.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.keyA) { // Make the attack.
-
+      
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       unit.openActionMenu(stage);
