@@ -106,9 +106,8 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         stage.activeComponent = stage.cursor;
         break;
       case MenuOption.attack:
-        // On selecting attack, pull up the weapon menu. For now, just wait.
         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
-        unit!.wait();
+        unit!.wait(); //Placeholder. Remove once the CombatUI is in place. 
         break;
       case MenuOption.item:
         // On selecting item, pull up the item menu.
@@ -318,9 +317,9 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
         gearEquippedIndex = selectedIndex;
         break;
       case ItemType.treasure:
-        equipTreasureSprite.removeFromParent();
+        treasureEquipSprite.removeFromParent();
         inventory[selectedIndex].equip(unit);
-        indexMap[selectedIndex]!.add(equipTreasureSprite);
+        indexMap[selectedIndex]!.add(treasureEquipSprite);
         treasureEquippedIndex = selectedIndex;
         break;
       default:
@@ -340,3 +339,4 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     removeAll(children);
   }
 }
+
