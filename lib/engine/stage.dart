@@ -92,6 +92,17 @@ class Stage extends Component with HasGameRef<MyGame>{
     tilesMap[newPoint]?.setUnit(unit);
   }
 
+  List<Unit> getTargets(){
+    List<Unit> targetList = [];
+    for (Tile tile in tilesMap.values){
+      if(tile.state == TileState.attack){
+        assert(tile.isOccupied);
+        targetList.add(tile.unit!);
+      }
+    }
+    return targetList;
+  }
+
   void endTurn() {
     for (var unit in units) {
       unit.toggleCanAct(true);

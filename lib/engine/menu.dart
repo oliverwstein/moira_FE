@@ -109,7 +109,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       case MenuOption.attack:
         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         assert(unit != null);
-        TargetSelector selector = TargetSelector();
+        TargetSelector selector = TargetSelector(stage.getTargets());
         unit!.add(selector);
         stage.activeComponent = selector;
         dev.log("$unit's attacks are: ${unit.attackSet}");
@@ -363,6 +363,9 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
 }
 
 class TargetSelector extends Component implements CommandHandler {
+  List<Unit> targets;
+  TargetSelector(this.targets);
+  int targetIndex = 0;
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     Unit unit = parent! as Unit;
@@ -380,19 +383,16 @@ class TargetSelector extends Component implements CommandHandler {
       }
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
+      stage.cursor.goToUnit(unit);
       unit.openActionMenu(stage);
       handled = true;
-    } else if (command == LogicalKeyboardKey.arrowLeft) {
-      stage.cursor.move(Direction.left);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowRight) {
-      stage.cursor.move(Direction.right);
-      handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
-      stage.cursor.move(Direction.up);
+      targetIndex = (targetIndex + 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
-      stage.cursor.move(Direction.down);
+      targetIndex = (targetIndex - 1) % targets.length;
+      stage.cursor.goToUnit(targets[targetIndex]);
       handled = true;
     }
     return handled;
