@@ -408,7 +408,7 @@ class TargetSelector extends Component implements CommandHandler {
 }
 
 class CombatBox extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
-  /// Combat UI should take a unit and a target and create three things:
+  /// Combat Box should take a unit and a target and create three things:
   /// A box that lists the weapon to use
   /// A box that lists the combat art to use
   /// A table that shows the damage and hit chance of the weapon/combat art combo.
@@ -446,6 +446,10 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       }
     }
     return attackList;
+  }
+
+  void getCombatValues(Unit attacker, Unit defender, Attack attack){
+    // Calculate Damage
   }
 
   @override

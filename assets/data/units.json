@@ -6,9 +6,11 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
+        "sta": 20,
         "atk": 10,
         "def": 10,
         "dex": 10,
+        "spe": 10,
         "int": 10,
         "res": 10,
         "wis": 10
@@ -25,9 +27,11 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
+        "sta": 20,
         "atk": 10,
         "def": 10,
         "dex": 10,
+        "spe": 10,
         "int": 10,
         "res": 10,
         "wis": 10
@@ -44,9 +48,11 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
+        "sta": 20,
         "atk": 10,
         "def": 10,
         "dex": 10,
+        "spe": 10,
         "int": 10,
         "res": 10,
         "wis": 10
@@ -63,9 +69,11 @@
         "movementRange": 6,
         "stats": {
             "hp": 30,
+            "sta": 20,
             "atk": 10,
             "def": 10,
             "dex": 10,
+            "spe": 10,
             "int": 10,
             "res": 10,
             "wis": 10
@@ -83,9 +91,11 @@
             "movementRange": 6,
             "stats": {
                 "hp": 30,
+                "sta": 20,
                 "atk": 10,
                 "def": 10,
                 "dex": 10,
+                "spe": 10,
                 "int": 10,
                 "res": 10,
                 "wis": 10

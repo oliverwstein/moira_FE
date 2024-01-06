@@ -47,9 +47,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Map<String, Attack> attackSet = {};
   List<Effect> effects = [];
   List<Skill> skills = [];
+  Map<String, int> stats = {};
+  int hp = -1;
+  int sta = -1;
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange);
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange, this.hp, this.sta);
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -86,8 +89,15 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       maxCombatRange = max(maxCombatRange, attackMap[attackName]!.range.$2);
     }
     (int, int) combatRange = (minCombatRange, maxCombatRange);
+
+    Map<String, int> stats = {};
+    for (String stat in unitData['stats']){
+      stats[stat] = unitData['stats'][stat];
+    }
+    int hp = stats['hp']!;
+    int sta = stats['sta']!;
     // Return a new Unit instance
-    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange);
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange, hp, sta);
   }
 
   @override
