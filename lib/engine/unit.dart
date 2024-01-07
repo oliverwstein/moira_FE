@@ -213,7 +213,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     /// the attacker’s might, hit, attack.magic, and (attack) type against the defender’s stats.
     /// damage = weapon.might + attack.might + sum((unit.atk, unit.dex, unit.int, unit.wis)*attack.type.values) - (attack.magic*targ.res + (1-attack.magic)*targ.def)
     /// accuracy is weapon.hit + attack.hit + unit.hit - (attack.magic*targ.magAvo + (1-attack.magic)*targ.phyAvo)
-    dev.log("${stats.keys}");
     assert(stats['str'] != null && stats['dex'] != null && stats['int'] != null && stats['wis'] != null);
     Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats['int']!.toDouble(), stats['wis']!.toDouble());
     int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();

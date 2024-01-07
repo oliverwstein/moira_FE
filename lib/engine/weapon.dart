@@ -45,7 +45,7 @@ class Weapon extends Component with HasGameRef<MyGame>{
     WeaponType weaponType = WeaponType.values.firstWhere((wt) => wt.toString().split('.').last == weaponTypeString);
     int might = weaponData['might'] ?? 0;
     int hit = weaponData['hit'] ?? 0;
-    int crit = weaponData['hit'] ?? 0;
+    int crit = weaponData['crit'] ?? 0;
     int fatigue = weaponData['fatigue'] ?? 0;
     // List<CombatEffect> effects = weaponData['effects'] ?? []; // Replace with actual type if you have a specific Effect class
     Attack specialAttack = Attack.fromJson(weaponData['specialAttack']); // Replace with actual type

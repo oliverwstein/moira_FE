@@ -459,7 +459,9 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     (int, int, int) attackerVals = attacker.attackCalc(attack, defender);
     (int, int, int) defenderVals = (0, 0, 0);
     if(defender.main?.weapon?.specialAttack != null){
-      Attack? counterAttack = validAttackCheck(getCombatDistance(), defender.attackSet[defender.main!.weapon!.specialAttack]!);
+      assert(defender.main?.weapon?.specialAttack?.name != null);
+      assert(defender.attackSet.containsKey(defender.main?.weapon?.specialAttack?.name));
+      Attack? counterAttack = validAttackCheck(getCombatDistance(), defender.attackSet[defender.main!.weapon!.specialAttack!.name]!);
       if(counterAttack != null){
          defenderVals = defender.attackCalc(counterAttack, attacker);
       }
