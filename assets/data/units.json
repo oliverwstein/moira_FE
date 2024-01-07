@@ -17,7 +17,7 @@
         "lck": 7
     },
     "skills": ["Canto"],
-    "inventory": ["Salve", "Salve", "Sword", "Lance"],
+    "inventory": ["Salve", "Salve", "Sword", "Lance", "Axe"],
     "attacks": ["Trample"],
     "sprites": {
         "idle": "sigurd.png"

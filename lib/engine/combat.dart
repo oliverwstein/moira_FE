@@ -41,7 +41,6 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   late final TextBoxComponent weaponTextBox;
   CombatBox(this.attacker, this.defender){
     attackList = attacker.attackSet.keys.toList();
-    if (attacker.main != null) {weaponList.add(attacker.main!);}
     for (Item item in attacker.inventory) {if (attacker.equipCheck(item, ItemType.main)) weaponList.add(item);}
     getCombatValMap();
     attackTextBox = TextBoxComponent(
