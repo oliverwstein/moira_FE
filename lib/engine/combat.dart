@@ -22,7 +22,23 @@ TextPaint combatTextRenderer = TextPaint(
           // Include any other styles you need
           ),
       );
-      
+
+TextPaint combatNumberRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 255, 255, 255),
+          fontSize: 22, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          height: 1.5,
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
 class CombatBox extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   /// Combat Box should take a unit and a target and create three things:
   /// A box that lists the weapon to use
@@ -41,26 +57,50 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   late final TextBoxComponent attackTextBox;
   late final TextBoxComponent weaponTextBox;
   late final TextBoxComponent defenderTextBox;
-  CombatBox(this.attacker, this.defender){
+  late final (TextBoxComponent, TextBoxComponent) hpRecord;
+  late final (TextBoxComponent, TextBoxComponent) damRecord;
+  late final (TextBoxComponent, TextBoxComponent) hitRecord;
+  late final (TextBoxComponent, TextBoxComponent) critRecord;
+  CombatBox(this.attacker, this.defender) {
+    // Initialization logic
     attackList = attacker.attackSet.keys.toList();
-    for (Item item in attacker.inventory) {if (attacker.equipCheck(item, ItemType.main)) weaponList.add(item);}
-    getCombatValMap();
-    attackTextBox = TextBoxComponent(
-      text: '${combatValMap[attackList.first].atk.fatigue}|${attackList.first}',
-      textRenderer: combatTextRenderer,
-      position: Vector2(24, 48),
-      priority: 20);
-    weaponTextBox = TextBoxComponent(
-      text: '${attacker.name}\n${attacker.main?.name ?? "Unarmed"}',
-      textRenderer: combatTextRenderer,
-      position: Vector2(24, 0),
-      priority: 20);
-    defenderTextBox = TextBoxComponent(
-      text: "${defender.name}\n${combatValMap[attackList.first].atk.fatigue}|${defender.main?.name ?? ""}-${defender.attackSet.keys.first}",
-      textRenderer: combatTextRenderer,
-      position: Vector2(24, 212),
-      priority: 20);
-    }
+    weaponList = attacker.inventory.where((item) => attacker.equipCheck(item, ItemType.main)).toList();
+    getCombatValMap(); // Assuming this method populates combatValMap
+
+    attackTextBox = createTextBox('${combatValMap[attackList.first].atk.fatigue}|${attackList.first}', 24, 48);
+    weaponTextBox = createTextBox('${attacker.name}\n${attacker.main?.name ?? "Unarmed"}', 24, 0);
+    defenderTextBox = createTextBox("${defender.name}\n${combatValMap[attackList.first].atk.fatigue}|${defender.main?.name ?? ""}-${defender.attackSet.keys.first}", 24, 212);
+
+    hpRecord = createRecordPair(attacker.hp.toString(), defender.hp.toString(), 80);
+    damRecord = createRecordPair(combatValMap[attackList.first].atk.damage.toString(), combatValMap[attackList.first].def.damage.toString(), 110);
+    hitRecord = createRecordPair(combatValMap[attackList.first].atk.accuracy.toString(), combatValMap[attackList.first].def.accuracy.toString(), 140);
+    critRecord = createRecordPair(combatValMap[attackList.first].atk.critRate.toString(), combatValMap[attackList.first].def.critRate.toString(), 170);
+  }
+
+  TextBoxComponent createTextBox(String text, double x, double y) {
+    return TextBoxComponent(
+      text: text,
+      textRenderer: combatTextRenderer, // Assuming combatTextRenderer is defined
+      position: Vector2(x, y),
+    );
+  }
+
+  (TextBoxComponent, TextBoxComponent) createRecordPair(String atkText, String defText, double y) {
+    var atkComp = TextBoxComponent(
+      text: atkText,
+      textRenderer: combatNumberRenderer, // Assuming combatNumberRenderer is defined
+      position: Vector2(110, y),
+    );
+
+    var defComp = TextBoxComponent(
+      text: defText,
+      textRenderer: combatNumberRenderer,
+      position: Vector2(10, y),
+    );
+
+    return (atkComp, defComp);
+  }
+  
 
 
   void getCombatValMap() {
@@ -89,6 +129,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     } else if (command == LogicalKeyboardKey.arrowUp) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
       attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
+      
       dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) { // Change attack option
@@ -134,6 +175,14 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     combatPaneSprite.add(attackTextBox);
     combatPaneSprite.add(weaponTextBox);
     combatPaneSprite.add(defenderTextBox);
+    combatPaneSprite.add(hpRecord.$1);
+    combatPaneSprite.add(hpRecord.$2);
+    combatPaneSprite.add(damRecord.$1);
+    combatPaneSprite.add(damRecord.$2);
+    combatPaneSprite.add(hitRecord.$1);
+    combatPaneSprite.add(hitRecord.$2);
+    combatPaneSprite.add(critRecord.$1);
+    combatPaneSprite.add(critRecord.$2);
     add(combatPaneSprite);
   }
   void close(){
