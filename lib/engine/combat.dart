@@ -53,9 +53,12 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     return attackList;
   }
 
-  ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) getCombatValues(Unit attacker, Unit defender, Attack attack){
+  ({
+  ({int accuracy, int critRate, int damage, int fatigue}) atk, 
+  ({int accuracy, int critRate, int damage, int fatigue}) def}) 
+  getCombatValues(Unit attacker, Unit defender, Attack attack){
     ({int accuracy, int critRate, int damage, int fatigue}) atk = attacker.attackCalc(attack, defender);
-    ({int accuracy, int critRate, int damage, int fatigue}) def = (0, 0, 0, 0) as ({int accuracy, int critRate, int damage, int fatigue});
+    ({int accuracy, int critRate, int damage, int fatigue}) def = (accuracy: 0, critRate: 0, damage: 0, fatigue: 0);
     if(defender.main?.weapon?.specialAttack != null){
       assert(defender.main?.weapon?.specialAttack?.name != null);
       assert(defender.attackSet.containsKey(defender.main?.weapon?.specialAttack?.name));
@@ -76,6 +79,9 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
         var damageDealt = critical ? 3 * damage : damage; // Calculate damage
         defender.hp -= damageDealt; // Apply damage
         attacker.sta -= fatigue; // Reduce stamina
+        dev.log('${attacker.name} hit, reducing ${defender.name} to ${defender.hp}');
+      } else {
+        dev.log('${attacker.name} missed');
       }
     }
   }
@@ -127,7 +133,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     bool handled = false;
     if (command == LogicalKeyboardKey.keyA) { // Make the attack.
       dev.log("${attacker.name} attacked ${defender.name}");
-      dev.log("${getCombatValues(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!)}");
+      combat(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
       attacker.wait();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
