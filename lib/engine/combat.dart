@@ -30,14 +30,18 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   Unit attacker;
   Unit defender;
   List<String> attackList = [];
+  Map<String, dynamic> combatValMap = {};
   int selectedAttackIndex = 0;
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
   late final TextBoxComponent attackTextBox;
   CombatBox(this.attacker, this.defender){
     attackList = attacker.attackSet.keys.toList();
+    for(String attackName in attackList){
+      combatValMap[attackName] =  getCombatValues(attacker, defender, attacker.attackSet[attackName]!);
+    }
     attackTextBox = TextBoxComponent(
-      text: attackList.first,
+      text: '${attackList.first} | ${combatValMap[attackList.first].atk.fatigue}',
       textRenderer: combatTextRenderer,
       position: Vector2(32, 10),
       priority: 20);
@@ -62,12 +66,12 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
       selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
-      attackTextBox.text = attackList[selectedAttackIndex];
+      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
       dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
       selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
-      attackTextBox.text = attackList[selectedAttackIndex];
+      attackTextBox.text = attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
       dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowLeft) {
@@ -134,7 +138,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
          def = defender.attackCalc(counterAttack, attacker);
       }
     }
-    dev.log("${atk}, ${def}");
+    dev.log("${attack.name}, ${atk}, ${def}");
     return (atk: atk, def: def);
   }
 
