@@ -376,7 +376,7 @@ class TargetSelector extends Component implements CommandHandler {
         if(stage.tilesMap[stage.cursor.gridCoord]!.unit!.team == UnitTeam.red){
           Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
           CombatBox combatBox = CombatBox(unit, target);
-          dev.log("${combatBox.getValidAttacks()}");
+          dev.log("${combatBox.getValidAttacks(unit)}");
           stage.activeComponent = combatBox;
         }
 
@@ -437,19 +437,33 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     return (attacker.gridCoord.x - defender.gridCoord.x).abs() + (attacker.gridCoord.y - defender.gridCoord.y).abs();
   }
 
-  List<String> getValidAttacks(){
+  Attack? validAttackCheck(int distance, Attack attack){
+    if (attack.range.$1 <= distance && distance <= attack.range.$1){
+      return attack;}
+    return null;
+  }
+
+  List<String> getValidAttacks(Unit attacker){
     int combatDistance = getCombatDistance();
     List<String> attackList = [];
     for (String attack in attacker.attackSet.keys){
-      if(attacker.attackSet[attack]!.range.$1 <= combatDistance && combatDistance <= attacker.attackSet[attack]!.range.$1){
+      if(validAttackCheck(combatDistance, attacker.attackSet[attack]!) != null){
         attackList.add(attack);
       }
     }
     return attackList;
   }
 
-  void getCombatValues(Unit attacker, Unit defender, Attack attack){
-    // Calculate Damage
+  (Record, Record) getCombatValues(Unit attacker, Unit defender, Attack attack){
+    (int, int, int) attackerVals = attacker.attackCalc(attack, defender);
+    (int, int, int) defenderVals = (0, 0, 0);
+    if(defender.main?.weapon?.specialAttack != null){
+      Attack? counterAttack = validAttackCheck(getCombatDistance(), defender.attackSet[defender.main!.weapon!.specialAttack]!);
+      if(counterAttack != null){
+         defenderVals = defender.attackCalc(counterAttack, attacker);
+      }
+    }
+    return (attackerVals, defenderVals);
   }
 
   @override
