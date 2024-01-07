@@ -95,6 +95,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
   }
 
+  void die(){
+    Stage stage = parent as Stage;
+    stage.tilesMap[gridCoord]!.removeUnit();
+    removeFromParent();
+  }
   void _postConstruction() {
     for (Item item in inventory){
       switch (item.type) {

@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:moira/engine/engine.dart';
@@ -52,22 +53,51 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     return attackList;
   }
 
-  ({({int accuracy, int critRate, int damage, int fatigue}) attackerVals, ({int accuracy, int critRate, int damage, int fatigue}) defenderVals}) getCombatValues(Unit attacker, Unit defender, Attack attack){
-    ({int accuracy, int critRate, int damage, int fatigue}) attackerVals = attacker.attackCalc(attack, defender);
-    ({int accuracy, int critRate, int damage, int fatigue}) defenderVals = (0, 0, 0, 0) as ({int accuracy, int critRate, int damage, int fatigue});
+  ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) getCombatValues(Unit attacker, Unit defender, Attack attack){
+    ({int accuracy, int critRate, int damage, int fatigue}) atk = attacker.attackCalc(attack, defender);
+    ({int accuracy, int critRate, int damage, int fatigue}) def = (0, 0, 0, 0) as ({int accuracy, int critRate, int damage, int fatigue});
     if(defender.main?.weapon?.specialAttack != null){
       assert(defender.main?.weapon?.specialAttack?.name != null);
       assert(defender.attackSet.containsKey(defender.main?.weapon?.specialAttack?.name));
       Attack? counterAttack = validAttackCheck(getCombatDistance(), defender.attackSet[defender.main!.weapon!.specialAttack!.name]!);
       if(counterAttack != null){
-         defenderVals = defender.attackCalc(counterAttack, attacker);
+         def = defender.attackCalc(counterAttack, attacker);
       }
     }
-    return (attackerVals: attackerVals, defenderVals: defenderVals);
+    return (atk: atk, def: def);
   }
 
   void combat(Unit attacker, Unit defender, Attack attack){
-    ({({int accuracy, int critRate, int damage, int fatigue}) attackerVals, ({int accuracy, int critRate, int damage, int fatigue}) defenderVals}) vals = getCombatValues(attacker, defender, attack);
+    /// Start with the attacker. Roll a random integer between 1-100 (inclusive) .
+      /// If the random integer is <= vals.atk.accuracy, the attack succeeds.
+    /// If the attack succeeds, roll another random integer between 1-100 (inclusive).
+      /// If the random integer is <= vals.atk.critRate, the attack is critical.
+    /// If the attack succeeds, defender.hp -= vals.atk.damage. 
+      /// If the attack is a critical, defender.hp -= 3*vals.atk.damage. 
+    // If defender.hp <= 0, they die and the combat ends. 
+    // Otherwise, if vals.def.accuracy > 0, calculate their counterattack.
+    // Once both attacker and defender have made attacks 
+      /// (whether they landed or not), if both units are alive,
+      /// if attacker.stats['spe'] >= defender.stats['spe'] + 4, 
+      /// the attacker gets another chance to attack. 
+      /// If defender.stats['spe'] >= attacker.stats['spe'] + 4 ,
+      /// the defender gets another chance to attack.
+    /// Each time a unit attacks, that unit's sta attribute -= fatigue.
+    
+    var rng = Random(); // Random number generator
+    ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
+    // Attacker's turn
+    if (rng.nextInt(100) + 1 <= vals.atk.accuracy) {
+      // Attack hits
+      var critical = rng.nextInt(100) + 1 <= vals.atk.critRate; // Check for critical
+      var damageDealt = critical ? 3 * vals.atk.damage : vals.atk.damage; // Calculate damage
+      defender.hp -= damageDealt; // Apply damage
+      attacker.sta -= vals.atk.fatigue; // Reduce stamina
+    }
+    if (defender.hp <= 0) {
+      defender.die();
+    return;
+  }
   }
 
   @override
