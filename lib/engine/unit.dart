@@ -208,7 +208,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.blankAllTiles();
   }
 
-  (int, int, int, int) attackCalc(Attack attack, target){
+  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
     ///In combat, the relevant stats for *damage* calculations are are:
     /// the attacker’s might, hit, attack.magic, and (attack) type against the defender’s stats.
     /// damage = weapon.might + attack.might + sum((unit.atk, unit.dex, unit.int, unit.wis)*attack.type.values) - (attack.magic*targ.res + (1-attack.magic)*targ.def)
@@ -236,7 +236,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     int accuracy = (hit - target.stats['lck'] - ((attack.magic ? 1 : 0)*target.stats['wis'] + (1-(attack.magic ? 1 : 0))*target.stats['dex'])).toInt().clamp(1, 99);
     int critRate = (crit - target.stats['lck']).toInt().clamp(1, 99);
     
-    return (damage, accuracy, critRate, fatigue);
+    return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
 
   }
   void openActionMenu(Stage stage){

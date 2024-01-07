@@ -52,9 +52,9 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     return attackList;
   }
 
-  (Record, Record) getCombatValues(Unit attacker, Unit defender, Attack attack){
-    (int, int, int, int) attackerVals = attacker.attackCalc(attack, defender);
-    (int, int, int, int) defenderVals = (0, 0, 0, 0);
+  ({({int accuracy, int critRate, int damage, int fatigue}) attackerVals, ({int accuracy, int critRate, int damage, int fatigue}) defenderVals}) getCombatValues(Unit attacker, Unit defender, Attack attack){
+    ({int accuracy, int critRate, int damage, int fatigue}) attackerVals = attacker.attackCalc(attack, defender);
+    ({int accuracy, int critRate, int damage, int fatigue}) defenderVals = (0, 0, 0, 0) as ({int accuracy, int critRate, int damage, int fatigue});
     if(defender.main?.weapon?.specialAttack != null){
       assert(defender.main?.weapon?.specialAttack?.name != null);
       assert(defender.attackSet.containsKey(defender.main?.weapon?.specialAttack?.name));
@@ -63,7 +63,11 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
          defenderVals = defender.attackCalc(counterAttack, attacker);
       }
     }
-    return (attackerVals, defenderVals);
+    return (attackerVals: attackerVals, defenderVals: defenderVals);
+  }
+
+  void combat(Unit attacker, Unit defender, Attack attack){
+    ({({int accuracy, int critRate, int damage, int fatigue}) attackerVals, ({int accuracy, int critRate, int damage, int fatigue}) defenderVals}) vals = getCombatValues(attacker, defender, attack);
   }
 
   @override
