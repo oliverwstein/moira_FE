@@ -59,7 +59,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   late final TextBoxComponent defenderTextBox;
   late final (TextBoxComponent, TextBoxComponent) hpRecord;
   late final (TextBoxComponent, TextBoxComponent) damRecord;
-  late final (TextBoxComponent, TextBoxComponent) hitRecord;
+  late final (TextBoxComponent, TextBoxComponent) accRecord;
   late final (TextBoxComponent, TextBoxComponent) critRecord;
   CombatBox(this.attacker, this.defender) {
     // Initialization logic
@@ -73,7 +73,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
 
     hpRecord = createRecordPair(attacker.hp.toString(), defender.hp.toString(), 80);
     damRecord = createRecordPair(combatValMap[attackList.first].atk.damage.toString(), combatValMap[attackList.first].def.damage.toString(), 110);
-    hitRecord = createRecordPair(combatValMap[attackList.first].atk.accuracy.toString(), combatValMap[attackList.first].def.accuracy.toString(), 140);
+    accRecord = createRecordPair(combatValMap[attackList.first].atk.accuracy.toString(), combatValMap[attackList.first].def.accuracy.toString(), 140);
     critRecord = createRecordPair(combatValMap[attackList.first].atk.critRate.toString(), combatValMap[attackList.first].def.critRate.toString(), 170);
   }
 
@@ -129,13 +129,12 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     } else if (command == LogicalKeyboardKey.arrowUp) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
       attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
-      
-      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
+      updateCombatDataUI();
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
       attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
-      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
+      updateCombatDataUI();
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowLeft) { // Change weapon option
       // Unequip the current weapon, equip the next weapon in ItemList,
@@ -148,7 +147,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       getCombatValMap();
       selectedAttackIndex = 0;
       attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
-      
+      updateCombatDataUI();
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowRight) { // change weapon option
       equippedWeaponIndex = (equippedWeaponIndex - 1) % weaponList.length;
@@ -159,11 +158,19 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       getCombatValMap();
       selectedAttackIndex = 0;
       attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
-      
-      handled = true;
+      updateCombatDataUI();
       handled = true;
     }
     return handled;
+  }
+
+  void updateCombatDataUI() {
+    damRecord.$1.text = '${combatValMap[attackList[selectedAttackIndex]].atk.damage}';
+    damRecord.$2.text = '${combatValMap[attackList[selectedAttackIndex]].def.damage}';
+    accRecord.$1.text = '${combatValMap[attackList[selectedAttackIndex]].atk.accuracy}';
+    accRecord.$2.text = '${combatValMap[attackList[selectedAttackIndex]].def.accuracy}';
+    critRecord.$1.text = '${combatValMap[attackList[selectedAttackIndex]].atk.critRate}';
+    critRecord.$2.text = '${combatValMap[attackList[selectedAttackIndex]].def.critRate}';
   }
 
   @override
@@ -179,8 +186,8 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     combatPaneSprite.add(hpRecord.$2);
     combatPaneSprite.add(damRecord.$1);
     combatPaneSprite.add(damRecord.$2);
-    combatPaneSprite.add(hitRecord.$1);
-    combatPaneSprite.add(hitRecord.$2);
+    combatPaneSprite.add(accRecord.$1);
+    combatPaneSprite.add(accRecord.$2);
     combatPaneSprite.add(critRecord.$1);
     combatPaneSprite.add(critRecord.$2);
     add(combatPaneSprite);
