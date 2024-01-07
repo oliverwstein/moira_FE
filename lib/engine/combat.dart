@@ -91,9 +91,9 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     } else if (command == LogicalKeyboardKey.arrowLeft) { // Change weapon option
       // Unequip the current weapon, equip the next weapon in ItemList,
       // and update the attackList and combatValMap.
-      attackList.remove(attacker.main?.name);
       equippedWeaponIndex = (equippedWeaponIndex + 1) % weaponList.length;
       attacker.equip(weaponList[equippedWeaponIndex]);
+      attackList = attacker.attackSet.keys.toList();
       weaponTextBox.text = '${weaponList[equippedWeaponIndex].name}';
       combatValMap = {};
       getCombatValMap();
@@ -102,7 +102,16 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowRight) { // change weapon option
+      equippedWeaponIndex = (equippedWeaponIndex - 1) % weaponList.length;
+      attacker.equip(weaponList[equippedWeaponIndex]);
+      attackList = attacker.attackSet.keys.toList();
+      weaponTextBox.text = '${weaponList[equippedWeaponIndex].name}';
+      combatValMap = {};
+      getCombatValMap();
+      selectedAttackIndex = 0;
+      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
       
+      handled = true;
       handled = true;
     }
     return handled;
@@ -165,7 +174,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
          def = defender.attackCalc(counterAttack, attacker);
       }
     }
-    dev.log("${attack.name}, ${atk}, ${def}");
+    // dev.log("${attack.name}, ${atk}, ${def}");
     return (atk: atk, def: def);
   }
 

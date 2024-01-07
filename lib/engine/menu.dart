@@ -110,6 +110,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         assert(unit != null);
         TargetSelector selector = TargetSelector(stage.getTargets());
+        stage.cursor.goToUnit(selector.targets[0]);
         unit!.add(selector);
         stage.activeComponent = selector;
         dev.log("$unit's attacks are: ${unit.attackSet}");
