@@ -51,7 +51,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int sta = -1;
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats);
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
+    _postConstruction();
+  }
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -79,13 +81,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     for(String itemName in unitData['inventory']){
       inventory.add(Item.fromJson(itemName));
     }
-    Item? main;
-    for (Item item in inventory){
-      if(item.type == ItemType.main){
-        main = item;
-        break;
-      }
-    }
+
     Map<String, Attack> attackMap = {};
     for(String attackName in unitData['attacks']){
       attackMap[attackName] = Attack.fromJson(attackName);
@@ -97,6 +93,27 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
     // Return a new Unit instance
     return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
+  }
+
+  void _postConstruction() {
+    for (Item item in inventory){
+      switch (item.type) {
+        case ItemType.main:
+          if (main == null) equip(item);
+          break;
+        case ItemType.gear:
+          if (gear == null) equip(item);
+          break;
+        case ItemType.treasure:
+        if (treasure == null) equip(item);
+          treasure ??= item;
+          break;
+        default:
+          break;
+      }
+    }
+    hp = stats['hp']!;
+    sta = stats['sta']!;
   }
 
   @override
