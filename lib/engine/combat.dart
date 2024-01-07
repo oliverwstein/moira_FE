@@ -67,6 +67,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
          def = defender.attackCalc(counterAttack, attacker);
       }
     }
+    dev.log("${atk}, ${def}");
     return (atk: atk, def: def);
   }
 
