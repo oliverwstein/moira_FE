@@ -8,8 +8,8 @@ import 'package:flame/text.dart';
 
 TextPaint combatTextRenderer = TextPaint(
         style: const TextStyle(
-          color: ui.Color.fromARGB(255, 221, 193, 245),
-          fontSize: 20, // Adjust the font size as needed
+          color: ui.Color.fromARGB(255, 255, 255, 255),
+          fontSize: 16, // Adjust the font size as needed
           fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
           shadows: <ui.Shadow>[
             ui.Shadow(
@@ -36,6 +36,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   int equippedWeaponIndex = 0;
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
+  late final SpriteComponent combatPaneSprite;
   late final TextBoxComponent attackTextBox;
   late final TextBoxComponent weaponTextBox;
   CombatBox(this.attacker, this.defender){
@@ -44,14 +45,14 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     for (Item item in attacker.inventory) {if (attacker.equipCheck(item, ItemType.main)) weaponList.add(item);}
     getCombatValMap();
     attackTextBox = TextBoxComponent(
-      text: '${attackList.first} | ${combatValMap[attackList.first].atk.fatigue}',
+      text: '${combatValMap[attackList.first].atk.fatigue}|${attackList.first}',
       textRenderer: combatTextRenderer,
-      position: Vector2(32, 10),
+      position: Vector2(24, 52),
       priority: 20);
     weaponTextBox = TextBoxComponent(
       text: attacker.main?.name ?? "Unarmed",
       textRenderer: combatTextRenderer,
-      position: Vector2(32, 10),
+      position: Vector2(24, 30),
       priority: 20);
     }
 
@@ -80,12 +81,12 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
-      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
       dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
-      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
       dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowLeft) { // Change weapon option
@@ -98,7 +99,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       combatValMap = {};
       getCombatValMap();
       selectedAttackIndex = 0;
-      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
       
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowRight) { // change weapon option
@@ -109,7 +110,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       combatValMap = {};
       getCombatValMap();
       selectedAttackIndex = 0;
-      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
       
       handled = true;
       handled = true;
@@ -119,21 +120,22 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
 
   @override
   Future<void> onLoad() async {
-    weaponBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('attack_box_trans.png'),
-        position: Vector2(128, 0),
+    // weaponBoxSprite = SpriteComponent(
+    //     sprite: await gameRef.loadSprite('attack_box_trans.png'),
+    //     position: Vector2(128, -64),
+    // );
+    // attackBoxSprite = SpriteComponent(
+    //     sprite: await gameRef.loadSprite('attack_box_trans.png'),
+    //     position: Vector2(128, -64),
+    //     // size: Vector2.all(8)
+    // );
+    combatPaneSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('tellius_combat_pane_attack.png'),
+        position: Vector2(160, 0),
     );
-    attackBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('attack_box_trans.png'),
-        position: Vector2(128, -64),
-        // size: Vector2.all(8)
-    );
-    add(attackBoxSprite);
-    attackTextBox.align = Anchor.centerLeft;
-    attackBoxSprite.add(attackTextBox);
-    add(weaponBoxSprite);
-    weaponTextBox.align = Anchor.centerLeft;
-    weaponBoxSprite.add(weaponTextBox);
+    combatPaneSprite.add(attackTextBox);
+    combatPaneSprite.add(weaponTextBox);
+    add(combatPaneSprite);
   }
   void close(){
     attacker.remove(this);

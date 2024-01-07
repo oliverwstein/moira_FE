@@ -126,8 +126,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
-      move(stage);
-      openActionMenu(stage);
+      if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
+        move(stage);
+        openActionMenu(stage);
+      }
+      
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       stage.activeComponent = stage.cursor;
