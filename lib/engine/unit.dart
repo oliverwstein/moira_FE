@@ -52,7 +52,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int sta = -1;
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange, this.hp, this.sta);
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange, this.stats, this.hp, this.sta);
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -91,13 +91,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     (int, int) combatRange = (minCombatRange, maxCombatRange);
 
     Map<String, int> stats = {};
-    for (String stat in unitData['stats']){
+    for (String stat in unitData['stats'].keys){
       stats[stat] = unitData['stats'][stat];
     }
     int hp = stats['hp']!;
     int sta = stats['sta']!;
     // Return a new Unit instance
-    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange, hp, sta);
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange, stats, hp, sta);
   }
 
   @override
@@ -197,6 +197,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     /// the attacker’s might, hit, attack.magic, and (attack) type against the defender’s stats.
     /// damage = weapon.might + attack.might + sum((unit.atk, unit.dex, unit.int, unit.wis)*attack.type.values) - (attack.magic*targ.res + (1-attack.magic)*targ.def)
     /// accuracy is weapon.hit + attack.hit + unit.hit - (attack.magic*targ.magAvo + (1-attack.magic)*targ.phyAvo)
+    dev.log("${stats.keys}");
+    assert(stats['str'] != null && stats['dex'] != null && stats['int'] != null && stats['wis'] != null);
     Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats['int']!.toDouble(), stats['wis']!.toDouble());
     int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
     int hit = attack.hit + stats['lck']!;
@@ -213,9 +215,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       hit += main!.weapon!.hit;
       crit += main!.weapon!.crit;
       }
-    int damage = (might - ((attack.magic ? 1 : 0)*target['stats']['res'] + (1-(attack.magic ? 1 : 0))*target['stats']['def'])).toInt().clamp(0, 100);
-    int accuracy = (hit - target['stats']['lck'] - ((attack.magic ? 1 : 0)*target['stats']['wis'] + (1-(attack.magic ? 1 : 0))*target['stats']['dex'])).toInt().clamp(1, 99);
-    int critRate = (crit - target['stats']['lck']).toInt().clamp(1, 99);
+    int damage = (might - ((attack.magic ? 1 : 0)*target.stats['res'] + (1-(attack.magic ? 1 : 0))*target.stats['def'])).toInt().clamp(0, 100);
+    int accuracy = (hit - target.stats['lck'] - ((attack.magic ? 1 : 0)*target.stats['wis'] + (1-(attack.magic ? 1 : 0))*target.stats['dex'])).toInt().clamp(1, 99);
+    int critRate = (crit - target.stats['lck']).toInt().clamp(1, 99);
     return (damage, accuracy, critRate);
 
   }

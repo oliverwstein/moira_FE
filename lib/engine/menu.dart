@@ -415,6 +415,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   Unit attacker;
   Unit defender;
   List<String> attackList = [];
+  int selectedAttackIndex = 0;
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
   CombatBox(this.attacker, this.defender){
@@ -472,6 +473,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     bool handled = false;
     if (command == LogicalKeyboardKey.keyA) { // Make the attack.
       dev.log("${attacker.name} attacked ${defender.name}");
+      dev.log("${getCombatValues(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!)}");
       attacker.wait();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
@@ -479,7 +481,21 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       stage.cursor.goToUnit(attacker);
       attacker.openActionMenu(stage);
       handled = true;
-    } 
+    } else if (command == LogicalKeyboardKey.arrowUp) {
+      selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
+      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
+      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowLeft) {
+      
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) {
+      
+      handled = true;
+    }
     return handled;
   }
 }
