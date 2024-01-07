@@ -67,6 +67,19 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     return (atk: atk, def: def);
   }
 
+  void makeAttack(int damage, int accuracy, int critRate, int fatigue, Unit attacker, Unit defender){
+    var rng = Random(); // Random number generator
+    if (accuracy > 0) {
+      if (rng.nextInt(100) + 1 <= accuracy) {
+        // Attack hits
+        var critical = rng.nextInt(100) + 1 <= critRate; // Check for critical
+        var damageDealt = critical ? 3 * damage : damage; // Calculate damage
+        defender.hp -= damageDealt; // Apply damage
+        attacker.sta -= fatigue; // Reduce stamina
+      }
+    }
+  }
+
   void combat(Unit attacker, Unit defender, Attack attack){
     /// Start with the attacker. Roll a random integer between 1-100 (inclusive) .
       /// If the random integer is <= vals.atk.accuracy, the attack succeeds.
@@ -87,17 +100,25 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     var rng = Random(); // Random number generator
     ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
     // Attacker's turn
-    if (rng.nextInt(100) + 1 <= vals.atk.accuracy) {
-      // Attack hits
-      var critical = rng.nextInt(100) + 1 <= vals.atk.critRate; // Check for critical
-      var damageDealt = critical ? 3 * vals.atk.damage : vals.atk.damage; // Calculate damage
-      defender.hp -= damageDealt; // Apply damage
-      attacker.sta -= vals.atk.fatigue; // Reduce stamina
-    }
+    makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
     if (defender.hp <= 0) {
       defender.die();
-    return;
-  }
+      return;
+    }
+    makeAttack(vals.def.damage, vals.def.accuracy, vals.def.critRate, vals.def.fatigue, defender, attacker);
+    
+    if (attacker.hp <= 0) {
+      attacker.die();
+      return;
+    }
+    // Follow-up attacks based on speed
+    assert(attacker.stats['spe'] != null);
+    assert(defender.stats['spe'] != null);
+    if (attacker.stats['spe']! >= defender.stats['spe']! + 4) {
+      makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
+    } else if (defender.stats['spe']! >= attacker.stats['spe']! + 4) {
+      makeAttack(vals.def.damage, vals.def.accuracy, vals.def.critRate, vals.def.fatigue, defender, attacker);
+    }
   }
 
   @override
