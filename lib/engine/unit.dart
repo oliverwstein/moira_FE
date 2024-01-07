@@ -19,7 +19,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   final String name;
   final String idleAnimationName;
   int movementRange;
-  (int, int) combatRange;
   UnitTeam team = UnitTeam.blue;
   double tileSize;
 
@@ -47,9 +46,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Map<String, Attack> attackSet = {};
   List<Effect> effects = [];
   List<Skill> skills = [];
+  Map<String, int> stats = {};
+  int hp = -1;
+  int sta = -1;
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange);
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
+    _postConstruction();
+  }
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -77,17 +81,44 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     for(String itemName in unitData['inventory']){
       inventory.add(Item.fromJson(itemName));
     }
+
     Map<String, Attack> attackMap = {};
-    int minCombatRange = 0;
-    int maxCombatRange = 0;
     for(String attackName in unitData['attacks']){
       attackMap[attackName] = Attack.fromJson(attackName);
-      minCombatRange = min(minCombatRange, attackMap[attackName]!.range.$1);
-      maxCombatRange = max(maxCombatRange, attackMap[attackName]!.range.$2);
     }
-    (int, int) combatRange = (minCombatRange, maxCombatRange);
+
+    Map<String, int> stats = {};
+    for (String stat in unitData['stats'].keys){
+      stats[stat] = unitData['stats'][stat];
+    }
     // Return a new Unit instance
-    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange);
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
+  }
+
+  void die(){
+    Stage stage = parent as Stage;
+    stage.tilesMap[gridCoord]!.removeUnit();
+    removeFromParent();
+  }
+  void _postConstruction() {
+    for (Item item in inventory){
+      switch (item.type) {
+        case ItemType.main:
+          if (main == null) equip(item);
+          break;
+        case ItemType.gear:
+          if (gear == null) equip(item);
+          break;
+        case ItemType.treasure:
+        if (treasure == null) equip(item);
+          treasure ??= item;
+          break;
+        default:
+          break;
+      }
+    }
+    hp = stats['hp']!;
+    sta = stats['sta']!;
   }
 
   @override
@@ -125,18 +156,18 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
         if(main?.weapon?.specialAttack != null) {
           attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
         }
-        dev.log("$name equipped $name as ${item.type}");
+        dev.log("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.gear:
         gear = item;
-        dev.log("$name equipped $name as ${item.type}");
+        dev.log("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.treasure:
         treasure = item;
-        dev.log("$name equipped $name as ${item.type}");
+        dev.log("$name equipped ${item.name} as ${item.type}");
         break;
       default:
-        dev.log("${name} can't equip $item");
+        dev.log("$name can't equip ${item.name}");
         break;
     }
   }
@@ -144,7 +175,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   void unequip(ItemType type){
     switch (type) {
       case ItemType.main:
-        dev.log("$name unequipped $main as $type");
+        dev.log("$name unequipped ${main!.name} as $type");
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
@@ -182,8 +213,40 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.blankAllTiles();
   }
 
+  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
+    ///In combat, the relevant stats for *damage* calculations are are:
+    /// the attacker’s might, hit, attack.magic, and (attack) type against the defender’s stats.
+    /// damage = weapon.might + attack.might + sum((unit.atk, unit.dex, unit.int, unit.wis)*attack.type.values) - (attack.magic*targ.res + (1-attack.magic)*targ.def)
+    /// accuracy is weapon.hit + attack.hit + unit.hit - (attack.magic*targ.magAvo + (1-attack.magic)*targ.phyAvo)
+    assert(stats['str'] != null && stats['dex'] != null && stats['int'] != null && stats['wis'] != null);
+    Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats['int']!.toDouble(), stats['wis']!.toDouble());
+    int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
+    int hit = attack.hit + stats['lck']!;
+    int crit = attack.crit + stats['lck']!;
+    int fatigue = attack.fatigue;
+    if(main?.weapon != null) {
+      if(attack.magic) {
+        hit += stats['wis']!*2;
+        crit += stats['wis']!~/2;
+      } else {
+        hit += stats['dex']!*2;
+        crit += stats['dex']!~/2;
+      }
+      might += main!.weapon!.might;
+      hit += main!.weapon!.hit;
+      crit += main!.weapon!.crit;
+      fatigue += main!.weapon!.fatigue;
+      }
+    int damage = (might - ((attack.magic ? 1 : 0)*target.stats['res'] + (1-(attack.magic ? 1 : 0))*target.stats['def'])).toInt().clamp(0, 100);
+    int accuracy = (hit - target.stats['lck'] - ((attack.magic ? 1 : 0)*target.stats['wis'] + (1-(attack.magic ? 1 : 0))*target.stats['dex'])).toInt().clamp(1, 99);
+    int critRate = (crit - target.stats['lck']).toInt().clamp(1, 99);
+    
+    return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
+
+  }
   void openActionMenu(Stage stage){
-    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, combatRange.$1, combatRange.$2);
+    (int, int) range = getCombatRange();
+    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
     List<MenuOption> visibleOptions = [MenuOption.wait];
     if(attackTiles.isNotEmpty){
       visibleOptions.add(MenuOption.attack);
@@ -389,12 +452,22 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return path; // The path from the start to the target
   }
   
+  (int, int) getCombatRange() {
+    int minCombatRange = 0;
+    int maxCombatRange = 0;
+    for(String attackName in attackSet.keys){
+      minCombatRange = min(minCombatRange, attackSet[attackName]!.range.$1);
+      maxCombatRange = max(maxCombatRange, attackSet[attackName]!.range.$2);
+    }
+    return (minCombatRange, maxCombatRange);
+  } 
   void markAttackableTiles(List<Tile> reachableTiles) {
     // Mark tiles attackable from the unit's current position
-    markTilesInRange(gridCoord, combatRange.$1, combatRange.$2, TileState.attack);
+    (int, int) range = getCombatRange();
+    markTilesInRange(gridCoord, range.$1, range.$2, TileState.attack);
     // Mark tiles attackable from each reachable tile
     for (var tile in reachableTiles) {
-      markTilesInRange(tile.gridCoord, combatRange.$1, combatRange.$2,  TileState.attack);
+      markTilesInRange(tile.gridCoord, range.$1, range.$2,  TileState.attack);
     }
   }
 

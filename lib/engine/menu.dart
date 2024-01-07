@@ -9,8 +9,8 @@ import 'package:flame/sprite.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/services.dart';
-
 import 'engine.dart';
+
 TextPaint selectedTextRenderer = TextPaint(
         style: const TextStyle(
           color: ui.Color.fromARGB(255, 235, 219, 214),
@@ -375,9 +375,9 @@ class TargetSelector extends Component implements CommandHandler {
       if(stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
         if(stage.tilesMap[stage.cursor.gridCoord]!.unit!.team == UnitTeam.red){
           Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
-          CombatUI combatUI = CombatUI(unit, target);
-          dev.log("${combatUI.getValidAttacks()}");
-          stage.activeComponent = combatUI;
+          CombatBox combatBox = CombatBox(unit, target);
+          dev.log("${combatBox.getValidAttacks(unit)}");
+          stage.activeComponent = combatBox;
         }
 
       }
@@ -406,63 +406,3 @@ class TargetSelector extends Component implements CommandHandler {
     return handled;
   }
 }
-
-class CombatUI extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
-  /// Combat UI should take a unit and a target and create three things:
-  /// A box that lists the weapon to use
-  /// A box that lists the combat art to use
-  /// A table that shows the damage and hit chance of the weapon/combat art combo.
-  Unit attacker;
-  Unit defender;
-  List<String> attackList = [];
-  late final SpriteComponent weaponBoxSprite;
-  late final SpriteComponent attackBoxSprite;
-  CombatUI(this.attacker, this.defender){
-    attackList = attacker.attackSet.keys.toList();
-  }
-
-  @override
-  Future<void> onLoad() async {
-    weaponBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('combat_box.png'),
-    );
-    attackBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('combat_box.png'),
-        position: Vector2(0, 32),
-        // size: Vector2.all(8)
-    );
-  }
-
-  int getCombatDistance(){
-    return (attacker.gridCoord.x - defender.gridCoord.x).abs() + (attacker.gridCoord.y - defender.gridCoord.y).abs();
-  }
-
-  List<String> getValidAttacks(){
-    int combatDistance = getCombatDistance();
-    List<String> attackList = [];
-    for (String attack in attacker.attackSet.keys){
-      if(attacker.attackSet[attack]!.range.$1 <= combatDistance && combatDistance <= attacker.attackSet[attack]!.range.$1){
-        attackList.add(attack);
-      }
-    }
-    return attackList;
-  }
-
-  @override
-  bool handleCommand(LogicalKeyboardKey command) {
-    Stage stage = attacker.parent as Stage;
-    bool handled = false;
-    if (command == LogicalKeyboardKey.keyA) { // Make the attack.
-      dev.log("${attacker.name} attacked ${defender.name}");
-      attacker.wait();
-      handled = true;
-    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
-      dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
-      stage.cursor.goToUnit(attacker);
-      attacker.openActionMenu(stage);
-      handled = true;
-    } 
-    return handled;
-  }
-}
-

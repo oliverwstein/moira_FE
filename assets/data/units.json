@@ -6,12 +6,15 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
-        "atk": 10,
+        "sta": 20,
+        "str": 10,
         "def": 10,
         "dex": 10,
+        "spe": 10,
         "int": 10,
         "res": 10,
-        "wis": 10
+        "wis": 10,
+        "lck": 10
     },
     "skills": ["Canto"],
     "inventory": ["Salve", "Salve", "Sword"],
@@ -25,12 +28,15 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
-        "atk": 10,
+        "sta": 20,
+        "str": 10,
         "def": 10,
         "dex": 10,
+        "spe": 10,
         "int": 10,
         "res": 10,
-        "wis": 10
+        "wis": 10,
+        "lck": 10
     },
     "skills": ["Canto"],
     "inventory": ["Salve", "Sword"],
@@ -44,12 +50,15 @@
     "movementRange": 8,
     "stats": {
         "hp": 30,
-        "atk": 10,
+        "sta": 20,
+        "str": 10,
         "def": 10,
         "dex": 10,
+        "spe": 10,
         "int": 10,
         "res": 10,
-        "wis": 10
+        "wis": 10,
+        "lck": 10
     },
     "skills": ["Canto"],
     "inventory": ["Salve", "Sword"],
@@ -63,12 +72,15 @@
         "movementRange": 6,
         "stats": {
             "hp": 30,
-            "atk": 10,
+            "sta": 20,
+            "str": 10,
             "def": 10,
             "dex": 10,
+            "spe": 10,
             "int": 10,
             "res": 10,
-            "wis": 10
+            "wis": 10,
+            "lck": 10
         },
         "skills": ["Pavise"],
         "inventory": ["Salve", "Sword"],
@@ -83,12 +95,15 @@
             "movementRange": 6,
             "stats": {
                 "hp": 30,
-                "atk": 10,
+                "sta": 20,
+                "str": 10,
                 "def": 10,
                 "dex": 10,
+                "spe": 10,
                 "int": 10,
                 "res": 10,
-                "wis": 10
+                "wis": 10,
+                "lck": 10
             },
             "skills": [],
             "inventory": ["Axe"],
