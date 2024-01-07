@@ -1,10 +1,27 @@
 import 'dart:developer' as dev;
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:moira/engine/engine.dart';
+import 'package:flame/text.dart';
 
-
+TextPaint combatTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 221, 193, 245),
+          fontSize: 20, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
+      
 class CombatBox extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   /// Combat Box should take a unit and a target and create three things:
   /// A box that lists the weapon to use
@@ -16,20 +33,70 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   int selectedAttackIndex = 0;
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
+  late final TextBoxComponent attackTextBox;
   CombatBox(this.attacker, this.defender){
     attackList = attacker.attackSet.keys.toList();
+    attackTextBox = TextBoxComponent(
+      text: attackList.first,
+      textRenderer: combatTextRenderer,
+      position: Vector2(32, 10),
+      priority: 20);
+    }
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Stage stage = attacker.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.keyA) { // Make the attack.
+      dev.log("${attacker.name} attacked ${defender.name}");
+      combat(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
+      attacker.wait();
+      close();
+      stage.activeComponent = stage.cursor;
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
+      dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
+      close();
+      stage.cursor.goToUnit(attacker);
+      attacker.openActionMenu(stage);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowUp) {
+      selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
+      attackTextBox.text = attackList[selectedAttackIndex];
+      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) {
+      selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
+      attackTextBox.text = attackList[selectedAttackIndex];
+      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowLeft) {
+      
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) {
+      
+      handled = true;
+    }
+    return handled;
   }
 
   @override
   Future<void> onLoad() async {
     weaponBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('combat_box.png'),
+        sprite: await gameRef.loadSprite('attack_box_trans.png'),
+        position: Vector2(128, -64),
     );
     attackBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('combat_box.png'),
-        position: Vector2(0, 32),
+        sprite: await gameRef.loadSprite('attack_box_trans.png'),
+        position: Vector2(128, -64),
         // size: Vector2.all(8)
     );
+    add(weaponBoxSprite);
+    attackTextBox.align = Anchor.centerLeft;
+    weaponBoxSprite.add(attackTextBox);
+  }
+  void close(){
+    attacker.remove(this);
   }
 
   int getCombatDistance(){
@@ -88,22 +155,6 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   }
 
   void combat(Unit attacker, Unit defender, Attack attack){
-    /// Start with the attacker. Roll a random integer between 1-100 (inclusive) .
-      /// If the random integer is <= vals.atk.accuracy, the attack succeeds.
-    /// If the attack succeeds, roll another random integer between 1-100 (inclusive).
-      /// If the random integer is <= vals.atk.critRate, the attack is critical.
-    /// If the attack succeeds, defender.hp -= vals.atk.damage. 
-      /// If the attack is a critical, defender.hp -= 3*vals.atk.damage. 
-    // If defender.hp <= 0, they die and the combat ends. 
-    // Otherwise, if vals.def.accuracy > 0, calculate their counterattack.
-    // Once both attacker and defender have made attacks 
-      /// (whether they landed or not), if both units are alive,
-      /// if attacker.stats['spe'] >= defender.stats['spe'] + 4, 
-      /// the attacker gets another chance to attack. 
-      /// If defender.stats['spe'] >= attacker.stats['spe'] + 4 ,
-      /// the defender gets another chance to attack.
-    /// Each time a unit attacks, that unit's sta attribute -= fatigue.
-    
     var rng = Random(); // Random number generator
     ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
     // Attacker's turn
@@ -128,36 +179,5 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     }
   }
 
-  @override
-  bool handleCommand(LogicalKeyboardKey command) {
-    Stage stage = attacker.parent as Stage;
-    bool handled = false;
-    if (command == LogicalKeyboardKey.keyA) { // Make the attack.
-      dev.log("${attacker.name} attacked ${defender.name}");
-      combat(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
-      attacker.wait();
-      handled = true;
-    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
-      dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
-      stage.cursor.goToUnit(attacker);
-      attacker.openActionMenu(stage);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowUp) {
-      selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
-      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowDown) {
-      selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
-      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowLeft) {
-      
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowRight) {
-      
-      handled = true;
-    }
-    return handled;
-  }
 }
 
