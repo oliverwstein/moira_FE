@@ -156,8 +156,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return false;
   }
   void equip(Item item){
+    unequip(item.type);
     switch (item.type) {
       case ItemType.main:
+        
         main = item;
         if(main?.weapon?.specialAttack != null) {
           attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
@@ -178,21 +180,21 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
   }
 
-  void unequip(ItemType type){
+  void unequip(ItemType? type){
     switch (type) {
       case ItemType.main:
-        dev.log("$name unequipped ${main!.name} as $type");
+        dev.log("$name unequipped ${main?.name} as $type");
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
         main = null;
         break;
       case ItemType.gear:
-        dev.log("$name unequipped $gear as $type");
+        dev.log("$name unequipped ${gear?.name} as $type");
         gear = null;
         break;
       case ItemType.treasure:
-        dev.log("$name unequipped $treasure as $type");
+        dev.log("$name unequipped ${treasure?.name} as $type");
         treasure = null;
         break;
       default:

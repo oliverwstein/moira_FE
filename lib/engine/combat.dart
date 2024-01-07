@@ -30,18 +30,19 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   Unit attacker;
   Unit defender;
   List<String> attackList = [];
-  List<String> weaponList = [];
+  List<Item> weaponList = [];
   Map<String, dynamic> combatValMap = {};
   int selectedAttackIndex = 0;
+  int equippedWeaponIndex = 0;
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
   late final TextBoxComponent attackTextBox;
   late final TextBoxComponent weaponTextBox;
   CombatBox(this.attacker, this.defender){
     attackList = attacker.attackSet.keys.toList();
-    for(String attackName in attackList){
-      combatValMap[attackName] =  getCombatValues(attacker, defender, attacker.attackSet[attackName]!);
-    }
+    if (attacker.main != null) {weaponList.add(attacker.main!);}
+    for (Item item in attacker.inventory) {if (attacker.equipCheck(item, ItemType.main)) weaponList.add(item);}
+    getCombatValMap();
     attackTextBox = TextBoxComponent(
       text: '${attackList.first} | ${combatValMap[attackList.first].atk.fatigue}',
       textRenderer: combatTextRenderer,
@@ -53,6 +54,12 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       position: Vector2(32, 10),
       priority: 20);
     }
+
+  void getCombatValMap() {
+    for(String attackName in attackList){
+      combatValMap[attackName] =  getCombatValues(attacker, defender, attacker.attackSet[attackName]!);
+    }
+  }
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
@@ -71,20 +78,30 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       stage.cursor.goToUnit(attacker);
       attacker.openActionMenu(stage);
       handled = true;
-    } else if (command == LogicalKeyboardKey.arrowUp) {
+    } else if (command == LogicalKeyboardKey.arrowUp) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
       attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
       dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
       handled = true;
-    } else if (command == LogicalKeyboardKey.arrowDown) {
+    } else if (command == LogicalKeyboardKey.arrowDown) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
-      attackTextBox.text = attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
+      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
       dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
       handled = true;
-    } else if (command == LogicalKeyboardKey.arrowLeft) {
+    } else if (command == LogicalKeyboardKey.arrowLeft) { // Change weapon option
+      // Unequip the current weapon, equip the next weapon in ItemList,
+      // and update the attackList and combatValMap.
+      attackList.remove(attacker.main?.name);
+      equippedWeaponIndex = (equippedWeaponIndex + 1) % weaponList.length;
+      attacker.equip(weaponList[equippedWeaponIndex]);
+      weaponTextBox.text = '${weaponList[equippedWeaponIndex].name}';
+      combatValMap = {};
+      getCombatValMap();
+      selectedAttackIndex = 0;
+      attackTextBox.text = '${attackList[selectedAttackIndex]} | ${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}';
       
       handled = true;
-    } else if (command == LogicalKeyboardKey.arrowRight) {
+    } else if (command == LogicalKeyboardKey.arrowRight) { // change weapon option
       
       handled = true;
     }
