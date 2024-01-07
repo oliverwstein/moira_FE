@@ -130,10 +130,12 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
       if (tile.isOccupied) { // Chosen tile has a unit on it
         Unit? unit = tile.unit;
         if (unit != null && unit.canAct) { // Unit can act
-          stage.activeComponent = unit;
-          dev.log('${unit.idleAnimationName} selected');
-          List<Tile> moveSet = unit.findReachableTiles();
-          unit.markAttackableTiles(moveSet);
+          if (unit.team == UnitTeam.blue){
+            stage.activeComponent = unit;
+            dev.log('${unit.idleAnimationName} selected');
+            List<Tile> moveSet = unit.findReachableTiles();
+            unit.markAttackableTiles(moveSet);
+          }
         } else {
           stage.blankAllTiles();
           List<MenuOption> visibleOptions = [MenuOption.endTurn, MenuOption.save];

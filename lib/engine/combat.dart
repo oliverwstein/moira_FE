@@ -1,10 +1,44 @@
 import 'dart:developer' as dev;
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:moira/engine/engine.dart';
+import 'package:flame/text.dart';
 
+TextPaint combatTextRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 255, 255, 255),
+          fontSize: 16, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          height: 1.5,
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
 
+TextPaint combatNumberRenderer = TextPaint(
+        style: const TextStyle(
+          color: ui.Color.fromARGB(255, 255, 255, 255),
+          fontSize: 22, // Adjust the font size as needed
+          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          height: 1.5,
+          shadows: <ui.Shadow>[
+            ui.Shadow(
+              offset: ui.Offset(1.0, 1.0),
+              blurRadius: 1.0,
+              color: ui.Color.fromARGB(255, 20, 11, 48),
+            ),
+          ],
+          // Include any other styles you need
+          ),
+      );
 class CombatBox extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   /// Combat Box should take a unit and a target and create three things:
   /// A box that lists the weapon to use
@@ -13,23 +47,153 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   Unit attacker;
   Unit defender;
   List<String> attackList = [];
+  List<Item> weaponList = [];
+  Map<String, dynamic> combatValMap = {};
   int selectedAttackIndex = 0;
+  int equippedWeaponIndex = 0;
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
-  CombatBox(this.attacker, this.defender){
+  late final SpriteComponent combatPaneSprite;
+  late final TextBoxComponent attackTextBox;
+  late final TextBoxComponent weaponTextBox;
+  late final TextBoxComponent defenderTextBox;
+  late final (TextBoxComponent, TextBoxComponent) hpRecord;
+  late final (TextBoxComponent, TextBoxComponent) damRecord;
+  late final (TextBoxComponent, TextBoxComponent) accRecord;
+  late final (TextBoxComponent, TextBoxComponent) critRecord;
+  CombatBox(this.attacker, this.defender) {
+    // Initialization logic
     attackList = attacker.attackSet.keys.toList();
+    weaponList = attacker.inventory.where((item) => attacker.equipCheck(item, ItemType.main)).toList();
+    getCombatValMap(); // Assuming this method populates combatValMap
+
+    attackTextBox = createTextBox('${combatValMap[attackList.first].atk.fatigue}|${attackList.first}', 24, 48);
+    weaponTextBox = createTextBox('${attacker.name}\n${attacker.main?.name ?? "Unarmed"}', 24, 0);
+    defenderTextBox = createTextBox("${defender.name}\n${combatValMap[attackList.first].atk.fatigue}|${defender.main?.name ?? ""}-${defender.attackSet.keys.first}", 24, 212);
+
+    hpRecord = createRecordPair(attacker.hp.toString(), defender.hp.toString(), 80);
+    damRecord = createRecordPair(combatValMap[attackList.first].atk.damage.toString(), combatValMap[attackList.first].def.damage.toString(), 110);
+    accRecord = createRecordPair(combatValMap[attackList.first].atk.accuracy.toString(), combatValMap[attackList.first].def.accuracy.toString(), 140);
+    critRecord = createRecordPair(combatValMap[attackList.first].atk.critRate.toString(), combatValMap[attackList.first].def.critRate.toString(), 170);
+  }
+
+  TextBoxComponent createTextBox(String text, double x, double y) {
+    return TextBoxComponent(
+      text: text,
+      textRenderer: combatTextRenderer, // Assuming combatTextRenderer is defined
+      position: Vector2(x, y),
+    );
+  }
+
+  (TextBoxComponent, TextBoxComponent) createRecordPair(String atkText, String defText, double y) {
+    var atkComp = TextBoxComponent(
+      text: atkText,
+      textRenderer: combatNumberRenderer, // Assuming combatNumberRenderer is defined
+      position: Vector2(110, y),
+    );
+
+    var defComp = TextBoxComponent(
+      text: defText,
+      textRenderer: combatNumberRenderer,
+      position: Vector2(10, y),
+    );
+
+    return (atkComp, defComp);
+  }
+  
+
+
+  void getCombatValMap() {
+    for(String attackName in attackList){
+      combatValMap[attackName] =  getCombatValues(attacker, defender, attacker.attackSet[attackName]!);
+    }
+  }
+
+  @override
+  bool handleCommand(LogicalKeyboardKey command) {
+    Stage stage = attacker.parent as Stage;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.keyA) { // Make the attack.
+      dev.log("${attacker.name} attacked ${defender.name}");
+      combat(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
+      attacker.wait();
+      close();
+      stage.activeComponent = stage.cursor;
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
+      dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
+      close();
+      stage.cursor.goToUnit(attacker);
+      attacker.openActionMenu(stage);
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowUp) { // Change attack option
+      selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
+      updateCombatDataUI();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowDown) { // Change attack option
+      selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
+      updateCombatDataUI();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowLeft) { // Change weapon option
+      // Unequip the current weapon, equip the next weapon in ItemList,
+      // and update the attackList and combatValMap.
+      equippedWeaponIndex = (equippedWeaponIndex + 1) % weaponList.length;
+      attacker.equip(weaponList[equippedWeaponIndex]);
+      attackList = attacker.attackSet.keys.toList();
+      weaponTextBox.text = '${attacker.name}\n${attacker.main?.name ?? "Unarmed"}';
+      combatValMap = {};
+      getCombatValMap();
+      selectedAttackIndex = 0;
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
+      updateCombatDataUI();
+      handled = true;
+    } else if (command == LogicalKeyboardKey.arrowRight) { // change weapon option
+      equippedWeaponIndex = (equippedWeaponIndex - 1) % weaponList.length;
+      attacker.equip(weaponList[equippedWeaponIndex]);
+      attackList = attacker.attackSet.keys.toList();
+      weaponTextBox.text = '${attacker.name}\n${attacker.main?.name ?? "Unarmed"}';
+      combatValMap = {};
+      getCombatValMap();
+      selectedAttackIndex = 0;
+      attackTextBox.text = '${combatValMap[attackList[selectedAttackIndex]].atk.fatigue}|${attackList[selectedAttackIndex]}';
+      updateCombatDataUI();
+      handled = true;
+    }
+    return handled;
+  }
+
+  void updateCombatDataUI() {
+    damRecord.$1.text = '${combatValMap[attackList[selectedAttackIndex]].atk.damage}';
+    damRecord.$2.text = '${combatValMap[attackList[selectedAttackIndex]].def.damage}';
+    accRecord.$1.text = '${combatValMap[attackList[selectedAttackIndex]].atk.accuracy}';
+    accRecord.$2.text = '${combatValMap[attackList[selectedAttackIndex]].def.accuracy}';
+    critRecord.$1.text = '${combatValMap[attackList[selectedAttackIndex]].atk.critRate}';
+    critRecord.$2.text = '${combatValMap[attackList[selectedAttackIndex]].def.critRate}';
   }
 
   @override
   Future<void> onLoad() async {
-    weaponBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('combat_box.png'),
+    combatPaneSprite = SpriteComponent(
+        sprite: await gameRef.loadSprite('tellius_combat_pane_attack.png'),
+        position: Vector2(160, 0),
     );
-    attackBoxSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('combat_box.png'),
-        position: Vector2(0, 32),
-        // size: Vector2.all(8)
-    );
+    combatPaneSprite.add(attackTextBox);
+    combatPaneSprite.add(weaponTextBox);
+    combatPaneSprite.add(defenderTextBox);
+    combatPaneSprite.add(hpRecord.$1);
+    combatPaneSprite.add(hpRecord.$2);
+    combatPaneSprite.add(damRecord.$1);
+    combatPaneSprite.add(damRecord.$2);
+    combatPaneSprite.add(accRecord.$1);
+    combatPaneSprite.add(accRecord.$2);
+    combatPaneSprite.add(critRecord.$1);
+    combatPaneSprite.add(critRecord.$2);
+    add(combatPaneSprite);
+  }
+  void close(){
+    attacker.remove(this);
   }
 
   int getCombatDistance(){
@@ -67,6 +231,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
          def = defender.attackCalc(counterAttack, attacker);
       }
     }
+    // dev.log("${attack.name}, ${atk}, ${def}");
     return (atk: atk, def: def);
   }
 
@@ -87,22 +252,6 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   }
 
   void combat(Unit attacker, Unit defender, Attack attack){
-    /// Start with the attacker. Roll a random integer between 1-100 (inclusive) .
-      /// If the random integer is <= vals.atk.accuracy, the attack succeeds.
-    /// If the attack succeeds, roll another random integer between 1-100 (inclusive).
-      /// If the random integer is <= vals.atk.critRate, the attack is critical.
-    /// If the attack succeeds, defender.hp -= vals.atk.damage. 
-      /// If the attack is a critical, defender.hp -= 3*vals.atk.damage. 
-    // If defender.hp <= 0, they die and the combat ends. 
-    // Otherwise, if vals.def.accuracy > 0, calculate their counterattack.
-    // Once both attacker and defender have made attacks 
-      /// (whether they landed or not), if both units are alive,
-      /// if attacker.stats['spe'] >= defender.stats['spe'] + 4, 
-      /// the attacker gets another chance to attack. 
-      /// If defender.stats['spe'] >= attacker.stats['spe'] + 4 ,
-      /// the defender gets another chance to attack.
-    /// Each time a unit attacks, that unit's sta attribute -= fatigue.
-    
     var rng = Random(); // Random number generator
     ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
     // Attacker's turn
@@ -127,36 +276,5 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     }
   }
 
-  @override
-  bool handleCommand(LogicalKeyboardKey command) {
-    Stage stage = attacker.parent as Stage;
-    bool handled = false;
-    if (command == LogicalKeyboardKey.keyA) { // Make the attack.
-      dev.log("${attacker.name} attacked ${defender.name}");
-      combat(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
-      attacker.wait();
-      handled = true;
-    } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
-      dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
-      stage.cursor.goToUnit(attacker);
-      attacker.openActionMenu(stage);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowUp) {
-      selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
-      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowDown) {
-      selectedAttackIndex = (selectedAttackIndex - 1) % attackList.length;
-      dev.log("Selected attack is ${attackList[selectedAttackIndex]}");
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowLeft) {
-      
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowRight) {
-      
-      handled = true;
-    }
-    return handled;
-  }
 }
 

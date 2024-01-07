@@ -41,14 +41,14 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    units.add(Unit.fromJSON(const Point(59, 10), 'arden'));
-    units.add(Unit.fromJSON(const Point(60, 12), 'alec'));
-    units.add(Unit.fromJSON(const Point(58, 12), 'noish'));
-    units.add(Unit.fromJSON(const Point(59, 13), 'sigurd'));
+    units.add(Unit.fromJSON(const Point(59, 10), 'Arden'));
+    units.add(Unit.fromJSON(const Point(60, 12), 'Alec'));
+    units.add(Unit.fromJSON(const Point(58, 12), 'Noish'));
+    units.add(Unit.fromJSON(const Point(59, 13), 'Sigurd'));
 
-    units.add(Unit.fromJSON(const Point(56, 12), 'brigand'));
-    units.add(Unit.fromJSON(const Point(55, 13), 'brigand'));
-    units.add(Unit.fromJSON(const Point(55, 11), 'brigand'));
+    units.add(Unit.fromJSON(const Point(56, 12), 'Brigand'));
+    units.add(Unit.fromJSON(const Point(55, 13), 'Brigand'));
+    units.add(Unit.fromJSON(const Point(55, 11), 'Brigand'));
      
     for (Unit unit in units) {
       add(unit);

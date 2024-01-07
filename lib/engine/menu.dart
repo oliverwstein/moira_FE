@@ -110,6 +110,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         assert(unit != null);
         TargetSelector selector = TargetSelector(stage.getTargets());
+        stage.cursor.goToUnit(selector.targets[0]);
         unit!.add(selector);
         stage.activeComponent = selector;
         dev.log("$unit's attacks are: ${unit.attackSet}");
@@ -376,7 +377,8 @@ class TargetSelector extends Component implements CommandHandler {
         if(stage.tilesMap[stage.cursor.gridCoord]!.unit!.team == UnitTeam.red){
           Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
           CombatBox combatBox = CombatBox(unit, target);
-          dev.log("${combatBox.getValidAttacks(unit)}");
+          unit.add(combatBox);
+          dev.log("${unit.name} has the attacks: ${combatBox.getValidAttacks(unit)}");
           stage.activeComponent = combatBox;
         }
 

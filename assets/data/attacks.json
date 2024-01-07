@@ -4,7 +4,7 @@
         "Strike":
             {
                 "description" : "A simple blow.",
-                "scaling" : [1.0, 1.0, 0.0, 0.0],
+                "scaling" : [0.25, 0.25, 0.0, 0.0],
                 "weaponType" : [],
                 "might": 0,
                 "hit": 0,
@@ -28,7 +28,7 @@
         "Slash":
             {
                 "description" : "Have at thee.",
-                "scaling" : [1.0, 2.0, 0.0, 0.0],
+                "scaling" : [0.6, 0.4, 0.0, 0.0],
                 "weaponType" : ["Sword", "Axe", "Knife"],
                 "might": 3,
                 "hit": 25,
@@ -40,7 +40,7 @@
         "Stab":
             {
                 "description" : "Have at thee.",
-                "scaling" : [1.0, 2.0, 0.0, 0.0],
+                "scaling" : [0.4, 0.6, 0.0, 0.0],
                 "weaponType" : ["Sword", "Lance", "Knife"],
                 "might": 5,
                 "hit": 10,
@@ -52,7 +52,7 @@
         "Smash":
             {
                 "description" : "Have at thee.",
-                "scaling" : [1.0, 2.0, 0.0, 0.0],
+                "scaling" : [0.8, 0.2, 0.0, 0.0],
                 "weaponType" : ["Axe"],
                 "might": 5,
                 "hit": 10,
@@ -64,7 +64,7 @@
         "Fire Axe":
             {
                 "description" : "Burn, baby.",
-                "scaling" : [2.0, 1.0, 0.0, 0.0],
+                "scaling" : [0.8, 0.2, 0.5, 0.0],
                 "weaponType" : ["Axe"],
                 "might": 5,
                 "hit": 10,
