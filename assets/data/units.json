@@ -45,7 +45,7 @@
         "idle": "noish.png"
     }},
     {
-    "name": "alec",
+    "name": "Alec",
     "team": "blue",
     "movementRange": 8,
     "stats": {
@@ -67,7 +67,7 @@
         "idle": "alec.png"
     }},
     {
-        "name": "arden",
+        "name": "Arden",
         "team": "blue",
         "movementRange": 6,
         "stats": {
@@ -90,7 +90,7 @@
         }
         },
         {
-            "name": "brigand",
+            "name": "Brigand",
             "team": "red",
             "movementRange": 6,
             "stats": {

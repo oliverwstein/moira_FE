@@ -64,7 +64,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     // Extract unit data from the static map in MyGame
     var unitsJson = MyGame.unitMap['units'] as List;
     Map<String, dynamic> unitData = unitsJson.firstWhere(
-        (unit) => unit['name'].toString().toLowerCase() == name.toLowerCase(),
+        (unit) => unit['name'].toString() == name,
         orElse: () => throw Exception('Unit $name not found in JSON data')
     );
 

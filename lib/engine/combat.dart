@@ -11,6 +11,7 @@ TextPaint combatTextRenderer = TextPaint(
           color: ui.Color.fromARGB(255, 255, 255, 255),
           fontSize: 16, // Adjust the font size as needed
           fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+          height: 1.5,
           shadows: <ui.Shadow>[
             ui.Shadow(
               offset: ui.Offset(1.0, 1.0),
@@ -39,6 +40,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   late final SpriteComponent combatPaneSprite;
   late final TextBoxComponent attackTextBox;
   late final TextBoxComponent weaponTextBox;
+  late final TextBoxComponent defenderTextBox;
   CombatBox(this.attacker, this.defender){
     attackList = attacker.attackSet.keys.toList();
     for (Item item in attacker.inventory) {if (attacker.equipCheck(item, ItemType.main)) weaponList.add(item);}
@@ -46,14 +48,20 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     attackTextBox = TextBoxComponent(
       text: '${combatValMap[attackList.first].atk.fatigue}|${attackList.first}',
       textRenderer: combatTextRenderer,
-      position: Vector2(24, 52),
+      position: Vector2(24, 48),
       priority: 20);
     weaponTextBox = TextBoxComponent(
-      text: attacker.main?.name ?? "Unarmed",
+      text: '${attacker.name}\n${attacker.main?.name ?? "Unarmed"}',
       textRenderer: combatTextRenderer,
-      position: Vector2(24, 30),
+      position: Vector2(24, 0),
+      priority: 20);
+    defenderTextBox = TextBoxComponent(
+      text: "${defender.name}\n${combatValMap[attackList.first].atk.fatigue}|${defender.main?.name ?? ""}-${defender.attackSet.keys.first}",
+      textRenderer: combatTextRenderer,
+      position: Vector2(24, 212),
       priority: 20);
     }
+
 
   void getCombatValMap() {
     for(String attackName in attackList){
@@ -94,7 +102,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       equippedWeaponIndex = (equippedWeaponIndex + 1) % weaponList.length;
       attacker.equip(weaponList[equippedWeaponIndex]);
       attackList = attacker.attackSet.keys.toList();
-      weaponTextBox.text = '${weaponList[equippedWeaponIndex].name}';
+      weaponTextBox.text = '${attacker.name}\n${attacker.main?.name ?? "Unarmed"}';
       combatValMap = {};
       getCombatValMap();
       selectedAttackIndex = 0;
@@ -105,7 +113,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       equippedWeaponIndex = (equippedWeaponIndex - 1) % weaponList.length;
       attacker.equip(weaponList[equippedWeaponIndex]);
       attackList = attacker.attackSet.keys.toList();
-      weaponTextBox.text = '${weaponList[equippedWeaponIndex].name}';
+      weaponTextBox.text = '${attacker.name}\n${attacker.main?.name ?? "Unarmed"}';
       combatValMap = {};
       getCombatValMap();
       selectedAttackIndex = 0;
@@ -119,21 +127,13 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
 
   @override
   Future<void> onLoad() async {
-    // weaponBoxSprite = SpriteComponent(
-    //     sprite: await gameRef.loadSprite('attack_box_trans.png'),
-    //     position: Vector2(128, -64),
-    // );
-    // attackBoxSprite = SpriteComponent(
-    //     sprite: await gameRef.loadSprite('attack_box_trans.png'),
-    //     position: Vector2(128, -64),
-    //     // size: Vector2.all(8)
-    // );
     combatPaneSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('tellius_combat_pane_attack.png'),
         position: Vector2(160, 0),
     );
     combatPaneSprite.add(attackTextBox);
     combatPaneSprite.add(weaponTextBox);
+    combatPaneSprite.add(defenderTextBox);
     add(combatPaneSprite);
   }
   void close(){
