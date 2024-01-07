@@ -149,6 +149,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return handled;
   }
 
+  bool equipCheck(Item item, ItemType slot) {
+    /// This will be made fancier later, once the Equip component
+    /// is implemented. For now it just checks if the item is the right type. 
+    if(item.type == slot) return true;
+    return false;
+  }
   void equip(Item item){
     switch (item.type) {
       case ItemType.main:

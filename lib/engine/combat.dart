@@ -30,11 +30,13 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   Unit attacker;
   Unit defender;
   List<String> attackList = [];
+  List<String> weaponList = [];
   Map<String, dynamic> combatValMap = {};
   int selectedAttackIndex = 0;
   late final SpriteComponent weaponBoxSprite;
   late final SpriteComponent attackBoxSprite;
   late final TextBoxComponent attackTextBox;
+  late final TextBoxComponent weaponTextBox;
   CombatBox(this.attacker, this.defender){
     attackList = attacker.attackSet.keys.toList();
     for(String attackName in attackList){
@@ -42,6 +44,11 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     }
     attackTextBox = TextBoxComponent(
       text: '${attackList.first} | ${combatValMap[attackList.first].atk.fatigue}',
+      textRenderer: combatTextRenderer,
+      position: Vector2(32, 10),
+      priority: 20);
+    weaponTextBox = TextBoxComponent(
+      text: attacker.main?.name ?? "Unarmed",
       textRenderer: combatTextRenderer,
       position: Vector2(32, 10),
       priority: 20);
@@ -88,16 +95,19 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   Future<void> onLoad() async {
     weaponBoxSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('attack_box_trans.png'),
-        position: Vector2(128, -64),
+        position: Vector2(128, 0),
     );
     attackBoxSprite = SpriteComponent(
         sprite: await gameRef.loadSprite('attack_box_trans.png'),
         position: Vector2(128, -64),
         // size: Vector2.all(8)
     );
-    add(weaponBoxSprite);
+    add(attackBoxSprite);
     attackTextBox.align = Anchor.centerLeft;
-    weaponBoxSprite.add(attackTextBox);
+    attackBoxSprite.add(attackTextBox);
+    add(weaponBoxSprite);
+    weaponTextBox.align = Anchor.centerLeft;
+    weaponBoxSprite.add(weaponTextBox);
   }
   void close(){
     attacker.remove(this);
