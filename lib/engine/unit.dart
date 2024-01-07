@@ -19,7 +19,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   final String name;
   final String idleAnimationName;
   int movementRange;
-  (int, int) combatRange;
   UnitTeam team = UnitTeam.blue;
   double tileSize;
 
@@ -52,7 +51,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int sta = -1;
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.combatRange, this.stats, this.hp, this.sta);
+  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats);
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -80,24 +79,24 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     for(String itemName in unitData['inventory']){
       inventory.add(Item.fromJson(itemName));
     }
+    Item? main;
+    for (Item item in inventory){
+      if(item.type == ItemType.main){
+        main = item;
+        break;
+      }
+    }
     Map<String, Attack> attackMap = {};
-    int minCombatRange = 0;
-    int maxCombatRange = 0;
     for(String attackName in unitData['attacks']){
       attackMap[attackName] = Attack.fromJson(attackName);
-      minCombatRange = min(minCombatRange, attackMap[attackName]!.range.$1);
-      maxCombatRange = max(maxCombatRange, attackMap[attackName]!.range.$2);
     }
-    (int, int) combatRange = (minCombatRange, maxCombatRange);
 
     Map<String, int> stats = {};
     for (String stat in unitData['stats'].keys){
       stats[stat] = unitData['stats'][stat];
     }
-    int hp = stats['hp']!;
-    int sta = stats['sta']!;
     // Return a new Unit instance
-    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, combatRange, stats, hp, sta);
+    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
   }
 
   @override
@@ -222,7 +221,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   }
   void openActionMenu(Stage stage){
-    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, combatRange.$1, combatRange.$2);
+    (int, int) range = getCombatRange();
+    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
     List<MenuOption> visibleOptions = [MenuOption.wait];
     if(attackTiles.isNotEmpty){
       visibleOptions.add(MenuOption.attack);
@@ -428,12 +428,22 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return path; // The path from the start to the target
   }
   
+  (int, int) getCombatRange() {
+    int minCombatRange = 0;
+    int maxCombatRange = 0;
+    for(String attackName in attackSet.keys){
+      minCombatRange = min(minCombatRange, attackSet[attackName]!.range.$1);
+      maxCombatRange = max(maxCombatRange, attackSet[attackName]!.range.$2);
+    }
+    return (minCombatRange, maxCombatRange);
+  } 
   void markAttackableTiles(List<Tile> reachableTiles) {
     // Mark tiles attackable from the unit's current position
-    markTilesInRange(gridCoord, combatRange.$1, combatRange.$2, TileState.attack);
+    (int, int) range = getCombatRange();
+    markTilesInRange(gridCoord, range.$1, range.$2, TileState.attack);
     // Mark tiles attackable from each reachable tile
     for (var tile in reachableTiles) {
-      markTilesInRange(tile.gridCoord, combatRange.$1, combatRange.$2,  TileState.attack);
+      markTilesInRange(tile.gridCoord, range.$1, range.$2,  TileState.attack);
     }
   }
 
