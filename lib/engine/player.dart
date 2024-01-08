@@ -44,10 +44,12 @@ class NPCPlayer extends Player {
   }
 
   @override
-  void takeTurn(){
+  void takeTurn() async {
     super.takeTurn();
+
     for (var unit in units) {
-      if(unit.canAct) {
+      if (unit.canAct) {
+        await Future.delayed(Duration(milliseconds: 500)); // Half-second delay
         unit.wait();
       }
     }
