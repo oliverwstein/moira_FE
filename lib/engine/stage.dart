@@ -22,6 +22,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   List<Unit> units = [];
   List<UnitTeam> teams = UnitTeam.values;
   Map<UnitTeam, List<Unit>> teamMap = {};
+  Map<UnitTeam, NPCPlayer> npcMap = {};
   UnitTeam activeTeam = UnitTeam.blue;
   final Vector2 tilesize = Vector2.all(16);
   Map<Point<int>, Tile> tilesMap = {};
@@ -62,7 +63,13 @@ class Stage extends Component with HasGameRef<MyGame>{
       tilesMap[unit.gridCoord]?.setUnit(unit);
       gameRef.addObserver(unit);
     }
-
+    for (UnitTeam team in UnitTeam.values){
+      if(team != UnitTeam.blue){
+        npcMap[team] = NPCPlayer(team, this);
+        dev.log('${npcMap[team]!.team}');
+        add(npcMap[team]!);
+      }
+    }
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
@@ -114,12 +121,13 @@ class Stage extends Component with HasGameRef<MyGame>{
     dev.log('Active team is now $activeTeam');
     var members = teamMap[activeTeam];
     if(members != null && activeTeam != UnitTeam.blue){
-      var npcPlayer = NPCPlayer(members);
-      npcPlayer.takeTurn();
+      var npcPlayer = npcMap[activeTeam];
+      npcPlayer?.takeTurn();
     } else {endTurn();}
   }
 
   void endTurn() {
+    dev.log('End turn for $activeTeam');
     if(activeTeam == UnitTeam.blue) turn++;
     int index = teams.indexOf(activeTeam);
     activeTeam = teams[(index + 1) % teams.length];
@@ -127,6 +135,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     for (var unit in units) {
       unit.toggleCanAct(true);
     }
+    startTurn();
   }
   
   Terrain determineTerrainType(Point<int> point){
