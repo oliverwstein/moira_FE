@@ -14,8 +14,8 @@ class UnitCreationEvent extends GameEvent {
 }
 
 class UnitDeathEvent extends GameEvent {
-  final UnitTeam activeTeam;
-  UnitDeathEvent(this.activeTeam);
+  final Unit unit;
+  UnitDeathEvent(this.unit);
 }
 
 class EventDispatcher {
