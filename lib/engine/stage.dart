@@ -22,7 +22,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   List<Unit> units = [];
   List<UnitTeam> teams = UnitTeam.values;
   Map<UnitTeam, List<Unit>> teamMap = {};
-  Map<UnitTeam, NPCPlayer> npcMap = {};
+  Map<UnitTeam, Player> playerMap = {};
   UnitTeam activeTeam = UnitTeam.blue;
   final Vector2 tilesize = Vector2.all(16);
   Map<Point<int>, Tile> tilesMap = {};
@@ -65,10 +65,10 @@ class Stage extends Component with HasGameRef<MyGame>{
     }
     for (UnitTeam team in UnitTeam.values){
       if(team != UnitTeam.blue){
-        npcMap[team] = NPCPlayer(team, this);
-        dev.log('${npcMap[team]!.team}');
-        add(npcMap[team]!);
-      }
+        playerMap[team] = NPCPlayer(team, this);
+        dev.log('${playerMap[team]!.team}');
+        add(playerMap[team]!);
+      } else {add(Player(UnitTeam.blue, this));}
     }
     cursor = Cursor();
     activeComponent = cursor;
@@ -121,7 +121,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     dev.log('Active team is now $activeTeam');
     var members = teamMap[activeTeam];
     if(members != null && activeTeam != UnitTeam.blue){
-      var npcPlayer = npcMap[activeTeam];
+      var npcPlayer = playerMap[activeTeam];
       npcPlayer?.takeTurn();
     } else {endTurn();}
   }
