@@ -9,8 +9,12 @@ class TurnStartEvent extends GameEvent {
 }
 
 class UnitCreationEvent extends GameEvent {
+  UnitCreationEvent();
+}
+
+class UnitDeathEvent extends GameEvent {
   final UnitTeam activeTeam;
-  UnitCreationEvent(this.activeTeam);
+  UnitDeathEvent(this.activeTeam);
 }
 
 class EventDispatcher {
