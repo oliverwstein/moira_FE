@@ -97,6 +97,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   void die(){
     Stage stage = parent as Stage;
+    stage.tilesMap[gridCoord]!.removeUnit(); // Remove unit from the tile
+    stage.remove(this); // Remove the unit from the stage's children.
+    stage.units.remove(this); // Remove the unit from the stage's list of units.
+    stage.playerMap[team]!.units.remove(this); // Remove the unit from the player map.
     stage.tilesMap[gridCoord]!.removeUnit();
     removeFromParent();
   }

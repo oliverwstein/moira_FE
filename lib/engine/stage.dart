@@ -131,11 +131,6 @@ class Stage extends Component with HasGameRef<MyGame>{
     }
     startTurn();
   }
-
-  void die(Unit unit){
-    tilesMap[unit.gridCoord]!.removeUnit(); // Remove unit from the tile
-    remove(unit); // Remove the unit from the stage.
-  }
   
   Terrain determineTerrainType(Point<int> point){
     int localId = point.y * mapTileWidth + point.x;
