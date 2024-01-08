@@ -128,6 +128,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeTeam = teams[(index + 1) % teams.length];
     for (var unit in units) {
       unit.toggleCanAct(true);
+      unit.remainingMovement = unit.movementRange.toDouble();
     }
     startTurn();
   }

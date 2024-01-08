@@ -49,7 +49,7 @@ class NPCPlayer extends Player {
 
     for (var unit in units) {
       if (unit.canAct) {
-        await Future.delayed(Duration(milliseconds: 500)); // Half-second delay
+        await Future.delayed(const Duration(milliseconds: 500)); // Half-second delay
         unit.wait();
       }
     }

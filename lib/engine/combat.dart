@@ -254,7 +254,6 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   }
 
   void combat(Unit attacker, Unit defender, Attack attack){
-    var rng = Random(); // Random number generator
     ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
     // Attacker's turn
     makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);

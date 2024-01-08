@@ -19,6 +19,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   final String name;
   final String idleAnimationName;
   int movementRange;
+  late double remainingMovement;
   UnitTeam team = UnitTeam.blue;
   double tileSize;
 
@@ -54,6 +55,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   // Private constructor for creating instances
   Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
     _postConstruction();
+    remainingMovement = movementRange.toDouble();
   }
 
   // Factory constructor
@@ -148,7 +150,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
-      if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
+      if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
         move(stage);
         getActionOptions();
         openActionMenu(stage);
@@ -298,6 +300,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   void wait(){
     Stage stage = parent as Stage;
     toggleCanAct(false);
+    actionsAvailable = [MenuOption.wait];
     stage.activeComponent = stage.cursor;
     stage.blankAllTiles();
     stage.updateTileWithUnit(oldTile, gridCoord, this);
@@ -406,11 +409,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     var queue = Queue<_TileMovement>(); // Queue for BFS
 
     // Starting point - no parent at the beginning
-    queue.add(_TileMovement(gridCoord, movementRange.toDouble(), null));
+    queue.add(_TileMovement(gridCoord, remainingMovement.toDouble(), null));
     while (queue.isNotEmpty) {
       var tileMovement = queue.removeFirst();
       Point<int> currentPoint = tileMovement.point;
-      double remainingMovement = tileMovement.remainingMovement;
+      remainingMovement = tileMovement.remainingMovement;
 
       // Skip if a better path to this tile has already been found
       if (visitedTiles.containsKey(currentPoint) && visitedTiles[currentPoint]!.remainingMovement >= remainingMovement) continue;
