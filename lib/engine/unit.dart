@@ -39,6 +39,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   late final ActionMenu actionMenu;
 
   // Unit Attributes & Components
+  List<MenuOption> actionsAvailable = [MenuOption.wait];
   Item? main;
   Item? treasure;
   Item? gear;
@@ -115,6 +116,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     hp = stats['hp']!;
     sta = stats['sta']!;
   }
+  
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
@@ -137,8 +139,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     size = Vector2.all(tileSize);
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
     gameRef.eventDispatcher.add(Announcer(this));
+    gameRef.eventDispatcher.add(Canto(this));
     gameRef.eventDispatcher.dispatch(UnitCreationEvent(this));
   }
+  
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
@@ -146,6 +150,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
       if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
         move(stage);
+        getActionOptions();
         openActionMenu(stage);
       }
       
@@ -180,6 +185,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.tilesMap[gridCoord]!.removeUnit();
     removeFromParent();
   }
+  
   bool equipCheck(Item item, ItemType slot) {
     /// This will be made fancier later, once the Equip component
     /// is implemented. For now it just checks if the item is the right type. 
@@ -285,14 +291,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   }
   void openActionMenu(Stage stage){
-    (int, int) range = getCombatRange();
-    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
-    List<MenuOption> visibleOptions = [MenuOption.wait];
-    if(attackTiles.isNotEmpty){
-      visibleOptions.add(MenuOption.attack);
-    }
-    if (inventory.isNotEmpty) visibleOptions.add(MenuOption.item);
-    stage.cursor.actionMenu.show(visibleOptions);
+    stage.cursor.actionMenu.show(actionsAvailable);
     stage.activeComponent = stage.cursor.actionMenu;
   }
 
@@ -538,6 +537,19 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       return Direction.up;
     }
     return null;
+  }
+  
+  void getActionOptions() {
+    Stage stage = parent as Stage;
+    (int, int) range = getCombatRange();
+    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
+    if(attackTiles.isNotEmpty){
+      if(!actionsAvailable.contains(MenuOption.attack)){
+        actionsAvailable.add(MenuOption.attack);}
+    } else{
+       actionsAvailable.remove(MenuOption.attack);
+    }
+    if (inventory.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
   }
   
 }

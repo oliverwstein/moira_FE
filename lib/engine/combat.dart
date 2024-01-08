@@ -119,11 +119,13 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       attacker.wait();
       close();
       stage.activeComponent = stage.cursor;
+      gameRef.eventDispatcher.dispatch(UnitActionEndEvent(attacker));
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
       close();
       stage.cursor.goToUnit(attacker);
+      attacker.getActionOptions();
       attacker.openActionMenu(stage);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) { // Change attack option

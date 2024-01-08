@@ -18,6 +18,12 @@ class UnitDeathEvent extends GameEvent {
   UnitDeathEvent(this.unit);
 }
 
+class UnitActionEndEvent extends GameEvent {
+  final Unit unit;
+  UnitActionEndEvent(this.unit);
+  
+}
+
 class EventDispatcher {
   final List<Observer> _observers = [];
 

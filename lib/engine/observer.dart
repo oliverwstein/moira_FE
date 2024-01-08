@@ -19,3 +19,17 @@ class Announcer extends Observer {
     }
   }
 }
+
+class Canto extends Observer {
+  final Unit unit;
+
+  Canto(this.unit);
+
+  @override
+  void onEvent(GameEvent event) {
+    if (event is UnitActionEndEvent && unit == event.unit) {
+      // Stage stage = unit.parent as Stage;
+      // unit.toggleCanAct(true);
+    }
+  }
+}

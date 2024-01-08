@@ -356,6 +356,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   void close(){
     Stage stage = unit.parent as Stage;
     removeAll(children);
+    unit.getActionOptions();
     unit.openActionMenu(stage);
 
   }
@@ -384,6 +385,7 @@ class TargetSelector extends Component implements CommandHandler {
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       stage.cursor.goToUnit(unit);
+      unit.getActionOptions();
       unit.openActionMenu(stage);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
