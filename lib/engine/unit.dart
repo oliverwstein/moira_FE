@@ -346,7 +346,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   @override
   void update(double dt) {
     super.update(dt);
-    if(hp <= 0) die;
+    if(hp <= 0) die();
 
     if (isMoving && currentTarget != null) {
       // Calculate the pixel position for the target tile position

@@ -21,7 +21,6 @@ class Stage extends Component with HasGameRef<MyGame>{
   late final Cursor cursor;
   List<Unit> units = [];
   List<UnitTeam> teams = UnitTeam.values;
-  Map<UnitTeam, List<Unit>> teamMap = {};
   Map<UnitTeam, Player> playerMap = {};
   UnitTeam activeTeam = UnitTeam.blue;
   final Vector2 tilesize = Vector2.all(16);
@@ -58,7 +57,6 @@ class Stage extends Component with HasGameRef<MyGame>{
     units.add(Unit.fromJSON(const Point(55, 11), 'Brigand'));
      
     for (Unit unit in units) {
-      teamMap.putIfAbsent(unit.team, () => []).add(unit);
       add(unit);
       tilesMap[unit.gridCoord]?.setUnit(unit);
       gameRef.addObserver(unit);
@@ -132,6 +130,11 @@ class Stage extends Component with HasGameRef<MyGame>{
       unit.toggleCanAct(true);
     }
     startTurn();
+  }
+
+  void die(Unit unit){
+    tilesMap[unit.gridCoord]!.removeUnit(); // Remove unit from the tile
+    remove(unit); // Remove the unit from the stage.
   }
   
   Terrain determineTerrainType(Point<int> point){
