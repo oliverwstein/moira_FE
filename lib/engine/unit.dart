@@ -137,7 +137,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     size = Vector2.all(tileSize);
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
     gameRef.eventDispatcher.add(Announcer(this));
-    gameRef.eventDispatcher.dispatch(UnitCreationEvent());
+    gameRef.eventDispatcher.dispatch(UnitCreationEvent(this));
   }
   @override
   bool handleCommand(LogicalKeyboardKey command) {

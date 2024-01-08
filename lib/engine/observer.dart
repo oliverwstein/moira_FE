@@ -11,7 +11,7 @@ class Announcer extends Observer {
 
   @override
   void onEvent(GameEvent event) {
-    if (event is UnitCreationEvent) {
+    if (event is UnitCreationEvent && unit == event.unit) {
       dev.log('${unit.name} is announced!');
     }
   }

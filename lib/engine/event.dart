@@ -9,7 +9,8 @@ class TurnStartEvent extends GameEvent {
 }
 
 class UnitCreationEvent extends GameEvent {
-  UnitCreationEvent();
+  final Unit unit;
+  UnitCreationEvent(this.unit);
 }
 
 class UnitDeathEvent extends GameEvent {
