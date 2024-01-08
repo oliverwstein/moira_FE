@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_overrides
 import 'dart:collection';
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -20,6 +21,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   late final Cursor cursor;
   List<Unit> units = [];
   List<UnitTeam> teams = UnitTeam.values;
+  Map<UnitTeam, List<Unit>> teamMap = {};
   UnitTeam activeTeam = UnitTeam.blue;
   final Vector2 tilesize = Vector2.all(16);
   Map<Point<int>, Tile> tilesMap = {};
@@ -55,6 +57,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     units.add(Unit.fromJSON(const Point(55, 11), 'Brigand'));
      
     for (Unit unit in units) {
+      teamMap.putIfAbsent(unit.team, () => []).add(unit);
       add(unit);
       tilesMap[unit.gridCoord]?.setUnit(unit);
       gameRef.addObserver(unit);
@@ -64,7 +67,6 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
-    startTurn();
   }
   @override
   void update(double dt) {
@@ -108,15 +110,23 @@ class Stage extends Component with HasGameRef<MyGame>{
   }
 
   void startTurn() {
-    turn++;
-    for (var unit in units) {
-      unit.toggleCanAct(true);
-    }
+    dev.log('Turn $turn');
+    dev.log('Active team is now $activeTeam');
+    var members = teamMap[activeTeam];
+    if(members != null && activeTeam != UnitTeam.blue){
+      var npcPlayer = NPCPlayer(members);
+      npcPlayer.takeTurn();
+    } else {endTurn();}
   }
 
   void endTurn() {
+    if(activeTeam == UnitTeam.blue) turn++;
     int index = teams.indexOf(activeTeam);
     activeTeam = teams[(index + 1) % teams.length];
+
+    for (var unit in units) {
+      unit.toggleCanAct(true);
+    }
   }
   
   Terrain determineTerrainType(Point<int> point){

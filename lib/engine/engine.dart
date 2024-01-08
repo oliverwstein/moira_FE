@@ -14,6 +14,7 @@ export 'item.dart';
 export 'attack.dart';
 export 'weapon.dart';
 export 'combat.dart';
+export 'ai.dart';
 
 enum Direction {up, down, left, right}
 enum UnitTeam {blue, red, green, yellow}
