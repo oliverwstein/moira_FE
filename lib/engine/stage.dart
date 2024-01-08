@@ -124,7 +124,6 @@ class Stage extends Component with HasGameRef<MyGame>{
 
   void endTurn() {
     dev.log('End turn for $activeTeam');
-    playerMap[activeTeam]!.active = false;
 
     if(activeTeam == UnitTeam.blue) turn++;
     int index = teams.indexOf(activeTeam);

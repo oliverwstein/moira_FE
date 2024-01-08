@@ -8,7 +8,6 @@ class Player extends Component {
   List<Unit> units = [];
   UnitTeam team;
   Stage stage;
-  bool active = false;
 
   Player(this.team, this.stage) {
     for (Unit unit in stage.units) {
@@ -18,7 +17,7 @@ class Player extends Component {
 
   @override
   void update(dt){
-    if(active){
+    if(team == stage.activeTeam){
       if (units.every((unit) => unit.canAct == false)) {
       dev.log('All $team units have acted.');
     }
@@ -27,7 +26,6 @@ class Player extends Component {
   }
 
   void takeTurn(){
-    active = true;
     dev.log("$team takes their turn");
   }
 }
@@ -40,10 +38,8 @@ class NPCPlayer extends Player {
 
     super.update(dt);
     // If it's this player's turn and units haven't acted yet, make them wait
-    if(active){
+    if(team == stage.activeTeam){
       if (units.every((unit) => unit.canAct == false)) stage.endTurn();
-      dev.log("NPCPlayer update: Time to end $team's turn");
-      dev.log("NPCPlayer update: Active team is ${stage.activeTeam}");
     }
   }
 
