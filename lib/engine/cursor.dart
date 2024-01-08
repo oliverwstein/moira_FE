@@ -117,7 +117,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     // Update the pixel position of the cursor
     x = gridCoord.x * tileSize;
     y = gridCoord.y * tileSize;
-    dev.log('Cursor @ $gridCoord, ${stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${stage.tilesMap[gridCoord]!.isOccupied}, ${stage.tilesMap[gridCoord]!.unit}');
+    dev.log('Cursor @ $gridCoord, ${stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${stage.tilesMap[gridCoord]!.isOccupied}, ${stage.tilesMap[gridCoord]!.unit?.canAct}');
   }
   
   void select() {

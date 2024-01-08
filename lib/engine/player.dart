@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flame/components.dart';
 
 import 'engine.dart';
@@ -6,6 +8,7 @@ class Player extends Component {
   List<Unit> units = [];
   UnitTeam team;
   Stage stage;
+  bool active = false;
 
   Player(this.team, this.stage) {
     for (Unit unit in stage.units) {
@@ -15,12 +18,17 @@ class Player extends Component {
 
   @override
   void update(dt){
-    if (units.every((unit) => unit.canAct == false)) {
-      stage.endTurn(); // End the turn if all units have acted
+    if(active){
+      if (units.every((unit) => unit.canAct == false)) {
+      dev.log('All $team units have acted.');
     }
+    }
+    
   }
 
   void takeTurn(){
+    active = true;
+    dev.log("$team takes their turn");
   }
 }
 
@@ -29,14 +37,19 @@ class NPCPlayer extends Player {
 
   @override
   void update(double dt) {
-    super.update(dt); // This will check if all units have acted and end the turn if so
 
+    super.update(dt);
     // If it's this player's turn and units haven't acted yet, make them wait
-    if (!units.every((unit) => unit.canAct == false)) stage.endTurn();
+    if(active){
+      if (units.every((unit) => unit.canAct == false)) stage.endTurn();
+      dev.log("NPCPlayer update: Time to end $team's turn");
+      dev.log("NPCPlayer update: Active team is ${stage.activeTeam}");
+    }
   }
 
   @override
   void takeTurn(){
+    super.takeTurn();
     for (var unit in units) {
       if(unit.canAct) {
         unit.wait();

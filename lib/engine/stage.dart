@@ -64,11 +64,10 @@ class Stage extends Component with HasGameRef<MyGame>{
       gameRef.addObserver(unit);
     }
     for (UnitTeam team in UnitTeam.values){
-      if(team != UnitTeam.blue){
-        playerMap[team] = NPCPlayer(team, this);
-        dev.log('${playerMap[team]!.team}');
-        add(playerMap[team]!);
-      } else {add(Player(UnitTeam.blue, this));}
+      if(team != UnitTeam.blue){playerMap[team] = NPCPlayer(team, this);} 
+      else {playerMap[team] = Player(team, this);}
+      dev.log('${playerMap[team]!.team}');
+      add(playerMap[team]!);
     }
     cursor = Cursor();
     activeComponent = cursor;
@@ -118,20 +117,18 @@ class Stage extends Component with HasGameRef<MyGame>{
 
   void startTurn() {
     dev.log('Turn $turn');
-    dev.log('Active team is now $activeTeam');
-    var members = teamMap[activeTeam];
-    if(members != null && activeTeam != UnitTeam.blue){
-      var npcPlayer = playerMap[activeTeam];
-      npcPlayer?.takeTurn();
-    } else {endTurn();}
+    dev.log('Start turn for $activeTeam');
+    Player? player = playerMap[activeTeam];
+    player?.takeTurn();
   }
 
   void endTurn() {
     dev.log('End turn for $activeTeam');
+    playerMap[activeTeam]!.active = false;
+
     if(activeTeam == UnitTeam.blue) turn++;
     int index = teams.indexOf(activeTeam);
     activeTeam = teams[(index + 1) % teams.length];
-
     for (var unit in units) {
       unit.toggleCanAct(true);
     }
