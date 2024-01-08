@@ -95,15 +95,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
   }
 
-  void die(){
-    Stage stage = parent as Stage;
-    stage.tilesMap[gridCoord]!.removeUnit(); // Remove unit from the tile
-    stage.remove(this); // Remove the unit from the stage's children.
-    stage.units.remove(this); // Remove the unit from the stage's list of units.
-    stage.playerMap[team]!.units.remove(this); // Remove the unit from the player map.
-    stage.tilesMap[gridCoord]!.removeUnit();
-    removeFromParent();
-  }
   void _postConstruction() {
     for (Item item in inventory){
       switch (item.type) {
@@ -124,7 +115,30 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     hp = stats['hp']!;
     sta = stats['sta']!;
   }
+  @override
+  Future<void> onLoad() async {
+    // Load the unit image and create the animation component
+    ui.Image unitImage = await gameRef.images.load(idleAnimationName);
+    unitSheet = SpriteSheet.fromColumnsAndRows(
+      image: unitImage,
+      columns: 4,
+      rows: 1,
+    );
 
+    _animationComponent = SpriteAnimationComponent(
+      animation: unitSheet.createAnimation(row: 0, stepTime: .5),
+      size: Vector2.all(tileSize), // Use tileSize for initial size
+    );
+    
+    // Add the animation component as a child
+    add(_animationComponent);
+
+    // Set the initial size and position of the unit
+    size = Vector2.all(tileSize);
+    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+    gameRef.eventDispatcher.add(Announcer(this));
+    gameRef.eventDispatcher.dispatch(UnitCreationEvent(team));
+  }
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
@@ -156,12 +170,22 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return handled;
   }
 
+  void die(){
+    Stage stage = parent as Stage;
+    stage.tilesMap[gridCoord]!.removeUnit(); // Remove unit from the tile
+    stage.remove(this); // Remove the unit from the stage's children.
+    stage.units.remove(this); // Remove the unit from the stage's list of units.
+    stage.playerMap[team]!.units.remove(this); // Remove the unit from the player map.
+    stage.tilesMap[gridCoord]!.removeUnit();
+    removeFromParent();
+  }
   bool equipCheck(Item item, ItemType slot) {
     /// This will be made fancier later, once the Equip component
     /// is implemented. For now it just checks if the item is the right type. 
     if(item.type == slot) return true;
     return false;
   }
+  
   void equip(Item item){
     unequip(item.type);
     switch (item.type) {
@@ -278,29 +302,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.blankAllTiles();
     stage.updateTileWithUnit(oldTile, gridCoord, this);
     oldTile = gridCoord;
-  }
-
-  @override
-  Future<void> onLoad() async {
-    // Load the unit image and create the animation component
-    ui.Image unitImage = await gameRef.images.load(idleAnimationName);
-    unitSheet = SpriteSheet.fromColumnsAndRows(
-      image: unitImage,
-      columns: 4,
-      rows: 1,
-    );
-
-    _animationComponent = SpriteAnimationComponent(
-      animation: unitSheet.createAnimation(row: 0, stepTime: .5),
-      size: Vector2.all(tileSize), // Use tileSize for initial size
-    );
-    
-    // Add the animation component as a child
-    add(_animationComponent);
-
-    // Set the initial size and position of the unit
-    size = Vector2.all(tileSize);
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 
   Vector2 get worldPosition {
