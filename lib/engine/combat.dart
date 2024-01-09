@@ -239,26 +239,28 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     return (atk: atk, def: def);
   }
 
-  void makeAttack(int damage, int accuracy, int critRate, int fatigue, Unit attacker, Unit defender){
+  (int, int) makeAttack(int damage, int accuracy, int critRate, int fatigue, Unit attacker, Unit defender){
     var rng = Random(); // Random number generator
+    int damageDealt = 0;
     if (accuracy > 0) {
       if (rng.nextInt(100) + 1 <= accuracy) {
         // Attack hits
         var critical = rng.nextInt(100) + 1 <= critRate; // Check for critical
-        var damageDealt = critical ? 3 * damage : damage; // Calculate damage
-        defender.hp -= damageDealt; // Apply damage
-        attacker.sta -= fatigue; // Reduce stamina
+        damageDealt = critical ? 3 * damage : damage; // Calculate damage
         dev.log('${attacker.name} hit, reducing ${defender.name} to ${defender.hp}');
       } else {
         dev.log('${attacker.name} missed');
       }
     }
+    return (damageDealt, fatigue);
   }
 
   void combat(Unit attacker, Unit defender, Attack attack){
     ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
     // Attacker's turn
-    makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
+    (int, int) outcome = makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
+    defender.hp -= outcome.$1;
+    attacker.sta -= outcome.$2;
     if (defender.hp <= 0) {
       defender.die();
       return;
