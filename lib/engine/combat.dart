@@ -62,6 +62,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   late final (TextBoxComponent, TextBoxComponent) damRecord;
   late final (TextBoxComponent, TextBoxComponent) accRecord;
   late final (TextBoxComponent, TextBoxComponent) critRecord;
+  late final Combat combat;
   CombatBox(this.attacker, this.defender) {
     // Initialization logic
     attackList = attacker.attackSet.keys.toList();
@@ -76,6 +77,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     damRecord = createRecordPair(combatValMap[attackList.first].atk.damage.toString(), combatValMap[attackList.first].def.damage.toString(), 110);
     accRecord = createRecordPair(combatValMap[attackList.first].atk.accuracy.toString(), combatValMap[attackList.first].def.accuracy.toString(), 140);
     critRecord = createRecordPair(combatValMap[attackList.first].atk.critRate.toString(), combatValMap[attackList.first].def.critRate.toString(), 170);
+    combat = Combat(attacker, defender);
   }
 
   TextBoxComponent createTextBox(String text, double x, double y) {
@@ -106,7 +108,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
 
   void getCombatValMap() {
     for(String attackName in attackList){
-      combatValMap[attackName] =  getCombatValues(attacker, defender, attacker.attackSet[attackName]!);
+      combatValMap[attackName] =  combat.getCombatValues(attacker, defender, attacker.attackSet[attackName]!);
     }
   }
 
@@ -116,7 +118,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     bool handled = false;
     if (command == LogicalKeyboardKey.keyA) { // Make the attack.
       dev.log("${attacker.name} attacked ${defender.name}");
-      combat(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
+      combat.bout(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
       attacker.wait();
       close();
       stage.activeComponent = stage.cursor;
@@ -200,6 +202,13 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     attacker.remove(this);
   }
 
+}
+
+class Combat extends Component with HasGameRef<MyGame>{
+  Unit attacker;
+  Unit defender;
+  Combat(this.attacker, this.defender);
+
   int getCombatDistance(){
     return (attacker.gridCoord.x - defender.gridCoord.x).abs() + (attacker.gridCoord.y - defender.gridCoord.y).abs();
   }
@@ -256,7 +265,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     return (damageDealt, fatigue);
   }
 
-  void combat(Unit attacker, Unit defender, Attack attack){
+  void bout(Unit attacker, Unit defender, Attack attack){
     ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
     // Attacker's turn
     (int, int) outcome = makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
@@ -281,9 +290,4 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       makeAttack(vals.def.damage, vals.def.accuracy, vals.def.critRate, vals.def.fatigue, defender, attacker);
     }
   }
-
-}
-
-class Combat {
-  // TODO
 }
