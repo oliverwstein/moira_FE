@@ -26,6 +26,12 @@ class UnitActionEndEvent extends GameEvent {
   
 }
 
+class UnitDamagedEvent extends GameEvent {
+  final Unit unit;
+  UnitDamagedEvent(this.unit);
+  
+}
+
 class EventDispatcher {
   final List<Observer> _observers = [];
 
