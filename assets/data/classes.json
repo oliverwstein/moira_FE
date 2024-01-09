@@ -5,24 +5,28 @@
             "description": "A Lord.",
             "movementRange": 9,
             "skills": ["Canto"],
+            "attacks": ["Trample"],
             "proficiencies": ["Sword", "Lance"]
         },
         "Cavalier": {
             "description": "A mounted knight sworn to service.",
             "movementRange": 8,
             "skills": ["Canto"],
+            "attacks": ["Trample"],
             "proficiencies": ["Sword", "Lance"]
         },
         "Armor": {
             "description": "A sturdy soldier encased in armor.",
             "movementRange": 6,
             "skills": ["Pavise"],
+            "attacks": [],
             "proficiencies": ["Lance"]
         },
         "Barbarian": {
             "description": "A ruthless fighter, but undisciplined.",
             "movementRange": 6,
             "skills": [],
+            "attacks": [],
             "proficiencies": ["Axe"]
         }
     }
