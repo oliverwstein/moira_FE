@@ -28,5 +28,6 @@ flutter:
     - assets/data/items.json
     - assets/data/weapons.json
     - assets/data/attacks.json
+    - assets/data/skills.json
   uses-material-design: true
 

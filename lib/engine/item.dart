@@ -53,5 +53,4 @@ class Equip extends Component {
 }
 
 class Effect extends Component {}
-class Skill extends Component {}
 class Use extends Component {}
