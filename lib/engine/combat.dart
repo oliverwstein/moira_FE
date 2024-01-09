@@ -246,7 +246,6 @@ class Combat extends Component with HasGameRef<MyGame>{
          def = defender.attackCalc(counterAttack, attacker);
       }
     }
-    // dev.log("${attack.name}, ${atk}, ${def}");
     return (atk: atk, def: def);
   }
 
@@ -263,7 +262,7 @@ class Combat extends Component with HasGameRef<MyGame>{
         dev.log('${attacker.name} missed');
       }
     }
-    gameRef.eventDispatcher.dispatch(MakeAttackEvent(attacker));
+    gameRef.eventDispatcher.dispatch(MakeAttackEvent(defender));
     return (damageDealt, fatigue);
   }
 

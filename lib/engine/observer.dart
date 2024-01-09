@@ -48,9 +48,7 @@ class Pavise extends Observer {
   void onEvent(GameEvent event) {
     if (event.runtimeType == MakeAttackEvent && event is MakeAttackEvent && unit == event.unit) {
       // Stage stage = unit.parent as Stage;
-      dev.log('${unit.remainingMovement}');
-      unit.toggleCanAct(true);
-      dev.log("${unit.actionsAvailable}");
+      dev.log('${unit.name} has pavise');
     }
   }
 }
