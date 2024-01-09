@@ -57,7 +57,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int sta = -1;
 
   // Factory constructor
-  factory Unit.fromJSON(Point<int> gridCoord, String name) {
+  factory Unit.fromJSON(Point<int> gridCoord, String name, {int? level}) {
 
     // Extract unit data from the static map in MyGame
     var unitsJson = MyGame.unitMap['units'] as List;
@@ -67,7 +67,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     );
 
     String className = unitData['class'];
-    int level = unitData['level'];
+    int givenLevel = level ?? unitData['level'] ?? 1;
     Class classData = Class.fromJson(className);
 
     int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : classData.movementRange;
@@ -104,8 +104,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       attackMap[attackName] = Attack.fromJson(attackName);
     }
 
-    Map<String, int> stats = classData.baseStats;
-    Map<String, int> growths = classData.growths;
+    Map<String, int> stats = Map<String, int>.from(classData.baseStats);
+    Map<String, int> growths = Map<String, int>.from(classData.growths);
     for (String stat in classData.growths.keys){
       if (unitData['growths']?.keys.contains(stat)){
         growths[stat] = unitData['growths'][stat];
@@ -116,14 +116,15 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       if (unitData['baseStats'].keys.contains(stat)){
         stats[stat] = unitData['baseStats'][stat];
       } else {
-        stats[stat] = unitData['baseStats'][stat] + 
-          Iterable.generate(level - 1, (_) => rng.nextInt(100) < growths[stat]! ? 1 : 0)
-          .fold(0, (acc, curr) => acc + curr); // Autoleveler
+        int levelUps = Iterable.generate(givenLevel - 1, (_) => rng.nextInt(100) < growths[stat]! ? 1 : 0)
+                        .fold(0, (acc, curr) => acc + curr); // Autoleveler
+        stats[stat] = classData.baseStats[stat]! + levelUps;
+
       }
       
     }
     // Return a new Unit instance
-    return Unit._internal(unitData, gridCoord, name, className, level, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances

@@ -52,9 +52,9 @@ class Stage extends Component with HasGameRef<MyGame>{
     units.add(Unit.fromJSON(const Point(58, 12), 'Noish'));
     units.add(Unit.fromJSON(const Point(59, 13), 'Sigurd'));
 
-    units.add(Unit.fromJSON(const Point(56, 12), 'Brigand'));
-    units.add(Unit.fromJSON(const Point(55, 13), 'Brigand'));
-    units.add(Unit.fromJSON(const Point(55, 11), 'Brigand'));
+    units.add(Unit.fromJSON(const Point(56, 12), 'Brigand', level: 1));
+    units.add(Unit.fromJSON(const Point(55, 13), 'Brigand', level: 5));
+    units.add(Unit.fromJSON(const Point(55, 11), 'Brigand', level: 10));
      
     for (Unit unit in units) {
       add(unit);

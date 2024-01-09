@@ -2,7 +2,7 @@
 // ignore_for_file: unused_import
 
 import 'dart:convert';
-
+import 'dart:developer' as dev;
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import '../engine/engine.dart';
@@ -31,8 +31,8 @@ class Class extends Component with HasGameRef<MyGame>{
     List<String> skills = List<String>.from(classData['skills'] ?? []);
     List<String> attacks = List<String>.from(classData['attacks'] ?? []);
     List<String> proficiencies = List<String>.from(classData['proficiencies'] ?? []);
-    Map<String, int> baseStats = classData['baseStats'];
-    Map<String, int> growths = classData['growths'];
+    Map<String, int> baseStats = Map<String, int>.from(classData['baseStats']);
+    Map<String, int> growths = Map<String, int>.from(classData['growths']);
     
     // Return a new Weapon instance
     return Class._internal(name, description, movementRange, skills, attacks, proficiencies, baseStats, growths);
