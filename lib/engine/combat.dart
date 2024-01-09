@@ -66,7 +66,11 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
   CombatBox(this.attacker, this.defender) {
     // Initialization logic
     attackList = attacker.attackSet.keys.toList();
-    weaponList = attacker.inventory.where((item) => attacker.equipCheck(item, ItemType.main)).toList();
+    weaponList = attacker.inventory
+    .where((item) => 
+        attacker.equipCheck(item, ItemType.main) && 
+        item.equipCond?.check(attacker) == true)
+    .toList();
     combat = Combat(attacker, defender);
     add(combat);
     getCombatValMap(); // Assuming this method populates combatValMap
