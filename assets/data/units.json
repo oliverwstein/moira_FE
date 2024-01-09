@@ -3,6 +3,7 @@
     {
     "name": "Sigurd",
     "team": "blue",
+    "class": "Lord",
     "movementRange": 8,
     "stats": {
         "hp": 35,
@@ -16,15 +17,17 @@
         "wis": 0,
         "lck": 7
     },
-    "skills": ["Canto"],
+    "skills": [],
     "inventory": ["Salve", "Salve", "Sword", "Lance", "Axe"],
-    "attacks": ["Trample"],
+    "attacks": [],
+    "proficiencies": [],
     "sprites": {
         "idle": "sigurd.png"
     }},
     {
     "name": "Noish",
     "team": "blue",
+    "class": "Cavalier",
     "movementRange": 8,
     "stats": {
         "hp": 33,
@@ -38,15 +41,17 @@
         "wis": 2,
         "lck": 4
     },
-    "skills": ["Canto"],
+    "skills": [],
     "inventory": ["Salve", "Sword"],
-    "attacks": ["Trample"],
+    "attacks": [],
+    "proficiencies": [],
     "sprites": {
         "idle": "noish.png"
     }},
     {
     "name": "Alec",
     "team": "blue",
+    "class": "Cavalier",
     "movementRange": 8,
     "stats": {
         "hp": 32,
@@ -60,57 +65,62 @@
         "wis": 4,
         "lck": 4
     },
-    "skills": ["Canto"],
+    "skills": [],
     "inventory": ["Salve", "Sword"],
-    "attacks": ["Trample"],
+    "attacks": [],
+    "proficiencies": [],
     "sprites": {
         "idle": "alec.png"
     }},
     {
-        "name": "Arden",
-        "team": "blue",
-        "movementRange": 6,
-        "stats": {
-            "hp": 36,
-            "sta": 40,
-            "str": 13,
-            "def": 13,
-            "dex": 7,
-            "spe": 6,
-            "mag": 0,
-            "res": 3,
-            "wis": 2,
-            "lck": 3
+    "name": "Arden",
+    "team": "blue",
+    "class": "Armor",
+    "movementRange": 6,
+    "stats": {
+        "hp": 36,
+        "sta": 40,
+        "str": 13,
+        "def": 13,
+        "dex": 7,
+        "spe": 6,
+        "mag": 0,
+        "res": 3,
+        "wis": 2,
+        "lck": 3
         },
-        "skills": ["Pavise"],
+        "skills": [],
         "inventory": ["Salve", "Sword"],
         "attacks": [],
+        "proficiencies": ["Sword"],
         "sprites": {
             "idle": "arden.png"
         }
         },
         {
-            "name": "Brigand",
-            "team": "red",
-            "movementRange": 6,
-            "stats": {
-                "hp": 36,
-                "sta": 20,
-                "str": 5,
-                "def": 5,
-                "dex": 0,
-                "spe": 7,
-                "mag": 0,
-                "res": 0,
-                "wis": 0,
-                "lck": 0
-            },
-            "skills": [],
-            "inventory": ["Axe"],
-            "attacks": [],
-            "sprites": {
-                "idle": "brigand_idle.png"
-            }
-            }
+        "name": "Brigand",
+        "team": "red",
+        "class": "Barbarian",
+        "movementRange": 6,
+        "stats": {
+            "hp": 36,
+            "sta": 20,
+            "str": 5,
+            "def": 5,
+            "dex": 0,
+            "spe": 7,
+            "mag": 0,
+            "res": 0,
+            "wis": 0,
+            "lck": 0
+        },
+        "skills": [],
+        "inventory": ["Axe"],
+        "attacks": [],
+        "proficiencies": [],
+        "sprites": {
+            "idle": "brigand_idle.png"
+        }
+        }
 ]
 }

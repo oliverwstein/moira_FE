@@ -7,7 +7,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'engine.dart';
 // ignore: constant_identifier_names
-enum WeaponType {Sword, Axe, Lance, Knife, Staff, Book, None}
+enum WeaponType {Sword, Axe, Lance, Knife, Staff, Book, Bow}
 
 class Weapon extends Component with HasGameRef<MyGame>{
   late WeaponType weaponType; // The type of the weapon. 

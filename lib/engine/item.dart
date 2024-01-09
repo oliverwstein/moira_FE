@@ -31,24 +31,30 @@ class Item extends Component with HasGameRef<MyGame>{
       
       if (itemData.containsKey("weapon")) {
         Weapon weapon = Weapon.fromJson(itemData['weapon']);
-        return Item._internal(name, description, type, weapon, Equip());
+        return Item._internal(name, description, type, weapon);
       } else {
-        return Item._internal(name, description, type, null, null);
+        return Item._internal(name, description, type, null);
       }
     }
   }
 
   // Internal constructor for creating instances from factory constructor
-  Item._internal(this.name, this.description, this.type, this.weapon, this.equipCond);
+  Item._internal(this.name, this.description, this.type, this.weapon) {
+    equipCond = Equip(this);
+  }
 
 }
 
 class Equip extends Component {
-
-  Equip();
+  final Item item;
+  Equip(this.item);
 
   bool check(Unit unit){
-    return true;
+    bool canEquip = false;
+    if(item.weapon != null){
+      if(unit.proficiencies.contains(item.weapon!.weaponType)){canEquip = true;}
+    } else {canEquip = true;}
+    return canEquip;
   }
 }
 

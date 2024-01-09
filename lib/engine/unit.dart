@@ -17,6 +17,7 @@ import 'engine.dart';
 class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   // Identifiers and Descriptive Information
   final String name;
+  final String className;
   final String idleAnimationName;
   int movementRange;
   late double remainingMovement;
@@ -50,14 +51,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
   Set<Skill> skillSet = {};
+  Set<WeaponType> proficiencies = {};
   Map<String, int> stats = {};
   int hp = -1;
   int sta = -1;
-
-  // Private constructor for creating instances
-  Unit._internal(this.unitData, this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
-    _postConstruction();
-  }
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
@@ -72,12 +69,30 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
         orElse: () => throw Exception('Unit $name not found in JSON data')
     );
 
-    // Extract other properties from unitData
-    int movementRange = unitData['movementRange'];
+    String className = unitData['class'];
+    Class classData = Class.fromJson(className);
+
+    int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : classData.movementRange;
+    unitData['skills'].addAll(classData.skills);
+    unitData['attacks'].addAll(classData.attacks);
+    unitData['proficiencies'].addAll(classData.proficiencies);
+
+    // Add Unit Team
     final Map<String, UnitTeam> stringToUnitTeam = {
       for (var team in UnitTeam.values) team.toString().split('.').last: team,
     };
     UnitTeam team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+
+    // Add weapon proficiencies
+    Set<WeaponType> proficiencies = {};
+    final Map<String, WeaponType> stringToProficiency = {
+      for (WeaponType weaponType in WeaponType.values) weaponType.toString().split('.').last: weaponType,
+    };
+    for (String weaponTypeString in unitData['proficiencies']){
+      WeaponType? prof = stringToProficiency[weaponTypeString];
+      if (prof != null){proficiencies.add(prof);}
+    }
+    
     String idleAnimationName = unitData['sprites']['idle'];
 
     // Create items for inventory
@@ -96,7 +111,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       stats[stat] = unitData['stats'][stat];
     }
     // Return a new Unit instance
-    return Unit._internal(unitData, gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
+    return Unit._internal(unitData, gridCoord, name, className, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
+  }
+
+   // Private constructor for creating instances
+  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.proficiencies, this.stats){
+    _postConstruction();
   }
 
   void _postConstruction() {
