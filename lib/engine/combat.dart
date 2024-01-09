@@ -68,6 +68,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     attackList = attacker.attackSet.keys.toList();
     weaponList = attacker.inventory.where((item) => attacker.equipCheck(item, ItemType.main)).toList();
     combat = Combat(attacker, defender);
+    add(combat);
     getCombatValMap(); // Assuming this method populates combatValMap
 
     attackTextBox = createTextBox('${combatValMap[attackList.first].atk.fatigue}|${attackList.first}', 24, 48);
@@ -262,7 +263,7 @@ class Combat extends Component with HasGameRef<MyGame>{
         dev.log('${attacker.name} missed');
       }
     }
-    // gameRef.eventDispatcher.dispatch(MakeAttackEvent(attacker));
+    gameRef.eventDispatcher.dispatch(MakeAttackEvent(attacker));
     return (damageDealt, fatigue);
   }
 
