@@ -176,6 +176,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
+    Stage stage = parent as Stage;
+    if (stage.activeTeam != UnitTeam.blue) return true;
     if (command == LogicalKeyboardKey.arrowLeft) {
       move(Direction.left);
       handled = true;
@@ -192,7 +194,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
       select();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) {
-      Stage stage = parent as Stage;
+      
       stage.blankAllTiles();
       stage.activeComponent = stage.cursor;
       handled = true;
