@@ -17,6 +17,7 @@ import 'engine.dart';
 class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   // Identifiers and Descriptive Information
   final String name;
+  final String className;
   final String idleAnimationName;
   int movementRange;
   late double remainingMovement;
@@ -55,11 +56,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int hp = -1;
   int sta = -1;
 
-  // Private constructor for creating instances
-  Unit._internal(this.unitData, this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
-    _postConstruction();
-  }
-
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
     // Use gridCoord and scaleFactor to set oldTile and tileSize
@@ -81,10 +77,22 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     unitData['attacks'].addAll(classData.attacks);
     unitData['proficiencies'].addAll(classData.proficiencies);
 
+    // Add Unit Team
     final Map<String, UnitTeam> stringToUnitTeam = {
       for (var team in UnitTeam.values) team.toString().split('.').last: team,
     };
     UnitTeam team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+
+    // Add weapon proficiencies
+    Set<WeaponType> proficiencies = {};
+    final Map<String, WeaponType> stringToProficiency = {
+      for (WeaponType weaponType in WeaponType.values) weaponType.toString().split('.').last: weaponType,
+    };
+    for (WeaponType weaponType in unitData['proficiencies']){
+      WeaponType? prof = stringToProficiency[weaponType];
+      if (prof != null){proficiencies.add(prof);}
+    }
+    
     String idleAnimationName = unitData['sprites']['idle'];
 
     // Create items for inventory
@@ -103,7 +111,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       stats[stat] = unitData['stats'][stat];
     }
     // Return a new Unit instance
-    return Unit._internal(unitData, gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
+    return Unit._internal(unitData, gridCoord, name, className, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
+  }
+
+   // Private constructor for creating instances
+  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.proficiencies, this.stats){
+    _postConstruction();
   }
 
   void _postConstruction() {
