@@ -73,8 +73,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
         orElse: () => throw Exception('Unit $name not found in JSON data')
     );
 
-    // Extract other properties from unitData
-    int movementRange = unitData['movementRange'];
+    String className = unitData['class'];
+    Class classData = Class.fromJson(className);
+
+    int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : classData.movementRange;
+    unitData['skills'].addAll(classData.skills);
+    unitData['attacks'].addAll(classData.attacks);
+    unitData['proficiencies'].addAll(classData.proficiencies);
+
     final Map<String, UnitTeam> stringToUnitTeam = {
       for (var team in UnitTeam.values) team.toString().split('.').last: team,
     };
