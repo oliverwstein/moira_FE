@@ -1,4 +1,6 @@
 // ignore_for_file: unnecessary_overrides
+import 'dart:collection';
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -6,6 +8,7 @@ import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 
 import 'engine.dart';
+
 class Stage extends Component with HasGameRef<MyGame>{
   /// Stage is a primary component in the game that manages the layout of the 
   /// game map, including tiles, units, and the cursor. It interfaces with the 
@@ -17,6 +20,9 @@ class Stage extends Component with HasGameRef<MyGame>{
   late final flame_tiled.TiledComponent tiles;
   late final Cursor cursor;
   List<Unit> units = [];
+  List<UnitTeam> teams = UnitTeam.values;
+  Map<UnitTeam, Player> playerMap = {};
+  UnitTeam activeTeam = UnitTeam.blue;
   final Vector2 tilesize = Vector2.all(16);
   Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
@@ -55,12 +61,16 @@ class Stage extends Component with HasGameRef<MyGame>{
       tilesMap[unit.gridCoord]?.setUnit(unit);
       gameRef.addObserver(unit);
     }
-
+    for (UnitTeam team in UnitTeam.values){
+      if(team != UnitTeam.blue){playerMap[team] = NPCPlayer(team, this);} 
+      else {playerMap[team] = Player(team, this);}
+      dev.log('${playerMap[team]!.team}');
+      add(playerMap[team]!);
+    }
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
-    
   }
   @override
   void update(double dt) {
@@ -103,11 +113,24 @@ class Stage extends Component with HasGameRef<MyGame>{
     return targetList;
   }
 
+  void startTurn() {
+    dev.log('Turn $turn');
+    dev.log('Start turn for $activeTeam');
+    Player? player = playerMap[activeTeam];
+    player?.takeTurn();
+  }
+
   void endTurn() {
+    dev.log('End turn for $activeTeam');
+
+    if(activeTeam == UnitTeam.blue) turn++;
+    int index = teams.indexOf(activeTeam);
+    activeTeam = teams[(index + 1) % teams.length];
     for (var unit in units) {
       unit.toggleCanAct(true);
+      unit.remainingMovement = unit.movementRange.toDouble();
     }
-    turn++;
+    startTurn();
   }
   
   Terrain determineTerrainType(Point<int> point){

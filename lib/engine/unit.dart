@@ -19,6 +19,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   final String name;
   final String idleAnimationName;
   int movementRange;
+  late double remainingMovement;
   UnitTeam team = UnitTeam.blue;
   double tileSize;
 
@@ -31,6 +32,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   // Collections and Complex Structures
   Queue<Point<int>> movementQueue = Queue<Point<int>>();
   Point<int>? currentTarget;
+  double moveCost = 0;
   Map<Point<int>, List<Point<int>>> paths = {};
 
   // Components and External References
@@ -39,6 +41,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   late final ActionMenu actionMenu;
 
   // Unit Attributes & Components
+  List<MenuOption> actionsAvailable = [MenuOption.wait];
   Item? main;
   Item? treasure;
   Item? gear;
@@ -53,6 +56,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   // Private constructor for creating instances
   Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
     _postConstruction();
+    remainingMovement = movementRange.toDouble();
   }
 
   // Factory constructor
@@ -95,11 +99,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
   }
 
-  void die(){
-    Stage stage = parent as Stage;
-    stage.tilesMap[gridCoord]!.removeUnit();
-    removeFromParent();
-  }
   void _postConstruction() {
     for (Item item in inventory){
       switch (item.type) {
@@ -120,14 +119,41 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     hp = stats['hp']!;
     sta = stats['sta']!;
   }
+  
+  @override
+  Future<void> onLoad() async {
+    // Load the unit image and create the animation component
+    ui.Image unitImage = await gameRef.images.load(idleAnimationName);
+    unitSheet = SpriteSheet.fromColumnsAndRows(
+      image: unitImage,
+      columns: 4,
+      rows: 1,
+    );
 
+    _animationComponent = SpriteAnimationComponent(
+      animation: unitSheet.createAnimation(row: 0, stepTime: .5),
+      size: Vector2.all(tileSize), // Use tileSize for initial size
+    );
+    
+    // Add the animation component as a child
+    add(_animationComponent);
+
+    // Set the initial size and position of the unit
+    size = Vector2.all(tileSize);
+    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+    gameRef.eventDispatcher.add(Announcer(this));
+    gameRef.eventDispatcher.add(Canto(this));
+    gameRef.eventDispatcher.dispatch(UnitCreationEvent(this));
+  }
+  
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
-      if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied){
+      if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
         move(stage);
+        getActionOptions();
         openActionMenu(stage);
       }
       
@@ -152,12 +178,24 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return handled;
   }
 
+  void die(){
+    gameRef.eventDispatcher.dispatch(UnitDeathEvent(this));
+    Stage stage = parent as Stage;
+    stage.tilesMap[gridCoord]!.removeUnit(); // Remove unit from the tile
+    stage.remove(this); // Remove the unit from the stage's children.
+    stage.units.remove(this); // Remove the unit from the stage's list of units.
+    stage.playerMap[team]!.units.remove(this); // Remove the unit from the player map.
+    stage.tilesMap[gridCoord]!.removeUnit();
+    removeFromParent();
+  }
+  
   bool equipCheck(Item item, ItemType slot) {
     /// This will be made fancier later, once the Equip component
     /// is implemented. For now it just checks if the item is the right type. 
     if(item.type == slot) return true;
     return false;
   }
+  
   void equip(Item item){
     unequip(item.type);
     switch (item.type) {
@@ -167,18 +205,18 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
         if(main?.weapon?.specialAttack != null) {
           attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
         }
-        dev.log("$name equipped ${item.name} as ${item.type}");
+        // dev.log("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.gear:
         gear = item;
-        dev.log("$name equipped ${item.name} as ${item.type}");
+        // dev.log("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.treasure:
         treasure = item;
-        dev.log("$name equipped ${item.name} as ${item.type}");
+        // dev.log("$name equipped ${item.name} as ${item.type}");
         break;
       default:
-        dev.log("$name can't equip ${item.name}");
+        // dev.log("$name can't equip ${item.name}");
         break;
     }
   }
@@ -186,18 +224,18 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   void unequip(ItemType? type){
     switch (type) {
       case ItemType.main:
-        dev.log("$name unequipped ${main?.name} as $type");
+        // dev.log("$name unequipped ${main?.name} as $type");
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
         main = null;
         break;
       case ItemType.gear:
-        dev.log("$name unequipped ${gear?.name} as $type");
+        // dev.log("$name unequipped ${gear?.name} as $type");
         gear = null;
         break;
       case ItemType.treasure:
-        dev.log("$name unequipped ${treasure?.name} as $type");
+        // dev.log("$name unequipped ${treasure?.name} as $type");
         treasure = null;
         break;
       default:
@@ -209,6 +247,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
     for(Point<int> point in paths[stage.cursor.gridCoord]!){
       enqueueMovement(point);
+      moveCost += stage.tilesMap[point]!.terrain.cost;
     }
     Point<int> newTile = paths[stage.cursor.gridCoord]!.last;
     stage.updateTileWithUnit(gridCoord, newTile, this);
@@ -256,47 +295,18 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   }
   void openActionMenu(Stage stage){
-    (int, int) range = getCombatRange();
-    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
-    List<MenuOption> visibleOptions = [MenuOption.wait];
-    if(attackTiles.isNotEmpty){
-      visibleOptions.add(MenuOption.attack);
-    }
-    if (inventory.isNotEmpty) visibleOptions.add(MenuOption.item);
-    stage.cursor.actionMenu.show(visibleOptions);
+    stage.cursor.actionMenu.show(actionsAvailable);
     stage.activeComponent = stage.cursor.actionMenu;
   }
 
   void wait(){
     Stage stage = parent as Stage;
     toggleCanAct(false);
+    actionsAvailable = [MenuOption.wait];
     stage.activeComponent = stage.cursor;
     stage.blankAllTiles();
     stage.updateTileWithUnit(oldTile, gridCoord, this);
     oldTile = gridCoord;
-  }
-
-  @override
-  Future<void> onLoad() async {
-    // Load the unit image and create the animation component
-    ui.Image unitImage = await gameRef.images.load(idleAnimationName);
-    unitSheet = SpriteSheet.fromColumnsAndRows(
-      image: unitImage,
-      columns: 4,
-      rows: 1,
-    );
-
-    _animationComponent = SpriteAnimationComponent(
-      animation: unitSheet.createAnimation(row: 0, stepTime: .5),
-      size: Vector2.all(tileSize), // Use tileSize for initial size
-    );
-    
-    // Add the animation component as a child
-    add(_animationComponent);
-
-    // Set the initial size and position of the unit
-    size = Vector2.all(tileSize);
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 
   Vector2 get worldPosition {
@@ -346,7 +356,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   @override
   void update(double dt) {
     super.update(dt);
-    if(hp <= 0) die;
+    if(hp <= 0) die();
 
     if (isMoving && currentTarget != null) {
       // Calculate the pixel position for the target tile position
@@ -401,7 +411,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     var queue = Queue<_TileMovement>(); // Queue for BFS
 
     // Starting point - no parent at the beginning
-    queue.add(_TileMovement(gridCoord, movementRange.toDouble(), null));
+    queue.add(_TileMovement(gridCoord, remainingMovement.toDouble(), null));
     while (queue.isNotEmpty) {
       var tileMovement = queue.removeFirst();
       Point<int> currentPoint = tileMovement.point;
@@ -532,6 +542,19 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       return Direction.up;
     }
     return null;
+  }
+  
+  void getActionOptions() {
+    Stage stage = parent as Stage;
+    (int, int) range = getCombatRange();
+    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
+    if(attackTiles.isNotEmpty){
+      if(!actionsAvailable.contains(MenuOption.attack)){
+        actionsAvailable.add(MenuOption.attack);}
+    } else{
+       actionsAvailable.remove(MenuOption.attack);
+    }
+    if (inventory.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
   }
   
 }

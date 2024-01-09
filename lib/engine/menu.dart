@@ -113,7 +113,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
         stage.cursor.goToUnit(selector.targets[0]);
         unit!.add(selector);
         stage.activeComponent = selector;
-        dev.log("$unit's attacks are: ${unit.attackSet}");
         break;
       case MenuOption.item:
         // On selecting item, pull up the item menu.
@@ -126,7 +125,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements Co
       case MenuOption.wait:
         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
         unit!.wait();
-        
       default:
         stage.activeComponent = stage.cursor;
         break;
@@ -358,6 +356,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   void close(){
     Stage stage = unit.parent as Stage;
     removeAll(children);
+    unit.getActionOptions();
     unit.openActionMenu(stage);
 
   }
@@ -386,6 +385,7 @@ class TargetSelector extends Component implements CommandHandler {
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       stage.cursor.goToUnit(unit);
+      unit.getActionOptions();
       unit.openActionMenu(stage);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
