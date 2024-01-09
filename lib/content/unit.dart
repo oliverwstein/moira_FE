@@ -21,13 +21,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int movementRange;
   late double remainingMovement;
   UnitTeam team = UnitTeam.blue;
-  double tileSize;
+  double tileSize = 16;
 
   // Status and State Variables
   Point<int> gridCoord; // The units's position in terms of tiles, not pixels
   bool canAct = true;
   bool isMoving = false;
-  Point<int> oldTile;
+  late Point<int> oldTile;
 
   // Collections and Complex Structures
   Queue<Point<int>> movementQueue = Queue<Point<int>>();
@@ -52,14 +52,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Set<Skill> skillSet = {};
   Set<WeaponType> proficiencies = {};
   Map<String, int> stats = {};
+  int level;
   int hp = -1;
   int sta = -1;
 
   // Factory constructor
   factory Unit.fromJSON(Point<int> gridCoord, String name) {
-    // Use gridCoord and scaleFactor to set oldTile and tileSize
-    Point<int> oldTile = gridCoord;
-    double tileSize = 16 * MyGame().scaleFactor; // This assumes scaleFactor is available from an instance of MyGame. If not, adjust accordingly.
 
     // Extract unit data from the static map in MyGame
     var unitsJson = MyGame.unitMap['units'] as List;
@@ -69,6 +67,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     );
 
     String className = unitData['class'];
+    int level = unitData['level'];
     Class classData = Class.fromJson(className);
 
     int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : classData.movementRange;
@@ -105,20 +104,35 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       attackMap[attackName] = Attack.fromJson(attackName);
     }
 
-    Map<String, int> stats = {};
-    for (String stat in unitData['stats'].keys){
-      stats[stat] = unitData['stats'][stat];
+    Map<String, int> stats = classData.baseStats;
+    Map<String, int> growths = classData.growths;
+    for (String stat in classData.growths.keys){
+      if (unitData['growths']?.keys.contains(stat)){
+        growths[stat] = unitData['growths'][stat];
+      }
+    }
+    var rng = Random();
+    for (String stat in classData.baseStats.keys){
+      if (unitData['baseStats'].keys.contains(stat)){
+        stats[stat] = unitData['baseStats'][stat];
+      } else {
+        stats[stat] = unitData['baseStats'][stat] + 
+          Iterable.generate(level - 1, (_) => rng.nextInt(100) < growths[stat]! ? 1 : 0)
+          .fold(0, (acc, curr) => acc + curr); // Autoleveler
+      }
+      
     }
     // Return a new Unit instance
-    return Unit._internal(unitData, gridCoord, name, className, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, gridCoord, name, className, level, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.level, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
   void _postConstruction() {
+    tileSize = 16 * MyGame().scaleFactor;
     for (Item item in inventory){
       switch (item.type) {
         case ItemType.main:
@@ -138,6 +152,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     hp = stats['hp']!;
     sta = stats['sta']!;
     remainingMovement = movementRange.toDouble();
+    oldTile = gridCoord;
   }
   
   @override

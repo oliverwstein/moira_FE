@@ -16,7 +16,7 @@ class Class extends Component with HasGameRef<MyGame>{
   final List<String> attacks;
   final List<String> proficiencies;
   final Map<String, int> baseStats;
-  final Map<String, int> baseGrowths;
+  final Map<String, int> growths;
 
   // Factory constructor
   factory Class.fromJson(String name) {
@@ -32,11 +32,11 @@ class Class extends Component with HasGameRef<MyGame>{
     List<String> attacks = List<String>.from(classData['attacks'] ?? []);
     List<String> proficiencies = List<String>.from(classData['proficiencies'] ?? []);
     Map<String, int> baseStats = classData['baseStats'];
-    Map<String, int> baseGrowths = classData['baseGrowths'];
+    Map<String, int> growths = classData['growths'];
     
     // Return a new Weapon instance
-    return Class._internal(name, description, movementRange, skills, attacks, proficiencies, baseStats, baseGrowths);
+    return Class._internal(name, description, movementRange, skills, attacks, proficiencies, baseStats, growths);
   }
   // Internal constructor for creating instances
-  Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.baseStats, this.baseGrowths);
+  Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.baseStats, this.growths);
 }

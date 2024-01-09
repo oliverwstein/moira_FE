@@ -4,8 +4,8 @@
     "name": "Sigurd",
     "team": "blue",
     "class": "Lord",
-    "movementRange": 8,
-    "stats": {
+    "level": 5,
+    "baseStats": {
         "hp": 35,
         "sta": 35,
         "str": 14,
@@ -18,7 +18,7 @@
         "lck": 7
     },
     "growths": {
-        "hp": 110,
+        "hp": 100,
         "sta": 90,
         "str": 50,
         "def": 40,
@@ -40,8 +40,8 @@
     "name": "Noish",
     "team": "blue",
     "class": "Cavalier",
-    "movementRange": 8,
-    "stats": {
+    "level": 3,
+    "baseStats": {
         "hp": 33,
         "sta": 30,
         "str": 11,
@@ -76,8 +76,8 @@
     "name": "Alec",
     "team": "blue",
     "class": "Cavalier",
-    "movementRange": 8,
-    "stats": {
+    "level": 2,
+    "baseStats": {
         "hp": 32,
         "sta": 30,
         "str": 9,
@@ -112,8 +112,8 @@
     "name": "Arden",
     "team": "blue",
     "class": "Armor",
-    "movementRange": 6,
-    "stats": {
+    "level": 3,
+    "baseStats": {
         "hp": 36,
         "sta": 40,
         "str": 13,
@@ -149,19 +149,6 @@
         "name": "Brigand",
         "team": "red",
         "class": "Barbarian",
-        "movementRange": 6,
-        "stats": {
-            "hp": 36,
-            "sta": 20,
-            "str": 5,
-            "def": 5,
-            "dex": 0,
-            "spe": 7,
-            "mag": 0,
-            "res": 0,
-            "wis": 0,
-            "lck": 0
-        },
         "skills": [],
         "inventory": ["Axe"],
         "attacks": [],

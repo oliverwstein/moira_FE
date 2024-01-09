@@ -7,7 +7,7 @@
             "skills": ["Canto"],
             "attacks": ["Trample"],
             "proficiencies": ["Sword", "Lance"],
-            "baseGrowths": {
+            "growths": {
                 "hp": 90,
                 "sta": 90,
                 "str": 40,
@@ -38,7 +38,7 @@
             "skills": ["Canto"],
             "attacks": ["Trample"],
             "proficiencies": ["Sword", "Lance"],
-            "baseGrowths": {
+            "growths": {
                 "hp": 80,
                 "sta": 60,
                 "str": 30,
@@ -69,7 +69,7 @@
             "skills": ["Pavise"],
             "attacks": [],
             "proficiencies": ["Lance"],
-            "baseGrowths": {
+            "growths": {
                 "hp": 90,
                 "sta": 80,
                 "str": 40,
@@ -100,7 +100,7 @@
             "skills": [],
             "attacks": [],
             "proficiencies": ["Axe"],
-            "baseGrowths": {
+            "growths": {
                 "hp": 90,
                 "sta": 50,
                 "str": 50,
