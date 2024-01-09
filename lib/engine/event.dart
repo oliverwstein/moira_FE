@@ -29,7 +29,11 @@ class UnitActionEndEvent extends GameEvent {
 class MakeAttackEvent extends GameEvent {
   final Unit unit;
   MakeAttackEvent(this.unit);
-  
+}
+
+class MakeDamageEvent extends GameEvent {
+  final Unit unit;
+  MakeDamageEvent(this.unit);
 }
 
 class EventDispatcher {

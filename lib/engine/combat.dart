@@ -252,6 +252,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
         dev.log('${attacker.name} missed');
       }
     }
+    gameRef.eventDispatcher.dispatch(MakeAttackEvent(attacker));
     return (damageDealt, fatigue);
   }
 
@@ -283,3 +284,6 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
 
 }
 
+class Combat {
+  // TODO
+}
