@@ -51,6 +51,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   static late Map<String, dynamic> itemMap;
   static late Map<String, dynamic> weaponMap;
   static late Map<String, dynamic> attackMap;
+  static late Map<String, dynamic> skillMap;
   final EventDispatcher eventDispatcher = EventDispatcher();
   // Static methods to load data from JSON
   static Future<Map<String, dynamic>> loadUnitData() async {
@@ -70,6 +71,11 @@ class MyGame extends FlameGame with KeyboardEvents {
 
   static Future<Map<String, dynamic>> loadAttacksData() async {
     String jsonString = await rootBundle.loadString('assets/data/attacks.json');
+    return jsonDecode(jsonString);
+  }
+
+  static Future<Map<String, dynamic>> loadSkillsData() async {
+    String jsonString = await rootBundle.loadString('assets/data/skills.json');
     return jsonDecode(jsonString);
   }
 
@@ -102,6 +108,7 @@ class MyGame extends FlameGame with KeyboardEvents {
     itemMap = await loadItemsData();
     weaponMap = await loadWeaponsData();
     attackMap = await loadAttacksData();
+    skillMap = await loadSkillsData();
     viewport = MaxViewport();
     camera.viewport = viewport;
     stage = Stage();

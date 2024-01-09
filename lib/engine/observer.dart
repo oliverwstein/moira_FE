@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 import 'engine.dart';
 
 abstract class Observer {
+  Type? listensTo;
   void onEvent(GameEvent event);
 }
 
@@ -22,15 +23,17 @@ class Announcer extends Observer {
 
 class Canto extends Observer {
   final Unit unit;
-
-  Canto(this.unit);
+  Canto(this.unit) {
+    listensTo = UnitActionEndEvent;
+  }
 
   @override
   void onEvent(GameEvent event) {
-    if (event is UnitActionEndEvent && unit == event.unit) {
+    if (event.runtimeType == UnitActionEndEvent && event is UnitActionEndEvent && unit == event.unit) {
       // Stage stage = unit.parent as Stage;
       dev.log('${unit.remainingMovement}');
       unit.toggleCanAct(true);
+      dev.log("${unit.actionsAvailable}");
     }
   }
 }

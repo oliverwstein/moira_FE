@@ -39,24 +39,24 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final ActionMenu actionMenu;
+  late final Map<String, dynamic> unitData;
 
   // Unit Attributes & Components
-  List<MenuOption> actionsAvailable = [MenuOption.wait];
+  List<MenuOption> actionsAvailable = [MenuOption.wait, MenuOption.attack];
   Item? main;
   Item? treasure;
   Item? gear;
   List<Item> inventory = [];
   Map<String, Attack> attackSet = {};
-  List<Effect> effects = [];
-  List<Skill> skills = [];
+  List<Effect> effectSet = [];
+  Set<Skill> skillSet = {};
   Map<String, int> stats = {};
   int hp = -1;
   int sta = -1;
 
   // Private constructor for creating instances
-  Unit._internal(this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
+  Unit._internal(this.unitData, this.gridCoord, this.name, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.stats){
     _postConstruction();
-    remainingMovement = movementRange.toDouble();
   }
 
   // Factory constructor
@@ -96,7 +96,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       stats[stat] = unitData['stats'][stat];
     }
     // Return a new Unit instance
-    return Unit._internal(gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
+    return Unit._internal(unitData, gridCoord, name, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, stats);
   }
 
   void _postConstruction() {
@@ -118,6 +118,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
     hp = stats['hp']!;
     sta = stats['sta']!;
+    remainingMovement = movementRange.toDouble();
   }
   
   @override
@@ -142,8 +143,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     size = Vector2.all(tileSize);
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
     gameRef.eventDispatcher.add(Announcer(this));
-    gameRef.eventDispatcher.add(Canto(this));
+    // gameRef.eventDispatcher.add(Canto(this));
     gameRef.eventDispatcher.dispatch(UnitCreationEvent(this));
+
+    // Create skills for skillset
+    for(String skillName in unitData['skills']){
+      Skill skill = Skill.fromJson(skillName, this);
+      skill.attachToUnit(this, gameRef.eventDispatcher);
+    }
   }
   
   @override
@@ -176,6 +183,17 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       handled = true;
     }
     return handled;
+  }
+  void addSkill(Skill skill, EventDispatcher dispatcher) {
+    // Add the skill to the unit
+    skillSet.add(skill);
+    skill.attachToUnit(this, dispatcher);
+  }
+
+  void removeSkill(Skill skill, EventDispatcher dispatcher) {
+    // Remove the skill from the unit
+    skillSet.remove(skill);
+    skill.detachFromUnit(dispatcher);
   }
 
   void die(){
@@ -548,11 +566,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     Stage stage = parent as Stage;
     (int, int) range = getCombatRange();
     List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
-    if(attackTiles.isNotEmpty){
-      if(!actionsAvailable.contains(MenuOption.attack)){
-        actionsAvailable.add(MenuOption.attack);}
-    } else{
-       actionsAvailable.remove(MenuOption.attack);
+    if(attackTiles.isEmpty){
+      if(actionsAvailable.contains(MenuOption.attack)){
+        actionsAvailable.remove(MenuOption.attack);}
     }
     if (inventory.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
   }

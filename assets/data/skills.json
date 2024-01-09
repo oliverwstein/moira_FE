@@ -1,0 +1,11 @@
+{
+    "skills":
+    {
+        "Canto": {
+            "description": "This unit may finish moving after making an attack."
+        },
+        "Pavise": {
+            "description": "This unit has a chance to take no damage in combat."
+        }
+    }
+}
