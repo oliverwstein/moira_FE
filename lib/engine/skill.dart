@@ -12,6 +12,9 @@ class Skill extends Component {
       case "Canto":
         observer = Canto(unit);
         break;
+      case "Pavise":
+        observer = Pavise(unit);
+        break;
       default:
     }
   }
@@ -32,7 +35,10 @@ class Skill extends Component {
     if (name == "Canto"){
       observer = Canto(unit); // Or determine the observer based on the skill name
       dispatcher.add(observer!);
-    } else if (name == "Pavise"){}
+    } else if (name == "Pavise"){
+      observer = Pavise(unit); // Or determine the observer based on the skill name
+      dispatcher.add(observer!);
+    }
     unit.skillSet.add(this);
   }
 

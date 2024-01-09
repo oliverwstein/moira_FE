@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'dart:math';
 import 'engine.dart';
 
 abstract class Observer {
@@ -34,6 +35,27 @@ class Canto extends Observer {
       dev.log('${unit.remainingMovement}');
       unit.toggleCanAct(true);
       dev.log("${unit.actionsAvailable}");
+    }
+  }
+}
+
+class Pavise extends Observer {
+  final Unit unit;
+  Pavise(this.unit) {
+    listensTo = MakeAttackEvent;
+  }
+
+  @override
+  void onEvent(GameEvent event) {
+    if (event.runtimeType == MakeAttackEvent && event is MakeAttackEvent && unit == event.defender) {
+      // Stage stage = unit.parent as Stage;
+      dev.log('${unit.name} has pavise');
+      var rng = Random();
+      int activationRate = event.defender.stats['dex']!;
+      if (rng.nextInt(100) + 1 <= activationRate) {
+        event.combat.damageDealt = 0;
+        dev.log('Pavise nullified the blow!');
+      }
     }
   }
 }

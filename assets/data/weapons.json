@@ -14,8 +14,8 @@
         "Axe":
             {
                 "weaponType" : "Axe",
-                "might": 9,
-                "hit": 0,
+                "might": 15,
+                "hit": 100,
                 "fatigue": 1,
                 "effects": [],
                 "specialAttack": "Smash"

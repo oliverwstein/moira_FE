@@ -26,6 +26,18 @@ class UnitActionEndEvent extends GameEvent {
   
 }
 
+class MakeAttackEvent extends GameEvent {
+  final Combat combat;
+  final Unit attacker;
+  final Unit defender;
+  MakeAttackEvent(this.combat, this.attacker, this.defender);
+}
+
+class MakeDamageEvent extends GameEvent {
+  final Unit unit;
+  MakeDamageEvent(this.unit);
+}
+
 class EventDispatcher {
   final List<Observer> _observers = [];
 

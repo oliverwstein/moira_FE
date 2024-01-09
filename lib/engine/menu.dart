@@ -377,7 +377,7 @@ class TargetSelector extends Component implements CommandHandler {
           Unit target = stage.tilesMap[stage.cursor.gridCoord]!.unit!;
           CombatBox combatBox = CombatBox(unit, target);
           unit.add(combatBox);
-          dev.log("${unit.name} has the attacks: ${combatBox.getValidAttacks(unit)}");
+          dev.log("${unit.name} has the attacks: ${combatBox.combat.getValidAttacks(unit)}");
           stage.activeComponent = combatBox;
         }
 
