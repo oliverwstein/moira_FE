@@ -1,11 +1,13 @@
 // ignore_for_file: unused_import
 
+import 'dart:convert';
 import 'dart:developer' as dev;
+import 'dart:io';
+
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
-import 'engine.dart';
-import 'dart:convert';
-import 'dart:io';
+
+import '../engine/engine.dart';
 
 class Item extends Component with HasGameRef<MyGame>{
   final String name;

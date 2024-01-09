@@ -1,10 +1,11 @@
 import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
+
 import 'package:flame/components.dart';
+import 'package:flame/text.dart';
 import 'package:flutter/services.dart';
 import 'package:moira/engine/engine.dart';
-import 'package:flame/text.dart';
 
 TextPaint combatTextRenderer = TextPaint(
 style: const TextStyle(

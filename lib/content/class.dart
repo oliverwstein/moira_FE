@@ -5,7 +5,7 @@ import 'dart:convert';
 
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
-import 'engine.dart';
+import '../engine/engine.dart';
 // ignore: constant_identifier_names
 
 class Class extends Component with HasGameRef<MyGame>{

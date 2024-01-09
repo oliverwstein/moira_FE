@@ -4,7 +4,8 @@ import 'dart:convert';
 
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
-import 'engine.dart';
+
+import '../engine/engine.dart';
 
 class Attack extends Component with HasGameRef<MyGame>{
   final String name; // The Attack name
@@ -18,9 +19,6 @@ class Attack extends Component with HasGameRef<MyGame>{
   bool magic = false; // Whether the attack does magical or physical damage.
   late (int, int) range; // The min and max range of the attack. 
   late List<CombatEffect>? effects; // The special effects of the attack. 
-
-  // Private constructor for creating instances
-  Attack._internal(this.name, this.description, this.scaling, this.weaponTypes, this.might, this.hit, this.crit, this.fatigue, this.magic, this.range, this.effects);
 
   // Factory constructor
   factory Attack.fromJson(String name) {
@@ -54,6 +52,9 @@ class Attack extends Component with HasGameRef<MyGame>{
     // Return a new Attack instance
     return Attack._internal(name, description, scaling, weaponTypes, might, hit, crit, fatigue, magic, range, null);
   }
+
+  // Private constructor for creating instances
+  Attack._internal(this.name, this.description, this.scaling, this.weaponTypes, this.might, this.hit, this.crit, this.fatigue, this.magic, this.range, this.effects);
 }
 
 class CombatEffect {}

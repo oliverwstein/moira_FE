@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
-import 'engine.dart';
+
+import '../engine/engine.dart';
 
 class Skill extends Component {
   final String name;

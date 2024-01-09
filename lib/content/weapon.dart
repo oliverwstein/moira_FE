@@ -5,7 +5,8 @@ import 'dart:convert';
 
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
-import 'engine.dart';
+
+import '../engine/engine.dart';
 // ignore: constant_identifier_names
 enum WeaponType {Sword, Axe, Lance, Knife, Staff, Book, Bow}
 
