@@ -67,6 +67,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     // Initialization logic
     attackList = attacker.attackSet.keys.toList();
     weaponList = attacker.inventory.where((item) => attacker.equipCheck(item, ItemType.main)).toList();
+    combat = Combat(attacker, defender);
     getCombatValMap(); // Assuming this method populates combatValMap
 
     attackTextBox = createTextBox('${combatValMap[attackList.first].atk.fatigue}|${attackList.first}', 24, 48);
@@ -77,7 +78,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
     damRecord = createRecordPair(combatValMap[attackList.first].atk.damage.toString(), combatValMap[attackList.first].def.damage.toString(), 110);
     accRecord = createRecordPair(combatValMap[attackList.first].atk.accuracy.toString(), combatValMap[attackList.first].def.accuracy.toString(), 140);
     critRecord = createRecordPair(combatValMap[attackList.first].atk.critRate.toString(), combatValMap[attackList.first].def.critRate.toString(), 170);
-    combat = Combat(attacker, defender);
+    
   }
 
   TextBoxComponent createTextBox(String text, double x, double y) {
@@ -261,7 +262,7 @@ class Combat extends Component with HasGameRef<MyGame>{
         dev.log('${attacker.name} missed');
       }
     }
-    gameRef.eventDispatcher.dispatch(MakeAttackEvent(attacker));
+    // gameRef.eventDispatcher.dispatch(MakeAttackEvent(attacker));
     return (damageDealt, fatigue);
   }
 
