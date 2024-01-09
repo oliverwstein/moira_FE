@@ -32,6 +32,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   // Collections and Complex Structures
   Queue<Point<int>> movementQueue = Queue<Point<int>>();
   Point<int>? currentTarget;
+  double moveCost = 0;
   Map<Point<int>, List<Point<int>>> paths = {};
 
   // Components and External References
@@ -246,6 +247,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
     for(Point<int> point in paths[stage.cursor.gridCoord]!){
       enqueueMovement(point);
+      moveCost += stage.tilesMap[point]!.terrain.cost;
     }
     Point<int> newTile = paths[stage.cursor.gridCoord]!.last;
     stage.updateTileWithUnit(gridCoord, newTile, this);
@@ -413,7 +415,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     while (queue.isNotEmpty) {
       var tileMovement = queue.removeFirst();
       Point<int> currentPoint = tileMovement.point;
-      remainingMovement = tileMovement.remainingMovement;
+      double remainingMovement = tileMovement.remainingMovement;
 
       // Skip if a better path to this tile has already been found
       if (visitedTiles.containsKey(currentPoint) && visitedTiles[currentPoint]!.remainingMovement >= remainingMovement) continue;

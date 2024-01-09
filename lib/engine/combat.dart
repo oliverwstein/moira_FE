@@ -119,6 +119,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
       attacker.wait();
       close();
       stage.activeComponent = stage.cursor;
+      attacker.remainingMovement -= attacker.moveCost;
       gameRef.eventDispatcher.dispatch(UnitActionEndEvent(attacker));
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.

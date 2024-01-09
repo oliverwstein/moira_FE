@@ -29,7 +29,8 @@ class Canto extends Observer {
   void onEvent(GameEvent event) {
     if (event is UnitActionEndEvent && unit == event.unit) {
       // Stage stage = unit.parent as Stage;
-      // unit.toggleCanAct(true);
+      dev.log('${unit.remainingMovement}');
+      unit.toggleCanAct(true);
     }
   }
 }
