@@ -50,6 +50,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
   Set<Skill> skillSet = {};
+  Set<WeaponType> weaponProficiencies = {};
   Map<String, int> stats = {};
   int hp = -1;
   int sta = -1;
