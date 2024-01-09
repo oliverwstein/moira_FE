@@ -37,3 +37,20 @@ class Canto extends Observer {
     }
   }
 }
+
+class Pavise extends Observer {
+  final Unit unit;
+  Pavise(this.unit) {
+    listensTo = MakeAttackEvent;
+  }
+
+  @override
+  void onEvent(GameEvent event) {
+    if (event.runtimeType == MakeAttackEvent && event is MakeAttackEvent && unit == event.unit) {
+      // Stage stage = unit.parent as Stage;
+      dev.log('${unit.remainingMovement}');
+      unit.toggleCanAct(true);
+      dev.log("${unit.actionsAvailable}");
+    }
+  }
+}

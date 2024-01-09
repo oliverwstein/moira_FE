@@ -26,9 +26,9 @@ class UnitActionEndEvent extends GameEvent {
   
 }
 
-class UnitDamagedEvent extends GameEvent {
+class MakeAttackEvent extends GameEvent {
   final Unit unit;
-  UnitDamagedEvent(this.unit);
+  MakeAttackEvent(this.unit);
   
 }
 
