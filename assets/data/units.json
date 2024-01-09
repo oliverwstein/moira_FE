@@ -18,7 +18,7 @@
         "lck": 7
     },
     "skills": [],
-    "inventory": ["Salve", "Salve", "Sword", "Lance"],
+    "inventory": ["Salve", "Salve", "Sword", "Lance", "Axe"],
     "attacks": [],
     "proficiencies": [],
     "sprites": {
