@@ -209,6 +209,7 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
 class Combat extends Component with HasGameRef<MyGame>{
   Unit attacker;
   Unit defender;
+  late int damageDealt = 0;
   Combat(this.attacker, this.defender);
 
   int getCombatDistance(){
@@ -249,35 +250,33 @@ class Combat extends Component with HasGameRef<MyGame>{
     return (atk: atk, def: def);
   }
 
-  (int, int) makeAttack(int damage, int accuracy, int critRate, int fatigue, Unit attacker, Unit defender){
+  void makeAttack(int damage, int accuracy, int critRate, int fatigue, Unit attacker, Unit defender){
     var rng = Random(); // Random number generator
-    int damageDealt = 0;
+    damageDealt = 0;
     if (accuracy > 0) {
       if (rng.nextInt(100) + 1 <= accuracy) {
         // Attack hits
         var critical = rng.nextInt(100) + 1 <= critRate; // Check for critical
         damageDealt = critical ? 3 * damage : damage; // Calculate damage
-        dev.log('${attacker.name} hit, reducing ${defender.name} to ${defender.hp}');
       } else {
         dev.log('${attacker.name} missed');
       }
     }
-    gameRef.eventDispatcher.dispatch(MakeAttackEvent(defender));
-    return (damageDealt, fatigue);
+    gameRef.eventDispatcher.dispatch(MakeAttackEvent(this, attacker, defender));
+    dev.log('${attacker.name} hit, doing ${damageDealt} to ${defender.name}');
+    defender.hp -= damageDealt;
+    attacker.sta -= fatigue;
   }
 
   void bout(Unit attacker, Unit defender, Attack attack){
     ({({int accuracy, int critRate, int damage, int fatigue}) atk, ({int accuracy, int critRate, int damage, int fatigue}) def}) vals = getCombatValues(attacker, defender, attack);
     // Attacker's turn
-    (int, int) outcome = makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
-    defender.hp -= outcome.$1;
-    attacker.sta -= outcome.$2;
+    makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
     if (defender.hp <= 0) {
       defender.die();
       return;
     }
     makeAttack(vals.def.damage, vals.def.accuracy, vals.def.critRate, vals.def.fatigue, defender, attacker);
-    
     if (attacker.hp <= 0) {
       attacker.die();
       return;
