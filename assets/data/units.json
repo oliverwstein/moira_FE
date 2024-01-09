@@ -17,6 +17,18 @@
         "wis": 0,
         "lck": 7
     },
+    "growths": {
+        "hp": 110,
+        "sta": 90,
+        "str": 50,
+        "def": 40,
+        "dex": 50,
+        "spe": 30,
+        "mag": 5,
+        "res": 5,
+        "wis": 20,
+        "lck": 40
+    },
     "skills": [],
     "inventory": ["Salve", "Salve", "Sword", "Lance", "Axe"],
     "attacks": [],
@@ -40,6 +52,18 @@
         "res": 0,
         "wis": 2,
         "lck": 4
+    },
+    "growths": {
+        "hp": 80,
+        "sta": 70,
+        "str": 40,
+        "def": 40,
+        "dex": 30,
+        "spe": 20,
+        "mag": 5,
+        "res": 5,
+        "wis": 10,
+        "lck": 20
     },
     "skills": [],
     "inventory": ["Salve", "Sword"],
@@ -65,6 +89,18 @@
         "wis": 4,
         "lck": 4
     },
+    "growths": {
+        "hp": 70,
+        "sta": 80,
+        "str": 30,
+        "def": 30,
+        "dex": 40,
+        "spe": 30,
+        "mag": 5,
+        "res": 5,
+        "wis": 30,
+        "lck": 40
+    },
     "skills": [],
     "inventory": ["Salve", "Sword"],
     "attacks": [],
@@ -88,6 +124,18 @@
         "res": 3,
         "wis": 2,
         "lck": 3
+        },
+        "growths": {
+            "hp": 90,
+            "sta": 100,
+            "str": 50,
+            "def": 50,
+            "dex": 30,
+            "spe": 20,
+            "mag": 5,
+            "res": 5,
+            "wis": 10,
+            "lck": 30
         },
         "skills": [],
         "inventory": ["Salve", "Sword"],

@@ -6,28 +6,124 @@
             "movementRange": 9,
             "skills": ["Canto"],
             "attacks": ["Trample"],
-            "proficiencies": ["Sword", "Lance"]
+            "proficiencies": ["Sword", "Lance"],
+            "baseGrowths": {
+                "hp": 90,
+                "sta": 90,
+                "str": 40,
+                "def": 40,
+                "dex": 40,
+                "spe": 40,
+                "mag": 10,
+                "res": 10,
+                "wis": 30,
+                "lck": 40
+            },
+            "baseStats": {
+                "hp": 40,
+                "sta": 30,
+                "str": 10,
+                "def": 7,
+                "dex": 7,
+                "spe": 7,
+                "mag": 0,
+                "res": 3,
+                "wis": 3,
+                "lck": 10
+            }
         },
         "Cavalier": {
             "description": "A mounted knight sworn to service.",
             "movementRange": 8,
             "skills": ["Canto"],
             "attacks": ["Trample"],
-            "proficiencies": ["Sword", "Lance"]
+            "proficiencies": ["Sword", "Lance"],
+            "baseGrowths": {
+                "hp": 80,
+                "sta": 60,
+                "str": 30,
+                "def": 20,
+                "dex": 40,
+                "spe": 40,
+                "mag": 5,
+                "res": 5,
+                "wis": 10,
+                "lck": 10
+            },
+            "baseStats": {
+                "hp": 30,
+                "sta": 25,
+                "str": 7,
+                "def": 6,
+                "dex": 6,
+                "spe": 6,
+                "mag": 0,
+                "res": 1,
+                "wis": 1,
+                "lck": 5
+            }
         },
         "Armor": {
             "description": "A sturdy soldier encased in armor.",
             "movementRange": 6,
             "skills": ["Pavise"],
             "attacks": [],
-            "proficiencies": ["Lance"]
+            "proficiencies": ["Lance"],
+            "baseGrowths": {
+                "hp": 90,
+                "sta": 80,
+                "str": 40,
+                "def": 40,
+                "dex": 20,
+                "spe": 20,
+                "mag": 5,
+                "res": 5,
+                "wis": 10,
+                "lck": 10
+            },
+            "baseStats": {
+                "hp": 40,
+                "sta": 30,
+                "str": 9,
+                "def": 10,
+                "dex": 5,
+                "spe": 3,
+                "mag": 0,
+                "res": 0,
+                "wis": 1,
+                "lck": 3
+            }
         },
         "Barbarian": {
             "description": "A ruthless fighter, but undisciplined.",
             "movementRange": 6,
             "skills": [],
             "attacks": [],
-            "proficiencies": ["Axe"]
+            "proficiencies": ["Axe"],
+            "baseGrowths": {
+                "hp": 90,
+                "sta": 50,
+                "str": 50,
+                "def": 10,
+                "dex": 35,
+                "spe": 35,
+                "mag": 5,
+                "res": 5,
+                "wis": 10,
+                "lck": 10
+            },
+            "baseStats": {
+                "hp": 35,
+                "sta": 20,
+                "str": 8,
+                "def": 5,
+                "dex": 2,
+                "spe": 7,
+                "mag": 0,
+                "res": 0,
+                "wis": 0,
+                "lck": 2
+            }
         }
     }
 }
