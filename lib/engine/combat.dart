@@ -7,38 +7,39 @@ import 'package:moira/engine/engine.dart';
 import 'package:flame/text.dart';
 
 TextPaint combatTextRenderer = TextPaint(
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 255, 255, 255),
-          fontSize: 16, // Adjust the font size as needed
-          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          height: 1.5,
-          shadows: <ui.Shadow>[
-            ui.Shadow(
-              offset: ui.Offset(1.0, 1.0),
-              blurRadius: 1.0,
-              color: ui.Color.fromARGB(255, 20, 11, 48),
-            ),
-          ],
-          // Include any other styles you need
-          ),
-      );
+style: const TextStyle(
+  color: ui.Color.fromARGB(255, 255, 255, 255),
+  fontSize: 16, // Adjust the font size as needed
+  fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+  height: 1.5,
+  shadows: <ui.Shadow>[
+    ui.Shadow(
+      offset: ui.Offset(1.0, 1.0),
+      blurRadius: 1.0,
+      color: ui.Color.fromARGB(255, 20, 11, 48),
+    ),
+  ],
+  // Include any other styles you need
+  ),
+);
 
 TextPaint combatNumberRenderer = TextPaint(
-        style: const TextStyle(
-          color: ui.Color.fromARGB(255, 255, 255, 255),
-          fontSize: 22, // Adjust the font size as needed
-          fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
-          height: 1.5,
-          shadows: <ui.Shadow>[
-            ui.Shadow(
-              offset: ui.Offset(1.0, 1.0),
-              blurRadius: 1.0,
-              color: ui.Color.fromARGB(255, 20, 11, 48),
-            ),
-          ],
-          // Include any other styles you need
-          ),
-      );
+style: const TextStyle(
+  color: ui.Color.fromARGB(255, 255, 255, 255),
+  fontSize: 22, // Adjust the font size as needed
+  fontFamily: 'Courier', // This is just an example, use the actual font that matches your design
+  height: 1.5,
+  shadows: <ui.Shadow>[
+    ui.Shadow(
+      offset: ui.Offset(1.0, 1.0),
+      blurRadius: 1.0,
+      color: ui.Color.fromARGB(255, 20, 11, 48),
+    ),
+  ],
+  // Include any other styles you need
+  ),
+);
+
 class CombatBox extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
   /// Combat Box should take a unit and a target and create three things:
   /// A box that lists the weapon to use
