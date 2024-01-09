@@ -88,8 +88,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     final Map<String, WeaponType> stringToProficiency = {
       for (WeaponType weaponType in WeaponType.values) weaponType.toString().split('.').last: weaponType,
     };
-    for (WeaponType weaponType in unitData['proficiencies']){
-      WeaponType? prof = stringToProficiency[weaponType];
+    for (String weaponTypeString in unitData['proficiencies']){
+      WeaponType? prof = stringToProficiency[weaponTypeString];
       if (prof != null){proficiencies.add(prof);}
     }
     

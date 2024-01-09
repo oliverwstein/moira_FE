@@ -26,9 +26,9 @@ class Class extends Component with HasGameRef<MyGame>{
     } else {classData = {};}
     String description = classData['description'] ?? "An unknown foe";
     int movementRange = classData['movementRange'] ?? 6;
-    List<String> skills = classData['skills'] ?? [];
-    List<String> attacks = classData['attacks'] ?? [];
-    List<String> proficiencies = classData['proficiencies'] ?? [];
+    List<String> skills = List<String>.from(classData['skills'] ?? []);
+    List<String> attacks = List<String>.from(classData['attacks'] ?? []);
+    List<String> proficiencies = List<String>.from(classData['proficiencies'] ?? []);
 
     // Return a new Weapon instance
     return Class._internal(name, description, movementRange, skills, attacks, proficiencies);
