@@ -191,7 +191,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
-    Stage stage = parent as Stage;
+    Stage stage = gameRef.stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
       if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
         move(stage, stage.cursor.gridCoord);
@@ -394,13 +394,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
       x += moveX;
       y += moveY;
-
+      gameRef.stage.cursor.goToUnit(this);
       // Check if the unit is close enough to the target position to snap it
       if ((x - targetX).abs() < 1 && (y - targetY).abs() < 1) {
         x = targetX; // Snap to exact position
         y = targetY;
         gridCoord = currentTarget!; // Update the gridCoord to the new tile        
-
+       
         // Move to the next target if any
         if (movementQueue.isNotEmpty) {
           currentTarget = movementQueue.removeFirst();
@@ -429,36 +429,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 
-  List<Point<int>> getPath(Point<int> destination) {
-    var visitedTiles = <Point<int>, _TileMovement>{};
-    var queue = Queue<_TileMovement>();
-    Stage stage = parent as Stage;
-    
-    queue.add(_TileMovement(gridCoord, 0, null));
-
-    while (queue.isNotEmpty) {
-      var tileMovement = queue.removeFirst();
-      Point<int> currentPoint = tileMovement.point;
-
-      if (currentPoint == destination) {
-        return _constructPath(destination, visitedTiles); // Path found
-      }
-
-      for (var direction in Direction.values) {
-        var nextPoint = _getNextPoint(currentPoint, direction);
-        if (stage.tilesMap.containsKey(nextPoint) && !visitedTiles.containsKey(nextPoint)) {
-          double cost = gameRef.stage.tilesMap[nextPoint]?.getTerrainCost() ?? 1; // Default cost
-          queue.add(_TileMovement(nextPoint, tileMovement.remainingMovement + cost, currentPoint));
-          visitedTiles[nextPoint] = _TileMovement(currentPoint, tileMovement.remainingMovement + cost, tileMovement.point);
-        }
-      }
-    }
-
-    return []; // No path found
-  }
   
   void move(Stage stage, Point<int> destination){
     oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
+    if(!paths.keys.contains(destination)){
+      paths[destination] = getPath(destination);
+    }
     for(Point<int> point in paths[destination]!){
       enqueueMovement(point);
       moveCost += stage.tilesMap[point]!.getTerrainCost();
@@ -483,7 +459,40 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       currentTarget = movementQueue.removeFirst();
     }
   }
-  
+  List<Point<int>> getPath(Point<int> destination) {
+    var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
+    var queue = Queue<_TileMovement>(); // Queue for BFS
+
+    // Starting point - no parent at the beginning
+    queue.add(_TileMovement(gridCoord, 100.0, null));
+    while (queue.isNotEmpty) {
+      var tileMovement = queue.removeFirst();
+      Point<int> currentPoint = tileMovement.point;
+      double remainingMovement = tileMovement.remainingMovement;
+
+      // Skip if a better path to this tile has already been found
+      if (visitedTiles.containsKey(currentPoint) && visitedTiles[currentPoint]!.remainingMovement >= remainingMovement) continue;
+      
+      // Record the tile with its movement data
+      visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
+      if(currentPoint == destination) {
+        return _constructPath(destination, visitedTiles);
+      }
+      Tile? tile = gameRef.stage.tilesMap[currentPoint]; // Accessing tiles through stage
+      if (tile!.isOccupied && tile.unit?.team != team) continue; // Skip enemy-occupied tiles
+      for (Direction direction in Direction.values) {
+        Point <int> nextPoint = _getNextPoint(currentPoint, direction);
+        Tile? nextTile = gameRef.stage.tilesMap[Point(nextPoint.x, nextPoint.y)];
+        if (nextTile != null && !(nextTile.isOccupied  && nextTile.unit?.team != team)) {
+          double cost = gameRef.stage.tilesMap[nextTile.gridCoord]!.getTerrainCost();
+          double nextRemainingMovement = remainingMovement - cost;
+            queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
+        }
+      }
+    }
+    return [];
+  }
+
   List<Tile> findReachableTiles() {
     List<Tile>reachableTiles = [];
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data

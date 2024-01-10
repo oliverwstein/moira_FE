@@ -61,6 +61,8 @@ class Stage extends Component with HasGameRef<MyGame>{
       tilesMap[unit.gridCoord]?.setUnit(unit);
       gameRef.addObserver(unit);
     }
+    units[0].move(this, Point(8, 26));
+    units[1].move(this, Point(8, 25));
     for (UnitTeam team in UnitTeam.values){
       if(team != UnitTeam.blue){playerMap[team] = NPCPlayer(team, this);} 
       else {playerMap[team] = Player(team, this);}
