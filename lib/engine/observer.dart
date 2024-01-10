@@ -22,6 +22,20 @@ class Announcer extends Observer {
   }
 }
 
+class Mover extends Observer {
+  final Unit unit;
+  final Point<int> destination;
+
+  Mover(this.unit, this.destination);
+  
+  @override
+  void onEvent(GameEvent event) {
+    if (event is UnitCreationEvent && unit == event.unit) {
+    }
+  }
+
+}
+
 class Canto extends Observer {
   final Unit unit;
   Canto(this.unit) {
