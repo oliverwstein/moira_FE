@@ -34,6 +34,36 @@ class EventQueue {
   }
 }
 
+class CreateStageEvent extends Event {
+  final MyGame game;
+  bool _isCompleted = false;
+
+  CreateStageEvent(this.game);
+
+  @override
+  void execute() {
+    // Create a new Stage instance
+    game.stage = Stage();
+
+    // Set the callback
+    game.stage.onLoaded = () {
+      game.addObserver(game.stage);
+      game.camera.follow(game.stage.cursor);
+      _isCompleted = true; // Set to true once loading is complete
+    };
+
+    // Add the stage to the game
+    game.world.add(game.stage);
+  }
+
+  @override
+  bool checkComplete() {
+    // Checks if the stage has finished loading
+    return _isCompleted;
+  }
+}
+
+
 class TurnStartEvent extends Event {
   final UnitTeam activeTeam;
   TurnStartEvent(this.activeTeam);

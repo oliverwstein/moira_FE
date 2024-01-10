@@ -1,9 +1,14 @@
 // ignore_for_file: unnecessary_overrides
 import 'dart:convert';
+import 'dart:ui' as ui;
 
+import 'package:flame/cache.dart';
 import 'package:flame/camera.dart';
+import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame/sprite.dart';
+import 'package:flame/src/components/core/component.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'engine.dart';
@@ -110,6 +115,13 @@ class MyGame extends FlameGame with KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
+    viewport = MaxViewport();
+    camera.viewport = viewport;
+    final imagesLoader = Images();
+    ui.Image titleCardImage = await imagesLoader.load('title_card.png');
+    SpriteComponent titleCardSprite = SpriteComponent.fromImage(titleCardImage);
+    world.add(titleCardSprite);
+    titleCardSprite.anchor = Anchor.center;
     await super.onLoad();
     unitMap = await loadUnitData();
     itemMap = await loadItemsData();
@@ -117,12 +129,12 @@ class MyGame extends FlameGame with KeyboardEvents {
     attackMap = await loadAttacksData();
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
-    viewport = MaxViewport();
-    camera.viewport = viewport;
-    stage = Stage();
-    await world.add(stage);
-    addObserver(stage);
-    camera.follow(stage.cursor);
+    
+    
+    // stage = Stage();
+    // await world.add(stage);
+    // addObserver(stage);
+    // camera.follow(stage.cursor);
   }
 
   @override
@@ -130,7 +142,10 @@ class MyGame extends FlameGame with KeyboardEvents {
     bool handled = false;
     // First, handle any game-wide key events (like zooming)
     if (event is RawKeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.equal) { // Zoom in
+      if (event.logicalKey == LogicalKeyboardKey.enter) {
+        eventQueue.addEventBatch([CreateStageEvent(this)]);
+        handled = true;
+      } else if (event.logicalKey == LogicalKeyboardKey.equal) { // Zoom in
         scaleFactor *= 1.1;
         handled = true;
       } else if (event.logicalKey == LogicalKeyboardKey.minus) { // Zoom out

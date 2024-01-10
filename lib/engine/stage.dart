@@ -14,6 +14,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   /// game map, including tiles, units, and the cursor. It interfaces with the 
   /// game's TiledComponent to render the map and holds the logic for the game's 
   /// terrain, unit positioning, and active components like cursor or units.
+  VoidCallback? onLoaded;
   late final int mapTileWidth;
   late final int mapTileHeight;
   late final Vector2 mapSize;
@@ -73,7 +74,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
-
+    onLoaded?.call();
   }
   @override
   void update(double dt) {
