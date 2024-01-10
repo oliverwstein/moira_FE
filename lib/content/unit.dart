@@ -194,7 +194,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     Stage stage = parent as Stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
       if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
-        move(stage);
+        move(stage, stage.cursor.gridCoord);
         getActionOptions();
         openActionMenu(stage);
       }
@@ -430,14 +430,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 
-  void move(Stage stage){
+  void move(Stage stage, Point<int> destination){
     oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
-    for(Point<int> point in paths[stage.cursor.gridCoord]!){
+    for(Point<int> point in paths[destination]!){
       enqueueMovement(point);
       moveCost += stage.tilesMap[point]!.terrain.cost;
     }
-    Point<int> newTile = paths[stage.cursor.gridCoord]!.last;
-    stage.updateTileWithUnit(gridCoord, newTile, this);
+    stage.updateTileWithUnit(gridCoord, destination, this);
     stage.blankAllTiles();
   }
 
