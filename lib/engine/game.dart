@@ -41,7 +41,8 @@ class MyGame extends FlameGame with KeyboardEvents {
   /// This class should be instantiated to start the game. It sets up necessary
   /// game components and starts the game loop. User interactions are primarily
   /// managed here and delegated to other components like Stage and Unit.
-
+  
+  EventQueue eventQueue = EventQueue();
   late MaxViewport viewport;
   late Stage stage;
   double _scaleFactor = 2;
@@ -104,6 +105,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   @override
     void update(double dt) {
         super.update(dt);
+        eventQueue.update(dt);
     }
 
   @override

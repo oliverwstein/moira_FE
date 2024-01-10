@@ -123,6 +123,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       }
       
     }
+    
     // Return a new Unit instance
     return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
   }
