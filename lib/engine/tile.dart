@@ -94,6 +94,10 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
     unit = null;
   }
 
+   double getTerrainCost() {
+    return terrain.cost;
+  }
+
   @override
   void render(Canvas canvas) {
     super.render(canvas); // Don't forget to call super.render
