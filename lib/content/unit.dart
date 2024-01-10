@@ -296,28 +296,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
   }
 
-  void move(Stage stage){
-    oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
-    for(Point<int> point in paths[stage.cursor.gridCoord]!){
-      enqueueMovement(point);
-      moveCost += stage.tilesMap[point]!.terrain.cost;
-    }
-    Point<int> newTile = paths[stage.cursor.gridCoord]!.last;
-    stage.updateTileWithUnit(gridCoord, newTile, this);
-    stage.blankAllTiles();
-  }
-
-  void undoMove(){
-    Stage stage = parent as Stage;
-    snapToTile(oldTile);
-    stage.updateTileWithUnit(gridCoord, oldTile, this);
-    gridCoord = oldTile;
-    stage.activeComponent = stage.cursor;
-    stage.blankAllTiles();
-  }
   int getStat(String stat){
     return stats[stat]!;
   }
+
   ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
     assert(stats['str'] != null && stats['dex'] != null && stats["mag"] != null && stats['wis'] != null);
     Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats["mag"]!.toDouble(), stats['wis']!.toDouble());
@@ -379,14 +361,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     _animationComponent.paint = canAct ? mat.Paint() : grayscalePaint;
   }
 
-  void enqueueMovement(Point<int> targetPoint) {
-    movementQueue.add(targetPoint);
-    if (!isMoving) {
-      isMoving = true;
-      currentTarget = movementQueue.removeFirst();
-    }
-  }
-  
   @override
   void onMount() {
     super.onMount();
@@ -456,6 +430,34 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
   }
 
+  void move(Stage stage){
+    oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
+    for(Point<int> point in paths[stage.cursor.gridCoord]!){
+      enqueueMovement(point);
+      moveCost += stage.tilesMap[point]!.terrain.cost;
+    }
+    Point<int> newTile = paths[stage.cursor.gridCoord]!.last;
+    stage.updateTileWithUnit(gridCoord, newTile, this);
+    stage.blankAllTiles();
+  }
+
+  void undoMove(){
+    Stage stage = parent as Stage;
+    snapToTile(oldTile);
+    stage.updateTileWithUnit(gridCoord, oldTile, this);
+    gridCoord = oldTile;
+    stage.activeComponent = stage.cursor;
+    stage.blankAllTiles();
+  }
+
+  void enqueueMovement(Point<int> targetPoint) {
+    movementQueue.add(targetPoint);
+    if (!isMoving) {
+      isMoving = true;
+      currentTarget = movementQueue.removeFirst();
+    }
+  }
+  
   List<Tile> findReachableTiles() {
     List<Tile>reachableTiles = [];
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
@@ -605,7 +607,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
     if (inventory.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
   }
-  
 }
 
 class _TileMovement {
