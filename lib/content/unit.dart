@@ -21,13 +21,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int movementRange;
   late double remainingMovement;
   UnitTeam team = UnitTeam.blue;
-  double tileSize;
+  double tileSize = 16;
 
   // Status and State Variables
   Point<int> gridCoord; // The units's position in terms of tiles, not pixels
   bool canAct = true;
   bool isMoving = false;
-  Point<int> oldTile;
+  late Point<int> oldTile;
 
   // Collections and Complex Structures
   Queue<Point<int>> movementQueue = Queue<Point<int>>();
@@ -52,14 +52,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Set<Skill> skillSet = {};
   Set<WeaponType> proficiencies = {};
   Map<String, int> stats = {};
+  int level;
   int hp = -1;
   int sta = -1;
 
   // Factory constructor
-  factory Unit.fromJSON(Point<int> gridCoord, String name) {
-    // Use gridCoord and scaleFactor to set oldTile and tileSize
-    Point<int> oldTile = gridCoord;
-    double tileSize = 16 * MyGame().scaleFactor; // This assumes scaleFactor is available from an instance of MyGame. If not, adjust accordingly.
+  factory Unit.fromJSON(Point<int> gridCoord, String name, {int? level}) {
 
     // Extract unit data from the static map in MyGame
     var unitsJson = MyGame.unitMap['units'] as List;
@@ -69,6 +67,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     );
 
     String className = unitData['class'];
+    int givenLevel = level ?? unitData['level'] ?? 1;
     Class classData = Class.fromJson(className);
 
     int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : classData.movementRange;
@@ -105,20 +104,36 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       attackMap[attackName] = Attack.fromJson(attackName);
     }
 
-    Map<String, int> stats = {};
-    for (String stat in unitData['stats'].keys){
-      stats[stat] = unitData['stats'][stat];
+    Map<String, int> stats = Map<String, int>.from(classData.baseStats);
+    Map<String, int> growths = Map<String, int>.from(classData.growths);
+    for (String stat in classData.growths.keys){
+      if (unitData['growths']?.keys.contains(stat)){
+        growths[stat] = unitData['growths'][stat];
+      }
+    }
+    var rng = Random();
+    for (String stat in classData.baseStats.keys){
+      if (unitData['baseStats'].keys.contains(stat)){
+        stats[stat] = unitData['baseStats'][stat];
+      } else {
+        int levelUps = Iterable.generate(givenLevel - 1, (_) => rng.nextInt(100) < growths[stat]! ? 1 : 0)
+                        .fold(0, (acc, curr) => acc + curr); // Autoleveler
+        stats[stat] = classData.baseStats[stat]! + levelUps;
+
+      }
+      
     }
     // Return a new Unit instance
-    return Unit._internal(unitData, gridCoord, name, className, oldTile, tileSize, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.oldTile, this.tileSize, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.level, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
   void _postConstruction() {
+    tileSize = 16 * MyGame().scaleFactor;
     for (Item item in inventory){
       switch (item.type) {
         case ItemType.main:
@@ -135,9 +150,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
           break;
       }
     }
-    hp = stats['hp']!;
-    sta = stats['sta']!;
+    hp = getStat('hp');
+    sta = getStat('sta');
     remainingMovement = movementRange.toDouble();
+    oldTile = gridCoord;
   }
   
   @override
@@ -299,12 +315,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     stage.activeComponent = stage.cursor;
     stage.blankAllTiles();
   }
-
+  int getStat(String stat){
+    return stats[stat]!;
+  }
   ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
-    ///In combat, the relevant stats for *damage* calculations are are:
-    /// the attacker’s might, hit, attack.magic, and (attack) type against the defender’s stats.
-    /// damage = weapon.might + attack.might + sum((unit.atk, unit.dex, unit.int, unit.wis)*attack.type.values) - (attack.magic*targ.res + (1-attack.magic)*targ.def)
-    /// accuracy is weapon.hit + attack.hit + unit.hit - (attack.magic*targ.magAvo + (1-attack.magic)*targ.phyAvo)
     assert(stats['str'] != null && stats['dex'] != null && stats["mag"] != null && stats['wis'] != null);
     Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats["mag"]!.toDouble(), stats['wis']!.toDouble());
     int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
@@ -313,20 +327,20 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     int fatigue = attack.fatigue;
     if(main?.weapon != null) {
       if(attack.magic) {
-        hit += stats['wis']!*2;
-        crit += stats['wis']!~/2;
+        hit += getStat('wis')*2;
+        crit += getStat('wis')~/2;
       } else {
-        hit += stats['dex']!*2;
-        crit += stats['dex']!~/2;
+        hit += getStat('dex')*2;
+        crit += getStat('dex')~/2;
       }
       might += main!.weapon!.might;
       hit += main!.weapon!.hit;
       crit += main!.weapon!.crit;
       fatigue += main!.weapon!.fatigue;
       }
-    int damage = (might - ((attack.magic ? 1 : 0)*target.stats['res'] + (1-(attack.magic ? 1 : 0))*target.stats['def'])).toInt().clamp(0, 100);
-    int accuracy = (hit - target.stats['lck'] - ((attack.magic ? 1 : 0)*target.stats['wis'] + (1-(attack.magic ? 1 : 0))*target.stats['dex'])).toInt().clamp(1, 99);
-    int critRate = (crit - target.stats['lck']).toInt().clamp(1, 99);
+    int damage = (might - ((attack.magic ? 1 : 0)*target.getStat('res') + (1-(attack.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
+    int accuracy = (hit - target.getStat('lck') - ((attack.magic ? 1 : 0)*target.getStat('wis') + (1-(attack.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
+    int critRate = (crit - target.getStat('lck')).toInt().clamp(1, 99);
     
     return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
 
