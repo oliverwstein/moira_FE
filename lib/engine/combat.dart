@@ -287,11 +287,9 @@ class Combat extends Component with HasGameRef<MyGame>{
       return;
     }
     // Follow-up attacks based on speed
-    assert(attacker.stats['spe'] != null);
-    assert(defender.stats['spe'] != null);
-    if (attacker.stats['spe']! >= defender.stats['spe']! + 4) {
+    if (attacker.getStat('spe') >= defender.getStat('spe') + 4) {
       makeAttack(vals.atk.damage, vals.atk.accuracy, vals.atk.critRate, vals.atk.fatigue, attacker, defender);
-    } else if (defender.stats['spe']! >= attacker.stats['spe']! + 4) {
+    } else if (defender.getStat('spe') >= attacker.getStat('spe') + 4) {
       makeAttack(vals.def.damage, vals.def.accuracy, vals.def.critRate, vals.def.fatigue, defender, attacker);
     }
   }

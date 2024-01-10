@@ -51,7 +51,7 @@ class Pavise extends Observer {
       // Stage stage = unit.parent as Stage;
       dev.log('${unit.name} has pavise');
       var rng = Random();
-      int activationRate = event.defender.stats['dex']!;
+      int activationRate = event.defender.getStat('dex');
       if (rng.nextInt(100) + 1 <= activationRate) {
         event.combat.damageDealt = 0;
         dev.log('Pavise nullified the blow!');
