@@ -142,7 +142,6 @@ class MyGame extends FlameGame with KeyboardEvents {
   }
 }
 
-enum UnitTeam {blue, red, green, yellow}
 abstract class ScaleObserver {
   void onScaleChanged(double scaleFactor);
 }

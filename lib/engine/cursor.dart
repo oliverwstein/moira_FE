@@ -8,7 +8,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart';
 
 import 'engine.dart';
-class Cursor extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility implements CommandHandler {
   /// Cursor represents the player's cursor in the game world. It extends the PositionComponent,
   /// allowing it to have a position in the game world, and implements CommandHandler for handling
   /// keyboard inputs. The Cursor navigates the game's stage, interacting with tiles and units.
@@ -50,6 +50,11 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
   Cursor() {
     // Initial size, will be updated in onLoad
     tileSize = 16 * MyGame().scaleFactor;
+  }
+  @override
+  void update(double dt) {
+    super.update(dt);
+    isVisible = (gameRef.stage.activeTeam == UnitTeam.blue);
   }
 
   @override

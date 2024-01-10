@@ -22,7 +22,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   List<Unit> units = [];
   List<UnitTeam> teams = UnitTeam.values;
   Map<UnitTeam, Player> playerMap = {};
-  UnitTeam activeTeam = UnitTeam.blue;
+  UnitTeam? activeTeam;
   final Vector2 tilesize = Vector2.all(16);
   Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
@@ -73,6 +73,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
+
   }
   @override
   void update(double dt) {
@@ -115,6 +116,11 @@ class Stage extends Component with HasGameRef<MyGame>{
     return targetList;
   }
 
+  void startStage(){
+    activeTeam = UnitTeam.blue;
+    dev.log('Start the stage!');
+
+  }
   void startTurn() {
     dev.log('Turn $turn');
     dev.log('Start turn for $activeTeam');
@@ -126,7 +132,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     dev.log('End turn for $activeTeam');
 
     if(activeTeam == UnitTeam.blue) turn++;
-    int index = teams.indexOf(activeTeam);
+    int index = teams.indexOf(activeTeam!);
     activeTeam = teams[(index + 1) % teams.length];
     for (var unit in units) {
       unit.toggleCanAct(true);
