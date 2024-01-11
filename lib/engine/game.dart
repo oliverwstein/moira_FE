@@ -50,7 +50,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   EventQueue eventQueue = EventQueue();
   late MaxViewport viewport;
   late Stage stage;
-  late SpriteComponent titleCardSprite;
+  late TitleCard titleCard;
   double _scaleFactor = 1;//2.66;
   final List _observers = [];
   double get scaleFactor => _scaleFactor;
@@ -112,18 +112,12 @@ class MyGame extends FlameGame with KeyboardEvents {
     void update(double dt) {
         super.update(dt);
         eventQueue.update(dt);
-        Vector2 scaleToCanvas = Vector2.all(1/max(titleCardSprite.size.x / canvasSize.x,
-                        titleCardSprite.size.y / canvasSize.y));
-        titleCardSprite.scale = scaleToCanvas;
     }
 
   @override
   Future<void> onLoad() async {
-    final imagesLoader = Images();
-    ui.Image titleCardImage = await imagesLoader.load('title_card.png');
-    titleCardSprite = SpriteComponent.fromImage(titleCardImage);
-    world.add(titleCardSprite);
-    titleCardSprite.anchor = Anchor.center;
+    titleCard = TitleCard();
+    world.add(titleCard);
     await super.onLoad();
     unitMap = await loadUnitData();
     itemMap = await loadItemsData();
@@ -140,13 +134,7 @@ class MyGame extends FlameGame with KeyboardEvents {
     if (event is RawKeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.enter) {
         eventQueue.addEventBatch([CreateStageEvent(this)]);
-        world.remove(titleCardSprite);
-        handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.equal) { // Zoom in
-        scaleFactor *= 1.1;
-        handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.minus) { // Zoom out
-        scaleFactor *= 0.9;
+        world.remove(titleCard);
         handled = true;
       } else {
         handled = stage.keyCommandHandler(event.logicalKey);

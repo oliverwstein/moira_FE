@@ -39,6 +39,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     add(tiles);
     mapTileHeight = tiles.tileMap.map.height;
     mapTileWidth = tiles.tileMap.map.width;
+    mapSize = Vector2(mapTileWidth*16, mapTileHeight*16);
     for (int x = 0; x < mapTileWidth; x++) {
       for (int y = 0; y < mapTileHeight; y++) {
         Point<int> gridCoord = Point(x, y);
@@ -57,7 +58,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     gameRef.addObserver(cursor);
     
     // THIS IS HOW YOU SET THE SIZE OF THE MAXIMUM VISIBLE AREA
-    gameRef.camera.viewport.size = Vector2(mapTileWidth*16, mapTileHeight*16);
+    gameRef.camera.viewport.size = Vector2(16*16, 12*16);
     gameRef.camera.moveTo(cursor.worldPosition);
     gameRef.camera.viewfinder;
     // gameRef.camera.follow(cursor);
@@ -70,7 +71,11 @@ class Stage extends Component with HasGameRef<MyGame>{
   @override
   void update(double dt) {
     super.update(dt);
-    gameRef.camera.viewport.size = Vector2(mapTileWidth*16*gameRef.scaleFactor, mapTileHeight*16*gameRef.scaleFactor);
+    // dev.log("stage ${mapSize}");
+    // gameRef.scaleFactor = max(mapSize.x / gameRef.canvasSize.x,
+    //                     mapSize.y / gameRef.canvasSize.y);
+    // dev.log("stage ${gameRef.scaleFactor}");
+
   }
 
   @override
