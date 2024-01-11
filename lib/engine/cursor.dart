@@ -44,17 +44,17 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   late final ActionMenu actionMenu;
-  Point<int> gridCoord = const Point(59, 12); // The cursor's position in terms of tiles, not pixels
+  Point<int> gridCoord = const Point(35, 20); // The cursor's position in terms of tiles, not pixels
   late double tileSize;
 
   Cursor() {
     // Initial size, will be updated in onLoad
-    tileSize = 16 * MyGame().scaleFactor;
+    tileSize = 16* MyGame().scaleFactor;
   }
   @override
   void update(double dt) {
     super.update(dt);
-    isVisible = (gameRef.stage.activeTeam == UnitTeam.blue);
+    isVisible = true;(gameRef.stage.activeTeam == UnitTeam.blue);
   }
 
   @override
