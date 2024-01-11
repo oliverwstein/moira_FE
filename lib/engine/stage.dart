@@ -56,9 +56,9 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    // activeTeam = UnitTeam.blue;
+    activeTeam = UnitTeam.blue;
     cursor = Cursor();
-    // activeComponent = cursor;
+    activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
     gameRef.camera.viewport = FixedAspectRatioViewport(aspectRatio: 4/3);
@@ -73,7 +73,6 @@ class Stage extends Component with HasGameRef<MyGame>{
     scaling = 1/max(16*16 / gameRef.canvasSize.x,
                         12*16 / gameRef.canvasSize.y);
     tiles.scale = Vector2.all(scaling);
-    cursor.scale = Vector2.all(scaling);
     // TODO: This will cause issues later, but for now,
     // it makes the camera react to changes in scaling
     // without requiring user input to refresh.

@@ -40,7 +40,7 @@ class EventQueue {
 
 class StageCreationEvent extends Event {
   final MyGame game;
-  final List<Event> nextEventBatch;
+  List<Event> nextEventBatch;
   bool _isCompleted = false;
 
   StageCreationEvent(this.game, [this.nextEventBatch = const []]);
@@ -74,7 +74,7 @@ class UnitCreationEvent extends Event {
   final MyGame game;
   final String name;
   final Point<int> gridCoord;
-  final List<Event> nextEventBatch;
+  List<Event> nextEventBatch;
   bool _isCompleted = false;
   final int level;
   late final Unit unit;
@@ -94,6 +94,7 @@ class UnitCreationEvent extends Event {
 
     // Once Stage's onLoad is complete, proceed with further actions
     dev.log("Unit loaded");
+
     _isCompleted = true;
     
     // Add your next event here

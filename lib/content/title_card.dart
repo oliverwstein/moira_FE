@@ -46,7 +46,7 @@ class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility impleme
   bool handleCommand(LogicalKeyboardKey command) {
    bool handled = false;
     if (command == LogicalKeyboardKey.enter) {
-      gameRef.eventQueue.addEventBatch([StageCreationEvent(gameRef)]);
+      gameRef.eventQueue.addEventBatch([StageCreationEvent(gameRef, [UnitCreationEvent(gameRef, "Brigand", const Point(32, 25), [])])]);
       handled = true;
     }
     return handled;

@@ -23,6 +23,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   void update(double dt) {
     super.update(dt);
     isVisible = (gameRef.stage.activeTeam == UnitTeam.blue);
+    scale = Vector2.all(gameRef.stage.scaling);
     size = gameRef.stage.tilesize*gameRef.stage.scaling;
     x = gridCoord.x * size.x;
     y = gridCoord.y * size.y;

@@ -135,7 +135,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   void _postConstruction() {
-    size = gameRef.stage.cursor.size;
     for (Item item in inventory){
       switch (item.type) {
         case ItemType.main:
@@ -172,16 +171,13 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       animation: unitSheet.createAnimation(row: 0, stepTime: .5),
       size: Vector2.all(16), // Use 16 for initial size
     );
-    
-    // Add the animation component as a child
     add(_animationComponent);
 
     // Set the initial size and position of the unit
-    size = gameRef.stage.cursor.size;
+    size = gameRef.stage.tiles.size;
     position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     gameRef.eventDispatcher.add(Announcer(this));
-    // gameRef.eventDispatcher.add(Canto(this));
-
+  
     // Create skills for skillset
     for(String skillName in unitData['skills']){
       Skill skill = Skill.fromJson(skillName, this);
@@ -385,9 +381,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   @override
   void update(double dt) {
     super.update(dt);
+    // I may not need these three lines. 
     size = gameRef.stage.tilesize*gameRef.stage.scaling;
     x = gridCoord.x * size.x;
     y = gridCoord.y * size.y;
+    scale = Vector2.all(gameRef.stage.scaling);
     if(hp <= 0) die();
     if (isMoving && currentTarget != null) {
       // Calculate the pixel position for the target tile position
