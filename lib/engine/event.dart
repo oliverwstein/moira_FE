@@ -2,11 +2,14 @@
 
 import 'dart:collection';
 import 'dart:developer' as dev;
+import 'package:flutter/services.dart';
+
 import 'engine.dart';
 
 abstract class Event {
-  void execute();
-  bool checkComplete();
+  void execute(){}
+  bool checkComplete(){return true;}
+  void handleUserInput(RawKeyEvent event){}
 }
 
 class EventQueue {
@@ -67,65 +70,24 @@ class CreateStageEvent extends Event {
 class TurnStartEvent extends Event {
   final UnitTeam activeTeam;
   TurnStartEvent(this.activeTeam);
-  
-  @override
-  bool checkComplete() {
-    // TODO: implement checkComplete
-    throw UnimplementedError();
-  }
-  
-  @override
-  void execute() {
-    // TODO: implement execute
-  }
+
 }
 
 class UnitCreationEvent extends Event {
   final Unit unit;
   UnitCreationEvent(this.unit);
   
-  @override
-  bool checkComplete() {
-    // TODO: implement checkComplete
-    throw UnimplementedError();
-  }
-  
-  @override
-  void execute() {
-    // TODO: implement execute
-  }
 }
 
 class UnitDeathEvent extends Event {
   final Unit unit;
   UnitDeathEvent(this.unit);
   
-  @override
-  bool checkComplete() {
-    // TODO: implement checkComplete
-    throw UnimplementedError();
-  }
-  
-  @override
-  void execute() {
-    // TODO: implement execute
-  }
 }
 
 class UnitActionEndEvent extends Event {
   final Unit unit;
   UnitActionEndEvent(this.unit);
-  
-  @override
-  bool checkComplete() {
-    // TODO: implement checkComplete
-    throw UnimplementedError();
-  }
-  
-  @override
-  void execute() {
-    // TODO: implement execute
-  }
   
 }
 
@@ -134,33 +96,13 @@ class MakeAttackEvent extends Event {
   final Unit attacker;
   final Unit defender;
   MakeAttackEvent(this.combat, this.attacker, this.defender);
-  
-  @override
-  bool checkComplete() {
-    // TODO: implement checkComplete
-    throw UnimplementedError();
-  }
-  
-  @override
-  void execute() {
-    // TODO: implement execute
-  }
+
 }
 
 class MakeDamageEvent extends Event {
   final Unit unit;
   MakeDamageEvent(this.unit);
   
-  @override
-  bool checkComplete() {
-    // TODO: implement checkComplete
-    throw UnimplementedError();
-  }
-  
-  @override
-  void execute() {
-    // TODO: implement execute
-  }
 }
 
 class EventDispatcher {

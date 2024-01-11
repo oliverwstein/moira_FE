@@ -33,7 +33,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   @override
   Future<void> onLoad() async {
     tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', tilesize);
-    tiles.anchor = Anchor.topLeft;
+    tiles.anchor = Anchor.center;
     tiles.scale = Vector2.all(gameRef.scaleFactor);
     add(tiles);
     mapTileHeight = tiles.tileMap.map.height;
@@ -48,34 +48,36 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    units.add(Unit.fromJSON(const Point(59, 10), 'Arden'));
-    units.add(Unit.fromJSON(const Point(60, 12), 'Alec'));
-    units.add(Unit.fromJSON(const Point(58, 12), 'Noish'));
-    units.add(Unit.fromJSON(const Point(59, 13), 'Sigurd'));
-
-    units.add(Unit.fromJSON(const Point(56, 12), 'Brigand', level: 1));
-    units.add(Unit.fromJSON(const Point(55, 13), 'Brigand', level: 5));
-    units.add(Unit.fromJSON(const Point(55, 11), 'Brigand', level: 10));
-     
-    for (Unit unit in units) {
-      add(unit);
-      tilesMap[unit.gridCoord]?.setUnit(unit);
-      gameRef.addObserver(unit);
-    }
-    units[0].move(this, Point(8, 26));
-    units[1].move(this, Point(8, 25));
-    for (UnitTeam team in UnitTeam.values){
-      if(team != UnitTeam.blue){playerMap[team] = NPCPlayer(team, this);} 
-      else {playerMap[team] = Player(team, this);}
-      dev.log('${playerMap[team]!.team}');
-      add(playerMap[team]!);
-    }
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
-    onLoaded?.call();
+    // gameRef.camera.moveTo(point);
+    
+    // onLoaded?.call();
   }
+    // units.add(Unit.fromJSON(const Point(59, 10), 'Arden'));
+    // units.add(Unit.fromJSON(const Point(60, 12), 'Alec'));
+    // units.add(Unit.fromJSON(const Point(58, 12), 'Noish'));
+    // units.add(Unit.fromJSON(const Point(59, 13), 'Sigurd'));
+
+    // units.add(Unit.fromJSON(const Point(56, 12), 'Brigand', level: 1));
+    // units.add(Unit.fromJSON(const Point(55, 13), 'Brigand', level: 5));
+    // units.add(Unit.fromJSON(const Point(55, 11), 'Brigand', level: 10));
+     
+    // for (Unit unit in units) {
+    //   add(unit);
+    //   tilesMap[unit.gridCoord]?.setUnit(unit);
+    //   gameRef.addObserver(unit);
+    // }
+    // units[0].move(this, Point(8, 26));
+    // units[1].move(this, Point(8, 25));
+    // for (UnitTeam team in UnitTeam.values){
+    //   if(team != UnitTeam.blue){playerMap[team] = NPCPlayer(team, this);} 
+    //   else {playerMap[team] = Player(team, this);}
+    //   dev.log('${playerMap[team]!.team}');
+    //   add(playerMap[team]!);
+    // }
   @override
   void update(double dt) {
     super.update(dt);
@@ -144,12 +146,21 @@ class Stage extends Component with HasGameRef<MyGame>{
     }
     startTurn();
   }
+
+  (String, String) getTileInfo(Point<int> point){
+    int localId = point.y * mapTileWidth + point.x;
+    var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
+    var type = tile?.properties.getProperty("terrain")?.value;
+    var name = tile?.properties.getProperty("name")?.value ?? type;
+    return (type as String, name as String);
+  }
   
+
   Terrain determineTerrainType(Point<int> point){
     int localId = point.y * mapTileWidth + point.x;
     var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
-    var type = tile?.properties.firstOrNull?.value ?? 'neutral';
-    return _stringToTerrain(type as String);
+    var terrain = tile?.properties.getProperty("terrain")?.value;
+    return _stringToTerrain(terrain as String);
   }
   
   Terrain _stringToTerrain(String input) {

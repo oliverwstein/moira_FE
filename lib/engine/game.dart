@@ -7,8 +7,6 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flame/sprite.dart';
-import 'package:flame/src/components/core/component.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'engine.dart';
