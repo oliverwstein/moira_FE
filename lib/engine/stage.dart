@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:math';
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
@@ -41,8 +42,8 @@ class Stage extends Component with HasGameRef<MyGame>{
     mapTileWidth = tiles.tileMap.map.width;
     
     mapSize = Vector2(mapTileWidth*16, mapTileHeight*16);
-    scaling = max(mapSize.x / gameRef.canvasSize.x,
-                        mapSize.y / gameRef.canvasSize.y);
+    scaling = 1/max(16*16 / gameRef.canvasSize.x,
+                        12*16 / gameRef.canvasSize.y);
     tiles.scale = Vector2.all(scaling);
     for (int x = 0; x < mapTileWidth; x++) {
       for (int y = 0; y < mapTileHeight; y++) {
@@ -60,6 +61,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
+    gameRef.camera.viewport = FixedAspectRatioViewport(aspectRatio: 4/3);
     _loadCompleter.complete();
   }
 
@@ -75,7 +77,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     // TODO: This will cause issues later, but for now,
     // it makes the camera react to changes in scaling
     // without requiring user input to refresh.
-    gameRef.camera.moveTo(cursor.worldPosition);
+    gameRef.camera.moveTo(cursor.position);
   }
 
   @override
