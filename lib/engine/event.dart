@@ -58,6 +58,9 @@ class CreateStageEvent extends Event {
     game.addObserver(game.stage);
     _isCompleted = true;
     dev.log("After _isCompleted check");
+    game.screen.removeFromParent();
+    game.screen = game.stage;
+    
     // Add your next event here
     // game.eventQueue.addEventBatch([YourNextEvent()]);
   }

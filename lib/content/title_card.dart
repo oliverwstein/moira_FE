@@ -41,12 +41,14 @@ class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility impleme
     gameRef.removeObserver(this);
     super.onRemove();
   }
-
+  
   @override
   bool handleCommand(LogicalKeyboardKey command) {
-    bool handled = false;
-    handled = true;
+   bool handled = false;
+    if (command == LogicalKeyboardKey.enter) {
+      gameRef.eventQueue.addEventBatch([CreateStageEvent(gameRef)]);
+      handled = true;
+    }
     return handled;
   }
-
 }

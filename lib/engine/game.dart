@@ -48,6 +48,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   /// managed here and delegated to other components like Stage and Unit.
   
   EventQueue eventQueue = EventQueue();
+  late Component screen;
   late MaxViewport viewport;
   late Stage stage;
   late TitleCard titleCard;
@@ -118,6 +119,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   Future<void> onLoad() async {
     titleCard = TitleCard();
     world.add(titleCard);
+    screen = titleCard;
     await super.onLoad();
     unitMap = await loadUnitData();
     itemMap = await loadItemsData();
@@ -132,10 +134,8 @@ class MyGame extends FlameGame with KeyboardEvents {
     bool handled = false;
     // First, handle any game-wide key events (like zooming)
     if (event is RawKeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.enter) {
-        eventQueue.addEventBatch([CreateStageEvent(this)]);
-        world.remove(titleCard);
-        handled = true;
+      if (screen == titleCard){
+        handled = titleCard.handleCommand(event.logicalKey);
       } else {
         handled = stage.keyCommandHandler(event.logicalKey);
       }
