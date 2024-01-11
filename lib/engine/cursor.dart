@@ -23,8 +23,9 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   void update(double dt) {
     super.update(dt);
     isVisible = true;(gameRef.stage.activeTeam == UnitTeam.blue);
-    x = gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling;
-    y = gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling;
+    size = gameRef.stage.tilesize*gameRef.stage.scaling;
+    x = gridCoord.x * size.x;
+    y = gridCoord.y * size.y;
   }
 
   @override
@@ -39,7 +40,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
 
     _animationComponent = SpriteAnimationComponent(
       animation: cursorSheet.createAnimation(row: 0, stepTime: .2),
-      size: gameRef.stage.tilesize, // Use tileSize for initial size
+      size: Vector2.all(16), // Use 16 for initial size
     );
 
     // Add the animation component as a child
@@ -49,11 +50,11 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
 
     // Set the initial size and position of the cursor
     size = gameRef.stage.tilesize*gameRef.stage.scaling;
-    position = Vector2(gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling, gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling);
+    position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
   }
 
   Vector2 get worldPosition {
-        return Vector2(gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling, gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling);
+        return Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     }
 
   void goToUnit(Unit unit){
@@ -63,7 +64,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
 
   void goToCoord(Point<int> point){
     gridCoord = point;
-    position = Vector2(point.x * gameRef.stage.tilesize.x, point.y * gameRef.stage.tilesize.y);
+    position = Vector2(point.x * size.x, point.y * size.y);
   }
 
   void move(Direction direction) {
@@ -98,8 +99,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     dev.log("${gameRef.camera.visibleWorldRect}");
 
     // Update the pixel position of the cursor
-    x = gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling;
-    y = gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling;
+    x = gridCoord.x * size.x;
+    y = gridCoord.y * size.y;
     dev.log('Cursor @ $gridCoord, ${stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${stage.tilesMap[gridCoord]!.isOccupied}, ${stage.tilesMap[gridCoord]!.unit?.canAct}');
   }
   
@@ -186,14 +187,11 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   }
   
   void snapToTile(Point<int> point){
-    x = point.x * gameRef.stage.tilesize.x;
-    y = point.x * gameRef.stage.tilesize.y;
+    x = point.x * size.x;
+    y = point.x * size.y;
   }
   void onScaleChanged(double scaleFactor) {
-    size = gameRef.stage.tilesize; // Update the size of the cursor itself
-    _animationComponent.size = gameRef.stage.tilesize; // Update animation component size
-
-    // Update position based on new tileSize
-    position = Vector2(gridCoord.x * gameRef.stage.tilesize.x, gridCoord.y * gameRef.stage.tilesize.y);
+    // If I let the user change the size of the mapview (in tiles),
+    // this will be needed later.
   }
 }
