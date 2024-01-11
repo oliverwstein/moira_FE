@@ -38,6 +38,37 @@ class EventQueue {
   }
 }
 
+class TitleCardCreationEvent extends Event {
+  final MyGame game;
+  List<Event> nextEventBatch;
+  bool _isCompleted = false;
+
+  TitleCardCreationEvent(this.game, [this.nextEventBatch = const []]);
+
+  @override
+  void execute() async { // Make this method async
+    dev.log("Load the title card");
+    game.titleCard = TitleCard();
+    game.world.add(game.titleCard);
+    game.screen = game.titleCard;
+
+    // Await the completion of Stage's onLoad
+    await game.titleCard.loadCompleted;
+
+    // Once Stage's onLoad is complete, proceed with further actions
+    dev.log("Title Card loaded");
+    _isCompleted = true;
+    
+    // Add your next event here
+    game.eventQueue.addEventBatch(nextEventBatch);
+  }
+
+  @override
+  bool checkComplete() {
+    return _isCompleted;
+  }
+}
+
 class StageCreationEvent extends Event {
   final MyGame game;
   List<Event> nextEventBatch;
@@ -83,7 +114,7 @@ class UnitCreationEvent extends Event {
   @override
   void execute() async { // Make this method async
     dev.log("Create unit $name");
-    if(this.level>0){unit = Unit.fromJSON(gridCoord, name, level:level);}
+    if(level>0){unit = Unit.fromJSON(gridCoord, name, level:level);}
     else {unit = Unit.fromJSON(gridCoord, name);}
     game.stage.add(unit); // Add the unit to the stage
     game.stage.units.add(unit);

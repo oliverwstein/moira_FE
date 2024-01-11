@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flame/cache.dart';
@@ -11,6 +12,7 @@ class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility impleme
   /// allowing it to have a position in the game world, and implements CommandHandler for handling
   /// keyboard inputs. The Cursor navigates the game's stage, interacting with tiles and units.
   late final SpriteComponent _spriteComponent;
+  final Completer<void> _loadCompleter = Completer<void>();
   
   TitleCard();
 
@@ -28,7 +30,10 @@ class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility impleme
     _spriteComponent = SpriteComponent.fromImage(titleCardImage);
     add(_spriteComponent);
     _spriteComponent.anchor = Anchor.center;
+   _loadCompleter.complete();
   }
+
+  Future<void> get loadCompleted => _loadCompleter.future;
 
   @override
   void onMount() {
