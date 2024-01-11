@@ -23,6 +23,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   void update(double dt) {
     super.update(dt);
     isVisible = true;(gameRef.stage.activeTeam == UnitTeam.blue);
+    x = gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling;
+    y = gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling;
   }
 
   @override
@@ -46,12 +48,12 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     add(actionMenu);
 
     // Set the initial size and position of the cursor
-    size = gameRef.stage.tilesize;
-    position = Vector2(gridCoord.x * gameRef.stage.tilesize.x, gridCoord.y * gameRef.stage.tilesize.y);
+    size = gameRef.stage.tilesize*gameRef.stage.scaling;
+    position = Vector2(gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling, gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling);
   }
 
   Vector2 get worldPosition {
-        return Vector2(gridCoord.x * gameRef.stage.tilesize.x, gridCoord.y * gameRef.stage.tilesize.y);
+        return Vector2(gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling, gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling);
     }
 
   void goToUnit(Unit unit){
@@ -96,8 +98,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     dev.log("${gameRef.camera.visibleWorldRect}");
 
     // Update the pixel position of the cursor
-    x = gridCoord.x * gameRef.stage.tilesize.x;
-    y = gridCoord.y * gameRef.stage.tilesize.y;
+    x = gridCoord.x * gameRef.stage.tilesize.x*gameRef.stage.scaling;
+    y = gridCoord.y * gameRef.stage.tilesize.y*gameRef.stage.scaling;
     dev.log('Cursor @ $gridCoord, ${stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${stage.tilesMap[gridCoord]!.isOccupied}, ${stage.tilesMap[gridCoord]!.unit?.canAct}');
   }
   

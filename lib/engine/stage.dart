@@ -21,6 +21,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   late final Vector2 mapSize;
   late final flame_tiled.TiledComponent tiles;
   late final Cursor cursor;
+  late double scaling;
   List<Unit> units = [];
   List<UnitTeam> teams = UnitTeam.values;
   Map<UnitTeam, Player> playerMap = {};
@@ -33,13 +34,16 @@ class Stage extends Component with HasGameRef<MyGame>{
 
   @override
   Future<void> onLoad() async {
-    tilesize = Vector2.all(16*gameRef.scaleFactor);
+    tilesize = Vector2.all(16);
     tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', tilesize);
-    tiles.scale = Vector2.all(gameRef.scaleFactor);
     add(tiles);
     mapTileHeight = tiles.tileMap.map.height;
     mapTileWidth = tiles.tileMap.map.width;
+    
     mapSize = Vector2(mapTileWidth*16, mapTileHeight*16);
+    scaling = max(mapSize.x / gameRef.canvasSize.x,
+                        mapSize.y / gameRef.canvasSize.y);
+    tiles.scale = Vector2.all(scaling);
     for (int x = 0; x < mapTileWidth; x++) {
       for (int y = 0; y < mapTileHeight; y++) {
         Point<int> gridCoord = Point(x, y);
@@ -71,11 +75,10 @@ class Stage extends Component with HasGameRef<MyGame>{
   @override
   void update(double dt) {
     super.update(dt);
-    // dev.log("stage ${mapSize}");
-    // gameRef.scaleFactor = max(mapSize.x / gameRef.canvasSize.x,
-    //                     mapSize.y / gameRef.canvasSize.y);
-    // dev.log("stage ${gameRef.scaleFactor}");
-
+    scaling = 1/max(16*16 / gameRef.canvasSize.x,
+                        12*16 / gameRef.canvasSize.y);
+    tiles.scale = Vector2.all(scaling);
+    cursor.scale = Vector2.all(scaling);
   }
 
   @override
