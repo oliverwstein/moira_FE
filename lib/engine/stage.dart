@@ -72,6 +72,10 @@ class Stage extends Component with HasGameRef<MyGame>{
                         12*16 / gameRef.canvasSize.y);
     tiles.scale = Vector2.all(scaling);
     cursor.scale = Vector2.all(scaling);
+    // TODO: This will cause issues later, but for now,
+    // it makes the camera react to changes in scaling
+    // without requiring user input to refresh.
+    gameRef.camera.moveTo(cursor.worldPosition);
   }
 
   @override
