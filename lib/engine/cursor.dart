@@ -59,7 +59,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
 
   void goToUnit(Unit unit){
     position = Vector2(unit.x, unit.y);
-    gridCoord = Point(unit.x ~/ unit.tileSize, unit.y ~/ unit.tileSize);
+    gridCoord = Point(unit.x ~/ size.x, unit.y ~/ size.y);
   }
 
   void goToCoord(Point<int> point){

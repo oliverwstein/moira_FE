@@ -21,7 +21,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int movementRange;
   late double remainingMovement;
   UnitTeam team = UnitTeam.blue;
-  double tileSize = 16;
 
   // Status and State Variables
   Point<int> gridCoord; // The units's position in terms of tiles, not pixels
@@ -134,7 +133,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   void _postConstruction() {
-    tileSize = 16 * MyGame().scaleFactor;
+    size = gameRef.stage.cursor.size;
     for (Item item in inventory){
       switch (item.type) {
         case ItemType.main:
@@ -169,15 +168,15 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
     _animationComponent = SpriteAnimationComponent(
       animation: unitSheet.createAnimation(row: 0, stepTime: .5),
-      size: Vector2.all(tileSize), // Use tileSize for initial size
+      size: Vector2.all(16), // Use 16 for initial size
     );
     
     // Add the animation component as a child
     add(_animationComponent);
 
     // Set the initial size and position of the unit
-    size = Vector2.all(tileSize);
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+    size = gameRef.stage.cursor.size;
+    position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     gameRef.eventDispatcher.add(Announcer(this));
     // gameRef.eventDispatcher.add(Canto(this));
     gameRef.eventDispatcher.dispatch(UnitCreationEvent(this));
@@ -344,7 +343,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   Vector2 get worldPosition {
-        return Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+        return Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     }
 
   void toggleCanAct(bool state) {
@@ -375,8 +374,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   void snapToTile(Point<int> point){
-    x = point.x * tileSize;
-    y = point.x * tileSize;
+    x = point.x * size.x;
+    y = point.x * size.y;
   }
 
   @override
@@ -386,8 +385,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
     if (isMoving && currentTarget != null) {
       // Calculate the pixel position for the target tile position
-      final targetX = currentTarget!.x * tileSize;
-      final targetY = currentTarget!.y * tileSize;
+      final targetX = currentTarget!.x * size.x;
+      final targetY = currentTarget!.y * size.y;
 
       // Move towards the target position
       var moveX = (targetX - x)*.6;
@@ -413,22 +412,15 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     } else {
     // Check if the gridCoord has changed without the animation
     // and update the sprite's position accordingly
-    final expectedX = gridCoord.x * tileSize;
-    final expectedY = gridCoord.y * tileSize;
+    final expectedX = gridCoord.x * size.x;
+    final expectedY = gridCoord.y * size.y;
     if (x != expectedX || y != expectedY) {
       position = Vector2(expectedX, expectedY); // Snap sprite to the new tile position
     }
   }
   }
   
-  void onScaleChanged(double scaleFactor) {
-    tileSize = 16 * scaleFactor; // Update tileSize
-    size = Vector2.all(tileSize); // Update the size of the unit itself
-    _animationComponent.size = Vector2.all(tileSize); // Update animation component size
-
-    // Update position based on new tileSize
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
-  }
+  void onScaleChanged(double scaleFactor) {}
 
   
   void move(Stage stage, Point<int> destination){
