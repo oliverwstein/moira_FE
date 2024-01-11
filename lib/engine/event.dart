@@ -114,11 +114,11 @@ class UnitCreationEvent extends Event {
   final MyGame game;
   final String name;
   final Point<int> gridCoord;
-  List<Event> nextEventBatch;
+  Point<int>? destination;
   bool _isCompleted = false;
   final int level;
   late final Unit unit;
-  UnitCreationEvent(this.game, this.name, this.gridCoord, [this.nextEventBatch = const [], this.level = -1]);
+  UnitCreationEvent(this.game, this.name, this.gridCoord, [this.level = -1, this.destination]);
 
   @override
   void execute() async { // Make this method async
@@ -134,11 +134,14 @@ class UnitCreationEvent extends Event {
 
     // Once Stage's onLoad is complete, proceed with further actions
     dev.log("Unit loaded");
-
     _isCompleted = true;
-    
+    List<Event> nextEventBatch = [];
+    if(destination != null){
+      nextEventBatch = [UnitMoveEvent(game, unit, destination!)];
+    } 
     // Add your next event here
     game.eventQueue.addEventBatch(nextEventBatch);
+    
   }
   
   @override
@@ -147,6 +150,25 @@ class UnitCreationEvent extends Event {
   }
 }
 
+class UnitMoveEvent extends Event {
+  final MyGame game;
+  final Point<int> gridCoord;
+  bool _isCompleted = false;
+  final Unit unit;
+  UnitMoveEvent(this.game, this.unit, this.gridCoord);
+
+  @override
+  void execute() async { // Make this method async
+    dev.log("Move unit ${unit.name}");
+    // unit.move(game.stage, gridCoord);
+    _isCompleted = true;
+  }
+  
+  @override
+  bool checkComplete() {
+    return _isCompleted;
+  }
+}
 
 
 class TurnStartEvent extends Event {

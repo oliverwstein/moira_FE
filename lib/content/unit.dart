@@ -398,7 +398,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
       x += moveX;
       y += moveY;
-      gameRef.stage.cursor.goToUnit(this);
+      // gameRef.stage.cursor.goToUnit(this);
       // Check if the unit is close enough to the target position to snap it
       if ((x - targetX).abs() < 1 && (y - targetY).abs() < 1) {
         x = targetX; // Snap to exact position
@@ -433,6 +433,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       paths[destination] = getPath(destination);
     }
     for(Point<int> point in paths[destination]!){
+      dev.log("enqueueMovement($point);");
       enqueueMovement(point);
       moveCost += stage.tilesMap[point]!.getTerrainCost();
     }

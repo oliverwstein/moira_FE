@@ -92,7 +92,9 @@ class MyGame extends FlameGame with KeyboardEvents {
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
     eventQueue.addEventBatch([TitleCardCreationEvent(this, [])]);
-    eventQueue.addEventBatch([StageCreationEvent(this, [UnitCreationEvent(this, "Brigand", const Point(32, 25), [])])]);
+    eventQueue.addEventBatch([StageCreationEvent(this, [])]);
+
+    eventQueue.addEventBatch([UnitCreationEvent(this, "Brigand", const Point(24, 22), -1, Point(34, 26))]);
   }
 
   @override

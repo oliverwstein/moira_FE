@@ -56,9 +56,9 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    activeTeam = UnitTeam.blue;
+    // activeTeam = UnitTeam.blue;
     cursor = Cursor();
-    activeComponent = this; // Until you want to let the player do something 
+    activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
     gameRef.camera.viewport = FixedAspectRatioViewport(aspectRatio: 4/3);
