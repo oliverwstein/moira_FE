@@ -60,13 +60,6 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
-    
-    // THIS IS HOW YOU SET THE SIZE OF THE MAXIMUM VISIBLE AREA
-    gameRef.camera.viewport.size = Vector2(16*16, 12*16);
-    gameRef.camera.moveTo(cursor.worldPosition);
-    gameRef.camera.viewfinder;
-    // gameRef.camera.follow(cursor);
-    dev.log("Test");
     _loadCompleter.complete();
   }
 
