@@ -49,7 +49,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   late MaxViewport viewport;
   late Stage stage;
   late SpriteComponent titleCardSprite;
-  double _scaleFactor = 2;
+  double _scaleFactor = 2.66;
   final List _observers = [];
   double get scaleFactor => _scaleFactor;
   static late Map<String, dynamic> unitMap;

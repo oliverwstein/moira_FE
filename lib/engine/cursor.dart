@@ -44,7 +44,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   late final ActionMenu actionMenu;
-  Point<int> gridCoord = const Point(35, 20); // The cursor's position in terms of tiles, not pixels
+  Point<int> gridCoord = const Point(32, 25); // The cursor's position in terms of tiles, not pixels
   late double tileSize;
 
   Cursor() {
