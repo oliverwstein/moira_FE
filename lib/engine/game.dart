@@ -113,6 +113,7 @@ class MyGame extends FlameGame with KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
+    camera = CameraComponent.withFixedResolution(width: 800, height: 600);
     final imagesLoader = Images();
     ui.Image titleCardImage = await imagesLoader.load('title_card.png');
     SpriteComponent titleCardSprite = SpriteComponent.fromImage(titleCardImage);
