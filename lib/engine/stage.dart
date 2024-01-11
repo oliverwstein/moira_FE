@@ -49,10 +49,12 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
+
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
+    
     // gameRef.camera.moveTo(point);
     
     // onLoaded?.call();
@@ -170,7 +172,7 @@ class Stage extends Component with HasGameRef<MyGame>{
       for (var terrain in Terrain.values) terrain.toString().split('.').last: terrain,
     };
     // Perform the lookup and return
-    return stringToTerrain[input] ?? Terrain.plain;
+    return stringToTerrain[input.toLowerCase()] ?? Terrain.plain;
   }
 
   bool keyCommandHandler(LogicalKeyboardKey command) {

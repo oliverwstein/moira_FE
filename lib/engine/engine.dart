@@ -19,7 +19,7 @@ export 'tile.dart';
 enum Direction {up, down, left, right}
 enum UnitTeam {blue, red, green, yellow}
 enum TileState {blank, move, attack}
-enum Terrain {forest, path, cliff, sea, stream, plain}
+enum Terrain {forest, path, cliff, sea, stream, fort, plain}
 enum ItemType {main, gear, treasure, basic}
 extension TerrainCost on Terrain {
   double get cost {
