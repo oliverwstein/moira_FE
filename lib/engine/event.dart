@@ -2,6 +2,7 @@
 
 import 'dart:collection';
 import 'dart:developer' as dev;
+import 'dart:math';
 import 'package:flutter/services.dart';
 
 import 'engine.dart';
@@ -53,10 +54,11 @@ class CreateStageEvent extends Event {
       game.addObserver(game.stage);
       game.camera.follow(game.stage.cursor);
       _isCompleted = true; // Set to true once loading is complete
-      game.world.remove(game.world.children.first);
+      
     };
 
     // Add the stage to the game
+    game.world.removeAll(game.world.children.toList());
     game.world.add(game.stage);
   }
 

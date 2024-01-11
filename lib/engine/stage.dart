@@ -24,7 +24,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   List<UnitTeam> teams = UnitTeam.values;
   Map<UnitTeam, Player> playerMap = {};
   UnitTeam? activeTeam;
-  final Vector2 tilesize = Vector2.all(16);
+  Vector2 tilesize = Vector2.all(16);
   Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
   int turn = 1;
@@ -32,8 +32,17 @@ class Stage extends Component with HasGameRef<MyGame>{
 
   @override
   Future<void> onLoad() async {
+    Vector2 windowSize = gameRef.size;
+
+    double tileSizeValue = min(windowSize.x / 16, windowSize.y / 12);
+    tilesize = Vector2.all(tileSizeValue);
+
+    for (var tile in tilesMap.values) {
+      tile.size = tilesize;
+    }
+    
     tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', tilesize);
-    tiles.anchor = Anchor.center;
+    // tiles.anchor = Anchor.center;
     tiles.scale = Vector2.all(gameRef.scaleFactor);
     add(tiles);
     mapTileHeight = tiles.tileMap.map.height;
@@ -54,11 +63,12 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
+    gameRef.camera.viewport.size = Vector2(mapTileWidth*16, mapTileHeight*16);
 
-    Point<int> jungbyPoint = findTilePoint("Jungby", Terrain.fort)!;
-    dev.log("${tilesMap[jungbyPoint]!.name}, ${tilesMap[jungbyPoint]!.terrain}");
-    cursor.goToCoord(jungbyPoint);
-    activeTeam == UnitTeam.blue;
+    // Point<int> jungbyPoint = findTilePoint("Jungby", Terrain.fort)!;
+    // dev.log("${tilesMap[jungbyPoint]!.name}, ${tilesMap[jungbyPoint]!.terrain}");
+    // cursor.goToCoord(jungbyPoint);
+    // activeTeam == UnitTeam.blue;
     // onLoaded?.call();
   }
     // units.add(Unit.fromJSON(const Point(59, 10), 'Arden'));

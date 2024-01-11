@@ -113,8 +113,6 @@ class MyGame extends FlameGame with KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
-    viewport = MaxViewport();
-    camera.viewport = viewport;
     final imagesLoader = Images();
     ui.Image titleCardImage = await imagesLoader.load('title_card.png');
     SpriteComponent titleCardSprite = SpriteComponent.fromImage(titleCardImage);
@@ -127,12 +125,6 @@ class MyGame extends FlameGame with KeyboardEvents {
     attackMap = await loadAttacksData();
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
-    
-    
-    // stage = Stage();
-    // await world.add(stage);
-    // addObserver(stage);
-    // camera.follow(stage.cursor);
   }
 
   @override
