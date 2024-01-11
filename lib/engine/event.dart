@@ -53,6 +53,7 @@ class CreateStageEvent extends Event {
       game.addObserver(game.stage);
       game.camera.follow(game.stage.cursor);
       _isCompleted = true; // Set to true once loading is complete
+      game.world.remove(game.world.children.first);
     };
 
     // Add the stage to the game

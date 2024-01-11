@@ -90,6 +90,12 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     position = Vector2(unit.x, unit.y);
     gridCoord = Point(unit.x ~/ unit.tileSize, unit.y ~/ unit.tileSize);
   }
+
+  void goToCoord(Point<int> point){
+    gridCoord = point;
+    position = Vector2(point.x*tileSize, point.y*tileSize);
+  }
+
   void move(Direction direction) {
     // Assuming parent is always a Stage which is the case in this architecture
     Stage stage = parent as Stage;

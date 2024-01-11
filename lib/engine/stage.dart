@@ -54,9 +54,11 @@ class Stage extends Component with HasGameRef<MyGame>{
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
-    
-    // gameRef.camera.moveTo(point);
-    
+
+    Point<int> jungbyPoint = findTilePoint("Jungby", Terrain.fort)!;
+    dev.log("${tilesMap[jungbyPoint]!.name}, ${tilesMap[jungbyPoint]!.terrain}");
+    cursor.goToCoord(jungbyPoint);
+    activeTeam == UnitTeam.blue;
     // onLoaded?.call();
   }
     // units.add(Unit.fromJSON(const Point(59, 10), 'Arden'));
@@ -174,6 +176,18 @@ class Stage extends Component with HasGameRef<MyGame>{
     // Perform the lookup and return
     return stringToTerrain[input.toLowerCase()] ?? Terrain.plain;
   }
+
+  Point<int>? findTilePoint(String name, Terrain terrain) {
+  try {
+    return tilesMap.entries
+        .firstWhere(
+            (entry) => entry.value.name == name && entry.value.terrain == terrain)
+        .key;
+  } on StateError {
+    // No tile found that matches the criteria
+    return null;
+  }
+}
 
   bool keyCommandHandler(LogicalKeyboardKey command) {
     if (activeComponent is CommandHandler) {
