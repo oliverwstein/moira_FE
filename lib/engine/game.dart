@@ -1,5 +1,7 @@
 // ignore_for_file: unnecessary_overrides
 import 'dart:convert';
+import 'dart:developer' as dev;
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flame/cache.dart';
@@ -49,7 +51,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   late MaxViewport viewport;
   late Stage stage;
   late SpriteComponent titleCardSprite;
-  double _scaleFactor = 2.66;
+  double _scaleFactor = 1;//2.66;
   final List _observers = [];
   double get scaleFactor => _scaleFactor;
   static late Map<String, dynamic> unitMap;
@@ -110,6 +112,9 @@ class MyGame extends FlameGame with KeyboardEvents {
     void update(double dt) {
         super.update(dt);
         eventQueue.update(dt);
+        Vector2 scaleToCanvas = Vector2.all(1/max(titleCardSprite.size.x / canvasSize.x,
+                        titleCardSprite.size.y / canvasSize.y));
+        titleCardSprite.scale = scaleToCanvas;
     }
 
   @override

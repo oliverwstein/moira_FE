@@ -25,7 +25,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   List<UnitTeam> teams = UnitTeam.values;
   Map<UnitTeam, Player> playerMap = {};
   UnitTeam? activeTeam;
-  Vector2 tilesize = Vector2.all(16);
+  late Vector2 tilesize;
   Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
   int turn = 1;
@@ -33,7 +33,8 @@ class Stage extends Component with HasGameRef<MyGame>{
 
   @override
   Future<void> onLoad() async {
-    tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', Vector2.all(16));
+    tilesize = Vector2.all(16*gameRef.scaleFactor);
+    tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', tilesize);
     tiles.scale = Vector2.all(gameRef.scaleFactor);
     add(tiles);
     mapTileHeight = tiles.tileMap.map.height;
@@ -57,7 +58,9 @@ class Stage extends Component with HasGameRef<MyGame>{
     
     // THIS IS HOW YOU SET THE SIZE OF THE MAXIMUM VISIBLE AREA
     gameRef.camera.viewport.size = Vector2(mapTileWidth*16, mapTileHeight*16);
-    gameRef.camera.follow(cursor);
+    gameRef.camera.moveTo(cursor.worldPosition);
+    gameRef.camera.viewfinder;
+    // gameRef.camera.follow(cursor);
     dev.log("Test");
     _loadCompleter.complete();
   }
@@ -67,6 +70,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   @override
   void update(double dt) {
     super.update(dt);
+    gameRef.camera.viewport.size = Vector2(mapTileWidth*16*gameRef.scaleFactor, mapTileHeight*16*gameRef.scaleFactor);
   }
 
   @override
