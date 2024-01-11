@@ -38,11 +38,12 @@ class EventQueue {
   }
 }
 
-class CreateStageEvent extends Event {
+class StageCreationEvent extends Event {
   final MyGame game;
+  final List<Event> nextEventBatch;
   bool _isCompleted = false;
 
-  CreateStageEvent(this.game);
+  StageCreationEvent(this.game, [this.nextEventBatch = const []]);
 
   @override
   void execute() async { // Make this method async
@@ -55,16 +56,50 @@ class CreateStageEvent extends Event {
 
     // Once Stage's onLoad is complete, proceed with further actions
     dev.log("Stage loaded");
-    game.addObserver(game.stage);
     _isCompleted = true;
-    dev.log("After _isCompleted check");
     game.screen.removeFromParent();
     game.screen = game.stage;
     
     // Add your next event here
-    // game.eventQueue.addEventBatch([YourNextEvent()]);
+    game.eventQueue.addEventBatch(nextEventBatch);
   }
 
+  @override
+  bool checkComplete() {
+    return _isCompleted;
+  }
+}
+
+class UnitCreationEvent extends Event {
+  final MyGame game;
+  final String name;
+  final Point<int> gridCoord;
+  final List<Event> nextEventBatch;
+  bool _isCompleted = false;
+  final int level;
+  late final Unit unit;
+  UnitCreationEvent(this.game, this.name, this.gridCoord, [this.nextEventBatch = const [], this.level = -1]);
+
+  @override
+  void execute() async { // Make this method async
+    dev.log("Create unit $name");
+    if(this.level>0){unit = Unit.fromJSON(gridCoord, name, level:level);}
+    else {unit = Unit.fromJSON(gridCoord, name);}
+    game.stage.add(unit); // Add the unit to the stage
+    game.stage.units.add(unit);
+    game.stage.tilesMap[gridCoord]!.setUnit(unit);
+
+    // Await the completion of unit's onLoad
+    await unit.loadCompleted;
+
+    // Once Stage's onLoad is complete, proceed with further actions
+    dev.log("Unit loaded");
+    _isCompleted = true;
+    
+    // Add your next event here
+    game.eventQueue.addEventBatch(nextEventBatch);
+  }
+  
   @override
   bool checkComplete() {
     return _isCompleted;
@@ -79,11 +114,7 @@ class TurnStartEvent extends Event {
 
 }
 
-class UnitCreationEvent extends Event {
-  final Unit unit;
-  UnitCreationEvent(this.unit);
-  
-}
+
 
 class UnitDeathEvent extends Event {
   final Unit unit;

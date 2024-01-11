@@ -1,6 +1,7 @@
 
 // ignore_for_file: unused_import
 
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer' as dev;
@@ -35,6 +36,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Map<Point<int>, List<Point<int>>> paths = {};
 
   // Components and External References
+  final Completer<void> _loadCompleter = Completer<void>();
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final ActionMenu actionMenu;
@@ -179,14 +181,16 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     gameRef.eventDispatcher.add(Announcer(this));
     // gameRef.eventDispatcher.add(Canto(this));
-    gameRef.eventDispatcher.dispatch(UnitCreationEvent(this));
 
     // Create skills for skillset
     for(String skillName in unitData['skills']){
       Skill skill = Skill.fromJson(skillName, this);
       skill.attachToUnit(this, gameRef.eventDispatcher);
     }
+    _loadCompleter.complete();
   }
+
+  Future<void> get loadCompleted => _loadCompleter.future;
   
   @override
   bool handleCommand(LogicalKeyboardKey command) {
