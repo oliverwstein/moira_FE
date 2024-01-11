@@ -1,4 +1,5 @@
 // ignore_for_file: unnecessary_overrides
+import 'dart:async';
 import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:math';
@@ -14,7 +15,7 @@ class Stage extends Component with HasGameRef<MyGame>{
   /// game map, including tiles, units, and the cursor. It interfaces with the 
   /// game's TiledComponent to render the map and holds the logic for the game's 
   /// terrain, unit positioning, and active components like cursor or units.
-  VoidCallback? onLoaded;
+  final Completer<void> _loadCompleter = Completer<void>();
   late final int mapTileWidth;
   late final int mapTileHeight;
   late final Vector2 mapSize;
@@ -49,42 +50,18 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
     // THIS IS HOW YOU SET THE SIZE OF THE MAXIMUM VISIBLE AREA
     gameRef.camera.viewport.size = Vector2(mapTileWidth*16, mapTileHeight*16);
-
-    // Point<int> jungbyPoint = findTilePoint("Jungby", Terrain.fort)!;
-    // dev.log("${tilesMap[jungbyPoint]!.name}, ${tilesMap[jungbyPoint]!.terrain}");
-    // cursor.goToCoord(jungbyPoint);
-    // activeTeam == UnitTeam.blue;
-    // onLoaded?.call();
+    dev.log("Test");
+    _loadCompleter.complete();
   }
-    // units.add(Unit.fromJSON(const Point(59, 10), 'Arden'));
-    // units.add(Unit.fromJSON(const Point(60, 12), 'Alec'));
-    // units.add(Unit.fromJSON(const Point(58, 12), 'Noish'));
-    // units.add(Unit.fromJSON(const Point(59, 13), 'Sigurd'));
 
-    // units.add(Unit.fromJSON(const Point(56, 12), 'Brigand', level: 1));
-    // units.add(Unit.fromJSON(const Point(55, 13), 'Brigand', level: 5));
-    // units.add(Unit.fromJSON(const Point(55, 11), 'Brigand', level: 10));
-     
-    // for (Unit unit in units) {
-    //   add(unit);
-    //   tilesMap[unit.gridCoord]?.setUnit(unit);
-    //   gameRef.addObserver(unit);
-    // }
-    // units[0].move(this, Point(8, 26));
-    // units[1].move(this, Point(8, 25));
-    // for (UnitTeam team in UnitTeam.values){
-    //   if(team != UnitTeam.blue){playerMap[team] = NPCPlayer(team, this);} 
-    //   else {playerMap[team] = Player(team, this);}
-    //   dev.log('${playerMap[team]!.team}');
-    //   add(playerMap[team]!);
-    // }
+  Future<void> get loadCompleted => _loadCompleter.future;
+  
   @override
   void update(double dt) {
     super.update(dt);

@@ -45,29 +45,29 @@ class CreateStageEvent extends Event {
   CreateStageEvent(this.game);
 
   @override
-  void execute() {
-    // Create a new Stage instance
+  void execute() async { // Make this method async
+    dev.log("Load the stage");
     game.stage = Stage();
+    game.world.add(game.stage); // Add the stage to the game world
 
-    // Set the callback
-    game.stage.onLoaded = () {
-      game.addObserver(game.stage);
-      game.camera.follow(game.stage.cursor);
-      _isCompleted = true; // Set to true once loading is complete
-      
-    };
+    // Await the completion of Stage's onLoad
+    await game.stage.loadCompleted;
 
-    // Add the stage to the game
-    game.world.removeAll(game.world.children.toList());
-    game.world.add(game.stage);
+    // Once Stage's onLoad is complete, proceed with further actions
+    dev.log("Stage loaded");
+    game.addObserver(game.stage);
+    _isCompleted = true;
+    dev.log("After _isCompleted check");
+    // Add your next event here
+    // game.eventQueue.addEventBatch([YourNextEvent()]);
   }
 
   @override
   bool checkComplete() {
-    // Checks if the stage has finished loading
     return _isCompleted;
   }
 }
+
 
 
 class TurnStartEvent extends Event {
