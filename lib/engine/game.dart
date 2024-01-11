@@ -92,17 +92,21 @@ class MyGame extends FlameGame with KeyboardEvents {
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
     eventQueue.addEventBatch([TitleCardCreationEvent(this, [])]);
+    eventQueue.addEventBatch([StageCreationEvent(this, [UnitCreationEvent(this, "Brigand", const Point(32, 25), [])])]);
   }
 
   @override
-  KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
     // First, handle any game-wide key events (like zooming)
-    if (event is RawKeyDownEvent) {
-      if (screen == titleCard){
-        handled = titleCard.handleCommand(event.logicalKey);
-      } else {
-        handled = stage.keyCommandHandler(event.logicalKey);
+    // Check if there is an event being processed and if it handles the user input
+    if (eventQueue.isProcessing() && key is RawKeyDownEvent) {
+      for (var event in eventQueue.currentBatch()) {
+        event.handleUserInput(key);
+        if (event.checkComplete()) {
+          handled = true;
+          break;
+        }
       }
     }
     return handled ? KeyEventResult.handled : KeyEventResult.ignored;

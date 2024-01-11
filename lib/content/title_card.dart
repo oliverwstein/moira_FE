@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 
 import '../engine/engine.dart';
 
-class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility implements CommandHandler {
+class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility{
   /// Cursor represents the player's cursor in the game world. It extends the PositionComponent,
   /// allowing it to have a position in the game world, and implements CommandHandler for handling
   /// keyboard inputs. The Cursor navigates the game's stage, interacting with tiles and units.
@@ -47,13 +47,4 @@ class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility impleme
     super.onRemove();
   }
   
-  @override
-  bool handleCommand(LogicalKeyboardKey command) {
-   bool handled = false;
-    if (command == LogicalKeyboardKey.enter) {
-      gameRef.eventQueue.addEventBatch([StageCreationEvent(gameRef, [UnitCreationEvent(gameRef, "Brigand", const Point(32, 25), [])])]);
-      handled = true;
-    }
-    return handled;
-  }
 }

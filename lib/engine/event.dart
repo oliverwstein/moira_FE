@@ -7,12 +7,6 @@ import 'package:flutter/services.dart';
 
 import 'engine.dart';
 
-abstract class Event {
-  void execute(){}
-  bool checkComplete(){return true;}
-  void handleUserInput(RawKeyEvent event){}
-}
-
 class EventQueue {
   Queue<List<Event>> _eventBatches = Queue<List<Event>>();
   List<Event> _currentBatch = [];
@@ -22,6 +16,13 @@ class EventQueue {
     _eventBatches.add(eventBatch);
   }
 
+  bool isProcessing(){
+    return _isProcessing;
+  }
+
+  List<Event> currentBatch(){
+    return _currentBatch;
+  }
   void update(double dt) {
     if (_isProcessing && _currentBatch.every((event) => event.checkComplete())) {
       _isProcessing = false;
@@ -38,11 +39,16 @@ class EventQueue {
   }
 }
 
+abstract class Event {
+  void execute(){}
+  bool checkComplete(){return true;}
+  void handleUserInput(RawKeyEvent event){}
+}
+
 class TitleCardCreationEvent extends Event {
   final MyGame game;
   List<Event> nextEventBatch;
   bool _isCompleted = false;
-
   TitleCardCreationEvent(this.game, [this.nextEventBatch = const []]);
 
   @override
@@ -57,9 +63,12 @@ class TitleCardCreationEvent extends Event {
 
     // Once Stage's onLoad is complete, proceed with further actions
     dev.log("Title Card loaded");
+  }
+
+  @override
+  void handleUserInput(RawKeyEvent event) {
+    // You can customize this condition based on your specific requirement
     _isCompleted = true;
-    
-    // Add your next event here
     game.eventQueue.addEventBatch(nextEventBatch);
   }
 
