@@ -42,7 +42,8 @@ class Stage extends Component with HasGameRef<MyGame>{
       for (int y = 0; y < mapTileHeight; y++) {
         Point<int> gridCoord = Point(x, y);
         Terrain terrain = determineTerrainType(gridCoord);
-        Tile tile = Tile(gridCoord, terrain);
+        String name = getTileName(gridCoord);
+        Tile tile = Tile(gridCoord, terrain, name);
         add(tile);
         gameRef.addObserver(tile);
         tilesMap[Point(x, y)] = tile;
@@ -147,12 +148,12 @@ class Stage extends Component with HasGameRef<MyGame>{
     startTurn();
   }
 
-  (String, String) getTileInfo(Point<int> point){
+  String getTileName(Point<int> point){
     int localId = point.y * mapTileWidth + point.x;
     var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
     var type = tile?.properties.getProperty("terrain")?.value;
     var name = tile?.properties.getProperty("name")?.value ?? type;
-    return (type as String, name as String);
+    return name as String;
   }
   
 
@@ -169,7 +170,7 @@ class Stage extends Component with HasGameRef<MyGame>{
       for (var terrain in Terrain.values) terrain.toString().split('.').last: terrain,
     };
     // Perform the lookup and return
-    return stringToTerrain[input] ?? Terrain.neutral;
+    return stringToTerrain[input] ?? Terrain.plain;
   }
 
   bool keyCommandHandler(LogicalKeyboardKey command) {
