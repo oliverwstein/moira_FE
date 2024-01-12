@@ -43,8 +43,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
       final targetY = targetPoint.y * size.y;
 
       // Smoothly move towards the target position
-      var moveX = (targetX - x) * 12 * dt; // Adjust speed as needed
-      var moveY = (targetY - y) * 12 * dt;
+      var moveX = (targetX - x) * 16 * dt; // Adjust speed as needed
+      var moveY = (targetY - y) * 16 * dt;
 
       x += moveX;
       y += moveY;
@@ -92,6 +92,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   if (newX != gridCoord.x || newY != gridCoord.y) {
     movementQueue.add(direction);
   }
+  dev.log("Cursor @ ${gridCoord}");
 }
 
   bool shouldCameraMove(double moveX, double moveY) {
@@ -175,7 +176,6 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   void panToTile(Point<int> destination) {
     int deltaX = destination.x - gridCoord.x;
     int deltaY = destination.y - gridCoord.y;
-
     // Alternate between horizontal and vertical movements
     while (deltaX != 0 || deltaY != 0) {
       if (deltaX > 0) {

@@ -396,8 +396,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
       x += moveX;
       y += moveY;
-      // dev.log("$gridCoord, $x, $y");
-      // gameRef.stage.cursor.goToUnit(this);
       // Check if the unit is close enough to the target position to snap it
       if ((x - targetX).abs() < 1 && (y - targetY).abs() < 1) {
         x = targetX; // Snap to exact position

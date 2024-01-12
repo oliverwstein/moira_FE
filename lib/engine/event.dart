@@ -28,7 +28,7 @@ class EventQueue {
   void executeCurrentBatch() {
     // Execute each event in the current batch
     for (var event in _currentBatch) {
-      event.execute();
+        event.execute();
     }
   }
 
@@ -39,9 +39,9 @@ class EventQueue {
         // and allow EventQueue to go on to the next batch.
         _isProcessing = false;
         _currentBatch.clear();
-      } else if (!_currentBatch.every((event) => event.checkStarted())){ 
+      } else if (_currentBatch.every((event) => !event.checkStarted())){ 
         // Checks if the batch has only elements that have not begun.
-        // Used for dealing with batches that create new batches. 
+        // Used for dealing with batches that create new batches.
         executeCurrentBatch();
       }
     }
@@ -58,7 +58,8 @@ class EventQueue {
 abstract class Event {
   String get type => "Generic";
   void execute(){}
-  bool checkStarted(){return true;}
+  bool _isStarted = false;
+  bool checkStarted(){return _isStarted;}
   bool checkComplete(){return true;}
   void handleUserInput(RawKeyEvent event){}
 }
@@ -69,10 +70,12 @@ class TitleCardCreationEvent extends Event {
   final MyGame game;
   List<Event> nextEventBatch;
   bool _isCompleted = false;
+  bool _isStarted = false;
   TitleCardCreationEvent(this.game, [this.nextEventBatch = const []]);
 
   @override
   void execute() async { // Make this method async
+    _isStarted = true;
     dev.log("Load the title card");
     game.titleCard = TitleCard();
     game.world.add(game.titleCard);
@@ -96,6 +99,12 @@ class TitleCardCreationEvent extends Event {
   bool checkComplete() {
     return _isCompleted;
   }
+  @override
+  bool checkStarted() {
+    return _isStarted;
+  }
+
+  
 }
 
 class StageCreationEvent extends Event {
@@ -104,11 +113,13 @@ class StageCreationEvent extends Event {
   final MyGame game;
   List<Event> nextEventBatch;
   bool _isCompleted = false;
+  bool _isStarted = false;
 
   StageCreationEvent(this.game, [this.nextEventBatch = const []]);
 
   @override
   Future<Stage> execute() async { // Make this method async
+    _isStarted = true;
     dev.log("Load the stage");
     game.stage = Stage();
     game.world.add(game.stage); // Add the stage to the game world
@@ -162,8 +173,11 @@ class UnitCreationEvent extends Event {
     // Mark as completed once the unit has finished being created.
     _isCompleted = true;
     // Move the unit to its destination
-    game.eventQueue.currentBatch().add(UnitMoveEvent(game, unit, destination));
-    game.eventQueue.currentBatch().remove(this);
+    if(destination != gridCoord) {
+      game.eventQueue.currentBatch().add(UnitMoveEvent(game, unit, destination));
+      game.eventQueue.currentBatch().remove(this);
+    }
+    
     return unit;
   }
   
@@ -214,13 +228,13 @@ class CursorMoveEvent extends Event {
   final MyGame game;
   final Point<int> gridCoord;
   bool _isCompleted = false;
-  bool _isStarted = false;
+  bool _isStarted = true;
   CursorMoveEvent(this.game, this.gridCoord);
 
   @override
   void execute() async { // Make this method async
     _isStarted = true;
-    dev.log("Move cursor to $gridCoord");
+    dev.log("Move cursor to $gridCoord from ${game.stage.cursor.gridCoord}");
     game.stage.cursor.panToTile(gridCoord);
   }
   
@@ -234,6 +248,7 @@ class CursorMoveEvent extends Event {
     return _isStarted;
   }
 }
+
 class TurnStartEvent extends Event {
   final UnitTeam activeTeam;
   TurnStartEvent(this.activeTeam);

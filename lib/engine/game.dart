@@ -104,12 +104,18 @@ class MyGame extends FlameGame with KeyboardEvents {
       UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(35, 26)),
       UnitCreationEvent(this, "Brigand", const Point(21, 19), 1, Point(27, 27)),]);
     eventQueue.addEventBatch([
-      UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(36, 21)),
-      UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 20)),
-      UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(36, 19)),
+      UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(36, 20)),
+      UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 19)),
+      UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(36, 18)),
       UnitCreationEvent(this, "Brigand", const Point(20, 22), 1, Point(32, 25)),
       UnitCreationEvent(this, "Brigand", const Point(20, 22), 5, Point(33, 26)),]);
-    eventQueue.addEventBatch([CursorMoveEvent(this, Point(59, 12))]);
+    eventQueue.addEventBatch([
+      CursorMoveEvent(this, Point(59, 12)),
+      UnitCreationEvent(this, "Brigand", const Point(42, 20), 1, Point(41, 20)),
+      UnitCreationEvent(this, "Brigand", const Point(42, 23), 5, Point(41, 23)),
+      UnitCreationEvent(this, "Brigand", const Point(42, 21), 1, Point(46, 21)),
+      UnitCreationEvent(this, "Brigand", const Point(42, 20), 1, Point(45, 22)),
+      UnitCreationEvent(this, "Brigand", const Point(42, 22), 1, Point(42, 26))]);
   }
 
   @override
