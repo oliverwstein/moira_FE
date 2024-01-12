@@ -171,6 +171,33 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     y = point.y * size.y;
     gridCoord = point;
   }
+  void panToTile(Point<int> destination) {
+  int deltaX = destination.x - gridCoord.x;
+  int deltaY = destination.y - gridCoord.y;
+
+  // Add horizontal movements
+  while (deltaX != 0) {
+    if (deltaX > 0) {
+      movementQueue.add(Direction.right);
+      deltaX--;
+    } else {
+      movementQueue.add(Direction.left);
+      deltaX++;
+    }
+  }
+
+  // Add vertical movements
+  while (deltaY != 0) {
+    if (deltaY > 0) {
+      movementQueue.add(Direction.down);
+      deltaY--;
+    } else {
+      movementQueue.add(Direction.up);
+      deltaY++;
+    }
+  }
+}
+
   void select() {
   if (parent is Stage) {
     Stage stage = parent as Stage;

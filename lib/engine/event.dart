@@ -108,7 +108,7 @@ class StageCreationEvent extends Event {
   StageCreationEvent(this.game, [this.nextEventBatch = const []]);
 
   @override
-  void execute() async { // Make this method async
+  Future<Stage> execute() async { // Make this method async
     dev.log("Load the stage");
     game.stage = Stage();
     game.world.add(game.stage); // Add the stage to the game world
@@ -124,6 +124,7 @@ class StageCreationEvent extends Event {
     
     // Add your next event here
     game.eventQueue.addEventBatch(nextEventBatch);
+    return game.stage;
   }
 
   @override
@@ -147,7 +148,7 @@ class UnitCreationEvent extends Event {
   UnitCreationEvent(this.game, this.name, this.gridCoord, this.level, this.destination);
 
   @override
-  void execute() async {
+  Future<Unit> execute() async {
     _isStarted = true;
     dev.log("Create unit $name");
     unit = level > 0 ? Unit.fromJSON(gridCoord, name, level: level) : Unit.fromJSON(gridCoord, name);
@@ -163,7 +164,7 @@ class UnitCreationEvent extends Event {
     // Move the unit to its destination
     game.eventQueue.currentBatch().add(UnitMoveEvent(game, unit, destination));
     game.eventQueue.currentBatch().remove(this);
-
+    return unit;
   }
   
   @override
@@ -207,8 +208,31 @@ class UnitMoveEvent extends Event {
   }
 }
 
-class PanEvent extends Event {
+class CursorMoveEvent extends Event {
+  @override
+  String get type => 'Movement';
+  final MyGame game;
+  final Point<int> gridCoord;
+  bool _isCompleted = false;
+  bool _isStarted = false;
+  CursorMoveEvent(this.game, this.gridCoord);
+
+  @override
+  void execute() async { // Make this method async
+    _isStarted = true;
+    dev.log("Move cursor to $gridCoord");
+    game.stage.cursor.panToTile(gridCoord);
+  }
   
+  @override
+  bool checkComplete() {
+    return _isCompleted && game.stage.cursor.isMoving == false;
+  }
+  @override
+  bool checkStarted() {
+    // Check if the unit has finished moving
+    return _isStarted;
+  }
 }
 class TurnStartEvent extends Event {
   final UnitTeam activeTeam;
