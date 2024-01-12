@@ -383,8 +383,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     super.update(dt);
     // I may not need these three lines. 
     size = gameRef.stage.tilesize*gameRef.stage.scaling;
-    x = gridCoord.x * size.x;
-    y = gridCoord.y * size.y;
     scale = Vector2.all(gameRef.stage.scaling);
     if(hp <= 0) die();
     if (isMoving && currentTarget != null) {
@@ -393,11 +391,12 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       final targetY = currentTarget!.y * size.y;
 
       // Move towards the target position
-      var moveX = (targetX - x)*.6;
-      var moveY = (targetY - y)*.6;
+      var moveX = (targetX - x)*.3;
+      var moveY = (targetY - y)*.3;
 
       x += moveX;
       y += moveY;
+      // dev.log("$gridCoord, $x, $y");
       // gameRef.stage.cursor.goToUnit(this);
       // Check if the unit is close enough to the target position to snap it
       if ((x - targetX).abs() < 1 && (y - targetY).abs() < 1) {
@@ -433,7 +432,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       paths[destination] = getPath(destination);
     }
     for(Point<int> point in paths[destination]!){
-      dev.log("enqueueMovement($point);");
       enqueueMovement(point);
       moveCost += stage.tilesMap[point]!.getTerrainCost();
     }

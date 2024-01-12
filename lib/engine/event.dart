@@ -160,7 +160,7 @@ class UnitMoveEvent extends Event {
   @override
   void execute() async { // Make this method async
     dev.log("Move unit ${unit.name}");
-    // unit.move(game.stage, gridCoord);
+    unit.move(game.stage, gridCoord);
     _isCompleted = true;
   }
   

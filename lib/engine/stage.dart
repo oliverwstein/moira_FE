@@ -56,7 +56,7 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
-    // activeTeam = UnitTeam.blue;
+    activeTeam = UnitTeam.blue;
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);

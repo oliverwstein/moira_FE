@@ -94,7 +94,22 @@ class MyGame extends FlameGame with KeyboardEvents {
     eventQueue.addEventBatch([TitleCardCreationEvent(this, [])]);
     eventQueue.addEventBatch([StageCreationEvent(this, [])]);
 
-    eventQueue.addEventBatch([UnitCreationEvent(this, "Brigand", const Point(24, 22), -1, Point(34, 26))]);
+    eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Brigand", const Point(24, 22), 1, Point(33, 25)),
+      UnitCreationEvent(this, "Brigand", const Point(23, 22), 5, Point(32, 26)),
+      UnitCreationEvent(this, "Brigand", const Point(22, 20), 1, Point(31, 25)),
+      UnitCreationEvent(this, "Brigand", const Point(21, 19), 1, Point(30, 28)),]);
+
+    eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(37, 26)),
+      UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 25)),
+      UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(35, 26)),
+      UnitCreationEvent(this, "Brigand", const Point(21, 19), 1, Point(27, 27)),]);
+    
+    eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(36, 21)),
+      UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 20)),
+      UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(36, 19)),]);
   }
 
   @override
@@ -109,6 +124,12 @@ class MyGame extends FlameGame with KeyboardEvents {
           handled = true;
           break;
         }
+      }
+    }
+    // Handle game-wide key events if not handled by an event
+    if (!handled) {
+      if (key is RawKeyDownEvent) {
+          handled = stage.keyCommandHandler(key.logicalKey);
       }
     }
     return handled ? KeyEventResult.handled : KeyEventResult.ignored;
