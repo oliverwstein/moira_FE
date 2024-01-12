@@ -164,6 +164,9 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   }
 
   void snapToTile(Point<int> point) {
+    if (shouldCameraMove(point.x * size.x - x, point.y * size.y - y)) {
+        gameRef.camera.moveBy(Vector2(point.x * size.x - x, point.y * size.y - y)); // Adjust duration as needed
+      }
     x = point.x * size.x;
     y = point.y * size.y;
     gridCoord = point;
