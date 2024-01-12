@@ -134,26 +134,22 @@ class UnitCreationEvent extends Event {
 
     // Once Stage's onLoad is complete, proceed with further actions
     dev.log("Unit loaded");
-    _isCompleted = true;
-    List<Event> nextEventBatch = [];
     if(destination != null){
-      nextEventBatch = [UnitMoveEvent(game, unit, destination!)];
+      UnitMoveEvent(game, unit, destination!).execute();
     } 
-    // Add your next event here
-    game.eventQueue.addEventBatch(nextEventBatch);
+    _isCompleted = true;
     
   }
   
   @override
   bool checkComplete() {
-    return _isCompleted;
+    return _isCompleted && !unit.isMoving;
   }
 }
 
 class UnitMoveEvent extends Event {
   final MyGame game;
   final Point<int> gridCoord;
-  bool _isCompleted = false;
   final Unit unit;
   UnitMoveEvent(this.game, this.unit, this.gridCoord);
 
@@ -161,12 +157,11 @@ class UnitMoveEvent extends Event {
   void execute() async { // Make this method async
     dev.log("Move unit ${unit.name}");
     unit.move(game.stage, gridCoord);
-    _isCompleted = true;
   }
   
   @override
   bool checkComplete() {
-    return _isCompleted;
+    return !unit.isMoving;
   }
 }
 
