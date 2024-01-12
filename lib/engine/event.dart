@@ -11,6 +11,7 @@ class EventQueue {
   Queue<List<Event>> _eventBatches = Queue<List<Event>>();
   List<Event> _currentBatch = [];
   bool _isProcessing = false;
+  String? _currentType;
 
   void addEventBatch(List<Event> eventBatch) {
     _eventBatches.add(eventBatch);
@@ -23,29 +24,45 @@ class EventQueue {
   List<Event> currentBatch(){
     return _currentBatch;
   }
+
+  void executeCurrentBatch() {
+    // Execute each event in the current batch
+    for (var event in _currentBatch) {
+      event.execute();
+    }
+  }
+
   void update(double dt) {
-    if (_isProcessing && _currentBatch.every((event) => event.checkComplete())) {
-      _isProcessing = false;
-      _currentBatch.clear();
+    if (_isProcessing) {
+      if (_currentBatch.every((event) => event.checkComplete())){
+        _isProcessing = false;
+        _currentBatch.clear();
+      } else if (!_currentBatch.every((event) => event.checkStarted())){ 
+        // Checks if the batch has only elements that have not begun.
+        // Used for dealing with batches that create new batches. 
+        executeCurrentBatch();
+      }
     }
 
     if (!_isProcessing && _eventBatches.isNotEmpty) {
       _currentBatch = _eventBatches.removeFirst();
-      for (var event in _currentBatch) {
-        event.execute();
-      }
+      executeCurrentBatch(); // Execute all events in the current batch simultaneously
       _isProcessing = true;
     }
   }
 }
 
 abstract class Event {
+  String get type => "Generic";
   void execute(){}
+  bool checkStarted(){return true;}
   bool checkComplete(){return true;}
   void handleUserInput(RawKeyEvent event){}
 }
 
 class TitleCardCreationEvent extends Event {
+  @override
+  String get type => 'Creation';
   final MyGame game;
   List<Event> nextEventBatch;
   bool _isCompleted = false;
@@ -79,6 +96,8 @@ class TitleCardCreationEvent extends Event {
 }
 
 class StageCreationEvent extends Event {
+  @override
+  String get type => 'Creation';
   final MyGame game;
   List<Event> nextEventBatch;
   bool _isCompleted = false;
@@ -111,57 +130,78 @@ class StageCreationEvent extends Event {
 }
 
 class UnitCreationEvent extends Event {
+  @override
+  String get type => 'Creation';
   final MyGame game;
   final String name;
   final Point<int> gridCoord;
-  Point<int>? destination;
-  bool _isCompleted = false;
   final int level;
+  bool _isCompleted = false;
+  bool _isStarted = false;
   late final Unit unit;
-  UnitCreationEvent(this.game, this.name, this.gridCoord, [this.level = -1, this.destination]);
+  final Point<int> destination;
+
+  UnitCreationEvent(this.game, this.name, this.gridCoord, this.level, this.destination);
 
   @override
-  void execute() async { // Make this method async
+  void execute() async {
+    _isStarted = true;
     dev.log("Create unit $name");
-    if(level>0){unit = Unit.fromJSON(gridCoord, name, level:level);}
-    else {unit = Unit.fromJSON(gridCoord, name);}
+    unit = level > 0 ? Unit.fromJSON(gridCoord, name, level: level) : Unit.fromJSON(gridCoord, name);
     game.stage.add(unit); // Add the unit to the stage
     game.stage.units.add(unit);
     game.stage.tilesMap[gridCoord]!.setUnit(unit);
 
-    // Await the completion of unit's onLoad
+    // Wait for unit's onLoad to complete
     await unit.loadCompleted;
 
-    // Once Stage's onLoad is complete, proceed with further actions
-    dev.log("Unit loaded");
-    if(destination != null){
-      UnitMoveEvent(game, unit, destination!).execute();
-    } 
+    // Mark as completed once the unit has finished being created.
     _isCompleted = true;
-    
+    // Move the unit to its destination
+    game.eventQueue.currentBatch().add(UnitMoveEvent(game, unit, destination));
+    game.eventQueue.currentBatch().remove(this);
+
   }
   
   @override
   bool checkComplete() {
-    return _isCompleted && !unit.isMoving;
+    // Check if the unit has finished moving
+    return _isCompleted;
+  }
+  @override
+  bool checkStarted() {
+    // Check if the unit has finished moving
+    return _isStarted;
   }
 }
 
+
 class UnitMoveEvent extends Event {
+  @override
+  String get type => 'Movement';
   final MyGame game;
   final Point<int> gridCoord;
   final Unit unit;
+  bool _isCompleted = false;
+  bool _isStarted = false;
   UnitMoveEvent(this.game, this.unit, this.gridCoord);
 
   @override
   void execute() async { // Make this method async
+    _isStarted = true;
     dev.log("Move unit ${unit.name}");
     unit.move(game.stage, gridCoord);
+    _isCompleted = true;
   }
   
   @override
   bool checkComplete() {
-    return !unit.isMoving;
+    return _isCompleted && unit.isMoving == false;
+  }
+  @override
+  bool checkStarted() {
+    // Check if the unit has finished moving
+    return _isStarted;
   }
 }
 

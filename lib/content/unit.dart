@@ -169,7 +169,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
     _animationComponent = SpriteAnimationComponent(
       animation: unitSheet.createAnimation(row: 0, stepTime: .5),
-      size: Vector2.all(16), // Use 16 for initial size
+      size: Vector2.all(16),
     );
     add(_animationComponent);
 
