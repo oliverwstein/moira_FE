@@ -35,6 +35,8 @@ class EventQueue {
   void update(double dt) {
     if (_isProcessing) {
       if (_currentBatch.every((event) => event.checkComplete())){
+        // If the batch elements have all been completed, clear the batch
+        // and allow EventQueue to go on to the next batch.
         _isProcessing = false;
         _currentBatch.clear();
       } else if (!_currentBatch.every((event) => event.checkStarted())){ 
@@ -43,10 +45,11 @@ class EventQueue {
         executeCurrentBatch();
       }
     }
-
     if (!_isProcessing && _eventBatches.isNotEmpty) {
+      // Pop the next batch waiting in the queue as the current batch
       _currentBatch = _eventBatches.removeFirst();
-      executeCurrentBatch(); // Execute all events in the current batch simultaneously
+      // Execute all events in the current batch simultaneously
+      executeCurrentBatch(); 
       _isProcessing = true;
     }
   }
@@ -175,7 +178,6 @@ class UnitCreationEvent extends Event {
   }
 }
 
-
 class UnitMoveEvent extends Event {
   @override
   String get type => 'Movement';
@@ -205,7 +207,9 @@ class UnitMoveEvent extends Event {
   }
 }
 
-
+class PanEvent extends Event {
+  
+}
 class TurnStartEvent extends Event {
   final UnitTeam activeTeam;
   TurnStartEvent(this.activeTeam);
