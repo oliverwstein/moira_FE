@@ -43,8 +43,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
       final targetY = targetPoint.y * size.y;
 
       // Smoothly move towards the target position
-      var moveX = (targetX - x) * 16 * dt; // Adjust speed as needed
-      var moveY = (targetY - y) * 16 * dt;
+      var moveX = (targetX - x) * 24 * dt; // Adjust speed as needed
+      var moveY = (targetY - y) * 24 * dt;
 
       x += moveX;
       y += moveY;
@@ -58,6 +58,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
         y = targetY;
         gridCoord = targetPoint;
         isMoving = false;
+        dev.log("Cursor @ $gridCoord");
         currentDirection = null;
       }
     }
@@ -92,7 +93,6 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   if (newX != gridCoord.x || newY != gridCoord.y) {
     movementQueue.add(direction);
   }
-  dev.log("Cursor @ ${gridCoord}");
 }
 
   bool shouldCameraMove(double moveX, double moveY) {
@@ -261,6 +261,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
       if (isMoving) {
         Point<int> targetPoint = _getNextPoint(gridCoord, currentDirection!);
         snapToTile(targetPoint);
+        dev.log("Cursor @ ${targetPoint}");
         isMoving = false;
         movementQueue.clear();
       }

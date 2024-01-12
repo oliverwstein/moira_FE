@@ -25,31 +25,33 @@ class EventQueue {
     return _currentBatch;
   }
 
-  void executeCurrentBatch() {
+  void executeBatch(List<Event> batch) {
     // Execute each event in the current batch
-    for (var event in _currentBatch) {
-        event.execute();
+    for (var event in batch) {
+      event.execute();
     }
   }
 
   void update(double dt) {
     if (_isProcessing) {
       if (_currentBatch.every((event) => event.checkComplete())){
+        dev.log("Current batch is $_currentBatch, _isProcessing && all batch events completed.");
         // If the batch elements have all been completed, clear the batch
         // and allow EventQueue to go on to the next batch.
         _isProcessing = false;
         _currentBatch.clear();
-      } else if (_currentBatch.every((event) => !event.checkStarted())){ 
-        // Checks if the batch has only elements that have not begun.
-        // Used for dealing with batches that create new batches.
-        executeCurrentBatch();
-      }
+      } else {
+        dev.log("Current batch is $_currentBatch, _isProcessing && some batch events still in progress.");
+        List<Event> batch = [];
+        for (Event event in _currentBatch){if (!event.checkStarted()) batch.add(event);}
+        executeBatch(batch);}
     }
     if (!_isProcessing && _eventBatches.isNotEmpty) {
+      dev.log("Current batch is $_currentBatch, !_isProcessing && _eventBatches.isNotEmpty");
       // Pop the next batch waiting in the queue as the current batch
       _currentBatch = _eventBatches.removeFirst();
       // Execute all events in the current batch simultaneously
-      executeCurrentBatch(); 
+      executeBatch(_currentBatch); 
       _isProcessing = true;
     }
   }
@@ -59,8 +61,9 @@ abstract class Event {
   String get type => "Generic";
   void execute(){}
   bool _isStarted = false;
+  bool _isCompleted = false;
   bool checkStarted(){return _isStarted;}
-  bool checkComplete(){return true;}
+  bool checkComplete(){return _isCompleted;}
   void handleUserInput(RawKeyEvent event){}
 }
 
@@ -69,8 +72,6 @@ class TitleCardCreationEvent extends Event {
   String get type => 'Creation';
   final MyGame game;
   List<Event> nextEventBatch;
-  bool _isCompleted = false;
-  bool _isStarted = false;
   TitleCardCreationEvent(this.game, [this.nextEventBatch = const []]);
 
   @override
@@ -93,18 +94,7 @@ class TitleCardCreationEvent extends Event {
     // You can customize this condition based on your specific requirement
     _isCompleted = true;
     game.eventQueue.addEventBatch(nextEventBatch);
-  }
-
-  @override
-  bool checkComplete() {
-    return _isCompleted;
-  }
-  @override
-  bool checkStarted() {
-    return _isStarted;
-  }
-
-  
+  }  
 }
 
 class StageCreationEvent extends Event {
@@ -112,9 +102,6 @@ class StageCreationEvent extends Event {
   String get type => 'Creation';
   final MyGame game;
   List<Event> nextEventBatch;
-  bool _isCompleted = false;
-  bool _isStarted = false;
-
   StageCreationEvent(this.game, [this.nextEventBatch = const []]);
 
   @override
@@ -137,11 +124,6 @@ class StageCreationEvent extends Event {
     game.eventQueue.addEventBatch(nextEventBatch);
     return game.stage;
   }
-
-  @override
-  bool checkComplete() {
-    return _isCompleted;
-  }
 }
 
 class UnitCreationEvent extends Event {
@@ -151,8 +133,6 @@ class UnitCreationEvent extends Event {
   final String name;
   final Point<int> gridCoord;
   final int level;
-  bool _isCompleted = false;
-  bool _isStarted = false;
   late final Unit unit;
   final Point<int> destination;
 
@@ -180,17 +160,6 @@ class UnitCreationEvent extends Event {
     
     return unit;
   }
-  
-  @override
-  bool checkComplete() {
-    // Check if the unit has finished moving
-    return _isCompleted;
-  }
-  @override
-  bool checkStarted() {
-    // Check if the unit has finished moving
-    return _isStarted;
-  }
 }
 
 class UnitMoveEvent extends Event {
@@ -199,8 +168,6 @@ class UnitMoveEvent extends Event {
   final MyGame game;
   final Point<int> gridCoord;
   final Unit unit;
-  bool _isCompleted = false;
-  bool _isStarted = false;
   UnitMoveEvent(this.game, this.unit, this.gridCoord);
 
   @override
@@ -208,17 +175,10 @@ class UnitMoveEvent extends Event {
     _isStarted = true;
     dev.log("Move unit ${unit.name}");
     unit.move(game.stage, gridCoord);
-    _isCompleted = true;
   }
-  
   @override
   bool checkComplete() {
-    return _isCompleted && unit.isMoving == false;
-  }
-  @override
-  bool checkStarted() {
-    // Check if the unit has finished moving
-    return _isStarted;
+    return (unit.gridCoord == gridCoord && _isStarted);
   }
 }
 
@@ -227,8 +187,6 @@ class CursorMoveEvent extends Event {
   String get type => 'Movement';
   final MyGame game;
   final Point<int> gridCoord;
-  bool _isCompleted = false;
-  bool _isStarted = true;
   CursorMoveEvent(this.game, this.gridCoord);
 
   @override
@@ -240,12 +198,7 @@ class CursorMoveEvent extends Event {
   
   @override
   bool checkComplete() {
-    return _isCompleted && game.stage.cursor.isMoving == false;
-  }
-  @override
-  bool checkStarted() {
-    // Check if the unit has finished moving
-    return _isStarted;
+    return (game.stage.cursor.gridCoord == gridCoord && _isStarted);
   }
 }
 

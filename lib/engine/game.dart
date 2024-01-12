@@ -116,6 +116,12 @@ class MyGame extends FlameGame with KeyboardEvents {
       UnitCreationEvent(this, "Brigand", const Point(42, 21), 1, Point(46, 21)),
       UnitCreationEvent(this, "Brigand", const Point(42, 20), 1, Point(45, 22)),
       UnitCreationEvent(this, "Brigand", const Point(42, 22), 1, Point(42, 26))]);
+    eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Arden", const Point(59, 12), -1, Point(59, 10)),
+      UnitCreationEvent(this, "Alec", const Point(59, 12), -1, Point(58, 12)),
+      UnitCreationEvent(this, "Noish", const Point(59, 12), -1, Point(60, 12)),
+      UnitCreationEvent(this, "Sigurd", const Point(59, 12), -1, Point(59, 13)),]);
+
   }
 
   @override
