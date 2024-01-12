@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_overrides
+// ignore_for_file: unnecessary_overrides, unused_import, prefer_const_constructors
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:math';
@@ -113,6 +113,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   }
 
   @override
+  // ignore: avoid_renaming_method_parameters
   KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
     // First, handle any game-wide key events (like zooming)

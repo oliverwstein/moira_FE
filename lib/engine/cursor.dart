@@ -1,4 +1,5 @@
 // ignore_for_file: unnecessary_overrides
+import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -15,6 +16,9 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   late final ActionMenu actionMenu;
+  Queue<Direction> movementQueue = Queue<Direction>();
+  bool isMoving = false;
+  Direction? currentDirection;
   Point<int> gridCoord = const Point(32, 25); // The cursor's initial position in terms of tiles, not pixels
 
   Cursor() {}
@@ -24,10 +28,100 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     super.update(dt);
     isVisible = (gameRef.stage.activeTeam == UnitTeam.blue);
     scale = Vector2.all(gameRef.stage.scaling);
-    size = gameRef.stage.tilesize*gameRef.stage.scaling;
-    x = gridCoord.x * size.x;
-    y = gridCoord.y * size.y;
+    size = gameRef.stage.tilesize * gameRef.stage.scaling;
+
+    // Handle smooth movement
+    if (!isMoving && movementQueue.isNotEmpty) {
+      currentDirection = movementQueue.removeFirst();
+      isMoving = true;
+    }
+
+    if (isMoving && currentDirection != null) {
+      // Calculate the pixel position for the target tile position
+      Point<int> targetPoint = _getNextPoint(gridCoord, currentDirection!);
+      final targetX = targetPoint.x * size.x;
+      final targetY = targetPoint.y * size.y;
+
+      // Smoothly move towards the target position
+      var moveX = (targetX - x) * 8 * dt; // Adjust speed as needed
+      var moveY = (targetY - y) * 8 * dt;
+
+      x += moveX;
+      y += moveY;
+      if (shouldCameraMove(moveX, moveY)) {
+        gameRef.camera.moveBy(Vector2(moveX, moveY)); // Adjust duration as needed
+      }
+
+      // Check if the cursor is close enough to the target position to snap it
+      if ((x - targetX).abs() < 1 && (y - targetY).abs() < 1) {
+        x = targetX;
+        y = targetY;
+        gridCoord = targetPoint;
+        isMoving = false;
+        currentDirection = null;
+      }
+    }
   }
+
+  void move(Direction direction) {
+  // Calculate the potential new position
+  int newX = gridCoord.x;
+  int newY = gridCoord.y;
+
+  switch (direction) {
+    case Direction.left:
+      newX -= 1;
+      break;
+    case Direction.right:
+      newX += 1;
+      break;
+    case Direction.up:
+      newY -= 1;
+      break;
+    case Direction.down:
+      newY += 1;
+      break;
+  }
+
+  // Clamp the new position to ensure it's within the bounds of the map
+  Stage stage = parent as Stage;
+  newX = newX.clamp(0, stage.mapTileWidth - 1);
+  newY = newY.clamp(0, stage.mapTileHeight - 1);
+
+  // Only enqueue the movement if it's within the bounds
+  if (newX != gridCoord.x || newY != gridCoord.y) {
+    movementQueue.add(direction);
+  }
+}
+
+  bool shouldCameraMove(double moveX, double moveY) {
+    Rect visibleRect = gameRef.camera.visibleWorldRect;
+    Stage stage = gameRef.stage;
+
+    double stageWidth = stage.mapTileWidth * size.x;
+    double stageHeight = stage.mapTileHeight * size.y;
+
+    // Calculate the midpoint of the visible rect
+    Offset midpoint = Offset(
+      visibleRect.left + visibleRect.width / 2,
+      visibleRect.top + visibleRect.height / 2
+    );
+
+    // Calculate the cursor's world position
+    Offset cursorPosition = Offset(gridCoord.x * size.x, gridCoord.y * size.y);
+
+    // Determine if cursor is beyond the midpoint
+    bool isBeyondMidpointX = (moveX < 0 && cursorPosition.dx < midpoint.dx) || (moveX > 0 && cursorPosition.dx > midpoint.dx);
+    bool isBeyondMidpointY = (moveY < 0 && cursorPosition.dy < midpoint.dy) || (moveY > 0 && cursorPosition.dy > midpoint.dy);
+
+    // Determine if moving the camera would reveal areas outside of the stage
+    bool withinStageX = (moveX < 0 && visibleRect.left > 0) || (moveX > 0 && visibleRect.right < stageWidth);
+    bool withinStageY = (moveY < 0 && visibleRect.top > 0) || (moveY > 0 && visibleRect.bottom < stageHeight);
+
+    // The camera should move if the cursor is beyond the midpoint and within stage boundaries
+    return (isBeyondMidpointX && withinStageX) || (isBeyondMidpointY && withinStageY);
+  }
+
 
   @override
   Future<void> onLoad() async {
@@ -52,6 +146,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     // Set the initial size and position of the cursor
     size = gameRef.stage.tilesize*gameRef.stage.scaling;
     position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
+    gameRef.camera.moveTo(position);
   }
 
   Vector2 get worldPosition {
@@ -68,43 +163,11 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     position = Vector2(point.x * size.x, point.y * size.y);
   }
 
-  void move(Direction direction) {
-    // Assuming parent is always a Stage which is the case in this architecture
-    Stage stage = parent as Stage;
-
-    int newX = gridCoord.x;
-    int newY = gridCoord.y;
-
-    switch (direction) {
-      case Direction.left:
-        newX -= 1;
-        break;
-      case Direction.right:
-        newX += 1;
-        break;
-      case Direction.up:
-        newY -= 1;
-        break;
-      case Direction.down:
-        newY += 1;
-        break;
-    }
-
-    // Clamp the new position to ensure it's within the bounds of the map
-    newX = newX.clamp(0, stage.mapTileWidth - 1);
-    newY = newY.clamp(0, stage.mapTileHeight - 1);
-
-    // Update gridCoord if it's within the map
-    gridCoord = Point(newX, newY);
-    gameRef.camera.moveTo(worldPosition);
-    dev.log("${gameRef.camera.visibleWorldRect}");
-
-    // Update the pixel position of the cursor
-    x = gridCoord.x * size.x;
-    y = gridCoord.y * size.y;
-    dev.log('Cursor @ $gridCoord, ${stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${stage.tilesMap[gridCoord]!.isOccupied}, ${stage.tilesMap[gridCoord]!.unit?.canAct}');
+  void snapToTile(Point<int> point) {
+    x = point.x * size.x;
+    y = point.y * size.y;
+    gridCoord = point;
   }
-  
   void select() {
   if (parent is Stage) {
     Stage stage = parent as Stage;
@@ -163,36 +226,57 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     bool handled = false;
     Stage stage = parent as Stage;
     if (stage.activeTeam != UnitTeam.blue) return true;
-    if (command == LogicalKeyboardKey.arrowLeft) {
-      move(Direction.left);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowRight) {
-      move(Direction.right);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowUp) {
-      move(Direction.up);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowDown) {
-      move(Direction.down);
+
+    if (command == LogicalKeyboardKey.arrowLeft || command == LogicalKeyboardKey.arrowRight || command == LogicalKeyboardKey.arrowUp || command == LogicalKeyboardKey.arrowDown) {
+      // If the user inputs a move command before reaching the next tile, jump to the next tile
+      if (isMoving) {
+        Point<int> targetPoint = _getNextPoint(gridCoord, currentDirection!);
+        snapToTile(targetPoint);
+        isMoving = false;
+        movementQueue.clear();
+      }
+
+      // Add new direction to the queue
+      if (command == LogicalKeyboardKey.arrowLeft) {
+        move(Direction.left);
+      } else if (command == LogicalKeyboardKey.arrowRight) {
+        move(Direction.right);
+      } else if (command == LogicalKeyboardKey.arrowUp) {
+        move(Direction.up);
+      } else if (command == LogicalKeyboardKey.arrowDown) {
+        move(Direction.down);
+      }
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
       select();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) {
-      
       stage.blankAllTiles();
       stage.activeComponent = stage.cursor;
       handled = true;
     }
     return handled;
   }
-  
-  void snapToTile(Point<int> point){
-    x = point.x * size.x;
-    y = point.x * size.y;
-  }
-  void onScaleChanged(double scaleFactor) {
-    // If I let the user change the size of the mapview (in tiles),
-    // this will be needed later.
+
+  Point<int> _getNextPoint(Point<int> currentPoint, Direction direction) {
+    int newX = currentPoint.x;
+    int newY = currentPoint.y;
+
+    switch (direction) {
+      case Direction.left:
+        newX -= 1;
+        break;
+      case Direction.right:
+        newX += 1;
+        break;
+      case Direction.up:
+        newY -= 1;
+        break;
+      case Direction.down:
+        newY += 1;
+        break;
+    }
+
+    return Point(newX, newY);
   }
 }

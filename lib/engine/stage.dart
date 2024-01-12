@@ -1,6 +1,5 @@
 // ignore_for_file: unnecessary_overrides
 import 'dart:async';
-import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:math';
 
@@ -38,6 +37,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     tilesize = Vector2.all(16);
     tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', tilesize);
     add(tiles);
+    
     mapTileHeight = tiles.tileMap.map.height;
     mapTileWidth = tiles.tileMap.map.width;
     
@@ -56,12 +56,14 @@ class Stage extends Component with HasGameRef<MyGame>{
         tilesMap[Point(x, y)] = tile;
       }
     }
+    
     activeTeam = UnitTeam.blue;
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
     gameRef.camera.viewport = FixedAspectRatioViewport(aspectRatio: 4/3);
+    gameRef.camera.moveTo(Vector2(32*16*scaling, 20*16*scaling));
     _loadCompleter.complete();
   }
 
@@ -76,7 +78,6 @@ class Stage extends Component with HasGameRef<MyGame>{
     // TODO: This will cause issues later, but for now,
     // it makes the camera react to changes in scaling
     // without requiring user input to refresh.
-    gameRef.camera.moveTo(cursor.position);
   }
 
   @override

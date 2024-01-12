@@ -1,4 +1,4 @@
-// ignore_for_file: unused_import
+// ignore_for_file: unused_import, prefer_final_fields
 
 import 'dart:collection';
 import 'dart:developer' as dev;
