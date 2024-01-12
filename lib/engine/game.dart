@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_overrides
+// ignore_for_file: unnecessary_overrides, unused_import, prefer_const_constructors
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:math';
@@ -93,7 +93,6 @@ class MyGame extends FlameGame with KeyboardEvents {
     classMap = await loadClassesData();
     eventQueue.addEventBatch([TitleCardCreationEvent(this, [])]);
     eventQueue.addEventBatch([StageCreationEvent(this, [])]);
-
     eventQueue.addEventBatch([
       UnitCreationEvent(this, "Brigand", const Point(24, 22), 1, Point(33, 25)),
       UnitCreationEvent(this, "Brigand", const Point(23, 22), 5, Point(32, 26)),
@@ -110,9 +109,11 @@ class MyGame extends FlameGame with KeyboardEvents {
       UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(36, 19)),
       UnitCreationEvent(this, "Brigand", const Point(20, 22), 1, Point(32, 25)),
       UnitCreationEvent(this, "Brigand", const Point(20, 22), 5, Point(33, 26)),]);
+    eventQueue.addEventBatch([CursorMoveEvent(this, Point(59, 12))]);
   }
 
   @override
+  // ignore: avoid_renaming_method_parameters
   KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
     // First, handle any game-wide key events (like zooming)
