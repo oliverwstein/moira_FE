@@ -43,8 +43,8 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
       final targetY = targetPoint.y * size.y;
 
       // Smoothly move towards the target position
-      var moveX = (targetX - x) * 8 * dt; // Adjust speed as needed
-      var moveY = (targetY - y) * 8 * dt;
+      var moveX = (targetX - x) * 12 * dt; // Adjust speed as needed
+      var moveY = (targetY - y) * 12 * dt;
 
       x += moveX;
       y += moveY;
@@ -171,32 +171,31 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     y = point.y * size.y;
     gridCoord = point;
   }
+
   void panToTile(Point<int> destination) {
-  int deltaX = destination.x - gridCoord.x;
-  int deltaY = destination.y - gridCoord.y;
+    int deltaX = destination.x - gridCoord.x;
+    int deltaY = destination.y - gridCoord.y;
 
-  // Add horizontal movements
-  while (deltaX != 0) {
-    if (deltaX > 0) {
-      movementQueue.add(Direction.right);
-      deltaX--;
-    } else {
-      movementQueue.add(Direction.left);
-      deltaX++;
+    // Alternate between horizontal and vertical movements
+    while (deltaX != 0 || deltaY != 0) {
+      if (deltaX > 0) {
+        movementQueue.add(Direction.right);
+        deltaX--;
+      } else if (deltaX < 0) {
+        movementQueue.add(Direction.left);
+        deltaX++;
+      }
+
+      if (deltaY > 0) {
+        movementQueue.add(Direction.down);
+        deltaY--;
+      } else if (deltaY < 0) {
+        movementQueue.add(Direction.up);
+        deltaY++;
+      }
     }
   }
 
-  // Add vertical movements
-  while (deltaY != 0) {
-    if (deltaY > 0) {
-      movementQueue.add(Direction.down);
-      deltaY--;
-    } else {
-      movementQueue.add(Direction.up);
-      deltaY++;
-    }
-  }
-}
 
   void select() {
   if (parent is Stage) {
