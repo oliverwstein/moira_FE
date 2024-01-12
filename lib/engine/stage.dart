@@ -1,8 +1,10 @@
 // ignore_for_file: unnecessary_overrides
+import 'dart:async';
 import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:math';
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
@@ -14,16 +16,18 @@ class Stage extends Component with HasGameRef<MyGame>{
   /// game map, including tiles, units, and the cursor. It interfaces with the 
   /// game's TiledComponent to render the map and holds the logic for the game's 
   /// terrain, unit positioning, and active components like cursor or units.
+  final Completer<void> _loadCompleter = Completer<void>();
   late final int mapTileWidth;
   late final int mapTileHeight;
   late final Vector2 mapSize;
   late final flame_tiled.TiledComponent tiles;
   late final Cursor cursor;
+  late double scaling;
   List<Unit> units = [];
   List<UnitTeam> teams = UnitTeam.values;
   Map<UnitTeam, Player> playerMap = {};
-  UnitTeam activeTeam = UnitTeam.blue;
-  final Vector2 tilesize = Vector2.all(16);
+  UnitTeam? activeTeam;
+  late Vector2 tilesize;
   Map<Point<int>, Tile> tilesMap = {};
   late Component activeComponent;
   int turn = 1;
@@ -31,50 +35,48 @@ class Stage extends Component with HasGameRef<MyGame>{
 
   @override
   Future<void> onLoad() async {
+    tilesize = Vector2.all(16);
     tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', tilesize);
-    tiles.anchor = Anchor.topLeft;
-    tiles.scale = Vector2.all(gameRef.scaleFactor);
     add(tiles);
     mapTileHeight = tiles.tileMap.map.height;
     mapTileWidth = tiles.tileMap.map.width;
+    
+    mapSize = Vector2(mapTileWidth*16, mapTileHeight*16);
+    scaling = 1/max(16*16 / gameRef.canvasSize.x,
+                        12*16 / gameRef.canvasSize.y);
+    tiles.scale = Vector2.all(scaling);
     for (int x = 0; x < mapTileWidth; x++) {
       for (int y = 0; y < mapTileHeight; y++) {
         Point<int> gridCoord = Point(x, y);
         Terrain terrain = determineTerrainType(gridCoord);
-        Tile tile = Tile(gridCoord, terrain);
+        String name = getTileName(gridCoord);
+        Tile tile = Tile(gridCoord, terrain, name);
         add(tile);
         gameRef.addObserver(tile);
         tilesMap[Point(x, y)] = tile;
       }
     }
-    units.add(Unit.fromJSON(const Point(59, 10), 'Arden'));
-    units.add(Unit.fromJSON(const Point(60, 12), 'Alec'));
-    units.add(Unit.fromJSON(const Point(58, 12), 'Noish'));
-    units.add(Unit.fromJSON(const Point(59, 13), 'Sigurd'));
-
-    units.add(Unit.fromJSON(const Point(56, 12), 'Brigand', level: 1));
-    units.add(Unit.fromJSON(const Point(55, 13), 'Brigand', level: 5));
-    units.add(Unit.fromJSON(const Point(55, 11), 'Brigand', level: 10));
-     
-    for (Unit unit in units) {
-      add(unit);
-      tilesMap[unit.gridCoord]?.setUnit(unit);
-      gameRef.addObserver(unit);
-    }
-    for (UnitTeam team in UnitTeam.values){
-      if(team != UnitTeam.blue){playerMap[team] = NPCPlayer(team, this);} 
-      else {playerMap[team] = Player(team, this);}
-      dev.log('${playerMap[team]!.team}');
-      add(playerMap[team]!);
-    }
+    activeTeam = UnitTeam.blue;
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
     gameRef.addObserver(cursor);
+    gameRef.camera.viewport = FixedAspectRatioViewport(aspectRatio: 4/3);
+    _loadCompleter.complete();
   }
+
+  Future<void> get loadCompleted => _loadCompleter.future;
+  
   @override
   void update(double dt) {
     super.update(dt);
+    scaling = 1/max(16*16 / gameRef.canvasSize.x,
+                        12*16 / gameRef.canvasSize.y);
+    tiles.scale = Vector2.all(scaling);
+    // TODO: This will cause issues later, but for now,
+    // it makes the camera react to changes in scaling
+    // without requiring user input to refresh.
+    gameRef.camera.moveTo(cursor.position);
   }
 
   @override
@@ -113,6 +115,11 @@ class Stage extends Component with HasGameRef<MyGame>{
     return targetList;
   }
 
+  void startStage(){
+    activeTeam = UnitTeam.blue;
+    dev.log('Start the stage!');
+
+  }
   void startTurn() {
     dev.log('Turn $turn');
     dev.log('Start turn for $activeTeam');
@@ -124,7 +131,7 @@ class Stage extends Component with HasGameRef<MyGame>{
     dev.log('End turn for $activeTeam');
 
     if(activeTeam == UnitTeam.blue) turn++;
-    int index = teams.indexOf(activeTeam);
+    int index = teams.indexOf(activeTeam!);
     activeTeam = teams[(index + 1) % teams.length];
     for (var unit in units) {
       unit.toggleCanAct(true);
@@ -135,12 +142,21 @@ class Stage extends Component with HasGameRef<MyGame>{
     }
     startTurn();
   }
+
+  String getTileName(Point<int> point){
+    int localId = point.y * mapTileWidth + point.x;
+    var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
+    var type = tile?.properties.getProperty("terrain")?.value;
+    var name = tile?.properties.getProperty("name")?.value ?? type;
+    return name as String;
+  }
   
+
   Terrain determineTerrainType(Point<int> point){
     int localId = point.y * mapTileWidth + point.x;
     var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
-    var type = tile?.properties.firstOrNull?.value ?? 'neutral';
-    return _stringToTerrain(type as String);
+    var terrain = tile?.properties.getProperty("terrain")?.value;
+    return _stringToTerrain(terrain as String);
   }
   
   Terrain _stringToTerrain(String input) {
@@ -149,8 +165,20 @@ class Stage extends Component with HasGameRef<MyGame>{
       for (var terrain in Terrain.values) terrain.toString().split('.').last: terrain,
     };
     // Perform the lookup and return
-    return stringToTerrain[input] ?? Terrain.neutral;
+    return stringToTerrain[input.toLowerCase()] ?? Terrain.plain;
   }
+
+  Point<int>? findTilePoint(String name, Terrain terrain) {
+  try {
+    return tilesMap.entries
+        .firstWhere(
+            (entry) => entry.value.name == name && entry.value.terrain == terrain)
+        .key;
+  } on StateError {
+    // No tile found that matches the criteria
+    return null;
+  }
+}
 
   bool keyCommandHandler(LogicalKeyboardKey command) {
     if (activeComponent is CommandHandler) {

@@ -1,50 +1,25 @@
 // ignore_for_file: unnecessary_overrides
 import 'dart:convert';
+import 'dart:developer' as dev;
+import 'dart:math';
+import 'dart:ui' as ui;
 
+import 'package:flame/cache.dart';
 import 'package:flame/camera.dart';
+import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'engine.dart';
 class MyGame extends FlameGame with KeyboardEvents {
-  /// MyGame is the core class for the tactical RPG game, extending FlameGame for 
-  /// game loop management and integrating KeyboardEvents for user interaction.
-  /// It manages the game's viewport, stage, and global state like scaling.
-  /// 
-  /// Attributes:
-  /// - `viewport`: Manages the game's viewport size and scaling.
-  /// - `stage`: The main container for all game elements, including tiles and units.
-  /// - `_scaleFactor`: A private variable managing the zoom level of the game view.
-  /// - `_observers`: A list of observers (like Stage) that listen to scale changes.
-  /// 
-  /// Methods:
-  /// - `scaleFactor`: Getter and setter for _scaleFactor, updates observers on change.
-  /// - `addObserver(observer)`: Adds an observer to be notified of scale changes.
-  /// - `removeObserver(observer)`: Removes an observer from the notification list.
-  /// - `update(dt)`: Updates the game state every tick, part of the game loop.
-  /// - `onLoad()`: Asynchronously loads game resources and initializes components.
-  /// - `onKeyEvent(event, keysPressed)`: Handles keyboard events globally.
-  /// 
-  /// Constructor:
-  /// Initializes game components, sets up the viewport, and loads the stage.
-  /// It ensures the game scales properly and the camera follows the cursor.
-  /// 
-  /// Connects with:
-  /// - Stage: Stage acts as the main interactive area of the game, containing all tiles,
-  ///   units, and managing the cursor.
-  /// - Tile, Unit: Managed by Stage, but their scaling and updates are propagated
-  ///   by MyGame through observers.
-  /// - MaxViewport: Manages how the game's view is scaled and presented.
-  /// 
-  /// Usage:
-  /// This class should be instantiated to start the game. It sets up necessary
-  /// game components and starts the game loop. User interactions are primarily
-  /// managed here and delegated to other components like Stage and Unit.
-
+  
+  EventQueue eventQueue = EventQueue();
+  late Component screen;
   late MaxViewport viewport;
   late Stage stage;
-  double _scaleFactor = 2;
+  late TitleCard titleCard;
+  double _scaleFactor = 1;
   final List _observers = [];
   double get scaleFactor => _scaleFactor;
   static late Map<String, dynamic> unitMap;
@@ -104,6 +79,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   @override
     void update(double dt) {
         super.update(dt);
+        eventQueue.update(dt);
     }
 
   @override
@@ -115,34 +91,51 @@ class MyGame extends FlameGame with KeyboardEvents {
     attackMap = await loadAttacksData();
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
-    viewport = MaxViewport();
-    camera.viewport = viewport;
-    stage = Stage();
-    await world.add(stage);
-    addObserver(stage);
-    camera.follow(stage.cursor);
+    eventQueue.addEventBatch([TitleCardCreationEvent(this, [])]);
+    eventQueue.addEventBatch([StageCreationEvent(this, [])]);
+
+    eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Brigand", const Point(24, 22), 1, Point(33, 25)),
+      UnitCreationEvent(this, "Brigand", const Point(23, 22), 5, Point(32, 26)),
+      UnitCreationEvent(this, "Brigand", const Point(22, 20), 1, Point(31, 25)),
+      UnitCreationEvent(this, "Brigand", const Point(21, 19), 1, Point(30, 28)),]);
+    eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(37, 26)),
+      UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 25)),
+      UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(35, 26)),
+      UnitCreationEvent(this, "Brigand", const Point(21, 19), 1, Point(27, 27)),]);
+    eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(36, 21)),
+      UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 20)),
+      UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(36, 19)),
+      UnitCreationEvent(this, "Brigand", const Point(20, 22), 1, Point(32, 25)),
+      UnitCreationEvent(this, "Brigand", const Point(20, 22), 5, Point(33, 26)),]);
   }
 
   @override
-  KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
     // First, handle any game-wide key events (like zooming)
-    if (event is RawKeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.equal) { // Zoom in
-        scaleFactor *= 1.1;
-        handled = true;
-      } else if (event.logicalKey == LogicalKeyboardKey.minus) { // Zoom out
-        scaleFactor *= 0.9;
-        handled = true;
-      } else {
-        handled = stage.keyCommandHandler(event.logicalKey);
+    // Check if there is an event being processed and if it handles the user input
+    if (eventQueue.isProcessing() && key is RawKeyDownEvent) {
+      for (var event in eventQueue.currentBatch()) {
+        event.handleUserInput(key);
+        if (event.checkComplete()) {
+          handled = true;
+          break;
+        }
+      }
+    }
+    // Handle game-wide key events if not handled by an event
+    if (!handled) {
+      if (key is RawKeyDownEvent) {
+          handled = stage.keyCommandHandler(key.logicalKey);
       }
     }
     return handled ? KeyEventResult.handled : KeyEventResult.ignored;
   }
 }
 
-enum UnitTeam {blue, red, green, yellow}
 abstract class ScaleObserver {
   void onScaleChanged(double scaleFactor);
 }

@@ -51,11 +51,12 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
   late final Point<int> gridCoord;
   late double tileSize;
   Terrain terrain; // e.g., "grass", "water", "mountain"
+  String name; // e.g., "grass", "water", "mountain"
   Unit? unit; // Initially null, set when a unit moves into the tile
   TileState state = TileState.blank;
   bool get isOccupied => unit != null;
 
-  Tile(this.gridCoord, this.terrain){
+  Tile(this.gridCoord, this.terrain, this.name){
     tileSize = 16 * MyGame().scaleFactor;
   }
   @override
@@ -92,6 +93,10 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
 
   void removeUnit() {
     unit = null;
+  }
+
+   double getTerrainCost() {
+    return terrain.cost;
   }
 
   @override

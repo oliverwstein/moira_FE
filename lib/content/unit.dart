@@ -1,6 +1,7 @@
 
 // ignore_for_file: unused_import
 
+import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer' as dev;
@@ -21,7 +22,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   int movementRange;
   late double remainingMovement;
   UnitTeam team = UnitTeam.blue;
-  double tileSize = 16;
 
   // Status and State Variables
   Point<int> gridCoord; // The units's position in terms of tiles, not pixels
@@ -36,6 +36,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Map<Point<int>, List<Point<int>>> paths = {};
 
   // Components and External References
+  final Completer<void> _loadCompleter = Completer<void>();
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet unitSheet;
   late final ActionMenu actionMenu;
@@ -123,6 +124,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       }
       
     }
+    
     // Return a new Unit instance
     return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
   }
@@ -133,7 +135,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   void _postConstruction() {
-    tileSize = 16 * MyGame().scaleFactor;
     for (Item item in inventory){
       switch (item.type) {
         case ItemType.main:
@@ -168,33 +169,32 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
     _animationComponent = SpriteAnimationComponent(
       animation: unitSheet.createAnimation(row: 0, stepTime: .5),
-      size: Vector2.all(tileSize), // Use tileSize for initial size
+      size: Vector2.all(16),
     );
-    
-    // Add the animation component as a child
     add(_animationComponent);
 
     // Set the initial size and position of the unit
-    size = Vector2.all(tileSize);
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+    size = gameRef.stage.tiles.size;
+    position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     gameRef.eventDispatcher.add(Announcer(this));
-    // gameRef.eventDispatcher.add(Canto(this));
-    gameRef.eventDispatcher.dispatch(UnitCreationEvent(this));
-
+  
     // Create skills for skillset
     for(String skillName in unitData['skills']){
       Skill skill = Skill.fromJson(skillName, this);
       skill.attachToUnit(this, gameRef.eventDispatcher);
     }
+    _loadCompleter.complete();
   }
+
+  Future<void> get loadCompleted => _loadCompleter.future;
   
   @override
   bool handleCommand(LogicalKeyboardKey command) {
     bool handled = false;
-    Stage stage = parent as Stage;
+    Stage stage = gameRef.stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
       if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
-        move(stage);
+        move(stage, stage.cursor.gridCoord);
         getActionOptions();
         openActionMenu(stage);
       }
@@ -296,28 +296,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
   }
 
-  void move(Stage stage){
-    oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
-    for(Point<int> point in paths[stage.cursor.gridCoord]!){
-      enqueueMovement(point);
-      moveCost += stage.tilesMap[point]!.terrain.cost;
-    }
-    Point<int> newTile = paths[stage.cursor.gridCoord]!.last;
-    stage.updateTileWithUnit(gridCoord, newTile, this);
-    stage.blankAllTiles();
-  }
-
-  void undoMove(){
-    Stage stage = parent as Stage;
-    snapToTile(oldTile);
-    stage.updateTileWithUnit(gridCoord, oldTile, this);
-    gridCoord = oldTile;
-    stage.activeComponent = stage.cursor;
-    stage.blankAllTiles();
-  }
   int getStat(String stat){
     return stats[stat]!;
   }
+
   ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
     assert(stats['str'] != null && stats['dex'] != null && stats["mag"] != null && stats['wis'] != null);
     Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats["mag"]!.toDouble(), stats['wis']!.toDouble());
@@ -361,7 +343,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   Vector2 get worldPosition {
-        return Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+        return Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     }
 
   void toggleCanAct(bool state) {
@@ -379,14 +361,6 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     _animationComponent.paint = canAct ? mat.Paint() : grayscalePaint;
   }
 
-  void enqueueMovement(Point<int> targetPoint) {
-    movementQueue.add(targetPoint);
-    if (!isMoving) {
-      isMoving = true;
-      currentTarget = movementQueue.removeFirst();
-    }
-  }
-  
   @override
   void onMount() {
     super.onMount();
@@ -400,34 +374,36 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   void snapToTile(Point<int> point){
-    x = point.x * tileSize;
-    y = point.x * tileSize;
+    x = point.x * size.x;
+    y = point.x * size.y;
   }
 
   @override
   void update(double dt) {
     super.update(dt);
+    // I may not need these three lines. 
+    size = gameRef.stage.tilesize*gameRef.stage.scaling;
+    scale = Vector2.all(gameRef.stage.scaling);
     if(hp <= 0) die();
-
     if (isMoving && currentTarget != null) {
       // Calculate the pixel position for the target tile position
-      final targetX = currentTarget!.x * tileSize;
-      final targetY = currentTarget!.y * tileSize;
+      final targetX = currentTarget!.x * size.x;
+      final targetY = currentTarget!.y * size.y;
 
       // Move towards the target position
-      var moveX = (targetX - x)*.6;
-      var moveY = (targetY - y)*.6;
+      var moveX = (targetX - x)*.3;
+      var moveY = (targetY - y)*.3;
 
       x += moveX;
       y += moveY;
-
+      // dev.log("$gridCoord, $x, $y");
+      // gameRef.stage.cursor.goToUnit(this);
       // Check if the unit is close enough to the target position to snap it
       if ((x - targetX).abs() < 1 && (y - targetY).abs() < 1) {
         x = targetX; // Snap to exact position
         y = targetY;
-        gridCoord = currentTarget!; // Update the gridCoord to the new tile
-        
-
+        gridCoord = currentTarget!; // Update the gridCoord to the new tile        
+       
         // Move to the next target if any
         if (movementQueue.isNotEmpty) {
           currentTarget = movementQueue.removeFirst();
@@ -439,21 +415,78 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     } else {
     // Check if the gridCoord has changed without the animation
     // and update the sprite's position accordingly
-    final expectedX = gridCoord.x * tileSize;
-    final expectedY = gridCoord.y * tileSize;
+    final expectedX = gridCoord.x * size.x;
+    final expectedY = gridCoord.y * size.y;
     if (x != expectedX || y != expectedY) {
       position = Vector2(expectedX, expectedY); // Snap sprite to the new tile position
     }
   }
   }
   
-  void onScaleChanged(double scaleFactor) {
-    tileSize = 16 * scaleFactor; // Update tileSize
-    size = Vector2.all(tileSize); // Update the size of the unit itself
-    _animationComponent.size = Vector2.all(tileSize); // Update animation component size
+  void onScaleChanged(double scaleFactor) {}
 
-    // Update position based on new tileSize
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+  
+  void move(Stage stage, Point<int> destination){
+    oldTile = gridCoord; // Store the position of the unit in case the command gets cancelled
+    if(!paths.keys.contains(destination)){
+      paths[destination] = getPath(destination);
+    }
+    for(Point<int> point in paths[destination]!){
+      enqueueMovement(point);
+      moveCost += stage.tilesMap[point]!.getTerrainCost();
+    }
+    stage.updateTileWithUnit(gridCoord, destination, this);
+    stage.blankAllTiles();
+  }
+
+  void undoMove(){
+    Stage stage = parent as Stage;
+    snapToTile(oldTile);
+    stage.updateTileWithUnit(gridCoord, oldTile, this);
+    gridCoord = oldTile;
+    stage.activeComponent = stage.cursor;
+    stage.blankAllTiles();
+  }
+
+  void enqueueMovement(Point<int> targetPoint) {
+    movementQueue.add(targetPoint);
+    if (!isMoving) {
+      isMoving = true;
+      currentTarget = movementQueue.removeFirst();
+    }
+  }
+  List<Point<int>> getPath(Point<int> destination) {
+    var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
+    var queue = Queue<_TileMovement>(); // Queue for BFS
+
+    // Starting point - no parent at the beginning
+    queue.add(_TileMovement(gridCoord, 100.0, null));
+    while (queue.isNotEmpty) {
+      var tileMovement = queue.removeFirst();
+      Point<int> currentPoint = tileMovement.point;
+      double remainingMovement = tileMovement.remainingMovement;
+
+      // Skip if a better path to this tile has already been found
+      if (visitedTiles.containsKey(currentPoint) && visitedTiles[currentPoint]!.remainingMovement >= remainingMovement) continue;
+      
+      // Record the tile with its movement data
+      visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
+      if(currentPoint == destination) {
+        return _constructPath(destination, visitedTiles);
+      }
+      Tile? tile = gameRef.stage.tilesMap[currentPoint]; // Accessing tiles through stage
+      if (tile!.isOccupied && tile.unit?.team != team) continue; // Skip enemy-occupied tiles
+      for (Direction direction in Direction.values) {
+        Point <int> nextPoint = _getNextPoint(currentPoint, direction);
+        Tile? nextTile = gameRef.stage.tilesMap[Point(nextPoint.x, nextPoint.y)];
+        if (nextTile != null && !(nextTile.isOccupied  && nextTile.unit?.team != team)) {
+          double cost = gameRef.stage.tilesMap[nextTile.gridCoord]!.getTerrainCost();
+          double nextRemainingMovement = remainingMovement - cost;
+            queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
+        }
+      }
+    }
+    return [];
   }
 
   List<Tile> findReachableTiles() {
@@ -475,25 +508,11 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
       Tile? tile = gameRef.stage.tilesMap[currentPoint]; // Accessing tiles through stage
       if (tile!.isOccupied && tile.unit?.team != team) continue; // Skip enemy-occupied tiles
-      for (var direction in Direction.values) {
-        Point<int> nextPoint;
-        switch (direction) {
-          case Direction.left:
-            nextPoint = Point(currentPoint.x - 1, currentPoint.y);
-            break;
-          case Direction.right:
-            nextPoint = Point(currentPoint.x + 1, currentPoint.y);
-            break;
-          case Direction.up:
-            nextPoint = Point(currentPoint.x, currentPoint.y - 1);
-            break;
-          case Direction.down:
-            nextPoint = Point(currentPoint.x, currentPoint.y + 1);
-            break;
-        }
+      for (Direction direction in Direction.values) {
+        Point <int> nextPoint = _getNextPoint(currentPoint, direction);
         Tile? nextTile = gameRef.stage.tilesMap[Point(nextPoint.x, nextPoint.y)];
         if (nextTile != null && !(nextTile.isOccupied  && nextTile.unit?.team != team)) {
-          double cost = gameRef.stage.tilesMap[nextTile.gridCoord]!.terrain.cost;
+          double cost = gameRef.stage.tilesMap[nextTile.gridCoord]!.getTerrainCost();
           double nextRemainingMovement = remainingMovement - cost;
           if (nextRemainingMovement > 0) {
             queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
@@ -606,6 +625,18 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     if (inventory.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
   }
   
+  Point<int> _getNextPoint(Point<int> currentPoint, Direction direction) {
+    switch (direction) {
+      case Direction.left:
+        return Point(currentPoint.x - 1, currentPoint.y);
+      case Direction.right:
+        return Point(currentPoint.x + 1, currentPoint.y);
+      case Direction.up:
+        return Point(currentPoint.x, currentPoint.y - 1);
+      case Direction.down:
+        return Point(currentPoint.x, currentPoint.y + 1);
+    }
+  }
 }
 
 class _TileMovement {

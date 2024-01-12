@@ -19,7 +19,7 @@ export 'tile.dart';
 enum Direction {up, down, left, right}
 enum UnitTeam {blue, red, green, yellow}
 enum TileState {blank, move, attack}
-enum Terrain {forest, path, cliff, water, neutral}
+enum Terrain {forest, path, cliff, sea, stream, fort, plain}
 enum ItemType {main, gear, treasure, basic}
 extension TerrainCost on Terrain {
   double get cost {
@@ -27,8 +27,10 @@ extension TerrainCost on Terrain {
       case Terrain.forest:
         return 2;
       case Terrain.cliff:
-        return 3;
-      case Terrain.water:
+        return 100;
+      case Terrain.sea:
+        return 100;
+      case Terrain.stream:
         return 100;
       case Terrain.path:
         return .7;

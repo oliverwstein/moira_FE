@@ -8,48 +8,25 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart';
 
 import 'engine.dart';
-class Cursor extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility implements CommandHandler {
   /// Cursor represents the player's cursor in the game world. It extends the PositionComponent,
   /// allowing it to have a position in the game world, and implements CommandHandler for handling
   /// keyboard inputs. The Cursor navigates the game's stage, interacting with tiles and units.
-  ///
-  /// Attributes:
-  /// - `_animationComponent`: Component for rendering cursor animations.
-  /// - `cursorSheet`: SpriteSheet for cursor animations.
-  /// - `ActionMenu`: ActionMenu component associated with the cursor for in-game actions.
-  /// - `gridCoord`: The cursor's position in terms of tiles, not pixels.
-  /// - `tileSize`: Size of the cursor in pixels, adjusted by the game's scale factor.
-  ///
-  /// Methods:
-  /// - `onLoad()`: Asynchronously loads resources necessary for the cursor, such as animations.
-  /// - `move(direction)`: Moves the cursor in the given direction, updating both tile and pixel positions.
-  /// - `select()`: Interacts with the tile at the cursor's current position, handling unit selection and battle menu toggling.
-  /// - `handleCommand(command)`: Implements the CommandHandler interface to handle keyboard commands.
-  /// - `onMount()`: Observes lifecycle changes, adds itself to game observers on mounting.
-  /// - `onRemove()`: Cleans up by removing itself from game observers on removal.
-  /// - `onScaleChanged(scaleFactor)`: Updates the cursor's size and position based on the game's scale factor.
-  ///
-  /// Constructor:
-  /// Initializes the cursor with a default tile position and sets up its size based on the game's scale factor.
-  ///
-  /// Usage:
-  /// The Cursor is the main interface for the player to interact with the game world, allowing them to move around the map, select units, and access menus. It is a crucial component for game navigation and interaction.
-  ///
-  /// Connects with:
-  /// - MyGame: Inherits properties and methods from HasGameRef<MyGame> for game reference.
-  /// - Stage: Interacts with and navigates within the Stage class, which holds all tiles and units.
-  /// - Tile: Interacts with tiles to select units or display menus.
-  /// - Unit: May select units on the tiles to activate them or show their possible movements.
-
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   late final ActionMenu actionMenu;
-  Point<int> gridCoord = const Point(59, 12); // The cursor's position in terms of tiles, not pixels
-  late double tileSize;
+  Point<int> gridCoord = const Point(32, 25); // The cursor's initial position in terms of tiles, not pixels
 
-  Cursor() {
-    // Initial size, will be updated in onLoad
-    tileSize = 16 * MyGame().scaleFactor;
+  Cursor() {}
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    isVisible = (gameRef.stage.activeTeam == UnitTeam.blue);
+    scale = Vector2.all(gameRef.stage.scaling);
+    size = gameRef.stage.tilesize*gameRef.stage.scaling;
+    x = gridCoord.x * size.x;
+    y = gridCoord.y * size.y;
   }
 
   @override
@@ -64,7 +41,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
 
     _animationComponent = SpriteAnimationComponent(
       animation: cursorSheet.createAnimation(row: 0, stepTime: .2),
-      size: Vector2.all(tileSize), // Use tileSize for initial size
+      size: Vector2.all(16), // Use 16 for initial size
     );
 
     // Add the animation component as a child
@@ -73,18 +50,24 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
     add(actionMenu);
 
     // Set the initial size and position of the cursor
-    size = Vector2.all(tileSize);
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+    size = gameRef.stage.tilesize*gameRef.stage.scaling;
+    position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
   }
 
   Vector2 get worldPosition {
-        return Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+        return Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
     }
 
   void goToUnit(Unit unit){
     position = Vector2(unit.x, unit.y);
-    gridCoord = Point(unit.x ~/ unit.tileSize, unit.y ~/ unit.tileSize);
+    gridCoord = Point(unit.x ~/ size.x, unit.y ~/ size.y);
   }
+
+  void goToCoord(Point<int> point){
+    gridCoord = point;
+    position = Vector2(point.x * size.x, point.y * size.y);
+  }
+
   void move(Direction direction) {
     // Assuming parent is always a Stage which is the case in this architecture
     Stage stage = parent as Stage;
@@ -113,10 +96,12 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
 
     // Update gridCoord if it's within the map
     gridCoord = Point(newX, newY);
+    gameRef.camera.moveTo(worldPosition);
+    dev.log("${gameRef.camera.visibleWorldRect}");
 
     // Update the pixel position of the cursor
-    x = gridCoord.x * tileSize;
-    y = gridCoord.y * tileSize;
+    x = gridCoord.x * size.x;
+    y = gridCoord.y * size.y;
     dev.log('Cursor @ $gridCoord, ${stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${stage.tilesMap[gridCoord]!.isOccupied}, ${stage.tilesMap[gridCoord]!.unit?.canAct}');
   }
   
@@ -203,15 +188,11 @@ class Cursor extends PositionComponent with HasGameRef<MyGame> implements Comman
   }
   
   void snapToTile(Point<int> point){
-    x = point.x * tileSize;
-    y = point.x * tileSize;
+    x = point.x * size.x;
+    y = point.x * size.y;
   }
   void onScaleChanged(double scaleFactor) {
-    tileSize = 16 * scaleFactor; // Update tileSize
-    size = Vector2.all(tileSize); // Update the size of the cursor itself
-    _animationComponent.size = Vector2.all(tileSize); // Update animation component size
-
-    // Update position based on new tileSize
-    position = Vector2(gridCoord.x * tileSize, gridCoord.y * tileSize);
+    // If I let the user change the size of the mapview (in tiles),
+    // this will be needed later.
   }
 }
