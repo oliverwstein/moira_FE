@@ -205,16 +205,16 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       stage.blankAllTiles();
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowLeft) {
-      stage.cursor.move(Direction.left);
+      stage.cursor.handleCommand(command);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowRight) {
-      stage.cursor.move(Direction.right);
+      stage.cursor.handleCommand(command);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) {
-      stage.cursor.move(Direction.up);
+      stage.cursor.handleCommand(command);
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
-      stage.cursor.move(Direction.down);
+      stage.cursor.handleCommand(command);
       handled = true;
     }
     return handled;
