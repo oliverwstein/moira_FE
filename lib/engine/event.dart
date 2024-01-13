@@ -199,10 +199,12 @@ class ActionMenuEvent extends Event {
       unit!.getActionOptions();
       actionMenu = ActionMenu(unit!.actionsAvailable, unit);
       unit!.add(actionMenu);
+      dev.log("action menu @ ${actionMenu.absolutePosition}");
     } else {
       List<MenuOption> actionsAvailable = [MenuOption.unitList, MenuOption.save, MenuOption.endTurn];
       actionMenu = ActionMenu(actionsAvailable);
       game.stage.cursor.add(actionMenu);
+      dev.log("action menu @ ${actionMenu.absolutePosition}");
     }
   }
 
@@ -293,7 +295,7 @@ class UnitWaitEvent extends Event {
   }
   @override
   void execute() async {
-    dev.log("$unit waits.");
+    dev.log("${unit.name} waits.");
     _isStarted = true;
     unit.wait();
     _isCompleted = true;

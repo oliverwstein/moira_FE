@@ -43,14 +43,14 @@ TextPaint basicTextRenderer = TextPaint(
       );
 class ActionMenu extends PositionComponent with HasGameRef<MyGame>{
   List<MenuOption> options;
-  Map<MenuOption, SpriteComponent> optionMap = {};
+  Map<MenuOption, ActionOption> optionMap = {};
   int selectedIndex = 0;
   late SpriteSheet blankWindowSpriteSheet;
   Unit? unit;
   ActionMenu(this.options, [this.unit]);
 
   @override
-  Future<void> onLoad() async {
+  Future<void> onMount() async {
     dev.log("Action Menu loaded.");
     ui.Image blankWindowImage = await gameRef.images.load('fancy_window.png');
     blankWindowSpriteSheet = SpriteSheet.fromColumnsAndRows(
@@ -58,33 +58,30 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame>{
       columns: 1,
       rows: 2,
     );
-    for (var option in MenuOption.values) {
-      var boxComponent = SpriteComponent(sprite: blankWindowSpriteSheet.getSprite(1, 1));
-      var textComponent = TextComponent(
-        text: option.label,
-        textRenderer: basicTextRenderer,
-        anchor: Anchor.center
-      );
-      boxComponent.add(textComponent);
-      boxComponent.scale = Vector2.all(gameRef.stage.scaling);
-      optionMap[option] = (boxComponent);
-      add(boxComponent);
+    for (var option in options) {
+      ActionOption actionOption = ActionOption(blankWindowSpriteSheet, option);
+      actionOption._spriteComponent.size = gameRef.stage.cursor.size;
+      actionOption._spriteComponent.scale = Vector2.all(gameRef.stage.scaling);
+      add(actionOption);
+      optionMap[option] = (actionOption);
     }
-    optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(2, 1);
+    optionMap[options[selectedIndex]]!.toggleHighlight();
+    dev.log("$options, selected: ${options[selectedIndex]}");
   }
 
   void move(Direction dir) {
     if (options.isNotEmpty){
       if (dir == Direction.up) {
-        optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(1, 1);
+        optionMap[options[selectedIndex]]!.toggleHighlight();
           selectedIndex = (selectedIndex - 1) % options.length;
-          optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(2, 1);
+          optionMap[options[selectedIndex]]!.toggleHighlight();
       } else 
       if (dir == Direction.down) {
-          optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(1, 1);
+          optionMap[options[selectedIndex]]!.toggleHighlight();
           selectedIndex = (selectedIndex + 1) % options.length;
-          optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(2, 1);
+          optionMap[options[selectedIndex]]!.toggleHighlight();
       }
+      dev.log("selected: ${options[selectedIndex]}");
     }
   }
 
@@ -117,6 +114,32 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame>{
   void close(){
     removeFromParent();
   }
+}
+
+class ActionOption extends PositionComponent with HasGameRef<MyGame>{
+  MenuOption option;
+  SpriteSheet blankWindowSpriteSheet;
+  late SpriteComponent _spriteComponent;
+  int highlight = 1;
+  ActionOption(this.blankWindowSpriteSheet, this.option){
+    _spriteComponent = SpriteComponent(sprite: blankWindowSpriteSheet.getSprite(highlight, 1));
+  } 
+  @override
+  Future<void> onMount() async {
+    size = gameRef.stage.tiles.size;
+    // add(TextComponent(
+    //   text: option.label,
+    //   textRenderer: basicTextRenderer,
+    //   anchor: Anchor.center
+    // ));
+    add(_spriteComponent);
+  }
+
+  void toggleHighlight(){
+    highlight = (highlight == 1) ? highlight = 2 : highlight = 1;
+    _spriteComponent.sprite = blankWindowSpriteSheet.getSprite(highlight, 1);
+  }
+
 }
 
 // class ActionMenuOld extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {

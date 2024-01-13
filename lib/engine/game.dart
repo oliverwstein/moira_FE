@@ -151,9 +151,7 @@ class MyGame extends FlameGame with KeyboardEvents {
   // ignore: avoid_renaming_method_parameters
   KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
-    // First, handle any game-wide key events (like zooming)
-    // Check if there is an event being processed and if it handles the user input
-    dev.log("Game onKeyEvent");
+    // dev.log("Game onKeyEvent");
     if (eventQueue.isProcessing() && key is RawKeyDownEvent) {
       dev.log("Game onKeyEvent eventQueue isProcessing");
       for (var event in eventQueue.currentBatch()) {
