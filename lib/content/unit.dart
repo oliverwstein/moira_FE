@@ -194,10 +194,9 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     Stage stage = gameRef.stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
       if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
-        gameRef.eventQueue.addEventBatch([UnitMoveEvent(gameRef, this, stage.cursor.gridCoord)]);
-        // move(stage, stage.cursor.gridCoord);
-        getActionOptions();
-        openActionMenu(stage);
+        gameRef.eventQueue.addEventBatch([
+          UnitMoveEvent(gameRef, this, stage.cursor.gridCoord),
+          UnitActionMenuEvent(gameRef, this)]);
       }
       
       handled = true;
@@ -328,18 +327,17 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
 
   }
-  void openActionMenu(Stage stage){
-    stage.cursor.actionMenu.show(actionsAvailable);
-    stage.activeComponent = stage.cursor.actionMenu;
+  void openActionMenu(){
+    gameRef.stage.cursor.actionMenu.show(actionsAvailable);
+    gameRef.stage.activeComponent = gameRef.stage.cursor.actionMenu;
   }
 
   void wait(){
-    Stage stage = parent as Stage;
     toggleCanAct(false);
     actionsAvailable = [MenuOption.wait];
-    stage.activeComponent = stage.cursor;
-    stage.blankAllTiles();
-    stage.updateTileWithUnit(oldTile, gridCoord, this);
+    gameRef.stage.activeComponent = gameRef.stage.cursor;
+    gameRef.stage.blankAllTiles();
+    gameRef.stage.updateTileWithUnit(oldTile, gridCoord, this);
     oldTile = gridCoord;
   }
 
@@ -614,14 +612,14 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
   
   void getActionOptions() {
-    Stage stage = parent as Stage;
     (int, int) range = getCombatRange();
-    List<Tile> attackTiles = markAttackableEnemies(stage.cursor.gridCoord, range.$1, range.$2);
+    List<Tile> attackTiles = markAttackableEnemies(gameRef.stage.cursor.gridCoord, range.$1, range.$2);
     if(attackTiles.isEmpty){
       if(actionsAvailable.contains(MenuOption.attack)){
         actionsAvailable.remove(MenuOption.attack);}
     }
     if (inventory.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
+    dev.log("Action options for $name are: $actionsAvailable");
   }
   
   Point<int> _getNextPoint(Point<int> currentPoint, Direction direction) {

@@ -182,6 +182,29 @@ class UnitMoveEvent extends Event {
   }
 }
 
+class UnitActionMenuEvent extends Event {
+  @override
+  String get type => 'Movement';
+  final MyGame game;
+  final Unit unit;
+  List<Event>? nextEventBatch;
+  UnitActionMenuEvent(this.game, this.unit, [this.nextEventBatch]);
+
+  @override
+  void execute() async { // Make this method async
+    _isStarted = true;
+    dev.log("Event: Open action menu for ${unit.name}");
+    unit.getActionOptions();
+    unit.openActionMenu();
+    if(nextEventBatch != null) game.eventQueue.addEventBatch(nextEventBatch!);
+    
+  }
+  @override
+  bool checkComplete() {
+    return (_isStarted);
+  }
+}
+
 class CursorMoveEvent extends Event {
   @override
   String get type => 'Movement';
