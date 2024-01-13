@@ -58,7 +58,7 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
         y = targetY;
         gridCoord = targetPoint;
         isMoving = false;
-        dev.log("Cursor @ $gridCoord");
+        dev.log('Cursor @ $gridCoord, ${gameRef.stage.tilesMap[gridCoord]!.terrain}, isOccupied = ${gameRef.stage.tilesMap[gridCoord]!.isOccupied}, ${gameRef.stage.tilesMap[gridCoord]!.unit}');
         currentDirection = null;
       }
     }

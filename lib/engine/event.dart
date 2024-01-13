@@ -165,13 +165,16 @@ class UnitMoveEvent extends Event {
   final MyGame game;
   final Point<int> gridCoord;
   final Unit unit;
-  UnitMoveEvent(this.game, this.unit, this.gridCoord);
+  List<Event>? nextEventBatch;
+  UnitMoveEvent(this.game, this.unit, this.gridCoord, [this.nextEventBatch]);
 
   @override
   void execute() async { // Make this method async
     _isStarted = true;
-    dev.log("Move unit ${unit.name}");
+    dev.log("Event: Move unit ${unit.name}");
     unit.move(game.stage, gridCoord);
+    if(nextEventBatch != null) game.eventQueue.addEventBatch(nextEventBatch!);
+    
   }
   @override
   bool checkComplete() {

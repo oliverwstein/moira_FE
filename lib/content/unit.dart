@@ -194,7 +194,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     Stage stage = gameRef.stage;
     if (command == LogicalKeyboardKey.keyA) { // Confirm the move.
       if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
-        move(stage, stage.cursor.gridCoord);
+        gameRef.eventQueue.addEventBatch([UnitMoveEvent(gameRef, this, stage.cursor.gridCoord)]);
+        // move(stage, stage.cursor.gridCoord);
         getActionOptions();
         openActionMenu(stage);
       }
