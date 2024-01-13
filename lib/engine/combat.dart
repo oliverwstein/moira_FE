@@ -121,23 +121,22 @@ class CombatBox extends PositionComponent with HasGameRef<MyGame> implements Com
 
   @override
   bool handleCommand(LogicalKeyboardKey command) {
-    Stage stage = attacker.parent as Stage;
     bool handled = false;
     if (command == LogicalKeyboardKey.keyA) { // Make the attack.
       dev.log("${attacker.name} attacked ${defender.name}");
       combat.bout(attacker, defender, attacker.attackSet[attackList[selectedAttackIndex]]!);
       attacker.wait();
       close();
-      stage.activeComponent = stage.cursor;
+      gameRef.stage.activeComponent = gameRef.stage.cursor;
       attacker.remainingMovement -= attacker.moveCost;
       gameRef.eventDispatcher.dispatch(UnitActionEndEvent(attacker));
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB) { // Cancel the action.
       dev.log("${attacker.name} cancelled it's attack on ${defender.name}");
       close();
-      stage.cursor.goToUnit(attacker);
+      gameRef.stage.cursor.goToUnit(attacker);
       attacker.getActionOptions();
-      attacker.openActionMenu(stage);
+      attacker.openActionMenu();
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowUp) { // Change attack option
       selectedAttackIndex = (selectedAttackIndex + 1) % attackList.length;
