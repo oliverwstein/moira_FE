@@ -41,19 +41,29 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
       columns: 2,
       rows: 1,
     );
-
+    size = gameRef.stage.tilesize * gameRef.stage.scaling;
     _moveAnimationComponent = SpriteAnimationComponent(
-      animation: movementSheet.createAnimation(row: 0, stepTime: .2),
-      size: Vector2.all(gameRef.stage.scaling*.9), // Use tileSize for initial size
+      animation: movementSheet.createAnimation(row: 0, stepTime: .2), 
     );
 
     _attackAnimationComponent = SpriteAnimationComponent(
       animation: attackSheet.createAnimation(row: 0, stepTime: .2),
-      size: Vector2.all(gameRef.stage.scaling*.9), // Use tileSize for initial size
     );
-    position = Vector2(gridCoord.x * gameRef.stage.scaling, gridCoord.y * gameRef.stage.scaling);
+    position = Vector2(gridCoord.x*size.x, gridCoord.y*size.y);
   }
 
+  @override
+void update(double dt) {
+  super.update(dt);
+  size = gameRef.stage.tilesize*gameRef.stage.scaling;
+  scale = Vector2.all(gameRef.stage.scaling);
+  // Update position based on the grid coordinates and scaling factor
+  position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
+
+  // Update the size of the animation components to match the tile size
+  _moveAnimationComponent.scale = Vector2.all(.4);
+  _attackAnimationComponent.scale = Vector2.all(.4);
+}
   void setUnit(Unit newUnit) {
     unit = newUnit;
   }
