@@ -391,8 +391,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       final targetY = currentTarget!.y * size.y;
 
       // Move towards the target position
-      var moveX = (targetX - x)*.3;
-      var moveY = (targetY - y)*.3;
+      var moveX = (targetX - x) * 16 * dt;
+      var moveY = (targetY - y) * 16 * dt;
 
       x += moveX;
       y += moveY;

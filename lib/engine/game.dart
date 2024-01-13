@@ -117,6 +117,21 @@ class MyGame extends FlameGame with KeyboardEvents {
       UnitCreationEvent(this, "Brigand", const Point(42, 20), 1, Point(45, 22)),
       UnitCreationEvent(this, "Brigand", const Point(42, 22), 1, Point(42, 26))]);
     eventQueue.addEventBatch([
+      UnitCreationEvent(this, "Brigand", const Point(40, 17), 1, Point(46, 11)),
+      UnitCreationEvent(this, "Brigand", const Point(40, 14), 1, Point(50, 14)),
+      UnitCreationEvent(this, "Brigand", const Point(44, 10), 1, Point(48, 7)),
+      UnitCreationEvent(this, "Brigand", const Point(40, 11), 1, Point(40, 11)),
+      UnitCreationEvent(this, "Brigand", const Point(35, 10), 1, Point(35, 10)),
+      UnitCreationEvent(this, "Brigand", const Point(31, 8), 1, Point(31, 8)),
+      UnitCreationEvent(this, "Brigand", const Point(34, 4), 1, Point(34, 4)),
+      UnitCreationEvent(this, "Brigand", const Point(35, 4), 1, Point(35, 4)),
+      UnitCreationEvent(this, "Brigand", const Point(12, 8), 1, Point(12, 8)),
+      UnitCreationEvent(this, "Brigand", const Point(11, 12), 1, Point(11, 12)),
+      UnitCreationEvent(this, "Brigand", const Point(24, 13), 1, Point(24, 13)),
+      UnitCreationEvent(this, "Brigand", const Point(24, 13), 1, Point(24, 13)),
+      UnitCreationEvent(this, "Brigand", const Point(21, 17), 1, Point(21, 17)),
+      UnitCreationEvent(this, "Brigand", const Point(23, 21), 1, Point(23, 21)),]);
+    eventQueue.addEventBatch([
       UnitCreationEvent(this, "Arden", const Point(59, 12), -1, Point(59, 10)),
       UnitCreationEvent(this, "Alec", const Point(59, 12), -1, Point(58, 12)),
       UnitCreationEvent(this, "Noish", const Point(59, 12), -1, Point(60, 12)),
