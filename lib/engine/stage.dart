@@ -181,6 +181,7 @@ class Stage extends Component with HasGameRef<MyGame>{
 }
 
   bool keyCommandHandler(LogicalKeyboardKey command) {
+    dev.log("$activeComponent");
     if (activeComponent is CommandHandler) {
       return (activeComponent as CommandHandler).handleCommand(command);
     }

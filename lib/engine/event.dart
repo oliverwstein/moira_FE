@@ -59,9 +59,10 @@ abstract class Event {
   void execute(){}
   bool _isStarted = false;
   bool _isCompleted = false;
+  bool handled = true;
   bool checkStarted(){return _isStarted;}
   bool checkComplete(){return _isCompleted;}
-  void handleUserInput(RawKeyEvent event){}
+  bool handleUserInput(RawKeyEvent event){return handled;}
 }
 
 class TitleCardCreationEvent extends Event {
@@ -87,10 +88,11 @@ class TitleCardCreationEvent extends Event {
   }
 
   @override
-  void handleUserInput(RawKeyEvent event) {
+  bool handleUserInput(RawKeyEvent event) {
     // You can customize this condition based on your specific requirement
     _isCompleted = true;
     game.eventQueue.addEventBatch(nextEventBatch);
+    return true;
   }  
 }
 
@@ -182,9 +184,63 @@ class UnitMoveEvent extends Event {
   }
 }
 
+class ItemMenuEvent extends Event {
+  @override
+  String get type => 'Menu';
+  final MyGame game;
+  final Unit unit;
+  List<Event>? nextEventBatch;
+  late ItemMenu itemMenu;
+  ItemMenuEvent(this.game, this.unit, [this.nextEventBatch]);
+
+  @override
+  void execute() async { // Make this method async
+    _isStarted = true;
+    dev.log("Event: Open item menu for ${unit.name}");
+    itemMenu = ItemMenu(unit);
+    unit.add(itemMenu);
+    dev.log("${unit.name} has ${itemMenu.inventory.map((item) => item.name).join(", ")}");
+  }
+
+  @override
+  bool checkComplete() {
+    return (_isCompleted);
+  }
+
+  @override
+  bool handleUserInput(RawKeyEvent event) {
+    LogicalKeyboardKey command = event.logicalKey;
+    bool handled = false;
+    itemMenu.handleCommand(command);
+    if (command == LogicalKeyboardKey.arrowUp) {
+      dev.log("Item Menu ArrowUp to ${itemMenu.inventory[itemMenu.selectedIndex].name}");
+      handled = true;
+    } else 
+    if (command == LogicalKeyboardKey.arrowDown) {
+      dev.log("Item Menu ArrowDown to ${itemMenu.inventory[itemMenu.selectedIndex].name}");
+      handled = true;
+    } else 
+    if (command == LogicalKeyboardKey.keyA) {
+      dev.log("Item Menu Select ${itemMenu.inventory[itemMenu.selectedIndex]}");
+      // @TODO: once the option to use an item exists, using an item should complete the event.
+      // It should also complete the event differently than cancellation should, 
+      // because equipping is a free action and using an item is not.
+      itemMenu.close();
+      _isCompleted = true;
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
+      dev.log("Item Menu Cancelled");
+      itemMenu.close();
+      _isCompleted = true;
+      handled = true;
+    }
+    return handled;
+  }  
+}
+
 class ActionMenuEvent extends Event {
   @override
-  String get type => 'Movement';
+  String get type => 'Menu';
   final MyGame game;
   final Unit? unit;
   List<Event>? nextEventBatch;
@@ -199,12 +255,10 @@ class ActionMenuEvent extends Event {
       unit!.getActionOptions();
       actionMenu = ActionMenu(unit!.actionsAvailable, unit);
       unit!.add(actionMenu);
-      dev.log("action menu @ ${actionMenu.absolutePosition}");
     } else {
       List<MenuOption> actionsAvailable = [MenuOption.unitList, MenuOption.save, MenuOption.endTurn];
       actionMenu = ActionMenu(actionsAvailable);
       game.stage.cursor.add(actionMenu);
-      dev.log("action menu @ ${actionMenu.absolutePosition}");
     }
   }
 
@@ -230,13 +284,14 @@ class ActionMenuEvent extends Event {
     if (command == LogicalKeyboardKey.keyA) {
       dev.log("Action Menu Select ${actionMenu.options[actionMenu.selectedIndex]}");
       game.eventQueue.addEventBatch(actionMenu.select());
-      actionMenu.close();
       _isCompleted = true;
+      actionMenu.close();
       handled = true;
     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
       dev.log("Action Menu Cancelled");
-      actionMenu.close();
+      if (unit != null) unit!.undoMove();
       _isCompleted = true;
+      actionMenu.close();
       handled = true;
     }
     return handled;

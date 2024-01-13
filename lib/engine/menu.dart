@@ -81,7 +81,6 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame>{
           selectedIndex = (selectedIndex + 1) % options.length;
           optionMap[options[selectedIndex]]!.toggleHighlight();
       }
-      dev.log("selected: ${options[selectedIndex]}");
     }
   }
 
@@ -101,7 +100,7 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame>{
         return [];
       case MenuOption.item:
         dev.log("Item Selected in ActionMenu");
-        return [];
+        return [ItemMenuEvent(game, unit!)];
       case MenuOption.wait:
         dev.log("Wait Selected in ActionMenu");
         if(unit != null) return [UnitWaitEvent(unit!)];
@@ -112,6 +111,8 @@ class ActionMenu extends PositionComponent with HasGameRef<MyGame>{
   }
 
   void close(){
+    dev.log("${gameRef.stage.activeComponent}");
+    removeAll(children);
     removeFromParent();
   }
 }
@@ -334,7 +335,6 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
         }
       }
       indexMap[i] = textComponent;
-      
     }
     indexMap[0]!.textRenderer = selectedTextRenderer;
   }

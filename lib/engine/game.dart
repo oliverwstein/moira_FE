@@ -151,18 +151,19 @@ class MyGame extends FlameGame with KeyboardEvents {
   // ignore: avoid_renaming_method_parameters
   KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
-    // dev.log("Game onKeyEvent");
-    if (eventQueue.isProcessing() && key is RawKeyDownEvent) {
-      dev.log("Game onKeyEvent eventQueue isProcessing");
-      for (var event in eventQueue.currentBatch()) {
-        event.handleUserInput(key);
-        handled = true;
+    if(key is RawKeyDownEvent){
+      if (eventQueue.isProcessing()) {
+        dev.log("Game onKeyEvent: Hand key to event");
+        for (var event in eventQueue.currentBatch()) {
+          handled = event.handleUserInput(key);
+          dev.log("Game onKeyEvent: $event tries to handle it. Result: $handled");
+        }
       }
-    }
-    // Handle game-wide key events if not handled by an event
-    if (!handled) {
-      if (key is RawKeyDownEvent) {
-          handled = stage.keyCommandHandler(key.logicalKey);
+      // Handle game-wide key events if not handled by an event
+      dev.log("Game onKeyEvent: handled = $handled, eventQueue batch is: ${eventQueue.currentBatch()}");
+      if (!handled) {
+        dev.log("Game onKeyEvent handed to stage.");
+        handled = stage.keyCommandHandler(key.logicalKey);
       }
     }
     return handled ? KeyEventResult.handled : KeyEventResult.ignored;
