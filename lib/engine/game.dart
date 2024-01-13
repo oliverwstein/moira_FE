@@ -93,22 +93,27 @@ class MyGame extends FlameGame with KeyboardEvents {
     classMap = await loadClassesData();
     eventQueue.addEventBatch([TitleCardCreationEvent(this, [])]);
     eventQueue.addEventBatch([StageCreationEvent(this, [])]);
+    // First batch of enemies
     eventQueue.addEventBatch([
       UnitCreationEvent(this, "Brigand", const Point(24, 22), 1, Point(33, 25)),
       UnitCreationEvent(this, "Brigand", const Point(23, 22), 5, Point(32, 26)),
       UnitCreationEvent(this, "Brigand", const Point(22, 20), 1, Point(31, 25)),
       UnitCreationEvent(this, "Brigand", const Point(21, 19), 1, Point(30, 28)),]);
+    // Second batch of enemies
     eventQueue.addEventBatch([
       UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(37, 26)),
       UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 25)),
       UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(35, 26)),
       UnitCreationEvent(this, "Brigand", const Point(21, 19), 1, Point(27, 27)),]);
+    // Third batch of enemies
     eventQueue.addEventBatch([
       UnitCreationEvent(this, "Brigand", const Point(37, 15), 1, Point(36, 20)),
       UnitCreationEvent(this, "Brigand", const Point(35, 15), 5, Point(35, 19)),
       UnitCreationEvent(this, "Brigand", const Point(36, 16), 1, Point(36, 18)),
       UnitCreationEvent(this, "Brigand", const Point(20, 22), 1, Point(32, 25)),
       UnitCreationEvent(this, "Brigand", const Point(20, 22), 5, Point(33, 26)),]);
+    //@TODO events with Midir go here
+    // Pan to Chalphy and add enemies
     eventQueue.addEventBatch([
       CursorMoveEvent(this, Point(59, 12)),
       UnitCreationEvent(this, "Brigand", const Point(42, 20), 1, Point(41, 20)),
@@ -116,6 +121,7 @@ class MyGame extends FlameGame with KeyboardEvents {
       UnitCreationEvent(this, "Brigand", const Point(42, 21), 1, Point(46, 21)),
       UnitCreationEvent(this, "Brigand", const Point(42, 20), 1, Point(45, 22)),
       UnitCreationEvent(this, "Brigand", const Point(42, 22), 1, Point(42, 26))]);
+    // Add other enemies
     eventQueue.addEventBatch([
       UnitCreationEvent(this, "Brigand", const Point(40, 17), 1, Point(46, 11)),
       UnitCreationEvent(this, "Brigand", const Point(40, 14), 1, Point(50, 14)),
@@ -131,12 +137,14 @@ class MyGame extends FlameGame with KeyboardEvents {
       UnitCreationEvent(this, "Brigand", const Point(24, 13), 1, Point(24, 13)),
       UnitCreationEvent(this, "Brigand", const Point(21, 17), 1, Point(21, 17)),
       UnitCreationEvent(this, "Brigand", const Point(23, 21), 1, Point(23, 21)),]);
+    // Add player units
     eventQueue.addEventBatch([
       UnitCreationEvent(this, "Arden", const Point(59, 12), -1, Point(59, 10)),
       UnitCreationEvent(this, "Alec", const Point(59, 12), -1, Point(58, 12)),
       UnitCreationEvent(this, "Noish", const Point(59, 12), -1, Point(60, 12)),
       UnitCreationEvent(this, "Sigurd", const Point(59, 12), -1, Point(59, 13)),]);
-
+    // StartTurnEvent
+    eventQueue.addEventBatch([TurnStartEvent(this, UnitTeam.blue)]);
   }
 
   @override

@@ -35,19 +35,16 @@ class EventQueue {
   void update(double dt) {
     if (_isProcessing) {
       if (_currentBatch.every((event) => event.checkComplete())){
-        dev.log("Current batch is $_currentBatch, _isProcessing && all batch events completed.");
         // If the batch elements have all been completed, clear the batch
         // and allow EventQueue to go on to the next batch.
         _isProcessing = false;
         _currentBatch.clear();
       } else {
-        dev.log("Current batch is $_currentBatch, _isProcessing && some batch events still in progress.");
         List<Event> batch = [];
         for (Event event in _currentBatch){if (!event.checkStarted()) batch.add(event);}
         executeBatch(batch);}
     }
     if (!_isProcessing && _eventBatches.isNotEmpty) {
-      dev.log("Current batch is $_currentBatch, !_isProcessing && _eventBatches.isNotEmpty");
       // Pop the next batch waiting in the queue as the current batch
       _currentBatch = _eventBatches.removeFirst();
       // Execute all events in the current batch simultaneously
@@ -203,9 +200,16 @@ class CursorMoveEvent extends Event {
 }
 
 class TurnStartEvent extends Event {
+  final MyGame game;
   final UnitTeam activeTeam;
-  TurnStartEvent(this.activeTeam);
-
+  TurnStartEvent(this.game, this.activeTeam);
+  @override
+  void execute() async { // Make this method async
+    dev.log("Start turn ${game.stage.turn} for $activeTeam");
+    _isStarted = true;
+    game.stage.activeTeam = activeTeam;
+    _isCompleted = true;
+  }
 }
 
 

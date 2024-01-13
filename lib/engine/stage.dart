@@ -57,7 +57,6 @@ class Stage extends Component with HasGameRef<MyGame>{
       }
     }
     
-    activeTeam = UnitTeam.blue;
     cursor = Cursor();
     activeComponent = cursor;
     add(cursor);
