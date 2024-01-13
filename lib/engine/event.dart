@@ -182,27 +182,63 @@ class UnitMoveEvent extends Event {
   }
 }
 
-class UnitActionMenuEvent extends Event {
+class ActionMenuEvent extends Event {
   @override
   String get type => 'Movement';
   final MyGame game;
-  final Unit unit;
+  final Unit? unit;
   List<Event>? nextEventBatch;
-  UnitActionMenuEvent(this.game, this.unit, [this.nextEventBatch]);
+  late ActionMenu actionMenu;
+  ActionMenuEvent(this.game, this.unit, [this.nextEventBatch]);
 
   @override
   void execute() async { // Make this method async
     _isStarted = true;
-    dev.log("Event: Open action menu for ${unit.name}");
-    unit.getActionOptions();
-    unit.openActionMenu();
-    if(nextEventBatch != null) game.eventQueue.addEventBatch(nextEventBatch!);
-    
+    if(unit != null){
+      dev.log("Event: Open action menu for ${unit!.name}");
+      unit!.getActionOptions();
+      actionMenu = ActionMenu(unit!.actionsAvailable, unit);
+      unit!.add(actionMenu);
+    } else {
+      List<MenuOption> actionsAvailable = [MenuOption.unitList, MenuOption.save, MenuOption.endTurn];
+      actionMenu = ActionMenu(actionsAvailable);
+      game.stage.cursor.add(actionMenu);
+    }
   }
+
   @override
   bool checkComplete() {
-    return (_isStarted);
+    return (_isCompleted);
   }
+
+  @override
+  bool handleUserInput(RawKeyEvent event) {
+    LogicalKeyboardKey command = event.logicalKey;
+    bool handled = false;
+    if (command == LogicalKeyboardKey.arrowUp) {
+      actionMenu.move(Direction.up);
+      dev.log("Action Menu ArrowUp to ${actionMenu.options[actionMenu.selectedIndex]}");
+      handled = true;
+    } else 
+    if (command == LogicalKeyboardKey.arrowDown) {
+      actionMenu.move(Direction.down);
+      dev.log("Action Menu ArrowDown to ${actionMenu.options[actionMenu.selectedIndex]}");
+      handled = true;
+    } else 
+    if (command == LogicalKeyboardKey.keyA) {
+      dev.log("Action Menu Select ${actionMenu.options[actionMenu.selectedIndex]}");
+      game.eventQueue.addEventBatch(actionMenu.select());
+      actionMenu.close();
+      _isCompleted = true;
+      handled = true;
+    } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
+      dev.log("Action Menu Cancelled");
+      actionMenu.close();
+      _isCompleted = true;
+      handled = true;
+    }
+    return handled;
+  }  
 }
 
 class CursorMoveEvent extends Event {
@@ -238,12 +274,35 @@ class TurnStartEvent extends Event {
   }
 }
 
+class TurnEndEvent extends Event {
+  final MyGame game;
+  TurnEndEvent(this.game);
+  @override
+  void execute() async {
+    dev.log("End turn ${game.stage.turn} for ${game.stage.activeTeam}");
+    _isStarted = true;
+    game.stage.endTurn();
+    _isCompleted = true;
+  }
+}
 
+class UnitWaitEvent extends Event {
+  final Unit unit;
+  UnitWaitEvent(this.unit){
+    dev.log("UnitWaitEvent created for $unit");
+  }
+  @override
+  void execute() async {
+    dev.log("$unit waits.");
+    _isStarted = true;
+    unit.wait();
+    _isCompleted = true;
+  }
+}
 
 class UnitDeathEvent extends Event {
   final Unit unit;
   UnitDeathEvent(this.unit);
-  
 }
 
 class UnitActionEndEvent extends Event {

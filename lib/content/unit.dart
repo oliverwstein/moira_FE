@@ -196,7 +196,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       if(!stage.tilesMap[stage.cursor.gridCoord]!.isOccupied || stage.tilesMap[stage.cursor.gridCoord]!.unit == this){
         gameRef.eventQueue.addEventBatch([
           UnitMoveEvent(gameRef, this, stage.cursor.gridCoord),
-          UnitActionMenuEvent(gameRef, this)]);
+          ActionMenuEvent(gameRef, this)]);
       }
       
       handled = true;
@@ -328,8 +328,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
 
   }
   void openActionMenu(){
-    gameRef.stage.cursor.actionMenu.show(actionsAvailable);
-    gameRef.stage.activeComponent = gameRef.stage.cursor.actionMenu;
+    gameRef.eventQueue.addEventBatch([ActionMenuEvent(gameRef, this)]);
+    // gameRef.stage.activeComponent = gameRef.stage.cursor.actionMenu;
   }
 
   void wait(){

@@ -141,8 +141,6 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
 
     // Add the animation component as a child
     add(_animationComponent);
-    actionMenu = ActionMenu();
-    add(actionMenu);
 
     // Set the initial size and position of the cursor
     size = gameRef.stage.tilesize*gameRef.stage.scaling;
@@ -215,15 +213,13 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
           }
         } else {
           stage.blankAllTiles();
-          List<MenuOption> visibleOptions = [MenuOption.endTurn, MenuOption.save];
-          stage.cursor.actionMenu.show(visibleOptions);
-          stage.activeComponent = stage.cursor.actionMenu;
+          gameRef.eventQueue.addEventBatch([ActionMenuEvent(gameRef, null)]);
+          // stage.activeComponent = stage.cursor.actionMenu;
         }
       } else {
         stage.blankAllTiles();
-        List<MenuOption> visibleOptions = [MenuOption.endTurn, MenuOption.save];
-        stage.cursor.actionMenu.show(visibleOptions);
-        stage.activeComponent = stage.cursor.actionMenu;
+        gameRef.eventQueue.addEventBatch([ActionMenuEvent(gameRef, null)]);
+        // stage.activeComponent = stage.cursor.actionMenu;
       }
     } else {
       // Throw an exception if tile is null

@@ -41,169 +41,231 @@ TextPaint basicTextRenderer = TextPaint(
           // Include any other styles you need
           ),
       );
-class ActionMenu extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
-  Map<MenuOption, PositionComponent> options = {};
-  late int selectedIndex;
-  List visibleOptions = [];
-  late AnimatedPointer pointer; 
-  late SpriteComponent blankWindowSprite;
-  static const double scaleFactor = 2;
-
-  ActionMenu();
+class ActionMenu extends PositionComponent with HasGameRef<MyGame>{
+  List<MenuOption> options;
+  Map<MenuOption, SpriteComponent> optionMap = {};
+  int selectedIndex = 0;
+  late SpriteSheet blankWindowSpriteSheet;
+  Unit? unit;
+  ActionMenu(this.options, [this.unit]);
 
   @override
   Future<void> onLoad() async {
-    blankWindowSprite = SpriteComponent(
-        sprite: await gameRef.loadSprite('action_menu_narrow.png'),
+    dev.log("Action Menu loaded.");
+    ui.Image blankWindowImage = await gameRef.images.load('fancy_window.png');
+    blankWindowSpriteSheet = SpriteSheet.fromColumnsAndRows(
+      image: blankWindowImage,
+      columns: 1,
+      rows: 2,
     );
     for (var option in MenuOption.values) {
-      var boxComponent = PositionComponent(
-      );
-      boxComponent.add(SpriteComponent(sprite: blankWindowSprite.sprite));
+      var boxComponent = SpriteComponent(sprite: blankWindowSpriteSheet.getSprite(1, 1));
       var textComponent = TextComponent(
         text: option.label,
         textRenderer: basicTextRenderer,
-        position: Vector2(8, 2)
+        anchor: Anchor.center
       );
       boxComponent.add(textComponent);
-      boxComponent.scale = Vector2.all(scaleFactor);
-      options[option] = boxComponent;
+      boxComponent.scale = Vector2.all(gameRef.stage.scaling);
+      optionMap[option] = (boxComponent);
+      add(boxComponent);
     }
-    pointer = AnimatedPointer();
+    optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(2, 1);
   }
 
-  @override
-  bool handleCommand(LogicalKeyboardKey command) {
-    Stage stage = parent!.parent as Stage;
-    bool handled = false;
-    if (command == LogicalKeyboardKey.arrowUp) {
-      pointer.move(Direction.up);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.arrowDown) {
-      pointer.move(Direction.down);
-      handled = true;
-    } else if (command == LogicalKeyboardKey.keyA) {
-      select();
-      close();
-      handled = true;
-    } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
-      Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
-      if (unit != null) unit.undoMove();
-      close();
-      handled = true;
-    }
-    return handled;
-  }
-
-  void select(){
-    Stage stage = parent!.parent as Stage;
-    switch (visibleOptions[selectedIndex]) {
-      case MenuOption.endTurn:
-        stage.endTurn();
-        stage.activeComponent = stage.cursor;
-      case MenuOption.unitList:
-        break;
-      case MenuOption.save:
-        stage.activeComponent = stage.cursor;
-        break;
-      case MenuOption.attack:
-        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
-        assert(unit != null);
-        TargetSelector selector = TargetSelector(stage.getTargets());
-        stage.cursor.goToUnit(selector.targets[0]);
-        unit!.add(selector);
-        stage.activeComponent = selector;
-        break;
-      case MenuOption.item:
-        // On selecting item, pull up the item menu.
-        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
-        assert(unit != null);
-        ItemMenu itemMenu = ItemMenu(unit!);
-        stage.cursor.add(itemMenu);
-        stage.activeComponent = itemMenu;
-        break;
-      case MenuOption.wait:
-        Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
-        unit!.wait();
-      default:
-        stage.activeComponent = stage.cursor;
-        break;
-    }
-    close();
-  }
-  void show(List<MenuOption> shownOptions) {
-    visibleOptions = shownOptions;
-    visibleOptions.sort((a, b) => a.priority.compareTo(b.priority));
-
-    double i = 1;
-    for (var option in visibleOptions) {
-      var component = options[option];
-      if (component != null) {
-        component.position = Vector2(64, 32*i);
-        add(component);
+  void move(Direction dir) {
+    if (options.isNotEmpty){
+      if (dir == Direction.up) {
+        optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(1, 1);
+          selectedIndex = (selectedIndex - 1) % options.length;
+          optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(2, 1);
+      } else 
+      if (dir == Direction.down) {
+          optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(1, 1);
+          selectedIndex = (selectedIndex + 1) % options.length;
+          optionMap[options[selectedIndex]]!.sprite = blankWindowSpriteSheet.getSprite(2, 1);
       }
-      i++;
     }
-    selectedIndex = 0;
-    add(pointer);
-    pointer.updatePosition();
+  }
+
+  List<Event> select(){
+    switch (options[selectedIndex]) {
+      case MenuOption.endTurn:
+        dev.log("End Turn Selected in ActionMenu");
+        return [TurnEndEvent(game)];
+      case MenuOption.unitList:
+        dev.log("Unit List Selected in ActionMenu");
+        return [];
+      case MenuOption.save:
+        dev.log("Save Selected in ActionMenu");
+        return [];
+      case MenuOption.attack:
+        dev.log("Attack Selected in ActionMenu");
+        return [];
+      case MenuOption.item:
+        dev.log("Item Selected in ActionMenu");
+        return [];
+      case MenuOption.wait:
+        dev.log("Wait Selected in ActionMenu");
+        if(unit != null) return [UnitWaitEvent(unit!)];
+        return [];
+      default:
+        return [];
+    }
   }
 
   void close(){
-    removeAll(children);
-  }
-
-}
-
-class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
-  late final SpriteAnimationComponent _animationComponent;
-  late final SpriteSheet pointerSheet;
-  final double stepY = 32;
-  late double tileSize;
-
-  AnimatedPointer() {
-    tileSize = 16;
-  }
-
-  @override
-  Future<void> onLoad() async {
-    // Load the cursor image and create the animation component
-    ui.Image pointerImage = await gameRef.images.load('dancing_selector.png');
-    pointerSheet = SpriteSheet.fromColumnsAndRows(
-      image: pointerImage,
-      columns: 3,
-      rows: 1,
-    );
-
-    _animationComponent = SpriteAnimationComponent(
-      animation: pointerSheet.createAnimation(row: 0, stepTime: .2),
-      position: Vector2(64, 32),
-    );
-    _animationComponent.scale = Vector2.all(ActionMenu.scaleFactor);
-    add(_animationComponent);
-
-    // Set the initial size and position of the cursor
-  }
-
-
-  // You might want methods to update the pointer's position based on the current selection
-  void move(Direction dir) {
-    ActionMenu menu = parent as ActionMenu;
-    if (menu.visibleOptions.isNotEmpty){
-      if (dir == Direction.up) {
-          menu.selectedIndex = (menu.selectedIndex - 1) % menu.visibleOptions.length;
-      } else if (dir == Direction.down) {
-          menu.selectedIndex = (menu.selectedIndex + 1) % menu.visibleOptions.length;
-      }
-      updatePosition();
-    }
-  }
-    
-  void updatePosition() {
-    ActionMenu menu = parent as ActionMenu;
-    y = stepY * menu.selectedIndex;
+    removeFromParent();
   }
 }
+
+// class ActionMenuOld extends PositionComponent with HasGameRef<MyGame> implements CommandHandler {
+//   Map<MenuOption, PositionComponent> options = {};
+//   late int selectedIndex;
+//   List visibleOptions = [];
+//   late AnimatedPointer pointer; 
+//   late SpriteComponent blankWindowSprite;
+//   static const double scaleFactor = 2;
+//   ActionMenuOld();
+//   @override
+//   Future<void> onLoad() async {
+//     blankWindowSprite = SpriteComponent(
+//         sprite: await gameRef.loadSprite('action_menu_narrow.png'),
+//     );
+//     for (var option in MenuOption.values) {
+//       var boxComponent = PositionComponent(
+//       );
+//       boxComponent.add(SpriteComponent(sprite: blankWindowSprite.sprite));
+//       var textComponent = TextComponent(
+//         text: option.label,
+//         textRenderer: basicTextRenderer,
+//         position: Vector2(8, 2)
+//       );
+//       boxComponent.add(textComponent);
+//       boxComponent.scale = Vector2.all(scaleFactor);
+//       options[option] = boxComponent;
+//     }
+//     pointer = AnimatedPointer();
+//   }
+//   @override
+//   bool handleCommand(LogicalKeyboardKey command) {
+//     bool handled = false;
+//     if (command == LogicalKeyboardKey.arrowUp) {
+//       pointer.move(Direction.up);
+//       handled = true;
+//     } else if (command == LogicalKeyboardKey.arrowDown) {
+//       pointer.move(Direction.down);
+//       handled = true;
+//     } else if (command == LogicalKeyboardKey.keyA) {
+//       select();
+//       close();
+//       handled = true;
+//     } else if (command == LogicalKeyboardKey.keyB || command == LogicalKeyboardKey.keyM) {
+//       Unit? unit = gameRef.stage.tilesMap[gameRef.stage.cursor.gridCoord]!.unit;
+//       if (unit != null) unit.undoMove();
+//       close();
+//       handled = true;
+//     }
+//     return handled;
+//   }
+//   void select(){
+//     Stage stage = parent!.parent as Stage;
+//     switch (visibleOptions[selectedIndex]) {
+//       case MenuOption.endTurn:
+//         stage.endTurn();
+//         stage.activeComponent = stage.cursor;
+//       case MenuOption.unitList:
+//         break;
+//       case MenuOption.save:
+//         stage.activeComponent = stage.cursor;
+//         break;
+//       case MenuOption.attack:
+//         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
+//         assert(unit != null);
+//         TargetSelector selector = TargetSelector(stage.getTargets());
+//         stage.cursor.goToUnit(selector.targets[0]);
+//         unit!.add(selector);
+//         stage.activeComponent = selector;
+//         break;
+//       case MenuOption.item:
+//         // On selecting item, pull up the item menu.
+//         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
+//         assert(unit != null);
+//         ItemMenu itemMenu = ItemMenu(unit!);
+//         stage.cursor.add(itemMenu);
+//         stage.activeComponent = itemMenu;
+//         break;
+//       case MenuOption.wait:
+//         Unit? unit = stage.tilesMap[stage.cursor.gridCoord]!.unit;
+//         unit!.wait();
+//       default:
+//         stage.activeComponent = stage.cursor;
+//         break;
+//     }
+//     close();
+//   }
+//   void show(List<MenuOption> shownOptions) {
+//     visibleOptions = shownOptions;
+//     visibleOptions.sort((a, b) => a.priority.compareTo(b.priority));
+//     double i = 1;
+//     for (var option in visibleOptions) {
+//       var component = options[option];
+//       if (component != null) {
+//         component.position = Vector2(64, 32*i);
+//         add(component);
+//       }
+//       i++;
+//     }
+//     selectedIndex = 0;
+//     add(pointer);
+//     pointer.updatePosition();
+//   }
+//   void close(){
+//     removeAll(children);
+//   }
+// }
+// class AnimatedPointer extends PositionComponent with HasGameRef<MyGame> {
+//   late final SpriteAnimationComponent _animationComponent;
+//   late final SpriteSheet pointerSheet;
+//   final double stepY = 32;
+//   late double tileSize;
+//   AnimatedPointer() {
+//     tileSize = 16;
+//   }
+//   @override
+//   Future<void> onLoad() async {
+//     // Load the cursor image and create the animation component
+//     ui.Image pointerImage = await gameRef.images.load('dancing_selector.png');
+//     pointerSheet = SpriteSheet.fromColumnsAndRows(
+//       image: pointerImage,
+//       columns: 3,
+//       rows: 1,
+//     );
+//     _animationComponent = SpriteAnimationComponent(
+//       animation: pointerSheet.createAnimation(row: 0, stepTime: .2),
+//       position: Vector2(64, 32),
+//     );
+//     _animationComponent.scale = Vector2.all(ActionMenu.scaleFactor);
+//     add(_animationComponent);
+//     // Set the initial size and position of the cursor
+//   }
+//   // You might want methods to update the pointer's position based on the current selection
+//   void move(Direction dir) {
+//     ActionMenu menu = parent as ActionMenu;
+//     if (menu.visibleOptions.isNotEmpty){
+//       if (dir == Direction.up) {
+//           menu.selectedIndex = (menu.selectedIndex - 1) % menu.visibleOptions.length;
+//       } else if (dir == Direction.down) {
+//           menu.selectedIndex = (menu.selectedIndex + 1) % menu.visibleOptions.length;
+//       }
+//       updatePosition();
+//     }
+//   } 
+//   void updatePosition() {
+//     ActionMenu menu = parent as ActionMenu;
+//     y = stepY * menu.selectedIndex;
+//   }
+// }
 
 enum MenuOption {
   unitList('Units', 1),
