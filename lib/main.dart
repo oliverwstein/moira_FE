@@ -31,37 +31,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     return stage.handleKeyEvent(key, keysPressed);
   }
-  // late InputHandler currentInputHandler;
-  // int tilesInRow = 16;
-  // int tilesInColumn = 12;
-  // late double tileSize;
-  // late Vector2 playAreaSize;
-  // final Stage stage = Stage(62, 30);
-  // @override
-  // Future<void> onLoad() async {    
-  //   calculateTileSize();
-  //   add(stage);
-  //   currentInputHandler = stage;
-  // }
-  // @override
-  // void onGameResize(Vector2 size) {
-  //   super.onGameResize(size);
-  //   calculateTileSize();
-  //   if (children.contains(stage) && stage.isLoaded) {
-  //     stage.resizeTiles();
-  //   }
-  // }
-  // void calculateTileSize() {
-  //   tileSize = min(size.x / tilesInRow, size.y / tilesInColumn);
-  // }
-  // @override
-  // KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-  //   return currentInputHandler.handleKeyEvent(key, keysPressed);
-  // }
-  // void switchInputHandler(InputHandler newHandler) {
-  //   currentInputHandler = newHandler;
-  // }
-  
+
 }
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
@@ -90,7 +60,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     camera.viewfinder.position = Vector2(gameMidX, gameMidY);
     camera.viewfinder.anchor = Anchor.center;
-    // camera.follow(cursor);
   }
 
   @override
@@ -151,7 +120,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
         handled = true;
       }
 
-      dev.log('Direction: ${direction.x}, ${direction.y}');
       Point<int> newTilePosition = Point(cursor.tilePosition.x + direction.x, cursor.tilePosition.y + direction.y);
       cursor.moveTo(newTilePosition);
     }
@@ -242,16 +210,26 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
   }
 
   @override
-void update(double dt) {
-  super.update(dt);
-  if (isMoving) {
-    position.lerp(targetPosition, min(1, speed * dt / position.distanceTo(targetPosition)));
-    if (position.distanceTo(targetPosition) < 0.5) { // Small threshold
-      position = targetPosition;
-      isMoving = false;
+  void update(double dt) {
+    super.update(dt);
+    if (isMoving) {
+      Vector2 positionDelta = Vector2.all(0);
+      if (position.distanceTo(targetPosition) < 0.1) { // Small threshold
+        
+        positionDelta = targetPosition - position;
+        position = targetPosition;
+        isMoving = false;
+      } else {
+        Vector2 currentPosition = position.clone();
+        position.lerp(targetPosition, min(1, speed * dt / position.distanceTo(targetPosition)));
+        positionDelta = position - currentPosition;
+      }
+      Rect boundingBox = game.camera.visibleWorldRect.deflate(game.stage.tileSize);
+      if (!boundingBox.contains(position.toOffset())) {
+          game.camera.moveBy(positionDelta);
+        }
     }
   }
-}
 
   void resize() {
     Tile tile = game.stage.tileMap[tilePosition]!;
