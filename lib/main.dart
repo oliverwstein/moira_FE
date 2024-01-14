@@ -25,12 +25,12 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   int tilesInRow = 16;
   int tilesInColumn = 12;
   late double tileSize;
+  late Vector2 playAreaSize;
   final Stage stage = Stage(62, 30);
 
   @override
-  Future<void> onLoad() async {
+  Future<void> onLoad() async {    
     calculateTileSize();
-    await super.onLoad();
     add(stage);
     currentInputHandler = stage;
 
@@ -132,7 +132,6 @@ class Stage extends PositionComponent with HasGameRef<MoiraGame> implements Inpu
     if(cursor.isMoving) handled = true;
     return handled ? KeyEventResult.handled : KeyEventResult.ignored;
   }
-  
 }
 
 
