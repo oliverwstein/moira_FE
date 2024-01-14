@@ -45,6 +45,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   final int mapTileHeight;
   final Map<Point<int>, Tile> tileMap = {};
   late final Cursor cursor;
+  late final Hud hud;
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
   Stage(this.mapTileWidth, this.mapTileHeight);
@@ -67,7 +68,8 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     camera.viewfinder.position = Vector2(gameMidX, gameMidY);
     camera.viewfinder.anchor = Anchor.center;
-    camera.viewport.add(Hud());
+    hud = Hud();
+    camera.viewport.add(hud);
   }
 
   @override
@@ -127,6 +129,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
       tile.resize();
     });
     cursor.resize();
+    hud.resize();
   }
 
   @override
@@ -281,7 +284,7 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
       }
       Rect boundingBox = game.camera.visibleWorldRect.deflate(game.stage.tileSize);
       if (!boundingBox.contains(position.toOffset())) {
-        Rect playArea = Rect.fromPoints(Offset(0, 0), game.stage.playAreaSize.toOffset());
+        Rect playArea = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
           if(playArea.contains((position).toOffset())){
             game.camera.moveBy(positionDelta);
           }
@@ -300,11 +303,13 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
 class Hud extends PositionComponent with HasGameReference<MoiraGame>{
   late final TextComponent pointText;
   late final TextComponent terrainText;
+
+  Hud(){
+  }
   
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    // Set the size and position of the HUD box
     size = Vector2(game.stage.tileSize*12, game.stage.tileSize*9);
     position = Vector2(5, 5);
     anchor = Anchor.topLeft;
@@ -327,14 +332,16 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>{
   @override
   void update(double dt) {
     super.update(dt);
-    size = Vector2(game.stage.tileSize*12, game.stage.tileSize*9);
     pointText.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
+    terrainText.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
+  }
+
+  void resize(){
+    size = Vector2(game.stage.tileSize*12, game.stage.tileSize*9);
     pointText.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
     pointText.position = Vector2(size.x / 2, size.y*1 / 3);
-    terrainText.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
     terrainText.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
     terrainText.position = Vector2(size.x / 2, size.y*2 / 3);
-
   }
 
   @override
