@@ -21,85 +21,111 @@ abstract class InputHandler {
 }
 
 class MoiraGame extends FlameGame with KeyboardEvents {
-  late InputHandler currentInputHandler;
+  late Stage stage;
+
+  MoiraGame() : super(world: Stage(62, 30)) {
+    stage = world as Stage;
+  }
+
+  @override
+  KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    return stage.handleKeyEvent(key, keysPressed);
+  }
+  // late InputHandler currentInputHandler;
+  // int tilesInRow = 16;
+  // int tilesInColumn = 12;
+  // late double tileSize;
+  // late Vector2 playAreaSize;
+  // final Stage stage = Stage(62, 30);
+  // @override
+  // Future<void> onLoad() async {    
+  //   calculateTileSize();
+  //   add(stage);
+  //   currentInputHandler = stage;
+  // }
+  // @override
+  // void onGameResize(Vector2 size) {
+  //   super.onGameResize(size);
+  //   calculateTileSize();
+  //   if (children.contains(stage) && stage.isLoaded) {
+  //     stage.resizeTiles();
+  //   }
+  // }
+  // void calculateTileSize() {
+  //   tileSize = min(size.x / tilesInRow, size.y / tilesInColumn);
+  // }
+  // @override
+  // KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+  //   return currentInputHandler.handleKeyEvent(key, keysPressed);
+  // }
+  // void switchInputHandler(InputHandler newHandler) {
+  //   currentInputHandler = newHandler;
+  // }
+  
+}
+class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
   int tilesInColumn = 12;
   late double tileSize;
+  final int mapTileWidth;
+  final int mapTileHeight;
+  final Map<Point<int>, Tile> tileMap = {};
+  late final Cursor cursor;
   late Vector2 playAreaSize;
-  final Stage stage = Stage(62, 30);
+  Stage(this.mapTileWidth, this.mapTileHeight);
 
   @override
-  Future<void> onLoad() async {    
+  Future<void> onLoad() async {
+    await super.onLoad();
     calculateTileSize();
-    add(stage);
-    currentInputHandler = stage;
+    createTiles();
+    cursor = Cursor();
+    add(cursor);
+    playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
+    final gameMidX = playAreaSize.x / 2;
+    final gameMidY = playAreaSize.y / 2;
 
+    final camera = game.camera;
+    camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn);
+    camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
+    camera.viewfinder.position = Vector2(gameMidX, gameMidY);
+    camera.viewfinder.anchor = Anchor.center;
+    // camera.follow(cursor);
   }
 
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
     calculateTileSize();
-    if (children.contains(stage) && stage.isLoaded) {
-      stage.resizeTiles();
-    }
+    resizeStage();
   }
+
   void calculateTileSize() {
-    tileSize = min(size.x / tilesInRow, size.y / tilesInColumn);
-  }
-
-  @override
-  KeyEventResult onKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    return currentInputHandler.handleKeyEvent(key, keysPressed);
-  }
-
-  void switchInputHandler(InputHandler newHandler) {
-    currentInputHandler = newHandler;
-  }
-  
-}
-
-class Stage extends PositionComponent with HasGameRef<MoiraGame> implements InputHandler {
-  final int mapTileWidth;
-  final int mapTileHeight;
-  final Map<Point<int>, Tile> tileMap = {};
-  late final Cursor cursor;
-
-  Stage(this.mapTileWidth, this.mapTileHeight) {
-    cursor = Cursor();
-  }
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    createTiles();
-    add(cursor);
+    // Calculate tile size based on the game's canvas size
+    final gameSize = game.size;
+    tileSize = min(gameSize.x / mapTileWidth, gameSize.y / mapTileHeight);
   }
 
   void createTiles() {
-    for (int i = 0; i < mapTileHeight; i++) {
-      for (int j = 0; j < mapTileWidth; j++) {
+    // Create tiles
+    for (int i = 0; i < mapTileWidth; i++) {
+      for (int j = 0; j < mapTileHeight; j++) {
         Point<int> point = Point(i, j);
-        Tile tile = Tile(point, gameRef.tileSize);
+        Tile tile = Tile(point, tileSize);
         tileMap[point] = tile;
-        add(tile..position = Vector2(i * gameRef.tileSize, j * gameRef.tileSize));
+        add(tile..position = Vector2(i * tileSize, j * tileSize));
       }
     }
   }
 
-  void resizeTiles() {
-    double tileSize = gameRef.tileSize;
 
+  void resizeStage() {
     tileMap.forEach((point, tile) {
-      tile.size = Vector2.all(tileSize);
-      tile.position = Vector2(point.x * tileSize, point.y * tileSize);
-      tile.textComponent.position = Vector2(tileSize / 2, tileSize / 2);
-      tile.textComponent.textRenderer = TextPaint(style: TextStyle(fontSize: tileSize / 5));
+      tile.resize();
     });
-
-    cursor.resize(tileSize); // Ensure cursor is initialized before calling resize
+    cursor.resize();
   }
-  
+
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
@@ -134,9 +160,7 @@ class Stage extends PositionComponent with HasGameRef<MoiraGame> implements Inpu
   }
 }
 
-
-
-class Tile extends PositionComponent {
+class Tile extends PositionComponent with HasGameRef<MoiraGame>{
   final Point<int> point;
   late final TextComponent textComponent;
 
@@ -158,12 +182,16 @@ class Tile extends PositionComponent {
     await super.onLoad();
     await add(textComponent);
   }
+  
+  void resize() {
+    size = Vector2.all(game.stage.tileSize);
+  }
 }
 
 class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility {
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
-  Point<int> tilePosition = Point<int>(5, 5); // Current tile position
+  Point<int> tilePosition = Point<int>(31, 15); // Current tile position
   Vector2 targetPosition; // Target position in pixels
   bool isMoving = false;
   final double speed = 300; // Speed of cursor movement in pixels per second
@@ -184,15 +212,17 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
 
     _animationComponent = SpriteAnimationComponent(
       animation: cursorSheet.createAnimation(row: 0, stepTime: 0.2),
-      size: Vector2.all(gameRef.tileSize),
+      size: Vector2.all(game.stage.tileSize),
     );
 
     // Set the initial position of the cursor
-    position = Vector2(tilePosition.x.toDouble(), tilePosition.y.toDouble()) * gameRef.tileSize;
+    
+    position = game.stage.tileMap[tilePosition]!.position;
     targetPosition = position.clone();
 
     // Add the animation component as a child
     add(_animationComponent);
+    anchor = Anchor.topLeft;
   }
 
   void moveTo(Point<int> newTilePosition) {
@@ -205,9 +235,10 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
     // Update only if the position has changed
     if (tilePosition != boundedPosition) {
       tilePosition = boundedPosition;
-      targetPosition = Vector2(boundedPosition.x.toDouble(), boundedPosition.y.toDouble()) * gameRef.tileSize;
+      targetPosition = game.stage.tileMap[boundedPosition]!.position;
       isMoving = true;
     }
+    dev.log("$tilePosition");
   }
 
   @override
@@ -222,9 +253,9 @@ void update(double dt) {
   }
 }
 
-  void resize(double tileSize) {
-    size = Vector2.all(tileSize); // Update the cursor's size
-    _animationComponent.size = Vector2.all(tileSize); // Update the animation component's size
-    position = Vector2(tilePosition.x.toDouble(), tilePosition.y.toDouble()) * tileSize; // Reposition the cursor
+  void resize() {
+    Tile tile = game.stage.tileMap[tilePosition]!;
+    size = tile.size;
+    position = tile.position;
   }
 }
