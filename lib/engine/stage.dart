@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:math';
+
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
@@ -12,18 +14,32 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   late double tileSize;
   final int mapTileWidth;
   final int mapTileHeight;
+  final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
   late final Cursor cursor;
   late final Hud hud;
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
-  Stage(this.mapTileWidth, this.mapTileHeight);
+  Stage(this.mapTileWidth, this.mapTileHeight, this.mapFileName);
+
+  Stage._internal(this.mapTileWidth, this.mapTileHeight, this.mapFileName);
+
+  // Factory constructor
+  factory Stage.fromJson(String source) {
+    
+    final data = json.decode(source);
+    final mapTileWidth = data['mapTileWidth'] as int;
+    final mapTileHeight = data['mapTileHeight'] as int;
+    final tmxFile = data['mapFileName'] as String;
+
+    return Stage._internal(mapTileWidth, mapTileHeight, tmxFile);
+  }
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     calculateTileSize();
-    tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', Vector2.all(tileSize));
+    tiles = await flame_tiled.TiledComponent.load(mapFileName, Vector2.all(tileSize));
     add(tiles);
     createTiles();
     cursor = Cursor();
@@ -70,7 +86,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   }
   String getTileName(Point<int> point){
     int localId = point.y * mapTileWidth + point.x;
-    var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
+    var tile = tiles.tileMap.map.tileByLocalId(mapFileName.split(".")[0], localId.toInt());
     var type = tile?.properties.getProperty("terrain")?.value;
     var name = tile?.properties.getProperty("name")?.value ?? type;
     return name as String;
@@ -78,7 +94,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   
   Terrain determineTerrainType(Point<int> point){
     int localId = point.y * mapTileWidth + point.x;
-    var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
+    var tile = tiles.tileMap.map.tileByLocalId(mapFileName.split(".")[0], localId.toInt());
     var terrain = tile?.properties.getProperty("terrain")?.value;
     return _stringToTerrain(terrain as String);
   }

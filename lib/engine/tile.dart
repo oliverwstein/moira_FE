@@ -18,6 +18,7 @@ class Tile extends PositionComponent with HasGameRef<MoiraGame>{
       position: Vector2(size / 2, size / 2),
       anchor: Anchor.center,
       textRenderer: TextPaint(style: TextStyle(fontSize: size / 5)),
+
     );
     add(textComponent);
   }

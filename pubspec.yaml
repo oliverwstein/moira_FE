@@ -30,5 +30,6 @@ flutter:
     - assets/data/attacks.json
     - assets/data/skills.json
     - assets/data/classes.json
+    - assets/data/stages.json
   uses-material-design: true
 
