@@ -3,8 +3,6 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/services.dart';
-
 import '../engine/engine.dart';
 
 class TitleCard extends Component with HasGameRef<MyGame>, HasVisibility{

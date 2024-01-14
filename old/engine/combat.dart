@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/services.dart';
-import 'package:moira/engine/engine.dart';
+import 'engine.dart';
 
 TextPaint combatTextRenderer = TextPaint(
 style: const TextStyle(
@@ -267,7 +267,7 @@ class Combat extends Component with HasGameRef<MyGame>{
       }
     }
     gameRef.eventDispatcher.dispatch(MakeAttackEvent(this, attacker, defender));
-    dev.log('${attacker.name} hit, doing ${damageDealt} to ${defender.name}');
+    dev.log('${attacker.name} hit, doing $damageDealt to ${defender.name}');
     defender.hp -= damageDealt;
     attacker.sta -= fatigue;
   }

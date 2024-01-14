@@ -11,6 +11,7 @@ class EventQueue {
   Queue<List<Event>> _eventBatches = Queue<List<Event>>();
   List<Event> _currentBatch = [];
   bool _isProcessing = false;
+  // ignore: unused_field
   String? _currentType;
 
   void addEventBatch(List<Event> eventBatch) {

@@ -1,3 +1,4 @@
+export '../engine/engine.dart';
 export 'attack.dart';
 export 'class.dart';
 export 'item.dart';
