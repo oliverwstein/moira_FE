@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
@@ -25,7 +26,7 @@ abstract class InputHandler {
 class MoiraGame extends FlameGame with KeyboardEvents {
   late Stage stage;
 
-  MoiraGame() : super(world: Stage(62, 30)) {
+  MoiraGame() : super(world: Stage(62, 31)) {
     stage = world as Stage;
   }
 
@@ -66,6 +67,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     camera.viewfinder.position = Vector2(gameMidX, gameMidY);
     camera.viewfinder.anchor = Anchor.center;
+    camera.viewport.add(Hud());
   }
 
   @override
@@ -74,6 +76,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     calculateTileSize();
     resizeStage();
   }
+  
 
   void calculateTileSize() {
     // Calculate tile size based on the game's canvas size
@@ -86,11 +89,36 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     for (int i = 0; i < mapTileWidth; i++) {
       for (int j = 0; j < mapTileHeight; j++) {
         Point<int> point = Point(i, j);
-        Tile tile = Tile(point, tileSize);
+        Terrain terrain = determineTerrainType(point);
+        String name = getTileName(point);
+        Tile tile = Tile(point, tileSize, terrain, name);
         tileMap[point] = tile;
         add(tile..position = Vector2(i * tileSize, j * tileSize));
       }
     }
+  }
+  String getTileName(Point<int> point){
+    int localId = point.y * mapTileWidth + point.x;
+    var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
+    var type = tile?.properties.getProperty("terrain")?.value;
+    var name = tile?.properties.getProperty("name")?.value ?? type;
+    return name as String;
+  }
+  
+  Terrain determineTerrainType(Point<int> point){
+    int localId = point.y * mapTileWidth + point.x;
+    var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
+    var terrain = tile?.properties.getProperty("terrain")?.value;
+    return _stringToTerrain(terrain as String);
+  }
+  
+  Terrain _stringToTerrain(String input) {
+    // Create and initialize the map within the method
+    final Map<String, Terrain> stringToTerrain = {
+      for (var terrain in Terrain.values) terrain.toString().split('.').last: terrain,
+    };
+    // Perform the lookup and return
+    return stringToTerrain[input.toLowerCase()] ?? Terrain.plain;
   }
 
 
@@ -137,8 +165,10 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
 class Tile extends PositionComponent with HasGameRef<MoiraGame>{
   final Point<int> point;
   late final TextComponent textComponent;
+  Terrain terrain; // e.g., "grass", "water", "mountain"
+  String name; // Defaults to the terrain name if there is no name.
 
-  Tile(this.point, double size) {
+  Tile(this.point, double size, this.terrain, this.name) {
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
 
@@ -161,7 +191,26 @@ class Tile extends PositionComponent with HasGameRef<MoiraGame>{
     size = Vector2.all(game.stage.tileSize);
   }
 }
-
+enum TileState {blank, move, attack}
+enum Terrain {forest, path, cliff, sea, stream, fort, plain}
+extension TerrainCost on Terrain {
+  double get cost {
+    switch (this) {
+      case Terrain.forest:
+        return 2;
+      case Terrain.cliff:
+        return 10;
+      case Terrain.sea:
+        return 100;
+      case Terrain.stream:
+        return 10;
+      case Terrain.path:
+        return .7;
+      default:
+        return 1;
+    }
+  }
+}
 class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility {
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
@@ -212,7 +261,7 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
       targetPosition = game.stage.tileMap[boundedPosition]!.position;
       isMoving = true;
     }
-    dev.log("$tilePosition");
+    dev.log("$tilePosition, ${game.stage.tileMap[tilePosition]!.name}, ${game.stage.tileMap[tilePosition]!.terrain}");
   }
 
   @override
@@ -232,7 +281,11 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
       }
       Rect boundingBox = game.camera.visibleWorldRect.deflate(game.stage.tileSize);
       if (!boundingBox.contains(position.toOffset())) {
-          game.camera.moveBy(positionDelta);
+        Rect playArea = Rect.fromPoints(Offset(0, 0), game.stage.playAreaSize.toOffset());
+          if(playArea.contains((position).toOffset())){
+            game.camera.moveBy(positionDelta);
+          }
+          
         }
     }
   }
@@ -241,5 +294,50 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
     Tile tile = game.stage.tileMap[tilePosition]!;
     size = tile.size;
     position = tile.position;
+  }
+}
+
+class Hud extends PositionComponent with HasGameReference<MoiraGame>{
+  late final TextComponent pointText;
+  late final TextComponent terrainText;
+  
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    // Set the size and position of the HUD box
+    size = Vector2(100, 100); // Adjust size as needed
+    position = Vector2(10, 10); // Adjust position as needed
+    anchor = Anchor.topLeft;
+    pointText = TextComponent(
+        text: '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})',
+        position: Vector2(size.x / 2, size.y / 3),
+        anchor: Anchor.center,
+        textRenderer: TextPaint(style: TextStyle(fontSize: size.x / 5)),
+      );
+    terrainText = TextComponent(
+        text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
+        position: Vector2(size.x / 2, size.y*2 / 3),
+        anchor: Anchor.center,
+        textRenderer: TextPaint(style: TextStyle(fontSize: size.x / 5)),
+      );
+      add(pointText);
+      add(terrainText);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    pointText.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
+    terrainText.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
+
+  }
+
+  @override
+  void render(Canvas canvas) {
+  super.render(canvas);
+  // Draw the HUD box
+  final paint = Paint()..color = Color(0xAAFFFFFF); // Semi-transparent white
+  canvas.drawRect(size.toRect(), paint);
+  // Add more rendering logic here as needed
   }
 }
