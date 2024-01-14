@@ -6,8 +6,10 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
 
 void main() {
   final game = MoiraGame();
@@ -33,6 +35,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   }
 
 }
+
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
   int tilesInColumn = 12;
@@ -42,12 +45,15 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   final Map<Point<int>, Tile> tileMap = {};
   late final Cursor cursor;
   late Vector2 playAreaSize;
+  late final flame_tiled.TiledComponent tiles;
   Stage(this.mapTileWidth, this.mapTileHeight);
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     calculateTileSize();
+    tiles = await flame_tiled.TiledComponent.load('Ch0.tmx', Vector2.all(tileSize));
+    add(tiles);
     createTiles();
     cursor = Cursor();
     add(cursor);
