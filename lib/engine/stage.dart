@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flame/camera.dart';
@@ -24,17 +25,19 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
 
   Stage._internal(this.mapTileWidth, this.mapTileHeight, this.mapFileName);
 
-  // Factory constructor
-  factory Stage.fromJson(String source) {
-    
-    final data = json.decode(source);
+  // Static async method to create an instance from JSON
+  static Future<Stage> fromJson(String mapFileName) async {
+    // Load the JSON file
+    final jsonString = await rootBundle.loadString('assets/data/stages.json');
+    final data = json.decode(jsonString)[mapFileName];
+
     final mapTileWidth = data['mapTileWidth'] as int;
     final mapTileHeight = data['mapTileHeight'] as int;
     final tmxFile = data['mapFileName'] as String;
 
+    // Create and return a new instance
     return Stage._internal(mapTileWidth, mapTileHeight, tmxFile);
   }
-
   @override
   Future<void> onLoad() async {
     await super.onLoad();

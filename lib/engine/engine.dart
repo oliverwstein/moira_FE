@@ -3,6 +3,7 @@ export 'stage.dart';
 export 'tile.dart';
 export 'cursor.dart';
 export 'hud.dart';
+export 'title_card.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
