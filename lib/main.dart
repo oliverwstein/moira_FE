@@ -305,8 +305,8 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>{
   Future<void> onLoad() async {
     super.onLoad();
     // Set the size and position of the HUD box
-    size = Vector2(100, 100); // Adjust size as needed
-    position = Vector2(10, 10); // Adjust position as needed
+    size = Vector2(game.stage.tileSize*12, game.stage.tileSize*9);
+    position = Vector2(5, 5);
     anchor = Anchor.topLeft;
     pointText = TextComponent(
         text: '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})',
@@ -327,8 +327,13 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>{
   @override
   void update(double dt) {
     super.update(dt);
+    size = Vector2(game.stage.tileSize*12, game.stage.tileSize*9);
     pointText.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
+    pointText.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
+    pointText.position = Vector2(size.x / 2, size.y*1 / 3);
     terrainText.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
+    terrainText.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
+    terrainText.position = Vector2(size.x / 2, size.y*2 / 3);
 
   }
 
