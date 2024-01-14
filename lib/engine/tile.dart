@@ -53,7 +53,7 @@ class Tile extends PositionComponent with HasGameRef<MyGame>{
   }
 
   @override
-void update(double dt) {
+  void update(double dt) {
   super.update(dt);
   size = gameRef.stage.tilesize*gameRef.stage.scaling;
   scale = gameRef.stage.tiles.scale;
@@ -64,6 +64,7 @@ void update(double dt) {
   _moveAnimationComponent.scale = Vector2.all(.45);
   _attackAnimationComponent.scale = Vector2.all(.45);
 }
+  
   void setUnit(Unit newUnit) {
     unit = newUnit;
   }

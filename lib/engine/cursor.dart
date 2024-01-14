@@ -123,7 +123,6 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
     return (isBeyondMidpointX && withinStageX) || (isBeyondMidpointY && withinStageY);
   }
 
-
   @override
   Future<void> onLoad() async {
     // Load the cursor image and create the animation component
@@ -193,7 +192,6 @@ class Cursor extends PositionComponent with HasGameRef<MyGame>, HasVisibility im
       }
     }
   }
-
 
   void select() {
   if (parent is Stage) {

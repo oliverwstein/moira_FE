@@ -9,12 +9,8 @@ import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 
 import 'engine.dart';
-
 class Stage extends Component with HasGameRef<MyGame>{
-  /// Stage is a primary component in the game that manages the layout of the 
-  /// game map, including tiles, units, and the cursor. It interfaces with the 
-  /// game's TiledComponent to render the map and holds the logic for the game's 
-  /// terrain, unit positioning, and active components like cursor or units.
+  
   final Completer<void> _loadCompleter = Completer<void>();
   late final int mapTileWidth;
   late final int mapTileHeight;
@@ -151,7 +147,6 @@ class Stage extends Component with HasGameRef<MyGame>{
     return name as String;
   }
   
-
   Terrain determineTerrainType(Point<int> point){
     int localId = point.y * mapTileWidth + point.x;
     var tile = tiles.tileMap.map.tileByLocalId('Ch0', localId.toInt());
