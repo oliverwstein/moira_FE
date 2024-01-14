@@ -301,8 +301,8 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
 }
 
 class Hud extends PositionComponent with HasGameReference<MoiraGame>{
-  late final TextComponent pointText;
-  late final TextComponent terrainText;
+  late final TextComponent point;
+  late final TextComponent terrain;
 
   Hud(){
   }
@@ -313,35 +313,35 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>{
     size = Vector2(game.stage.tileSize*12, game.stage.tileSize*9);
     position = Vector2(5, 5);
     anchor = Anchor.topLeft;
-    pointText = TextComponent(
+    point = TextComponent(
         text: '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})',
         position: Vector2(size.x / 2, size.y / 3),
         anchor: Anchor.center,
         textRenderer: TextPaint(style: TextStyle(fontSize: size.x / 5)),
       );
-    terrainText = TextComponent(
+    terrain = TextComponent(
         text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
         position: Vector2(size.x / 2, size.y*2 / 3),
         anchor: Anchor.center,
         textRenderer: TextPaint(style: TextStyle(fontSize: size.x / 5)),
       );
-      add(pointText);
-      add(terrainText);
+      add(point);
+      add(terrain);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    pointText.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
-    terrainText.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
+    point.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
+    terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
   }
 
   void resize(){
     size = Vector2(game.stage.tileSize*12, game.stage.tileSize*9);
-    pointText.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
-    pointText.position = Vector2(size.x / 2, size.y*1 / 3);
-    terrainText.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
-    terrainText.position = Vector2(size.x / 2, size.y*2 / 3);
+    point.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
+    point.position = Vector2(size.x / 2, size.y*1 / 3);
+    terrain.textRenderer = TextPaint(style: TextStyle(fontSize: size.x / 5));
+    terrain.position = Vector2(size.x / 2, size.y*2 / 3);
   }
 
   @override
