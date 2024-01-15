@@ -6,7 +6,7 @@ import 'package:moira/content/content.dart';
 class Movement {
   Direction direction;
   int tileDistance;
-
+  String get directionString => direction.name.toString();
   Movement(this.direction, this.tileDistance);
 }
 enum Direction {up, down, left, right}

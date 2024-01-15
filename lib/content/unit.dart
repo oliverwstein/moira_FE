@@ -18,10 +18,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   late Vector2 targetPosition; // Target position in pixels
   Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
+  late SpriteAnimationComponent sprite;
   late final SpriteSheet unitSheet;
   late final Map<String, dynamic> unitData;
   bool isMoving = false;
-  final double speed = 2; // Speed of cursor movement in pixels per second
+  final double speed = 1; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
   Item? main;
@@ -135,34 +136,38 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
   
   @override
-void update(double dt) {
-  super.update(dt);
+  void update(double dt) {
+    super.update(dt);
 
-  if (movementQueue.isNotEmpty) {
-    if(!isMoving) {
+    if (movementQueue.isNotEmpty) {
       Movement currentMovement = movementQueue.first;
-      Vector2 movementVector = getMovementVector(currentMovement);
-      targetPosition = position + movementVector * currentMovement.tileDistance.toDouble() * game.stage.tileSize;
-      isMoving = true;
-    }
-    // Use lerp to move towards the target position
-    double distance = position.distanceTo(targetPosition);
-    double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
-    // dev.log("position: ${position}, targetPosition: $targetPosition, distance: $distance, moveStep: $moveStep");
-    if (distance < 0.1) { // Using a small threshold like 1.0 to ensure we reach the target
-      position = targetPosition;
-      isMoving = false;
-      movementQueue.removeFirst(); // Dequeue the completed movement
+      if(!isMoving) {
+        Vector2 movementVector = getMovementVector(currentMovement);
+        targetPosition = position + movementVector * currentMovement.tileDistance.toDouble() * game.stage.tileSize;
+        isMoving = true;
+      }
+      // Use lerp to move towards the target position
+      double distance = position.distanceTo(targetPosition);
+      double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
+      if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
+        position = targetPosition;
+        isMoving = false;
+        movementQueue.removeFirst(); // Dequeue the completed movement
 
-      if (movementQueue.isNotEmpty) {
-        // @TODO: Update sprite for the next movement direction
+        if (movementQueue.isNotEmpty) {
+          Movement currentMovement = movementQueue.first;
+          SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
+          sprite.animation = newAnimation;
+        }
+      } else {
+        // dev.log("$position, $targetPosition, $dt");
+        position.moveToTarget(targetPosition, moveStep);
       }
     } else {
-      dev.log("$position, $targetPosition, $dt");
-      position.moveToTarget(targetPosition, moveStep);
+        SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
+        sprite.animation = newAnimation;
     }
   }
-}
 
   @override
   Future<void> onLoad() async {
@@ -194,7 +199,11 @@ void update(double dt) {
                             animation: unitSheet.createAnimation(row: 4, stepTime: .5),
                             size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
                             anchor: Anchor.center);
-    add(animationMap['idle']!);
+    sprite = SpriteAnimationComponent(
+                            animation: unitSheet.createAnimation(row: 4, stepTime: .5),
+                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            anchor: Anchor.center);
+    add(sprite);
     position = game.stage.tileMap[tilePosition]!.center;
     anchor = Anchor.center;
   
