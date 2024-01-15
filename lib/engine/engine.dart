@@ -1,5 +1,6 @@
 export 'game.dart';
 export 'stage.dart';
+export 'event.dart';
 export 'tile.dart';
 export 'cursor.dart';
 export 'hud.dart';

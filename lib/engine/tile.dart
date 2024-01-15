@@ -34,6 +34,7 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   
   void resize() {
     size = Vector2.all(game.stage.tileSize);
+    if(isOccupied) unit!.resize();
   }
     void setUnit(Unit newUnit) {
     unit = newUnit;

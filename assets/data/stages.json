@@ -5,35 +5,37 @@
         "mapFileName": "Ch0.tmx",
         "initialPosition": [33, 22], 
         "Events": [
-                {
-                "type": "UnitCreationEvent",
-                "name": "Barbarian",
-                "team": "Red",
-                "gridCoord": [33, 25],
-                "level": 5
-                },
-                {
-                "type": "UnitCreationEvent",
-                "name": "Barbarian",
-                "team": "Red",
-                "gridCoord": [32, 26],
-                "level": 5
-                },
-                {
-                "type": "UnitCreationEvent",
-                "name": "Barbarian",
-                "team": "Red",
-                "gridCoord": [31, 25],
-                "level": 5
-                },
-                {
-                "type": "UnitCreationEvent",
-                "name": "Barbarian",
-                "team": "Red",
-                "gridCoord": [30, 28],
-                "level": 10,
-                "items": ["Hand Axe"]
-                }
+                [
+                    {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "gridCoord": [33, 25],
+                    "level": 5
+                    },
+                    {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "gridCoord": [32, 26],
+                    "level": 5
+                    },
+                    {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "gridCoord": [31, 25],
+                    "level": 5
+                    },
+                    {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "gridCoord": [30, 28],
+                    "level": 10,
+                    "items": ["Hand Axe"]
+                    }
+                ]
         ]
     }
 }

@@ -22,6 +22,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   late final Hud hud;
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
+  EventQueue eventQueue = EventQueue();
   Stage(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName);
 
   Stage._internal(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName);

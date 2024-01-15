@@ -138,30 +138,29 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
       rows: 5,
     );
 
-    animationMap['idle'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 4, stepTime: .5),
-                            size: Vector2(20, 16),
-                          );
     animationMap['down'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 0, stepTime: .5),
                             size: Vector2(20, 16),
-                          );
+                            anchor: Anchor.center);
     animationMap['up'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 1, stepTime: .5),
                             size: Vector2(20, 16),
-                          );
+                            anchor: Anchor.center);
     animationMap['right'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 2, stepTime: .5),
                             size: Vector2(20, 16),
-                          );
+                            anchor: Anchor.center);
     animationMap['left'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 3, stepTime: .5),
                             size: Vector2(20, 16),
-                          );
-
-    // Set the initial size and position of the unit
-    size = game.stage.tiles.size;
-    position = Vector2(gridCoord.x * size.x, gridCoord.y * size.y);
+                            anchor: Anchor.center);
+    animationMap['idle'] = SpriteAnimationComponent(
+                            animation: unitSheet.createAnimation(row: 4, stepTime: .5),
+                            size: Vector2(20, 16),
+                            anchor: Anchor.center);
+    add(animationMap['idle']!);
+    position = game.stage.tileMap[gridCoord]!.position;
+    anchor = Anchor.topLeft;
   
     // Create skills for skillset
     for(String skillName in unitData['skills']){
@@ -229,5 +228,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
 
   int getStat(String stat){
     return stats[stat]!;
+  }
+
+  void resize() {
+    size = Vector2.all(game.stage.tileSize);
   }
 }

@@ -40,6 +40,13 @@
                 "might": 8,
                 "hit": 10,
                 "specialAttack": "Throw"
+            },
+            "Bow":
+            {
+                "weaponType" : "Bow",
+                "might": 10,
+                "hit": 30,
+                "specialAttack": "Shoot"
             }
         }
  }

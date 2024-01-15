@@ -73,6 +73,18 @@
                 "range": [1, 2],
                 "effects": []
             },
+        "Shoot":
+            {
+                "description" : "Ready, aim...",
+                "scaling" : [0.6, 0.6, 0.0, 0.0],
+                "weaponType" : ["Bow"],
+                "might": 3,
+                "hit": 30,
+                "fatigue": 1,
+                "magic": false,
+                "range": [2, 4],
+                "effects": []
+            },
         "Fire Axe":
             {
                 "description" : "Burn, baby.",
