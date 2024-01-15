@@ -31,7 +31,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   int hp = -1;
   int sta = -1;
 
-  factory Unit.fromJSON(Point<int> gridCoord, String name, {int? level, UnitTeam? team, }) {
+  factory Unit.fromJSON(Point<int> gridCoord, String name, {int? level, String? teamString, List<String>? itemStrings}) {
 
     // Extract unit data from the static map in MoiraGame
     var unitsJson = MoiraGame.unitMap['units'] as List;
@@ -53,7 +53,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
     final Map<String, UnitTeam> stringToUnitTeam = {
       for (var team in UnitTeam.values) team.toString().split('.').last: team,
     };
-    UnitTeam team = stringToUnitTeam[unitData['team']] ?? UnitTeam.blue;
+    UnitTeam team = stringToUnitTeam[teamString ?? unitData['team']] ?? UnitTeam.blue;
 
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = {};
@@ -67,7 +67,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
     
     // Create items for items
     List<Item> items = [];
-    for(String itemName in unitData['items']){
+    for(String itemName in itemStrings ?? unitData['items'] ?? []){
       items.add(Item.fromJson(itemName));
     }
 
