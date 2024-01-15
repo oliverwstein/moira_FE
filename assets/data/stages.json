@@ -10,28 +10,28 @@
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
                     "team": "Red",
-                    "gridCoord": [33, 25],
+                    "tilePosition": [33, 25],
                     "level": 5
                     },
                     {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
                     "team": "Red",
-                    "gridCoord": [32, 26],
+                    "tilePosition": [32, 26],
                     "level": 5
                     },
                     {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
                     "team": "Red",
-                    "gridCoord": [31, 25],
+                    "tilePosition": [31, 25],
                     "level": 5
                     },
                     {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
                     "team": "Red",
-                    "gridCoord": [30, 28],
+                    "tilePosition": [30, 28],
                     "level": 10,
                     "items": ["Hand Axe"]
                     }

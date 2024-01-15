@@ -81,8 +81,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
           if(playArea.contains((position).toOffset())){
             game.camera.moveBy(positionDelta);
           }
-          
-        }
+      }
     }
   }
 
