@@ -15,15 +15,16 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   late double tileSize;
   final int mapTileWidth;
   final int mapTileHeight;
+  final Vector2 initialPosition;
   final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
   late final Cursor cursor;
   late final Hud hud;
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
-  Stage(this.mapTileWidth, this.mapTileHeight, this.mapFileName);
+  Stage(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName);
 
-  Stage._internal(this.mapTileWidth, this.mapTileHeight, this.mapFileName);
+  Stage._internal(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName);
 
   // Static async method to create an instance from JSON
   static Future<Stage> fromJson(String mapFileName) async {
@@ -33,10 +34,12 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
 
     final mapTileWidth = data['mapTileWidth'] as int;
     final mapTileHeight = data['mapTileHeight'] as int;
+    final Vector2 initialPosition = Vector2(data['initialPosition'][0].toDouble(), data['initialPosition'][1].toDouble());
+
     final tmxFile = data['mapFileName'] as String;
 
     // Create and return a new instance
-    return Stage._internal(mapTileWidth, mapTileHeight, tmxFile);
+    return Stage._internal(mapTileWidth, mapTileHeight, initialPosition, tmxFile);
   }
   @override
   Future<void> onLoad() async {
@@ -55,6 +58,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn);
     camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     camera.viewfinder.position = Vector2(gameMidX, gameMidY);
+    // camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     camera.viewfinder.anchor = Anchor.center;
     hud = Hud();
     camera.viewport.add(hud);

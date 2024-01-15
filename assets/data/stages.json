@@ -2,6 +2,7 @@
     "Prologue":{
         "mapTileWidth": 62,
         "mapTileHeight": 31,
-        "mapFileName": "Ch0.tmx"
+        "mapFileName": "Ch0.tmx",
+        "initialPosition": [33, 22]
     }
 }

@@ -89,7 +89,7 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
 
   void resize() {
     Tile tile = game.stage.tileMap[tilePosition]!;
-    size = tile.size;
+    size = Vector2.all(game.stage.tileSize);
     position = tile.position;
   }
 }
