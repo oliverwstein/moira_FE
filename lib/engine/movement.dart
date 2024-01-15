@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:moira/engine/engine.dart';
+import 'package:moira/content/content.dart';
 class Movement {
   Direction direction;
   int tileDistance;
@@ -12,13 +12,13 @@ class Movement {
 enum Direction {up, down, left, right}
 
 mixin UnitMovement on PositionComponent {
-  Queue<Movement> movementQueue = Queue<Movement>();
-  Point<int> get tilePosition;
+  Queue<Movement> get _movementQueue => (this as Unit).movementQueue;
+  Point<int> get _tilePosition => (this as Unit).tilePosition;
   MoiraGame get game;
 
   void moveTo(Point<int> destination, [List<Movement>? path]) {
     path ??= getPath(destination);
-    movementQueue.addAll(path);
+    _movementQueue.addAll(path);
   }
 
   Vector2 getMovementVector(Movement movement) {
@@ -37,10 +37,10 @@ mixin UnitMovement on PositionComponent {
   }
   List<Movement> getPath(Point<int> destination) {
     Map<Point<int>, Point<int>> cameFrom = {};
-    Map<Point<int>, double> gScore = {tilePosition: 0};
-    Map<Point<int>, double> fScore = {tilePosition: _heuristicCost(tilePosition, destination)};
+    Map<Point<int>, double> gScore = {_tilePosition: 0};
+    Map<Point<int>, double> fScore = {_tilePosition: _heuristicCost(_tilePosition, destination)};
 
-    var openSet = {tilePosition};
+    var openSet = {_tilePosition};
 
     while (openSet.isNotEmpty) {
       Point<int> current = openSet.reduce((a, b) => fScore[a]! < fScore[b]! ? a : b);

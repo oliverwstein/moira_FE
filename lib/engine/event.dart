@@ -114,9 +114,32 @@ class UnitCreationEvent extends Event{
     game.stage.add(unit);
     // Wait for unit's onLoad to complete
     await unit.loadCompleted;
+    if(destination != null){
+      await UnitMoveEvent(unit, destination!).execute();
+    } 
     _isCompleted = true;
     dev.log("Unit $name Created @ tilePosition $tilePosition");
+    
     return unit;
+  }
+}
+
+class UnitMoveEvent extends Event {
+  final Point<int> tilePosition;
+  final Unit unit;
+  UnitMoveEvent(this.unit, this.tilePosition);
+
+  @override
+  Future<void> execute() async { // Make this method async
+    _isStarted = true;
+    dev.log("Event: Move unit ${unit.name}");
+    unit.moveTo(tilePosition);
+    _isCompleted = true;
+    
+  }
+  @override
+  bool checkComplete() {
+    return (unit.tilePosition == tilePosition && _isStarted);
   }
 }
 
