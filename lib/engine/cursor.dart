@@ -11,12 +11,12 @@ import 'package:moira/engine/engine.dart';
 class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility {
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
-  Point<int> tilePosition = const Point<int>(31, 15); // Current tile position
+  Point<int> tilePosition; // Current tile position
   Vector2 targetPosition; // Target position in pixels
   bool isMoving = false;
   final double speed = 300; // Speed of cursor movement in pixels per second
 
-  Cursor() : targetPosition = Vector2.zero();
+  Cursor(this.tilePosition) : targetPosition = Vector2.zero();
 
   @override
   Future<void> onLoad() async {
@@ -29,7 +29,6 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
       columns: 3,
       rows: 1,
     );
-
     _animationComponent = SpriteAnimationComponent(
       animation: cursorSheet.createAnimation(row: 0, stepTime: 0.2),
       size: Vector2.all(game.stage.tileSize),

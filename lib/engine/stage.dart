@@ -11,11 +11,11 @@ import 'package:moira/engine/engine.dart';
 
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
-  int tilesInColumn = 12;
+  int tilesInColumn = 14;
   late double tileSize;
   final int mapTileWidth;
   final int mapTileHeight;
-  final Vector2 initialPosition;
+  final Point<int> initialPosition;
   final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
   late final Cursor cursor;
@@ -34,7 +34,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
 
     final mapTileWidth = data['mapTileWidth'] as int;
     final mapTileHeight = data['mapTileHeight'] as int;
-    final Vector2 initialPosition = Vector2(data['initialPosition'][0].toDouble(), data['initialPosition'][1].toDouble());
+    final Point<int> initialPosition = Point(data['initialPosition'][0], data['initialPosition'][1]);
 
     final tmxFile = data['mapFileName'] as String;
 
@@ -48,17 +48,13 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     tiles = await flame_tiled.TiledComponent.load(mapFileName, Vector2.all(tileSize));
     add(tiles);
     createTiles();
-    cursor = Cursor();
+    cursor = Cursor(initialPosition);
     add(cursor);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
-    final gameMidX = playAreaSize.x / 2;
-    final gameMidY = playAreaSize.y / 2;
-
     final camera = game.camera;
-    camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn);
+    camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
     camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
-    camera.viewfinder.position = Vector2(gameMidX, gameMidY);
-    // camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
+    camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     camera.viewfinder.anchor = Anchor.center;
     hud = Hud();
     camera.viewport.add(hud);
@@ -74,7 +70,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
 
   void calculateTileSize() {
     // Calculate tile size based on the game's canvas size
-    final gameSize = game.size;
+    final gameSize = game.canvasSize;
     tileSize = min(gameSize.x / mapTileWidth, gameSize.y / mapTileHeight);
   }
 
