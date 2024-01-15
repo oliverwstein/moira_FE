@@ -61,8 +61,7 @@ class UnitCreationEvent extends Event{
   @override
   Future<Unit> execute() async {
     dev.log("Create unit $name");
-    unit = level != null ? Unit.fromJSON(gridCoord, name, level: level) : Unit.fromJSON(gridCoord, name);
-    // @TODO if the items is not null, replace the unit's inherent items with it.
+    unit = Unit.fromJSON(gridCoord, name, level: level, itemStrings: items);
     // Wait for unit's onLoad to complete
     await unit.loadCompleted;
     return unit;

@@ -13,7 +13,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   int movementRange;
   UnitTeam team;
   Point<int> gridCoord;
-  late final SpriteAnimationComponent _animationComponent;
+  late final Map<String, SpriteAnimationComponent> animationMap;
   late final SpriteSheet unitSheet;
   late final Map<String, dynamic> unitData;
 
@@ -131,18 +131,33 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
-    ui.Image unitImage = await game.images.load('${name}_idle.png');
+    ui.Image unitImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
     unitSheet = SpriteSheet.fromColumnsAndRows(
       image: unitImage,
       columns: 4,
-      rows: 1,
+      rows: 5,
     );
 
-    _animationComponent = SpriteAnimationComponent(
-      animation: unitSheet.createAnimation(row: 0, stepTime: .5),
-      size: Vector2.all(16),
-    );
-    add(_animationComponent);
+    animationMap['idle'] = SpriteAnimationComponent(
+                            animation: unitSheet.createAnimation(row: 4, stepTime: .5),
+                            size: Vector2(20, 16),
+                          );
+    animationMap['down'] = SpriteAnimationComponent(
+                            animation: unitSheet.createAnimation(row: 0, stepTime: .5),
+                            size: Vector2(20, 16),
+                          );
+    animationMap['up'] = SpriteAnimationComponent(
+                            animation: unitSheet.createAnimation(row: 1, stepTime: .5),
+                            size: Vector2(20, 16),
+                          );
+    animationMap['right'] = SpriteAnimationComponent(
+                            animation: unitSheet.createAnimation(row: 2, stepTime: .5),
+                            size: Vector2(20, 16),
+                          );
+    animationMap['left'] = SpriteAnimationComponent(
+                            animation: unitSheet.createAnimation(row: 3, stepTime: .5),
+                            size: Vector2(20, 16),
+                          );
 
     // Set the initial size and position of the unit
     size = game.stage.tiles.size;
