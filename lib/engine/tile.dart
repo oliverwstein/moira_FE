@@ -1,11 +1,14 @@
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/widgets.dart';
+import 'package:moira/content/content.dart';
 import 'package:moira/engine/engine.dart';
 
 class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   final Point<int> point;
   late final TextComponent textComponent;
+  Unit? unit;
+  bool get isOccupied => unit != null;
   Terrain terrain; // e.g., "grass", "water", "mountain"
   String name; // Defaults to the terrain name if there is no name.
 
@@ -31,6 +34,13 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   
   void resize() {
     size = Vector2.all(game.stage.tileSize);
+  }
+    void setUnit(Unit newUnit) {
+    unit = newUnit;
+  }
+
+  void removeUnit() {
+    unit = null;
   }
 }
 
