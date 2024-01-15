@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/engine/engine.dart';
@@ -53,6 +54,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     attackMap = await loadAttacksData();
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
+    await FlameAudio.audioCache.load('Prologue (Birth of the Holy Knight).mp3');
   }
 
   MoiraGame() : super(world: TitleCard()) {

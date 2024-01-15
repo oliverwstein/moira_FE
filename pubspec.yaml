@@ -9,6 +9,7 @@ environment:
 dependencies:
   flame: any
   flame_oxygen: any
+  flame_audio: any
   flutter:
     sdk: flutter
   flutter_animate: any
@@ -24,6 +25,7 @@ flutter:
   assets:
     - assets/images/
     - assets/tiles/
+    - assets/audio/
     - assets/data/units.json
     - assets/data/items.json
     - assets/data/weapons.json
