@@ -39,6 +39,41 @@
             "level": 10,
             "items": ["Hand Axe"]
             }
+        ],
+        [
+            {
+            "type": "UnitCreationEvent",
+            "name": "Barbarian",
+            "team": "Red",
+            "tilePosition": [37, 15],
+            "destination": [37, 26],
+            "level": 5
+            },
+            {
+            "type": "UnitCreationEvent",
+            "name": "Barbarian",
+            "team": "Red",
+            "tilePosition": [35, 15],
+            "destination": [35, 25],
+            "level": 5
+            },
+            {
+            "type": "UnitCreationEvent",
+            "name": "Barbarian",
+            "team": "Red",
+            "tilePosition": [36, 16],
+            "destination": [35, 26],
+            "level": 5
+            },
+            {
+            "type": "UnitCreationEvent",
+            "name": "Barbarian",
+            "team": "Red",
+            "tilePosition": [21, 19],
+            "destination": [27, 27],
+            "level": 10,
+            "items": ["Hand Axe"]
+            }
         ]
         ]
     }

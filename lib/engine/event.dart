@@ -119,7 +119,11 @@ class UnitCreationEvent extends Event{
     // Wait for unit's onLoad to complete
     await unit.loadCompleted;
     if(destination != null){
-      await UnitMoveEvent(unit, destination!).execute();
+      var moveEvent = UnitMoveEvent(unit, destination!);
+      await moveEvent.execute();
+      while (!moveEvent.checkComplete()) {
+        await Future.delayed(Duration(milliseconds: 100));
+      }
       dev.log("Unit $name deployed to $destination");
     } 
     _isCompleted = true;
@@ -139,11 +143,13 @@ class UnitMoveEvent extends Event {
     _isStarted = true;
     dev.log("Event: Move unit ${unit.name}");
     unit.moveTo(tilePosition);
+
     _isCompleted = true;
     
   }
   @override
   bool checkComplete() {
+    dev.log("${unit.tilePosition}, == $tilePosition && $_isStarted)}");
     return (unit.tilePosition == tilePosition && _isStarted);
   }
 }

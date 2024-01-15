@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
+import 'package:flame/flame.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -47,6 +49,8 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    FlameAudio.bgm.stop();
+    FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
     calculateTileSize();
     tiles = await flame_tiled.TiledComponent.load(mapFileName, Vector2.all(tileSize));
     add(tiles);

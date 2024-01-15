@@ -135,10 +135,13 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     sta = getStat('sta');
   }
   
+  Point<int> getTilePositionFromPosition(){
+    return Point(position.x~/game.stage.tileSize, position.y~/game.stage.tileSize);
+  }
   @override
   void update(double dt) {
     super.update(dt);
-
+    tilePosition = getTilePositionFromPosition();
     if (movementQueue.isNotEmpty) {
       Movement currentMovement = movementQueue.first;
       if(!isMoving) {
