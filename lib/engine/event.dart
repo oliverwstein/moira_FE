@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:moira/content/content.dart';
@@ -24,7 +25,28 @@ class EventQueue {
             event.execute();
         }
     }
+}
+EventQueue loadEventsFromJson(String jsonString) {
+    var data = jsonDecode(jsonString);
+    EventQueue queue = EventQueue();
 
+    for (var eventData in data['events']) {
+        Event event;
+
+        switch (eventData['type']) {
+            case 'UnitCreationEvent':
+                // event = UnitCreationEvent();
+                break;
+            case 'DialogueEvent':
+                // event = DialogueEvent();
+                break;
+            // Other cases
+        }
+
+        // queue.addEvent(event);
+    }
+
+    return queue;
 }
 
 class UnitCreationEvent extends Event {
@@ -49,3 +71,4 @@ class DialogueEvent extends Event {
         // Logic for handling dialogue
     }
 }
+
