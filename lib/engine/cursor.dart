@@ -8,7 +8,7 @@ import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
 import 'package:moira/engine/engine.dart';
 
-class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility {
+class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
   late final SpriteAnimationComponent _animationComponent;
   late final SpriteSheet cursorSheet;
   Point<int> tilePosition; // Current tile position
@@ -23,7 +23,7 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
     await super.onLoad();
 
     // Load the cursor image and create the animation component
-    ui.Image cursorImage = await gameRef.images.load('cursor.png');
+    ui.Image cursorImage = await game.images.load('cursor.png');
     cursorSheet = SpriteSheet.fromColumnsAndRows(
       image: cursorImage,
       columns: 3,
@@ -47,8 +47,8 @@ class Cursor extends PositionComponent with HasGameRef<MoiraGame>, HasVisibility
   void moveTo(Point<int> newTilePosition) {
     // Calculate the bounded position within the full stage size
     Point<int> boundedPosition = Point(
-      max(0, min(newTilePosition.x, gameRef.stage.mapTileWidth - 1)),
-      max(0, min(newTilePosition.y, gameRef.stage.mapTileHeight - 1))
+      max(0, min(newTilePosition.x, game.stage.mapTileWidth - 1)),
+      max(0, min(newTilePosition.y, game.stage.mapTileHeight - 1))
     );
 
     // Update only if the position has changed

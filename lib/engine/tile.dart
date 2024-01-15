@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/engine/engine.dart';
 
-class Tile extends PositionComponent with HasGameRef<MoiraGame>{
+class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   final Point<int> point;
   late final TextComponent textComponent;
   Terrain terrain; // e.g., "grass", "water", "mountain"
