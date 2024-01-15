@@ -54,7 +54,8 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     attackMap = await loadAttacksData();
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
-    await FlameAudio.audioCache.load('Prologue (Birth of the Holy Knight).mp3');
+    await FlameAudio.audioCache.load('105 - Prologue (Birth of the Holy Knight).mp3');
+    FlameAudio.loop('105 - Prologue (Birth of the Holy Knight).mp3');
   }
 
   MoiraGame() : super(world: TitleCard()) {
