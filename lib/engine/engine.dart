@@ -12,8 +12,10 @@ import 'package:flutter/widgets.dart';
 abstract class InputHandler {
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed);
 }
+enum UnitTeam {blue, red, green, yellow}
 enum TileState {blank, move, attack}
 enum Terrain {forest, path, cliff, sea, stream, fort, plain}
+enum ItemType {main, gear, treasure, basic}
 extension TerrainCost on Terrain {
   double get cost {
     switch (this) {
