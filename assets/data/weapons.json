@@ -29,10 +29,17 @@
                 "effects": [],
                 "specialAttack": "Stab"
             },
-            "Magic Axe":
+        "Magic Axe":
             {
                 "weaponType" : "Axe",
                 "specialAttack": "Fire Axe"
+            },
+        "Hand Axe":
+            {
+                "weaponType" : "Axe",
+                "might": 8,
+                "hit": 10,
+                "specialAttack": "Throw"
             }
         }
  }

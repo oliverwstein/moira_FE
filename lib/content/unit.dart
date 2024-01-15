@@ -21,7 +21,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   Item? main;
   Item? treasure;
   Item? gear;
-  List<Item> inventory = [];
+  List<Item> items = [];
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
   Set<Skill> skillSet = {};
@@ -31,7 +31,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   int hp = -1;
   int sta = -1;
 
-  factory Unit.fromJSON(Point<int> gridCoord, String name, {int? level}) {
+  factory Unit.fromJSON(Point<int> gridCoord, String name, {int? level, UnitTeam? team, }) {
 
     // Extract unit data from the static map in MoiraGame
     var unitsJson = MoiraGame.unitMap['units'] as List;
@@ -65,10 +65,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
       if (prof != null){proficiencies.add(prof);}
     }
     
-    // Create items for inventory
-    List<Item> inventory = [];
-    for(String itemName in unitData['inventory']){
-      inventory.add(Item.fromJson(itemName));
+    // Create items for items
+    List<Item> items = [];
+    for(String itemName in unitData['items']){
+      items.add(Item.fromJson(itemName));
     }
 
     Map<String, Attack> attackMap = {};
@@ -97,16 +97,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, inventory, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, items, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.level, this.movementRange, this.team, this.inventory, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.level, this.movementRange, this.team, this.items, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
   void _postConstruction() {
-    for (Item item in inventory){
+    for (Item item in items){
       switch (item.type) {
         case ItemType.main:
           if (main == null) equip(item);

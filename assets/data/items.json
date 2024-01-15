@@ -19,6 +19,12 @@
             "description": "An axe.",
             "type": "main"
         },
+    "Hand Axe":
+        {
+            "weapon": "Hand Axe",
+            "description": "A lightweight axe that can be thrown.",
+            "type": "main"
+        },
     "Salve":
         {
             "description": "A healing salve.",

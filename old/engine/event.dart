@@ -200,7 +200,7 @@ class ItemMenuEvent extends Event {
     dev.log("Event: Open item menu for ${unit.name}");
     itemMenu = ItemMenu(unit);
     unit.add(itemMenu);
-    dev.log("${unit.name} has ${itemMenu.inventory.map((item) => item.name).join(", ")}");
+    dev.log("${unit.name} has ${itemMenu.items.map((item) => item.name).join(", ")}");
   }
 
   @override
@@ -214,15 +214,15 @@ class ItemMenuEvent extends Event {
     bool handled = false;
     itemMenu.handleCommand(command);
     if (command == LogicalKeyboardKey.arrowUp) {
-      dev.log("Item Menu ArrowUp to ${itemMenu.inventory[itemMenu.selectedIndex].name}");
+      dev.log("Item Menu ArrowUp to ${itemMenu.items[itemMenu.selectedIndex].name}");
       handled = true;
     } else 
     if (command == LogicalKeyboardKey.arrowDown) {
-      dev.log("Item Menu ArrowDown to ${itemMenu.inventory[itemMenu.selectedIndex].name}");
+      dev.log("Item Menu ArrowDown to ${itemMenu.items[itemMenu.selectedIndex].name}");
       handled = true;
     } else 
     if (command == LogicalKeyboardKey.keyA) {
-      dev.log("Item Menu Select ${itemMenu.inventory[itemMenu.selectedIndex]}");
+      dev.log("Item Menu Select ${itemMenu.items[itemMenu.selectedIndex]}");
       // @TODO: once the option to use an item exists, using an item should complete the event.
       // It should also complete the event differently than cancellation should, 
       // because equipping is a free action and using an item is not.

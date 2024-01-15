@@ -311,7 +311,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   late final SpriteComponent mainEquipSprite;
   late final SpriteComponent gearEquipSprite;
   late final SpriteComponent treasureEquipSprite;
-  late List<Item> inventory;
+  late List<Item> items;
   Map<int, TextComponent> indexMap = {};
   int selectedIndex = 0;
   int mainEquippedIndex = -1;
@@ -320,17 +320,17 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   static const double scaleFactor = 2;
 
   ItemMenu(this.unit){
-    inventory = unit.inventory;
-    for (int i = 0; i < inventory.length; i++){
+    items = unit.items;
+    for (int i = 0; i < items.length; i++){
       var textComponent = TextComponent(
-        text: inventory[i].name,
+        text: items[i].name,
         textRenderer: basicTextRenderer,
         position: Vector2(20, 16*(i+1)),
         priority: 20,
       );
       add(textComponent);
       if(unit.main != null){
-        if (inventory[i] == unit.main){
+        if (items[i] == unit.main){
           mainEquippedIndex = i;
         }
       }
@@ -371,13 +371,13 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
     bool handled = false;
     if (command == LogicalKeyboardKey.arrowUp) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      selectedIndex = (selectedIndex - 1) % inventory.length;
+      selectedIndex = (selectedIndex - 1) % items.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
 
       handled = true;
     } else if (command == LogicalKeyboardKey.arrowDown) {
       indexMap[selectedIndex]!.textRenderer = basicTextRenderer;
-      selectedIndex = (selectedIndex + 1) % inventory.length;
+      selectedIndex = (selectedIndex + 1) % items.length;
       indexMap[selectedIndex]!.textRenderer = selectedTextRenderer;
       handled = true;
     } else if (command == LogicalKeyboardKey.keyA) {
@@ -392,37 +392,37 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
 
   void equipItem(){
     
-    switch (inventory[selectedIndex].type) {
+    switch (items[selectedIndex].type) {
       case ItemType.main:
-        if (unit.main == inventory[selectedIndex]){
+        if (unit.main == items[selectedIndex]){
           mainEquipSprite.removeFromParent();
           unit.unequip(ItemType.main);
         } else{
           mainEquipSprite.removeFromParent();
-          unit.equip(inventory[selectedIndex]);
+          unit.equip(items[selectedIndex]);
           indexMap[selectedIndex]!.add(mainEquipSprite);
           mainEquippedIndex = selectedIndex;
         }
         
         break;
       case ItemType.gear:
-        if (unit.gear == inventory[selectedIndex]){
+        if (unit.gear == items[selectedIndex]){
           gearEquipSprite.removeFromParent();
           unit.unequip(ItemType.gear);
         } else{
           gearEquipSprite.removeFromParent();
-          unit.equip(inventory[selectedIndex]);
+          unit.equip(items[selectedIndex]);
           indexMap[selectedIndex]!.add(gearEquipSprite);
           gearEquippedIndex = selectedIndex;
         }
         break;
       case ItemType.treasure:
-      if (unit.treasure == inventory[selectedIndex]){
+      if (unit.treasure == items[selectedIndex]){
           treasureEquipSprite.removeFromParent();
           unit.unequip(ItemType.treasure);
         } else{
           treasureEquipSprite.removeFromParent();
-          unit.equip(inventory[selectedIndex]);
+          unit.equip(items[selectedIndex]);
           indexMap[selectedIndex]!.add(treasureEquipSprite);
           treasureEquippedIndex = selectedIndex;
           }
@@ -434,7 +434,7 @@ class ItemMenu extends PositionComponent with HasGameRef<MyGame> implements Comm
   }
 
   void select(){
-    if (inventory[selectedIndex].equipCond?.check(unit) ?? true){equipItem();}
+    if (items[selectedIndex].equipCond?.check(unit) ?? true){equipItem();}
     close();
   }
 

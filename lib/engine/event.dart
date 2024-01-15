@@ -48,33 +48,23 @@ EventQueue loadEventsFromJson(String jsonString) {
 }
 
 class UnitCreationEvent extends Event{
-  final MoiraGame game;
   final String name;
   final Point<int> gridCoord;
   int? level;
-  late final Unit unit;
+  List<String>? items;
   Point<int>? destination;
+  late final Unit unit;
+  
 
-  UnitCreationEvent(this.game, this.name, this.gridCoord, {this.level, this.destination});
+  UnitCreationEvent(this.name, this.gridCoord, {this.level, this.items, this.destination});
 
   @override
   Future<Unit> execute() async {
     dev.log("Create unit $name");
     unit = level != null ? Unit.fromJSON(gridCoord, name, level: level) : Unit.fromJSON(gridCoord, name);
-    game.stage.add(unit);
-    game.stage.tileMap[gridCoord]!.setUnit(unit);
-
+    // @TODO if the items is not null, replace the unit's inherent items with it.
     // Wait for unit's onLoad to complete
     await unit.loadCompleted;
-
-    // Mark as completed once the unit has finished being created.
-    _isCompleted = true;
-    // Move the unit to its destination
-    if(destination != gridCoord) {
-      game.eventQueue.currentBatch().add(UnitMoveEvent(game, unit, destination));
-      game.eventQueue.currentBatch().remove(this);
-    }
-    
     return unit;
   }
 }

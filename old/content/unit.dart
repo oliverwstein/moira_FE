@@ -47,7 +47,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   Item? main;
   Item? treasure;
   Item? gear;
-  List<Item> inventory = [];
+  List<Item> items = [];
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
   Set<Skill> skillSet = {};
@@ -94,10 +94,10 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     
     String idleAnimationName = unitData['sprites']['idle'];
 
-    // Create items for inventory
-    List<Item> inventory = [];
-    for(String itemName in unitData['inventory']){
-      inventory.add(Item.fromJson(itemName));
+    // Create items for items
+    List<Item> items = [];
+    for(String itemName in unitData['items']){
+      items.add(Item.fromJson(itemName));
     }
 
     Map<String, Attack> attackMap = {};
@@ -126,16 +126,16 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, idleAnimationName, inventory, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, gridCoord, name, className, givenLevel, movementRange, team, idleAnimationName, items, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.level, this.movementRange, this.team, this.idleAnimationName, this.inventory, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.gridCoord, this.name, this.className, this.level, this.movementRange, this.team, this.idleAnimationName, this.items, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
   void _postConstruction() {
-    for (Item item in inventory){
+    for (Item item in items){
       switch (item.type) {
         case ItemType.main:
           if (main == null) equip(item);
@@ -618,7 +618,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       if(actionsAvailable.contains(MenuOption.attack)){
         actionsAvailable.remove(MenuOption.attack);}
     }
-    if (inventory.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
+    if (items.isNotEmpty) if(!actionsAvailable.contains(MenuOption.item)){actionsAvailable.add(MenuOption.item);}
     dev.log("Action options for $name are: $actionsAvailable");
   }
   
