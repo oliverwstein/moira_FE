@@ -65,8 +65,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
       if (prof != null){proficiencies.add(prof);}
     }
     
-    String idleAnimationName = unitData['sprites']['idle'];
-
     // Create items for inventory
     List<Item> inventory = [];
     for(String itemName in unitData['inventory']){
