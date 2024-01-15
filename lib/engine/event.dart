@@ -6,7 +6,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:moira/content/content.dart';
 
-abstract class Event {
+abstract class Event extends Component with HasGameReference<MoiraGame>{
   void execute() {}
 }
 
@@ -14,7 +14,7 @@ mixin Observer {
     void onEvent(Event event);
 }
 
-class EventQueue {
+class EventQueue extends Component with HasGameReference<MoiraGame>{
   final Queue<List<Event>> _events = Queue<List<Event>>();
 
   void addEvent(Event event) {
@@ -24,41 +24,44 @@ class EventQueue {
   void executeNext() {
       if (_events.isNotEmpty) {
           List<Event> eventBatch = _events.removeFirst();
-          for (Event event in eventBatch) {event.execute();}
+          for (Event event in eventBatch) {
+            game.world.add(event);
+            event.execute();}
       }
   }
   
   void addBatch(List<Event> eventBatch) {
     _events.add(eventBatch);
   }
-}
-
-EventQueue loadEventsFromJson(String jsonString) {
-  var data = jsonDecode(jsonString);
-  EventQueue queue = EventQueue();
-
-  for (List<dynamic> eventBatchList in data['events']) {
-    for (Map eventData in eventBatchList){
-      List<Event> eventBatch = [];
-      switch (eventData['type']) {
-          case 'UnitCreationEvent':
-            String name = eventData['name'];
-            String team = eventData['team'];
-            Point<int> gridCoord = Point(eventData['gridCoord'][0], eventData['gridCoord'][1]);
-            int level = eventData['level'];
-            List<String> itemStrings = eventData['items'];
-            eventBatch.add(UnitCreationEvent(name, gridCoord, level:level, teamString: team, items:itemStrings));
-            break;
-          case 'DialogueEvent':
-            eventBatch.add(DialogueEvent([]));
-            break;
-      }
-      queue.addBatch(eventBatch);
+  void loadEventsFromJson(dynamic jsonData) {
+    for (List<dynamic> eventBatch in jsonData) {
+      // dev.log("$eventBatch");
+      for (Map eventData in eventBatch){
+        List<Event> eventBatch = [];
+        dev.log("$eventData");
+        switch (eventData['type']) {
+            case 'UnitCreationEvent':
+              String name = eventData['name'];
+              String team = eventData['team'];
+              Point<int> gridCoord = Point(eventData['gridCoord'][0], eventData['gridCoord'][1]);
+              int? level = eventData['level'];
+              List<String>? itemStrings;
+              dev.log("${eventData['items']}");
+              if (eventData['items'] != null) {
+                itemStrings = List<String>.from(eventData['items']);
+              }
+              eventBatch.add(UnitCreationEvent(name, gridCoord, level:level, teamString: team, items:itemStrings));
+              break;
+            case 'DialogueEvent':
+              eventBatch.add(DialogueEvent([]));
+              break;
+        }
+        addBatch(eventBatch);
+      }  
     }
-          
   }
-  return queue;
 }
+
 
 class UnitCreationEvent extends Event{
   final String name;
@@ -78,6 +81,7 @@ class UnitCreationEvent extends Event{
     unit = Unit.fromJSON(gridCoord, name, level: level, teamString: teamString, itemStrings: items);
     // Wait for unit's onLoad to complete
     await unit.loadCompleted;
+    game.world.add(unit);
     return unit;
   }
 }

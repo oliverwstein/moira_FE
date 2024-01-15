@@ -67,7 +67,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
     
     // Create items for items
     List<Item> items = [];
-    for(String itemName in itemStrings ?? unitData['items'] ?? []){
+    itemStrings = itemStrings ?? [];
+    for(String itemName in itemStrings!.isNotEmpty ? unitData['items'] : itemStrings){
       items.add(Item.fromJson(itemName));
     }
 
