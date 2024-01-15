@@ -81,7 +81,11 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               if (eventData['items'] != null) {
                 itemStrings = List<String>.from(eventData['items']);
               }
-              eventBatch.add(UnitCreationEvent(name, tilePosition, level:level, teamString: team, items:itemStrings));
+              Point<int>? destination;
+              if (eventData['destination'] != null) {
+                destination = Point(eventData['destination'][0], eventData['destination'][1]);
+              }
+              eventBatch.add(UnitCreationEvent(name, tilePosition, level:level, teamString: team, items:itemStrings, destination: destination));
               break;
             case 'DialogueEvent':
               eventBatch.add(DialogueEvent([]));
@@ -116,9 +120,10 @@ class UnitCreationEvent extends Event{
     await unit.loadCompleted;
     if(destination != null){
       await UnitMoveEvent(unit, destination!).execute();
+      dev.log("Unit $name deployed to $destination");
     } 
     _isCompleted = true;
-    dev.log("Unit $name Created @ tilePosition $tilePosition");
+    dev.log("Unit $name Created");
     
     return unit;
   }

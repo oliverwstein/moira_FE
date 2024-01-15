@@ -21,7 +21,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   late final SpriteSheet unitSheet;
   late final Map<String, dynamic> unitData;
   bool isMoving = false;
-  final double speed = 300; // Speed of cursor movement in pixels per second
+  final double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
   Item? main;
@@ -135,32 +135,35 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
   
   @override
-  void update(double dt) {
-    super.update(dt);
+void update(double dt) {
+  super.update(dt);
 
-    if (movementQueue.isNotEmpty) {
+  if (movementQueue.isNotEmpty) {
+    if(!isMoving) {
       Movement currentMovement = movementQueue.first;
-
-      // Calculate the target position based on currentMovement
       Vector2 movementVector = getMovementVector(currentMovement);
-      Vector2 targetPosition = position + movementVector * currentMovement.tileDistance.toDouble() * game.stage.tileSize;
+      targetPosition = position + movementVector * currentMovement.tileDistance.toDouble() * game.stage.tileSize;
+      isMoving = true;
+    }
+    // Use lerp to move towards the target position
+    double distance = position.distanceTo(targetPosition);
+    double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
+    // dev.log("position: ${position}, targetPosition: $targetPosition, distance: $distance, moveStep: $moveStep");
+    if (distance < 0.1) { // Using a small threshold like 1.0 to ensure we reach the target
+      position = targetPosition;
+      isMoving = false;
+      movementQueue.removeFirst(); // Dequeue the completed movement
 
-      // Linearly interpolate the position towards the target position
-      if ((targetPosition - position).length < game.stage.tileSize * dt * speed) {
-        // Close enough to snap to the target position
-        position = targetPosition;
-        movementQueue.removeFirst(); // Dequeue the completed movement
-
-        if (movementQueue.isNotEmpty) {
-          // @TODO: Update sprite for the next movement direction
-        }
-      } else {
-        // Continue moving towards the target position
-        Vector2 direction = (targetPosition - position).normalized();
-        position += direction * game.stage.tileSize * dt * speed;
+      if (movementQueue.isNotEmpty) {
+        // @TODO: Update sprite for the next movement direction
       }
+    } else {
+      dev.log("$position, $targetPosition, $dt");
+      position.moveToTarget(targetPosition, moveStep);
     }
   }
+}
+
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
