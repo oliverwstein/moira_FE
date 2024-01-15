@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -7,7 +8,7 @@ import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 
-class Unit extends PositionComponent with HasGameReference<MoiraGame>{
+class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement{
   final Completer<void> _loadCompleter = Completer<void>();
   final String name;
   final String className;
@@ -15,6 +16,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   UnitTeam team;
   Point<int> tilePosition;
   late Vector2 targetPosition; // Target position in pixels
+  Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
   late final SpriteSheet unitSheet;
   late final Map<String, dynamic> unitData;
@@ -34,6 +36,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   int level;
   int hp = -1;
   int sta = -1;
+  
 
   factory Unit.fromJSON(Point<int> tilePosition, String name, {int? level, String? teamString, List<String>? itemStrings}) {
 
@@ -134,13 +137,27 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   @override
   void update(double dt) {
     super.update(dt);
-    // dev.log("Unit named $name @ tilePosition $tilePosition");
-    if (isMoving) {
-      if (position.distanceTo(targetPosition) < 0.1) { // Small threshold
+
+    if (movementQueue.isNotEmpty) {
+      Movement currentMovement = movementQueue.first;
+
+      // Calculate the target position based on currentMovement
+      Vector2 movementVector = getMovementVector(currentMovement);
+      Vector2 targetPosition = position + movementVector * currentMovement.tileDistance.toDouble() * game.stage.tileSize;
+
+      // Linearly interpolate the position towards the target position
+      if ((targetPosition - position).length < game.stage.tileSize * dt * speed) {
+        // Close enough to snap to the target position
         position = targetPosition;
-        isMoving = false;
+        movementQueue.removeFirst(); // Dequeue the completed movement
+
+        if (movementQueue.isNotEmpty) {
+          // @TODO: Update sprite for the next movement direction
+        }
       } else {
-        position.lerp(targetPosition, min(1, speed * dt / position.distanceTo(targetPosition)));
+        // Continue moving towards the target position
+        Vector2 direction = (targetPosition - position).normalized();
+        position += direction * game.stage.tileSize * dt * speed;
       }
     }
   }
@@ -245,8 +262,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>{
   int getStat(String stat){
     return stats[stat]!;
   }
-
   void resize() {
     size = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
   }
+
 }
+
+
