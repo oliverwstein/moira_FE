@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 
+import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
@@ -8,6 +9,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jenny/jenny.dart';
+import 'package:moira/content/content.dart';
 import 'package:moira/engine/engine.dart';
 class MoiraGame extends FlameGame with KeyboardEvents {
   late Stage stage;
@@ -58,6 +60,12 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     String prologueDialogueData =
         await rootBundle.loadString('assets/yarn/prologue.yarn');
     yarnProject.parse(prologueDialogueData);
+    var testDialogue = Dialogue("jungby_interior.png");
+    var dialogueRunner = DialogueRunner(
+        yarnProject: yarnProject, dialogueViews: [testDialogue]);
+    add(testDialogue);
+    dialogueRunner.startDialogue('Opening_Jungby');
+    switchToWorld(testDialogue);
     FlameAudio.bgm.initialize();
     await FlameAudio.audioCache.load('105 - Prologue (Birth of the Holy Knight).mp3');
     await FlameAudio.audioCache.load('101 - Beginning.mp3');
@@ -76,10 +84,8 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   MoiraGame() : super(world: TitleCard()) {
     titleCard = world as TitleCard;
   }
-  void switchToWorld(String worldName) async {
-    if (worldName == 'Stage') {
-      world = stage; // Switch to the Stage world
-    }
+  void switchToWorld(World newWorld) async {
+      world = newWorld; // Switch to the Stage world
   }
 
   @override

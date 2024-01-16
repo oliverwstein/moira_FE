@@ -17,6 +17,7 @@ class TitleCard extends World with HasGameReference<MoiraGame> implements InputH
     _spriteComponent = SpriteComponent.fromImage(game.images.fromCache('title_card.png'));
     add(_spriteComponent);
     _spriteComponent.anchor = Anchor.center;
+    _spriteComponent.size = game.canvasSize;
     dev.log("Await Stage!");
     game.stage = await Stage.fromJson('Prologue'); // Load the Stage asynchronously
     dev.log("Stage is initialized!");
@@ -27,7 +28,7 @@ class TitleCard extends World with HasGameReference<MoiraGame> implements InputH
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-   game.switchToWorld("Stage");
+   game.switchToWorld(game.stage);
    return KeyEventResult.handled;
   }
 }
