@@ -3,15 +3,13 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:math';
 
+import 'package:async/async.dart';
 import 'package:flame/components.dart';
 import 'package:moira/content/content.dart';
 
 abstract class Event extends Component with HasGameReference<MoiraGame>{
-  bool _isStarted = false;
-  bool _isCompleted = false;
-  bool checkStarted(){return _isStarted;}
-  bool checkComplete(){return _isCompleted;}
-  void execute() {}
+  Future<void> execute() async{}
+  Future<void> checkComplete() async {}
 }
 
 mixin Observer {
@@ -24,37 +22,34 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   bool get isProcessing => _isProcessing;
   List<Event> _currentBatch = [];
 
-  @override
-  void update(double dt) {
-    if (_isProcessing) {
-      if (_currentBatch.every((event) => event.checkComplete())){
-        // If the batch elements have all been completed, clear the batch
-        // and allow EventQueue to go on to the next batch.
-        _isProcessing = false;
-        _currentBatch.clear();
-      } else {
-        List<Event> batch = [];
-        for (Event event in _currentBatch){if (!event.checkStarted()) batch.add(event);}
-        executeBatch(batch);}
-    }
-    if (!_isProcessing && _events.isNotEmpty) {
-      // Pop the next batch waiting in the queue as the current batch
-      _currentBatch = _events.removeFirst();
-      // Execute all events in the current batch simultaneously
-      executeBatch(_currentBatch); 
-      _isProcessing = true;
-    }
-  }
-  void addEvent(Event event) {
-      _events.add([event]);
-  }
   void executeBatch(List<Event> batch) {
-    // Execute each event in the current batch
+    FutureGroup futureGroup = FutureGroup();
+
     for (var event in batch) {
       game.stage.add(event);
       dev.log("Execute event $event");
       event.execute();
+      futureGroup.add(event.checkComplete());
     }
+    futureGroup.close();
+    futureGroup.future.then((_) {
+      _isProcessing = false;
+      dev.log("All events in batch completed");
+    });
+  }
+
+@override
+void update(double dt) {
+  super.update(dt);
+
+  if (!_isProcessing && _events.isNotEmpty) {
+    _isProcessing = true;
+    _currentBatch = _events.removeFirst();
+    executeBatch(_currentBatch);
+  }
+}
+  void addEvent(Event event) {
+      _events.add([event]);
   }
   void executeNext() {
       if (_events.isNotEmpty) {
@@ -111,25 +106,25 @@ class UnitCreationEvent extends Event{
   UnitCreationEvent(this.name, this.tilePosition, {this.level, this.teamString, this.items, this.destination});
 
   @override
-  Future<Unit> execute() async {
-    _isStarted = true;
+  Future<void> execute() async {
     dev.log("Create unit $name");
     unit = Unit.fromJSON(tilePosition, name, level: level, teamString: teamString, itemStrings: items);
     game.stage.add(unit);
-    // Wait for unit's onLoad to complete
-    await unit.loadCompleted;
-    if(destination != null){
+    if (destination != null) {
       var moveEvent = UnitMoveEvent(unit, destination!);
-      await moveEvent.execute();
-      while (!moveEvent.checkComplete()) {
-        await Future.delayed(Duration(milliseconds: 100));
-      }
+      moveEvent.execute();  // Start the move event but don't await it
       dev.log("Unit $name deployed to $destination");
+    } else {
+      destination = tilePosition;
+    }
+  dev.log("Unit $name Created");
+  }
+  @override
+  Future<void> checkComplete() async {
+    if (unit.tilePosition != destination){
+      await Future.delayed(const Duration(seconds: 1));
+      checkComplete();
     } 
-    _isCompleted = true;
-    dev.log("Unit $name Created");
-    
-    return unit;
   }
 }
 
@@ -140,17 +135,8 @@ class UnitMoveEvent extends Event {
 
   @override
   Future<void> execute() async { // Make this method async
-    _isStarted = true;
     dev.log("Event: Move unit ${unit.name}");
     unit.moveTo(tilePosition);
-
-    _isCompleted = true;
-    
-  }
-  @override
-  bool checkComplete() {
-    dev.log("${unit.tilePosition}, == $tilePosition && $_isStarted)}");
-    return (unit.tilePosition == tilePosition && _isStarted);
   }
 }
 
@@ -160,7 +146,7 @@ class DialogueEvent extends Event {
     DialogueEvent(this.dialogueLines);
 
     @override
-    void execute() {
+    Future<void> execute() async {
         // Logic for handling dialogue
     }
 }

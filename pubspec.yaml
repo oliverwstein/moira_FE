@@ -15,6 +15,7 @@ dependencies:
   flutter_animate: any
   google_fonts: any
   flame_tiled: any
+  async: any
 
 dev_dependencies:
   flutter_test:
