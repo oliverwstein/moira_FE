@@ -1,9 +1,10 @@
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:moira/engine/engine.dart';
 
-import 'engine/engine.dart';
+
 void main() {
-  final game = MyGame();
+  final game = MoiraGame();
   runApp(
     GameWidget(game: game),
   );

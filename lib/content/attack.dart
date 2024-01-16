@@ -1,13 +1,6 @@
-// ignore_for_file: unused_import
-
-import 'dart:convert';
-
 import 'package:flame/components.dart';
-import 'package:flutter/services.dart';
-
-import '../engine/engine.dart';
-
-class Attack extends Component with HasGameRef<MyGame>{
+import 'package:moira/content/content.dart';
+class Attack extends Component with HasGameReference<MoiraGame>{
   final String name; // The Attack name
   late String description; // A description of the attack
   late Vector4 scaling; // The stat scaling of the attack
@@ -23,7 +16,7 @@ class Attack extends Component with HasGameRef<MyGame>{
   // Factory constructor
   factory Attack.fromJson(String name) {
     // Check if the attack exists in the map and retrieve its data
-    var attackData = MyGame.attackMap['attacks'][name];
+    var attackData = MoiraGame.attackMap['attacks'][name];
     if (attackData == null) {
       // Handle the case where attackData does not exist for the given name
       // Perhaps throw an error or return a default attack

@@ -9,11 +9,13 @@ environment:
 dependencies:
   flame: any
   flame_oxygen: any
+  flame_audio: any
   flutter:
     sdk: flutter
   flutter_animate: any
   google_fonts: any
   flame_tiled: any
+  async: any
 
 dev_dependencies:
   flutter_test:
@@ -24,11 +26,13 @@ flutter:
   assets:
     - assets/images/
     - assets/tiles/
+    - assets/audio/
     - assets/data/units.json
     - assets/data/items.json
     - assets/data/weapons.json
     - assets/data/attacks.json
     - assets/data/skills.json
     - assets/data/classes.json
+    - assets/data/stages.json
   uses-material-design: true
 

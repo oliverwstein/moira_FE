@@ -1,22 +1,19 @@
-// ignore_for_file: unused_import
-
-import 'dart:ui' as ui;
-
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:moira/main.dart';
-
-export '../content/content.dart';
-export 'combat.dart';
-export 'cursor.dart';
-export 'event.dart';
 export 'game.dart';
-export 'menu.dart';
-export 'observer.dart';
-export 'player.dart';
 export 'stage.dart';
+export 'event.dart';
 export 'tile.dart';
+export 'cursor.dart';
+export 'hud.dart';
+export 'movement.dart';
+export 'title_card.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
-enum Direction {up, down, left, right}
+
+
+abstract class InputHandler {
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed);
+}
 enum UnitTeam {blue, red, green, yellow}
 enum TileState {blank, move, attack}
 enum Terrain {forest, path, cliff, sea, stream, fort, plain}
@@ -27,11 +24,11 @@ extension TerrainCost on Terrain {
       case Terrain.forest:
         return 2;
       case Terrain.cliff:
-        return 100;
+        return 10;
       case Terrain.sea:
         return 100;
       case Terrain.stream:
-        return 100;
+        return 10;
       case Terrain.path:
         return .7;
       default:
@@ -40,9 +37,3 @@ extension TerrainCost on Terrain {
   }
 }
 
-
-
-Future<String> loadJsonData(String jsonPath) async {
-  var jsonText = await rootBundle.loadString(jsonPath);
-  return jsonText;
-}

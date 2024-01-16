@@ -61,6 +61,30 @@
                 "range": [1, 1],
                 "effects": []
             },
+        "Throw":
+            {
+                "description" : "Have at thee.",
+                "scaling" : [0.8, 0.2, 0.0, 0.0],
+                "weaponType" : ["Axe"],
+                "might": 2,
+                "hit": 0,
+                "fatigue": 1,
+                "magic": false,
+                "range": [1, 2],
+                "effects": []
+            },
+        "Shoot":
+            {
+                "description" : "Ready, aim...",
+                "scaling" : [0.6, 0.6, 0.0, 0.0],
+                "weaponType" : ["Bow"],
+                "might": 3,
+                "hit": 30,
+                "fatigue": 1,
+                "magic": false,
+                "range": [2, 4],
+                "effects": []
+            },
         "Fire Axe":
             {
                 "description" : "Burn, baby.",

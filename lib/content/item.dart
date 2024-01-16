@@ -1,15 +1,6 @@
-// ignore_for_file: unused_import
-
-import 'dart:convert';
-import 'dart:developer' as dev;
-import 'dart:io';
-
 import 'package:flame/components.dart';
-import 'package:flutter/services.dart';
-
-import '../engine/engine.dart';
-
-class Item extends Component with HasGameRef<MyGame>{
+import 'package:moira/content/content.dart';
+class Item extends Component with HasGameReference<MoiraGame>{
   final String name;
   String description;
   ItemType? type;
@@ -20,7 +11,7 @@ class Item extends Component with HasGameRef<MyGame>{
   
   // Factory constructor
   factory Item.fromJson(String name) {
-    var itemData = MyGame.itemMap['items'][name];
+    var itemData = MoiraGame.itemMap['items'][name];
 
     if (itemData == null) {
       // Handle the case where itemData does not exist for the given name

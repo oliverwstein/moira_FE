@@ -1,16 +1,9 @@
-
-// ignore_for_file: unused_import
-
-import 'dart:convert';
-
 import 'package:flame/components.dart';
-import 'package:flutter/services.dart';
+import 'package:moira/content/content.dart';
 
-import '../engine/engine.dart';
-// ignore: constant_identifier_names
 enum WeaponType {Sword, Axe, Lance, Knife, Staff, Book, Bow}
 
-class Weapon extends Component with HasGameRef<MyGame>{
+class Weapon extends Component with HasGameReference<MoiraGame>{
   late WeaponType weaponType; // The type of the weapon. 
   late int might; // The base power of the weapon. 
   late int hit; // The base accuracy of the weapon. 
@@ -28,8 +21,8 @@ class Weapon extends Component with HasGameRef<MyGame>{
     Map<String, dynamic> weaponData;
 
     // Check if the weapon exists in the map and retrieve its data
-    if (MyGame.weaponMap['weapons'].containsKey(name)) {
-      weaponData = MyGame.weaponMap['weapons'][name];
+    if (MoiraGame.weaponMap['weapons'].containsKey(name)) {
+      weaponData = MoiraGame.weaponMap['weapons'][name];
     } else {
       // Define default values for a weapon that doesn't exist in the map
       weaponData = {

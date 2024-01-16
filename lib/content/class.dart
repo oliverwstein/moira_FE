@@ -1,14 +1,6 @@
-
-// ignore_for_file: unused_import
-
-import 'dart:convert';
-import 'dart:developer' as dev;
 import 'package:flame/components.dart';
-import 'package:flutter/services.dart';
-import '../engine/engine.dart';
-// ignore: constant_identifier_names
-
-class Class extends Component with HasGameRef<MyGame>{
+import 'package:moira/content/content.dart';
+class Class extends Component with HasGameReference<MoiraGame>{
   final String name;
   final String description;
   final int movementRange;
@@ -23,8 +15,8 @@ class Class extends Component with HasGameRef<MyGame>{
     Map<String, dynamic> classData;
 
     // Check if the class exists in the map and retrieve its data
-    if (MyGame.classMap['classes'].containsKey(name)) {
-      classData = MyGame.classMap['classes'][name];
+    if (MoiraGame.classMap['classes'].containsKey(name)) {
+      classData = MoiraGame.classMap['classes'][name];
     } else {classData = {};}
     String description = classData['description'] ?? "An unknown foe";
     int movementRange = classData['movementRange'] ?? 6;

@@ -19,10 +19,27 @@
             "description": "An axe.",
             "type": "main"
         },
+    "Hand Axe":
+        {
+            "weapon": "Hand Axe",
+            "description": "A lightweight axe that can be thrown.",
+            "type": "main"
+        },
+    "Bow":
+        {
+            "weapon": "Bow",
+            "description": "A bow.",
+            "type": "main"
+        },
     "Salve":
         {
-            "description": "A healing salve.",
+            "description": "Restores 10 health on use.",
             "type": "basic"
+        },
+    "Skill Ring":
+        {
+            "description": "Wearer gains 5 Dexterity.",
+            "type": "treasure"
         }
     }
 }

@@ -4032,7 +4032,7 @@
  <tile id="803">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Gate"/>
   </properties>
  </tile>
  <tile id="804">
@@ -4696,7 +4696,7 @@
  <tile id="934">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Gate"/>
   </properties>
  </tile>
  <tile id="935">
@@ -4732,6 +4732,7 @@
  </tile>
  <tile id="941">
   <properties>
+   <property name="name" value="Bridge"/>
    <property name="terrain" value="Path"/>
   </properties>
  </tile>
@@ -6997,7 +6998,8 @@
  </tile>
  <tile id="1394">
   <properties>
-   <property name="terrain" value="Plain"/>
+   <property name="name" value="Bridge"/>
+   <property name="terrain" value="path"/>
   </properties>
  </tile>
  <tile id="1395">
@@ -7310,7 +7312,8 @@
  </tile>
  <tile id="1456">
   <properties>
-   <property name="terrain" value="Plain"/>
+   <property name="name" value="Bridge"/>
+   <property name="terrain" value="path"/>
   </properties>
  </tile>
  <tile id="1457">
@@ -7603,6 +7606,7 @@
  </tile>
  <tile id="1514">
   <properties>
+   <property name="name" value="Bridge"/>
    <property name="terrain" value="Path"/>
   </properties>
  </tile>
@@ -7623,7 +7627,8 @@
  </tile>
  <tile id="1518">
   <properties>
-   <property name="terrain" value="Plain"/>
+   <property name="name" value="Bridge"/>
+   <property name="terrain" value="path"/>
   </properties>
  </tile>
  <tile id="1519">
@@ -7948,7 +7953,7 @@
  <tile id="1582">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Gate"/>
   </properties>
  </tile>
  <tile id="1583">

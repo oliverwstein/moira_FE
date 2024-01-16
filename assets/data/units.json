@@ -30,12 +30,9 @@
         "lck": 40
     },
     "skills": [],
-    "inventory": ["Salve", "Salve", "Sword", "Lance", "Axe"],
+    "items": ["Salve", "Salve", "Sword", "Lance", "Axe"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "sigurd.png"
-    }},
+    "proficiencies": []},
     {
     "name": "Noish",
     "team": "blue",
@@ -66,12 +63,9 @@
         "lck": 20
     },
     "skills": [],
-    "inventory": ["Salve", "Sword"],
+    "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "noish.png"
-    }},
+    "proficiencies": []},
     {
     "name": "Alec",
     "team": "blue",
@@ -102,12 +96,9 @@
         "lck": 40
     },
     "skills": [],
-    "inventory": ["Salve", "Sword"],
+    "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "alec.png"
-    }},
+    "proficiencies": []},
     {
     "name": "Arden",
     "team": "blue",
@@ -138,26 +129,64 @@
         "lck": 30
     },
     "skills": [],
-    "inventory": ["Salve", "Sword"],
+    "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": ["Sword"],
-    "sprites": {
-        "idle": "arden.png"
-    }
+    "proficiencies": ["Sword"]
     },
     {
     "name": "Brigand",
+    "team": "red",
+    "class": "Brigand",
+    "baseStats": {},
+    "growths": {},
+    "skills": [],
+    "items": ["Axe"],
+    "attacks": [],
+    "proficiencies": []
+    },
+    {
+    "name": "Barbarian",
     "team": "red",
     "class": "Barbarian",
     "baseStats": {},
     "growths": {},
     "skills": [],
-    "inventory": ["Axe"],
+    "items": ["Axe"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "brigand_idle.png"
-    }
+    "proficiencies": []
+    },
+    {
+    "name": "Hunter",
+    "team": "red",
+    "class": "Hunter",
+    "baseStats": {},
+    "growths": {},
+    "skills": [],
+    "items": ["Bow"],
+    "attacks": [],
+    "proficiencies": []
+    },
+    {
+    "name": "DiMaggio",
+    "team": "red",
+    "class": "Fighter",
+    "baseStats": {},
+    "growths": {},
+    "skills": [],
+    "items": ["Axe"],
+    "attacks": [],
+    "proficiencies": []
+    },
+    {
+    "name": "Gandolf",
+    "team": "red",
+    "class": "Warrior",
+    "baseStats": {},
+    "growths": {},
+    "skills": [],
+    "items": ["Hand Axe", "Skill Ring"],
+    "attacks": [],
+    "proficiencies": []
     }
 ]
 }
