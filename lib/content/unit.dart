@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 
 class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement{
@@ -175,7 +176,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
-    ui.Image unitImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
+    ui.Image unitImage = await game.images.load('${className.toLowerCase()}_spritesheet.png');
     unitSheet = SpriteSheet.fromColumnsAndRows(
       image: unitImage,
       columns: 4,

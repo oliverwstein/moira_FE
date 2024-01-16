@@ -110,12 +110,11 @@
             },
             {
             "type": "UnitCreationEvent",
-            "name": "Barbarian",
+            "name": "DiMaggio",
             "team": "Red",
             "tilePosition": [19, 19],
             "destination": [33, 26],
-            "level": 10,
-            "items": ["Hand Axe"]
+            "level": 10
             }
         ]
         ]
