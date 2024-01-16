@@ -56,6 +56,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     await super.onLoad();
     await images.load('title_card.png');
     await images.load('portraits_spritesheet.png');
+    await images.load('dialogue_boxes.png');
     portraitSheet = SpriteSheet(image: images.fromCache("portraits_spritesheet.png"), srcSize: Vector2(48, 64));
     String prologueDialogueData =
         await rootBundle.loadString('assets/yarn/prologue.yarn');
