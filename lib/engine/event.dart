@@ -45,7 +45,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 
   void mountBatch(List<Event> batch) {
     // Execute each event in the current batch
-    dev.log("${batch.length}");
     for (var event in batch) {
       add(event);
     }
@@ -53,7 +52,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 
   @override
   void update(double dt) {
-    dev.log("Current batch: ${currentBatch()}");
     if(currentBatch().isEmpty){
       if(_eventBatches.isNotEmpty){
         mountBatch(_eventBatches.removeFirst());
@@ -85,12 +83,10 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               batch.add(DialogueEvent([]));
               break;
         }
-      }  
-      addEventBatch(batch);
+      } addEventBatch(batch);
     }
   }
 }
-
 
 class UnitCreationEvent extends Event{
   final String name;

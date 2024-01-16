@@ -32,10 +32,7 @@
     "skills": [],
     "items": ["Salve", "Salve", "Sword", "Lance", "Axe"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "sigurd.png"
-    }},
+    "proficiencies": []},
     {
     "name": "Noish",
     "team": "blue",
@@ -68,10 +65,7 @@
     "skills": [],
     "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "noish.png"
-    }},
+    "proficiencies": []},
     {
     "name": "Alec",
     "team": "blue",
@@ -104,10 +98,7 @@
     "skills": [],
     "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "alec.png"
-    }},
+    "proficiencies": []},
     {
     "name": "Arden",
     "team": "blue",
@@ -140,10 +131,7 @@
     "skills": [],
     "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": ["Sword"],
-    "sprites": {
-        "idle": "arden.png"
-    }
+    "proficiencies": ["Sword"]
     },
     {
     "name": "Brigand",
@@ -154,10 +142,7 @@
     "skills": [],
     "items": ["Axe"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "brigand_idle.png"
-    }
+    "proficiencies": []
     },
     {
     "name": "Barbarian",
@@ -168,10 +153,18 @@
     "skills": [],
     "items": ["Axe"],
     "attacks": [],
-    "proficiencies": [],
-    "sprites": {
-        "idle": "brigand_idle.png"
-    }
+    "proficiencies": []
+    },
+    {
+    "name": "Hunter",
+    "team": "red",
+    "class": "Hunter",
+    "baseStats": {},
+    "growths": {},
+    "skills": [],
+    "items": ["Bow"],
+    "attacks": [],
+    "proficiencies": []
     }
 ]
 }
