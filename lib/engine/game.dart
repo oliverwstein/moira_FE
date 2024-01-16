@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
 
+import 'package:flame/cache.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flame/sprite.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -48,6 +50,11 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    final spriteSheet = SpriteSheet(
+      image: await images.load('portraits_spritesheet.png'),
+      srcSize: Vector2(48, 64),
+    );
+    await images.load('title_card.png');
     FlameAudio.bgm.initialize();
     await FlameAudio.audioCache.load('105 - Prologue (Birth of the Holy Knight).mp3');
     await FlameAudio.audioCache.load('101 - Beginning.mp3');
@@ -58,6 +65,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     attackMap = await loadAttacksData();
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
+
     
     
   }

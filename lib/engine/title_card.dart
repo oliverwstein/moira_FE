@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
+import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'engine.dart';
@@ -13,9 +14,8 @@ class TitleCard extends World with HasGameReference<MoiraGame> implements InputH
   final Completer<void> _loadCompleter = Completer<void>();
   @override
   Future<void> onLoad() async {
-    final imagesLoader = Images();
-    ui.Image titleCardImage = await imagesLoader.load('title_card.png');
-    _spriteComponent = SpriteComponent.fromImage(titleCardImage);
+    
+    _spriteComponent = SpriteComponent.fromImage(game.images.fromCache('title_card.png'));
     add(_spriteComponent);
     _spriteComponent.anchor = Anchor.center;
     dev.log("Await Stage!");
