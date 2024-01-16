@@ -16,7 +16,7 @@ import 'package:moira/content/content.dart';
 class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView implements InputHandler {
   late final String bgSource;
   late final SpriteComponent _bgSprite;
-  late final TextBoxComponent _dialogueTextComponent;
+  late TextBoxComponent? _dialogueTextComponent;
   late final SpriteComponent bottomBox;
   late final SpriteComponent topBox;
   final Completer<void> _loadCompleter = Completer<void>();
@@ -51,7 +51,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
       anchor: Anchor.topLeft,
       size: Vector2(aspectBox.x, aspectBox.y/3));
     _dialogueTextComponent = TextBoxComponent(
-      text: "Midir: My lady, the castle is surrounded and they will overrun us soon. I'm sorry.",
+      text: "",
       textRenderer: TextPaint(style: TextStyle(fontSize: aspectBox.x / 25)),
       size: Vector2(aspectBox.x*(.72), aspectBox.y*(.2)),
       boxConfig: TextBoxConfig(
@@ -61,7 +61,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
         margins: EdgeInsets.all(5),
       ));
 
-    bottomBox.add(_dialogueTextComponent);
+    bottomBox.add(_dialogueTextComponent!);
     _bgSprite.add(bottomBox);
     _bgSprite.add(topBox);
 
@@ -75,28 +75,51 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     bottomBox.size = Vector2(aspectBox.x, aspectBox.y/3);
     bottomBox.position = Vector2(0, 2*aspectBox.y/3);
     topBox.size = Vector2(aspectBox.x, aspectBox.y/3);
-    _dialogueTextComponent.size = Vector2(aspectBox.x*(.72), aspectBox.y*(.2));
-    _dialogueTextComponent.position = Vector2(aspectBox.x*(1/4), bottomBox.y*(.15));
-    _dialogueTextComponent.textRenderer =  TextPaint(style: TextStyle(fontSize: aspectBox.x / 25));
+    _dialogueTextComponent!.size = Vector2(aspectBox.x*(.72), aspectBox.y*(.2));
+    _dialogueTextComponent!.position = Vector2(aspectBox.x*(1/4), bottomBox.y*(.15));
+    _dialogueTextComponent!.textRenderer =  TextPaint(style: TextStyle(fontSize: aspectBox.x / 25));
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     if (key is RawKeyDownEvent) {
-      _forwardCompleter.complete();
+      if (!_forwardCompleter.isCompleted){
+        _forwardCompleter.complete();
+      }
     }
     return KeyEventResult.handled;
   }
   @override
   FutureOr<bool> onLineStart(DialogueLine line) async {
-    _forwardCompleter = Completer();
+    bottomBox.remove(_dialogueTextComponent!);
+    // Create a new dialogue text component with the new line
+    var aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
+    _dialogueTextComponent = TextBoxComponent(
+      text: line.text,
+      textRenderer: TextPaint(style: TextStyle(fontSize: bottomBox.size.x / 25)),
+      size: Vector2(bottomBox.size.x * (.72), aspectBox.y * (.2)),
+      position : Vector2(aspectBox.x*(1/4), bottomBox.y*(.15)),
+      boxConfig: TextBoxConfig(
+        maxWidth: bottomBox.size.x * (2 / 3),
+        timePerChar: 0.02,
+        growingBox: true,
+        margins: EdgeInsets.all(5),
+      ),
+    );
+
+    // Add the new dialogue text component to the bottom box
+    bottomBox.add(_dialogueTextComponent!);
+
     await _advance(line);
     return super.onLineStart(line);
   }
+  @override
+  FutureOr<void> onLineFinish(DialogueLine line) async {
+    _forwardCompleter = Completer();
+    return super.onLineFinish(line);
+  }
   Future<void> _advance(DialogueLine line) {
     var characterName = line.character?.name ?? '';
-    var dialogueLineText = '$characterName: ${line.text}';
-    _dialogueTextComponent.text = dialogueLineText;
-    debugPrint('debug: $dialogueLineText');
+    debugPrint('$characterName: ${line.text}');
     return _forwardCompleter.future;
   }
 }
