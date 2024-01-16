@@ -6,7 +6,6 @@ import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-
 import 'engine.dart';
 
 class TitleCard extends World with HasGameReference<MoiraGame> implements InputHandler  {
