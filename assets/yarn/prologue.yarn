@@ -1,5 +1,10 @@
 <<character Midir>>
 <<character Aideen>>
+<<character Sigurd>>
+<<character Noish>>
+<<character Alec>>
+<<character Oifey>>
+<<character Arden>>
 title: Opening_Jungby
 ---
 Midir: My lady, the castle is surrounded and they will overrun us soon. I'm sorry.
@@ -9,11 +14,6 @@ Midir: None of us are going anywhere, my lady. We’re here for you till the ver
 Aideen: Damn you, my valiant Midir. And thank you.
 ===
 
-<<character Sigurd>>
-<<character Noish>>
-<<character Alec>>
-<<character Oifey>>
-<<character Arden>>
 title: Opening_Chalphy
 ---
 Sigurd: Adean is in trouble. Gandolf’s army has laid siege to Jungby Castle. Noish, I’m going to go and see if I can do something. You’re in charge while I’m gone.

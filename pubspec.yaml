@@ -28,6 +28,7 @@ flutter:
     - assets/images/
     - assets/tiles/
     - assets/audio/
+    - assets/yarn/
     - assets/data/units.json
     - assets/data/items.json
     - assets/data/weapons.json
