@@ -101,11 +101,11 @@
             },
             {
             "type": "UnitCreationEvent",
-            "name": "Barbarian",
+            "name": "Gandolf",
             "team": "Red",
             "tilePosition": [21, 19],
             "destination": [32, 25],
-            "level": 10,
+            "level": 20,
             "items": ["Hand Axe"]
             },
             {

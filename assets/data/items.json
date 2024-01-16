@@ -33,8 +33,13 @@
         },
     "Salve":
         {
-            "description": "A healing salve.",
+            "description": "Restores 10 health on use.",
             "type": "basic"
+        },
+    "Skill Ring":
+        {
+            "description": "Wearer gains 5 Dexterity.",
+            "type": "treasure"
         }
     }
 }

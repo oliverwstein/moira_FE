@@ -176,6 +176,17 @@
     "items": ["Axe"],
     "attacks": [],
     "proficiencies": []
+    },
+    {
+    "name": "Gandolf",
+    "team": "red",
+    "class": "Warrior",
+    "baseStats": {},
+    "growths": {},
+    "skills": [],
+    "items": ["Hand Axe", "Skill Ring"],
+    "attacks": [],
+    "proficiencies": []
     }
 ]
 }

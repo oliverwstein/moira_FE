@@ -187,6 +187,37 @@
             "lck": 2
         }
     },
+    "Warrior": {
+        "description": "A veteran fighter of brutal ferocity.",
+        "movementRange": 6,
+        "skills": [],
+        "attacks": [],
+        "proficiencies": ["Axe"],
+        "growths": {
+            "hp": 90,
+            "sta": 50,
+            "str": 50,
+            "def": 10,
+            "dex": 35,
+            "spe": 35,
+            "mag": 5,
+            "res": 5,
+            "wis": 10,
+            "lck": 10
+        },
+        "baseStats": {
+            "hp": 35,
+            "sta": 20,
+            "str": 8,
+            "def": 5,
+            "dex": 2,
+            "spe": 7,
+            "mag": 0,
+            "res": 0,
+            "wis": 0,
+            "lck": 2
+        }
+    },
     "Hunter": {
         "description": "A yeoman experienced with weapons.",
         "movementRange": 7,
