@@ -14,7 +14,6 @@ class TitleCard extends World with HasGameReference<MoiraGame> implements InputH
   final Completer<void> _loadCompleter = Completer<void>();
   @override
   Future<void> onLoad() async {
-    
     _spriteComponent = SpriteComponent.fromImage(game.images.fromCache('title_card.png'));
     add(_spriteComponent);
     _spriteComponent.anchor = Anchor.center;
