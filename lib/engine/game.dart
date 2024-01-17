@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:flame/text.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +15,7 @@ import 'package:moira/engine/engine.dart';
 class MoiraGame extends FlameGame with KeyboardEvents {
   late Stage stage;
   late TitleCard titleCard;
+  late SpriteFont font;
   static late SpriteSheet portraitSheet;
   static late Map<String, dynamic> unitMap;
   static late Map<String, dynamic> itemMap;
@@ -57,6 +59,16 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     await images.load('title_card.png');
     await images.load('portraits_spritesheet.png');
     await images.load('dialogue_box_spritesheet.png');
+    await images.load('alphabet_spritesheet.png');
+    String alphabetOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?!'-\"º:;()0123456789\$%&×+/“”=[♪]~ ";
+    SpriteSheet alphabetSpriteSheet = SpriteSheet.fromColumnsAndRows(image: images.fromCache("alphabet_spritesheet.png"), columns: 8, rows: 19);
+    List<Glyph> glyphList = [];
+    for (int i = 0; i < alphabetOrder.length; i++) {
+      final char = alphabetOrder[i];
+      Sprite charSprite = alphabetSpriteSheet.getSpriteById(i);
+      glyphList.add(Glyph(char, left: charSprite.srcPosition.x, top: charSprite.srcPosition.y));
+    }
+    font = SpriteFont(source: images.fromCache("alphabet_spritesheet.png"), size: 16, ascent: 16, glyphs: glyphList);
     portraitSheet = SpriteSheet(image: images.fromCache("portraits_spritesheet.png"), srcSize: Vector2(48, 64));
     String prologueDialogueData =
         await rootBundle.loadString('assets/yarn/prologue.yarn');
