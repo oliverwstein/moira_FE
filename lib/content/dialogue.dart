@@ -22,6 +22,9 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   late final SpriteAnimationComponent dBoxSprite;
   late Vector2 aspectBox;
   int speakerSide = 0;
+  late SpriteComponent leftPortrait = SpriteComponent();
+  late SpriteComponent rightPortrait = SpriteComponent();
+  late SpriteFontRenderer fontRenderer;
   final Completer<void> _loadCompleter = Completer<void>();
   Completer<void> _forwardCompleter = Completer();
 
@@ -35,27 +38,27 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
         double yPos = .1;
         return TextBoxComponent(
             text: "",
-            textRenderer: SpriteFontRenderer.fromFont(game.font),
+            textRenderer: fontRenderer,
             align: Anchor.topLeft,
             position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
             boxConfig: TextBoxConfig(
               maxWidth: aspectBox.x*width,
-              timePerChar: 0.05,
-              growingBox: true,
+              timePerChar: 0.02,
+              growingBox: false,
               margins: EdgeInsets.all(5),
             ));
       case "name":
         double xPos = .5;
-        double yPos = .05;
+        double yPos = .02;
 
         return TextBoxComponent(
         text: "",
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        textRenderer: fontRenderer,
         anchor: Anchor.topCenter,
         align: Anchor.topCenter,
         position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
         boxConfig: TextBoxConfig(
-          maxWidth: 100,
+          maxWidth: aspectBox.x/5,
           margins: EdgeInsets.all(5),
         ));
       default:
@@ -68,6 +71,8 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     _bgSprite = SpriteComponent.fromImage(bgImage);
     add(_bgSprite);
     aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
+    
+    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: (aspectBox.x/40)/8);
     _bgSprite.size = aspectBox;
     _bgSprite.anchor = Anchor.center;
     dBoxSheet = SpriteSheet.fromColumnsAndRows(
@@ -79,33 +84,23 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
       animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
       size: Vector2(aspectBox.x, aspectBox.y*.4),
     );
-
     _dialogueTextComponent = getBlankTextComponent("dialogue");
     _nameTextComponent = getBlankTextComponent("name");
     dBoxSprite.add(_dialogueTextComponent!);
     dBoxSprite.add(_nameTextComponent!);
     _bgSprite.add(dBoxSprite);
-
     _loadCompleter.complete();
   }
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
     aspectBox = Vector2(min(size.x, size.y*(4/3)), min(size.y, size.x*(3/4)));
+    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: (aspectBox.x/40)/8);
     _bgSprite.size = aspectBox;
     dBoxSprite.size = Vector2(aspectBox.x, aspectBox.y/3);
     dBoxSprite.position = Vector2(0, 2*aspectBox.y/3);
-    // _dialogueTextComponent!.size = Vector2(aspectBox.x*(.90), aspectBox.y*(.2));
-    // _dialogueTextComponent!.position = Vector2(aspectBox.x*(.05), dBoxSprite.y*(.13));
-    // _dialogueTextComponent!.textRenderer = TextPaint(style: TextStyle(
-    //     fontSize: aspectBox.x / 25,
-    //     color: ui.Color.fromARGB(255, 18, 1, 1)));
-
-    // _nameTextComponent!.size = Vector2(aspectBox.x*(.35), aspectBox.y*(.2));
-    // _nameTextComponent!.position = Vector2(aspectBox.x*(.5), aspectBox.y*(.03));
-    // _nameTextComponent!.textRenderer = TextPaint(style: TextStyle(
-    //     fontSize: aspectBox.x / 25,
-    //     color: ui.Color.fromARGB(255, 18, 1, 1)));
+    _dialogueTextComponent!.textRenderer = fontRenderer;
+    _nameTextComponent!.textRenderer = fontRenderer;
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -118,6 +113,36 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   }
   @override
   FutureOr<bool> onLineStart(DialogueLine line) async {
+    String left = game.yarnProject.nodes['Opening_Jungby']!.variables!.getVariable("\$left");
+    String right = game.yarnProject.nodes['Opening_Jungby']!.variables!.getVariable("\$right");
+    if(line.character?.name == right) {
+      speakerSide = 0;
+    } else {
+      speakerSide = 1;
+    }
+    final grayscalePaint = Paint()
+      ..colorFilter = const ColorFilter.matrix([
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0,      0,      0,      1, 0,
+      ]);
+
+    // Apply or remove the grayscale effect based on canAct
+    leftPortrait.paint = speakerSide == 1 ? Paint() : grayscalePaint;
+    rightPortrait.paint = speakerSide == 0 ? Paint() : grayscalePaint;
+    dBoxSprite.animation = dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2);
+    leftPortrait.sprite = game.portraitMap[left]; 
+    rightPortrait.sprite = game.portraitMap[right];
+    leftPortrait.scale = Vector2(3, 3);
+    leftPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.05+leftPortrait.scaledSize.x*1.2, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
+    leftPortrait.anchor = Anchor.bottomRight;
+    rightPortrait.scale = Vector2(3, 3);
+    rightPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.95-rightPortrait.scaledSize.x, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
+    rightPortrait.anchor = Anchor.bottomRight;
+    rightPortrait.flipHorizontally();
+    dBoxSprite.add(leftPortrait);
+    dBoxSprite.add(rightPortrait);
     dBoxSprite.removeAll([_dialogueTextComponent!, _nameTextComponent!]);
     // Create a new dialogue text component with the new line
     aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
