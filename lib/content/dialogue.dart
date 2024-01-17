@@ -17,15 +17,18 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   late final String bgSource;
   late final SpriteComponent _bgSprite;
   late TextBoxComponent? _dialogueTextComponent;
-  late final SpriteComponent bottomBox;
-  late final SpriteComponent topBox;
+  late TextBoxComponent? _nameTextComponent;
+  late final SpriteSheet dBoxSheet;
+  late final SpriteAnimationComponent dBoxSprite;
+  late Vector2 aspectBox;
+  int speakerSide = 0;
   final Completer<void> _loadCompleter = Completer<void>();
   Completer<void> _forwardCompleter = Completer();
   final TextPaint _dialoguePaint = TextPaint(
     style: const TextStyle(
-      backgroundColor: Color.fromARGB(180, 85, 84, 84),
+      backgroundColor: ui.Color.fromARGB(180, 2, 2, 2),
       fontSize: 24,
-      color: Colors.white,
+      color: ui.Color.fromARGB(255, 18, 1, 1),
     ),
   );
 
@@ -36,48 +39,70 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     ui.Image bgImage = await game.images.load(bgSource);
     _bgSprite = SpriteComponent.fromImage(bgImage);
     add(_bgSprite);
-    var aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
+    aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
     _bgSprite.size = aspectBox;
     _bgSprite.anchor = Anchor.center;
+    dBoxSheet = SpriteSheet.fromColumnsAndRows(
+      image: game.images.fromCache("dialogue_box_spritesheet.png"),
+      columns: 2,
+      rows: 2,
+    );
+    dBoxSprite = SpriteAnimationComponent(
+      animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
+      size: Vector2(aspectBox.x, aspectBox.y*.4),
+    );
 
-    SpriteSheet dialogueBoxes = SpriteSheet(image: game.images.fromCache("dialogue_boxes.png"), srcSize: Vector2(648, 164));
-    bottomBox = SpriteComponent(
-      sprite:dialogueBoxes.getSpriteById(0), 
-      anchor: Anchor.topLeft,
-      size: Vector2(aspectBox.x, aspectBox.y/3),
-      position: Vector2(0, 2*aspectBox.y/3));
-    topBox = SpriteComponent(
-      sprite:dialogueBoxes.getSpriteById(1), 
-      anchor: Anchor.topLeft,
-      size: Vector2(aspectBox.x, aspectBox.y/3));
     _dialogueTextComponent = TextBoxComponent(
       text: "",
-      textRenderer: TextPaint(style: TextStyle(fontSize: aspectBox.x / 25)),
-      size: Vector2(aspectBox.x*(.72), aspectBox.y*(.2)),
+      textRenderer: TextPaint(style: TextStyle(
+        fontSize: aspectBox.x / 25,
+        color: ui.Color.fromARGB(255, 18, 1, 1))),
+      size: Vector2(0, aspectBox.y*(.18)),
+      align: Anchor.topLeft,
       boxConfig: TextBoxConfig(
-        maxWidth: aspectBox.x*(2/3),
+        maxWidth: aspectBox.x*(.95),
         timePerChar: 0.05,
         growingBox: true,
         margins: EdgeInsets.all(5),
       ));
 
-    bottomBox.add(_dialogueTextComponent!);
-    _bgSprite.add(bottomBox);
-    _bgSprite.add(topBox);
+     _nameTextComponent = TextBoxComponent(
+      text: "Name Last Tree",
+      textRenderer: TextPaint(style: TextStyle(
+        fontSize: aspectBox.x / 25,
+        color: ui.Color.fromARGB(255, 18, 1, 1))),
+      size: Vector2(aspectBox.x*(.35), aspectBox.y*(.2)),
+      anchor: Anchor.topCenter,
+      align: Anchor.topCenter,
+      position: Vector2(aspectBox.x*(.5), aspectBox.y*(.03)),
+      boxConfig: TextBoxConfig(
+        maxWidth: 100,
+        margins: EdgeInsets.all(5),
+      ));
+    dBoxSprite.add(_dialogueTextComponent!);
+    dBoxSprite.add(_nameTextComponent!);
+    _bgSprite.add(dBoxSprite);
 
     _loadCompleter.complete();
   }
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    var aspectBox = Vector2(min(size.x, size.y*(4/3)), min(size.y, size.x*(3/4)));
+    aspectBox = Vector2(min(size.x, size.y*(4/3)), min(size.y, size.x*(3/4)));
     _bgSprite.size = aspectBox;
-    bottomBox.size = Vector2(aspectBox.x, aspectBox.y/3);
-    bottomBox.position = Vector2(0, 2*aspectBox.y/3);
-    topBox.size = Vector2(aspectBox.x, aspectBox.y/3);
-    _dialogueTextComponent!.size = Vector2(aspectBox.x*(.72), aspectBox.y*(.2));
-    _dialogueTextComponent!.position = Vector2(aspectBox.x*(1/4), bottomBox.y*(.15));
-    _dialogueTextComponent!.textRenderer =  TextPaint(style: TextStyle(fontSize: aspectBox.x / 25));
+    dBoxSprite.size = Vector2(aspectBox.x, aspectBox.y/3);
+    dBoxSprite.position = Vector2(0, 2*aspectBox.y/3);
+    _dialogueTextComponent!.size = Vector2(aspectBox.x*(.90), aspectBox.y*(.2));
+    _dialogueTextComponent!.position = Vector2(aspectBox.x*(.05), dBoxSprite.y*(.13));
+    _dialogueTextComponent!.textRenderer = TextPaint(style: TextStyle(
+        fontSize: aspectBox.x / 25,
+        color: ui.Color.fromARGB(255, 18, 1, 1)));
+
+    _nameTextComponent!.size = Vector2(aspectBox.x*(.35), aspectBox.y*(.2));
+    _nameTextComponent!.position = Vector2(aspectBox.x*(.5), aspectBox.y*(.03));
+    _nameTextComponent!.textRenderer = TextPaint(style: TextStyle(
+        fontSize: aspectBox.x / 25,
+        color: ui.Color.fromARGB(255, 18, 1, 1)));
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -90,24 +115,39 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   }
   @override
   FutureOr<bool> onLineStart(DialogueLine line) async {
-    bottomBox.remove(_dialogueTextComponent!);
+    dBoxSprite.removeAll([_dialogueTextComponent!, _nameTextComponent!]);
     // Create a new dialogue text component with the new line
-    var aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
+    aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
     _dialogueTextComponent = TextBoxComponent(
       text: line.text,
-      textRenderer: TextPaint(style: TextStyle(fontSize: bottomBox.size.x / 25)),
-      size: Vector2(bottomBox.size.x * (.72), aspectBox.y * (.2)),
-      position : Vector2(aspectBox.x*(1/4), bottomBox.y*(.15)),
+      textRenderer: TextPaint(style: TextStyle(
+        fontSize: aspectBox.x / 25,
+        color: ui.Color.fromARGB(255, 18, 1, 1))),
+      size: Vector2(dBoxSprite.size.x * (.9), aspectBox.y * (.2)),
+      position : Vector2(aspectBox.x*(.05), dBoxSprite.y*(.15)),
       boxConfig: TextBoxConfig(
-        maxWidth: bottomBox.size.x * (2 / 3),
+        maxWidth: dBoxSprite.size.x * (2 / 3),
         timePerChar: 0.02,
         growingBox: true,
         margins: EdgeInsets.all(5),
       ),
     );
+    _nameTextComponent = TextBoxComponent(
+      text: line.character?.name,
+      textRenderer: TextPaint(style: TextStyle(
+        fontSize: aspectBox.x / 25,
+        color: ui.Color.fromARGB(255, 18, 1, 1))),
+      size: Vector2(aspectBox.x*(.35), aspectBox.y*(.2)),
+      anchor: Anchor.topCenter,
+      align: Anchor.topCenter,
+      position: Vector2(aspectBox.x*(.5), aspectBox.y*(.03)),
+      boxConfig: TextBoxConfig(
+        maxWidth: 100,
+        margins: EdgeInsets.all(5),
+      ));
 
     // Add the new dialogue text component to the bottom box
-    bottomBox.add(_dialogueTextComponent!);
+    dBoxSprite.addAll([_dialogueTextComponent!, _nameTextComponent!]);
 
     await _advance(line);
     return super.onLineStart(line);
