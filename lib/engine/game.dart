@@ -91,7 +91,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     String prologueDialogueData =
         await rootBundle.loadString('assets/yarn/prologue.yarn');
     yarnProject.parse(prologueDialogueData);
-    var testDialogue = Dialogue("jungby_interior_dark2.png");
+    var testDialogue = Dialogue("jungby_interior_dark2.png", "Opening_Jungby");
     var dialogueRunner = DialogueRunner(
         yarnProject: yarnProject, dialogueViews: [testDialogue]);
     add(testDialogue);

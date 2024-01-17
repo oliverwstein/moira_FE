@@ -15,6 +15,7 @@ import 'package:moira/content/content.dart';
 
 class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView implements InputHandler {
   late final String bgSource;
+  String nodeName;
   late final SpriteComponent _bgSprite;
   late TextBoxComponent? _dialogueTextComponent;
   late TextBoxComponent? _nameTextComponent;
@@ -28,7 +29,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   final Completer<void> _loadCompleter = Completer<void>();
   Completer<void> _forwardCompleter = Completer();
 
-  Dialogue(this.bgSource);
+  Dialogue(this.bgSource, this.nodeName);
 
   TextBoxComponent getBlankTextComponent(String type){
     switch (type) {
@@ -113,8 +114,8 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   }
   @override
   FutureOr<bool> onLineStart(DialogueLine line) async {
-    String left = game.yarnProject.nodes['Opening_Jungby']!.variables!.getVariable("\$left");
-    String right = game.yarnProject.nodes['Opening_Jungby']!.variables!.getVariable("\$right");
+    String left = game.yarnProject.nodes[nodeName]!.variables!.getVariable("\$left");
+    String right = game.yarnProject.nodes[nodeName]!.variables!.getVariable("\$right");
     getPortraits(line, right, left);
     dBoxSprite.animation = dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2);
     dBoxSprite.removeAll([_dialogueTextComponent!, _nameTextComponent!]);
