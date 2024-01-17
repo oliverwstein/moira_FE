@@ -115,34 +115,8 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   FutureOr<bool> onLineStart(DialogueLine line) async {
     String left = game.yarnProject.nodes['Opening_Jungby']!.variables!.getVariable("\$left");
     String right = game.yarnProject.nodes['Opening_Jungby']!.variables!.getVariable("\$right");
-    if(line.character?.name == right) {
-      speakerSide = 0;
-    } else {
-      speakerSide = 1;
-    }
-    final grayscalePaint = Paint()
-      ..colorFilter = const ColorFilter.matrix([
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0,      0,      0,      1, 0,
-      ]);
-
-    // Apply or remove the grayscale effect based on canAct
-    leftPortrait.paint = speakerSide == 1 ? Paint() : grayscalePaint;
-    rightPortrait.paint = speakerSide == 0 ? Paint() : grayscalePaint;
+    getPortraits(line, right, left);
     dBoxSprite.animation = dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2);
-    leftPortrait.sprite = game.portraitMap[left]; 
-    rightPortrait.sprite = game.portraitMap[right];
-    leftPortrait.scale = Vector2(3, 3);
-    leftPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.05+leftPortrait.scaledSize.x*1.2, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
-    leftPortrait.anchor = Anchor.bottomRight;
-    rightPortrait.scale = Vector2(3, 3);
-    rightPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.95-rightPortrait.scaledSize.x, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
-    rightPortrait.anchor = Anchor.bottomRight;
-    rightPortrait.flipHorizontally();
-    dBoxSprite.add(leftPortrait);
-    dBoxSprite.add(rightPortrait);
     dBoxSprite.removeAll([_dialogueTextComponent!, _nameTextComponent!]);
     // Create a new dialogue text component with the new line
     aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
@@ -156,6 +130,37 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
 
     await _advance(line);
     return super.onLineStart(line);
+  }
+
+  void getPortraits(DialogueLine line, String right, String left) {
+    if(line.character?.name == right) {
+      speakerSide = 0;
+    } else {
+      speakerSide = 1;
+    }
+    final grayscalePaint = Paint()
+      ..colorFilter = const ColorFilter.matrix([
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0,      0,      0,      1, 0,
+      ]);
+    
+    // Apply or remove the grayscale effect based on canAct
+    leftPortrait.paint = speakerSide == 1 ? Paint() : grayscalePaint;
+    rightPortrait.paint = speakerSide == 0 ? Paint() : grayscalePaint;
+    
+    leftPortrait.sprite = game.portraitMap[left]; 
+    rightPortrait.sprite = game.portraitMap[right];
+    leftPortrait.scale = Vector2(3, 3);
+    leftPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.05+leftPortrait.scaledSize.x*1.2, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
+    leftPortrait.anchor = Anchor.bottomRight;
+    rightPortrait.scale = Vector2(3, 3);
+    rightPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.95-rightPortrait.scaledSize.x, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
+    rightPortrait.anchor = Anchor.bottomRight;
+    rightPortrait.flipHorizontally();
+    dBoxSprite.add(leftPortrait);
+    dBoxSprite.add(rightPortrait);
   }
   @override
   FutureOr<void> onLineFinish(DialogueLine line) async {
