@@ -148,10 +148,9 @@ class DialogueEvent extends Event{
     var dialogue = Dialogue(bgName, nodeName);
     var dialogueRunner = DialogueRunner(
         yarnProject: game.yarnProject, dialogueViews: [dialogue]);
-    game.add(dialogue);
-    game.switchToWorld(dialogue);
+    await game.add(dialogue);
     dialogueRunner.startDialogue(nodeName);
-    
+    game.switchToWorld(dialogue);
   }
 }
 

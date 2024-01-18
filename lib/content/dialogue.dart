@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
@@ -30,6 +31,33 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   Completer<void> _forwardCompleter = Completer();
 
   Dialogue(this.bgSource, this.nodeName);
+
+  @override
+  Future<void> onLoad() async {
+    ui.Image bgImage = await game.images.load(bgSource);
+    _bgSprite = SpriteComponent.fromImage(bgImage);
+    add(_bgSprite);
+    final camera = CameraComponent(world: this);
+    camera.viewfinder.anchor = Anchor.center;
+    game.camera = camera;
+    aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
+    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: (aspectBox.x/40)/8);
+    _bgSprite.size = aspectBox;
+    _bgSprite.anchor = Anchor.center;
+    dBoxSheet = SpriteSheet.fromColumnsAndRows(
+      image: game.images.fromCache("dialogue_box_spritesheet.png"),
+      columns: 2,
+      rows: 2,
+    );
+    dBoxSprite = SpriteAnimationComponent(
+      animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
+      size: Vector2(aspectBox.x, aspectBox.y*.4),
+    );
+    _bgSprite.add(dBoxSprite);
+    _dialogueTextComponent = getBlankTextComponent("dialogue");
+    _nameTextComponent = getBlankTextComponent("name");
+    
+  }
 
   TextBoxComponent getBlankTextComponent(String type){
     switch (type) {
@@ -68,28 +96,8 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   }
   @override
   Future<void> onDialogueStart() async {
-    ui.Image bgImage = await game.images.load(bgSource);
-    _bgSprite = SpriteComponent.fromImage(bgImage);
-    add(_bgSprite);
-    aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
-    
-    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: (aspectBox.x/40)/8);
-    _bgSprite.size = aspectBox;
-    _bgSprite.anchor = Anchor.center;
-    dBoxSheet = SpriteSheet.fromColumnsAndRows(
-      image: game.images.fromCache("dialogue_box_spritesheet.png"),
-      columns: 2,
-      rows: 2,
-    );
-    dBoxSprite = SpriteAnimationComponent(
-      animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
-      size: Vector2(aspectBox.x, aspectBox.y*.4),
-    );
-    _dialogueTextComponent = getBlankTextComponent("dialogue");
-    _nameTextComponent = getBlankTextComponent("name");
     dBoxSprite.add(_dialogueTextComponent!);
     dBoxSprite.add(_nameTextComponent!);
-    _bgSprite.add(dBoxSprite);
     _loadCompleter.complete();
   }
   @override
