@@ -42,7 +42,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
       position: game.camera.viewfinder.position);
     add(_bgSprite);
     //Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
-    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale:.5);
+    fontRenderer = SpriteFontRenderer.fromFont(game.font);
     _bgSprite.size = aspectBox;
     _bgSprite.anchor = Anchor.center;
     dBoxSheet = SpriteSheet.fromColumnsAndRows(
@@ -70,15 +70,17 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
             textRenderer: fontRenderer,
             align: Anchor.topLeft,
             position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
+            scale: Vector2(.5, .5),
+            // size: Vector2(aspectBox.x*.95, aspectBox.y*.25),
             boxConfig: TextBoxConfig(
-              maxWidth: aspectBox.x*width,
+              maxWidth: aspectBox.x*2,
               timePerChar: 0.02,
               growingBox: false,
-              margins: EdgeInsets.all(1),
+              margins: EdgeInsets.all(2),
             ));
       case "name":
         double xPos = .5;
-        double yPos = .025;
+        double yPos = .024;
 
         return TextBoxComponent(
         text: "",
@@ -86,9 +88,10 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
         anchor: Anchor.topCenter,
         align: Anchor.topCenter,
         position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
+        scale: Vector2(.5, .5),
         boxConfig: TextBoxConfig(
-          maxWidth: aspectBox.x/5,
-          margins: EdgeInsets.all(1),
+          maxWidth: 2*aspectBox.x/5,
+          margins: EdgeInsets.all(2),
         ));
       default:
         return TextBoxComponent();
@@ -118,7 +121,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
     aspectBox = game.camera.viewfinder.visibleGameSize!;
-    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: .5);
+    fontRenderer = SpriteFontRenderer.fromFont(game.font);
     _bgSprite.size = aspectBox;
     dBoxSprite.size = Vector2(aspectBox.x, aspectBox.y/3);
     dBoxSprite.position = Vector2(0, 2*aspectBox.y/3);
