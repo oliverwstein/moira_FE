@@ -146,16 +146,18 @@ class DialogueEvent extends Event{
   String bgName;
   String nodeName;
   late Dialogue dialogue;
-  DialogueEvent(this.bgName, this.nodeName){
-    dialogue = Dialogue(bgName, nodeName);
-  }
+  late DialogueRunner runner;
+  DialogueEvent(this.bgName, this.nodeName);
 
   @override
   Future<void> execute() async {
-    var dialogueRunner = DialogueRunner(
-        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
+    super.execute();
+    dev.log("DialogueEvent execution");
+    dialogue = Dialogue(bgName, nodeName);
     await game.add(dialogue);
-    dialogueRunner.startDialogue(nodeName);
+    runner = DialogueRunner(
+        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
+    runner.startDialogue(nodeName);
     game.switchToWorld(dialogue);
   }
   @override

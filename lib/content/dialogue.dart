@@ -41,7 +41,6 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     _bgSprite = SpriteComponent.fromImage(bgImage,
       position: game.camera.viewfinder.position);
     add(_bgSprite);
-    //Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
     fontRenderer = SpriteFontRenderer.fromFont(game.font);
     _bgSprite.size = aspectBox;
     _bgSprite.anchor = Anchor.center;
@@ -50,7 +49,18 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
       columns: 2,
       rows: 2,
     );
+    dBoxSprite = SpriteAnimationComponent(
+      animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
+      size: Vector2(aspectBox.x, aspectBox.y*.4),
+    );
+    _bgSprite.add(dBoxSprite);
+    _dialogueTextComponent = getBlankTextComponent("dialogue");
+    _nameTextComponent = getBlankTextComponent("name");
+    dBoxSprite.add(_dialogueTextComponent!);
+    dBoxSprite.add(_nameTextComponent!);
+    rightPortrait.flipHorizontally();
     getCamera();
+    _loadCompleter.complete();
   }
 
   void getCamera() {
@@ -78,7 +88,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
             ));
       case "name":
         double xPos = .5;
-        double yPos = .024;
+        double yPos = .025;
 
         return TextBoxComponent(
         text: "",
@@ -95,22 +105,11 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
         return TextBoxComponent();
     }
   }
-  @override
-  Future<void> onDialogueStart() async {
-    dBoxSprite = SpriteAnimationComponent(
-      animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
-      size: Vector2(aspectBox.x, aspectBox.y*.4),
-    );
-    _bgSprite.add(dBoxSprite);
-    _dialogueTextComponent = getBlankTextComponent("dialogue");
-    _nameTextComponent = getBlankTextComponent("name");
-    dBoxSprite.add(_dialogueTextComponent!);
-    dBoxSprite.add(_nameTextComponent!);
-    _loadCompleter.complete();
-  }
 
   @override
   Future<void> onDialogueFinish() async {
+    super.onDialogueFinish();
+    dev.log("onDialogueFinish");
     game.switchToWorld(game.stage);
     finished = true;
   }
@@ -129,11 +128,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     if (key is RawKeyDownEvent) {
       if (!_forwardCompleter.isCompleted){
-        dialogueRunner?.stopLine();
         _forwardCompleter.complete();
-      }
-      if(finished == true){
-        game.switchToWorld(game.stage);
       }
     }
     return KeyEventResult.handled;
@@ -186,7 +181,6 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     rightPortrait.anchor = Anchor.center;
     rightPortrait.position = Vector2(aspectBox.x*.8, aspectBox.y*(2/3));
     rightPortrait.size = Vector2(aspectBox.x*.2, aspectBox.y*.2);
-    rightPortrait.flipHorizontally();
     _bgSprite.add(leftPortrait);
     _bgSprite.add(rightPortrait);
   }

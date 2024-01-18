@@ -10,9 +10,13 @@ title: Opening_Jungby
 <<local $left = "Midir" as String>>
 <<local $right = "Aideen" as String>>
 Midir: My lady, the castle is surrounded. We will make them pay in blood, but it's only a matter of time.
+
 Aideen: I do not ask you to die for me, Midir. Your blood is not the measure of my honor. 
+
 Aideen: Please, I want as many of you to get out of this alive as possible.
+
 Midir: None of us are going anywhere, my lady. We're here for you till the very end. Even if it means our lives.
+
 Aideen: Damn you, my valiant Midir. 
 <<set $left = "">>
 Aideen: ...and thank you.
