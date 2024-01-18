@@ -85,6 +85,10 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               String nodeName = eventData['nodeName'];
               batch.add(DialogueEvent(bgName, nodeName));
               break;
+            case 'PanEvent':
+              Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
+              batch.add(PanEvent(destination));
+              break;
         }
       } addEventBatch(batch);
     }
@@ -142,21 +146,43 @@ class DialogueEvent extends Event{
   String bgName;
   String nodeName;
   late Dialogue dialogue;
-  DialogueEvent(this.bgName, this.nodeName){
-    dialogue = Dialogue(bgName, nodeName);
-  }
+  late DialogueRunner runner;
+  DialogueEvent(this.bgName, this.nodeName);
 
   @override
   Future<void> execute() async {
-    var dialogueRunner = DialogueRunner(
-        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
+    super.execute();
+    dev.log("DialogueEvent execution");
+    dialogue = Dialogue(bgName, nodeName);
     await game.add(dialogue);
-    dialogueRunner.startDialogue(nodeName);
+    runner = DialogueRunner(
+        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
+    runner.startDialogue(nodeName);
     game.switchToWorld(dialogue);
   }
   @override
   bool checkComplete() {
     return dialogue.finished;
+  } 
+}
+
+class PanEvent extends Event{
+  final Point<int> destination;
+  PanEvent(this.destination);
+  @override
+  void execute() {
+    super.execute();
+    game.stage.cursor.speed = 50;
+    dev.log("Event: Pan to $destination");
+    game.stage.cursor.moveTo(destination);
+  }
+  @override
+  bool checkComplete() {
+    if(!game.stage.cursor.isMoving){
+      game.stage.cursor.speed = 300;
+      return true;
+    }
+    return false;
   } 
 }
 

@@ -184,19 +184,19 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     );
 
     animationMap['down'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 0, stepTime: .5),
+                            animation: unitSheet.createAnimation(row: 0, stepTime: .25),
                             size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
                             anchor: Anchor.center);
     animationMap['up'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 1, stepTime: .5),
+                            animation: unitSheet.createAnimation(row: 1, stepTime: .25),
                             size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
                             anchor: Anchor.center);
     animationMap['right'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 2, stepTime: .5),
+                            animation: unitSheet.createAnimation(row: 2, stepTime: .25),
                             size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
                             anchor: Anchor.center);
     animationMap['left'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 3, stepTime: .5),
+                            animation: unitSheet.createAnimation(row: 3, stepTime: .25),
                             size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
                             anchor: Anchor.center);
     animationMap['idle'] = SpriteAnimationComponent(
