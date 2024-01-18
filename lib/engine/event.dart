@@ -85,6 +85,10 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               String nodeName = eventData['nodeName'];
               batch.add(DialogueEvent(bgName, nodeName));
               break;
+            case 'PanEvent':
+              Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
+              batch.add(PanEvent(destination));
+              break;
         }
       } addEventBatch(batch);
     }
@@ -157,6 +161,24 @@ class DialogueEvent extends Event{
   @override
   bool checkComplete() {
     return dialogue.finished;
+  } 
+}
+
+class PanEvent extends Event{
+  final Point<int> destination;
+  PanEvent(this.destination);
+  @override
+  void execute() {
+    super.execute();
+    dev.log("Event: Pan to $destination");
+    game.stage.cursor.moveTo(destination);
+  }
+  @override
+  bool checkComplete() {
+    if(!game.stage.cursor.isMoving){
+      return true;
+    }
+    return false;
   } 
 }
 
