@@ -108,10 +108,12 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   MoiraGame() : super(world: TitleCard()) {
     titleCard = world as TitleCard;
   }
+  
   void switchToWorld(World newWorld) async {
       world = newWorld;
       camera.world = newWorld;
   }
+
 
   @override
   KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {

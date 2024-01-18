@@ -36,11 +36,13 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   
   @override
   Future<void> onLoad() async {
+    aspectBox = game.camera.viewfinder.visibleGameSize!;
     ui.Image bgImage = await game.images.load(bgSource);
-    _bgSprite = SpriteComponent.fromImage(bgImage);
+    _bgSprite = SpriteComponent.fromImage(bgImage,
+      position: game.camera.viewfinder.position);
     add(_bgSprite);
-    aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
-    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: (aspectBox.x/40)/8);
+    //Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
+    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale:.5);
     _bgSprite.size = aspectBox;
     _bgSprite.anchor = Anchor.center;
     dBoxSheet = SpriteSheet.fromColumnsAndRows(
@@ -55,10 +57,6 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     dev.log("Get the dialogue camera");
     camera = game.camera;
     game.camera.world = this;
-    camera.viewport = FixedAspectRatioViewport(aspectRatio: 4/3); //Vital
-    camera.viewfinder.visibleGameSize = aspectBox;
-    camera.viewfinder.position = Vector2(0, 0);
-    camera.viewfinder.anchor = Anchor.center;
   }
 
   TextBoxComponent getBlankTextComponent(String type){
@@ -76,11 +74,11 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
               maxWidth: aspectBox.x*width,
               timePerChar: 0.02,
               growingBox: false,
-              margins: EdgeInsets.all(5),
+              margins: EdgeInsets.all(1),
             ));
       case "name":
         double xPos = .5;
-        double yPos = .02;
+        double yPos = .025;
 
         return TextBoxComponent(
         text: "",
@@ -90,7 +88,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
         position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
         boxConfig: TextBoxConfig(
           maxWidth: aspectBox.x/5,
-          margins: EdgeInsets.all(5),
+          margins: EdgeInsets.all(1),
         ));
       default:
         return TextBoxComponent();
@@ -112,14 +110,15 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
 
   @override
   Future<void> onDialogueFinish() async {
+    dev.log("onDialogueFinish");
     game.switchToWorld(game.stage);
     finished = true;
   }
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    aspectBox = Vector2(min(size.x, size.y*(4/3)), min(size.y, size.x*(3/4)));
-    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: (aspectBox.x/40)/8);
+    aspectBox = game.camera.viewfinder.visibleGameSize!;
+    fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: .5);
     _bgSprite.size = aspectBox;
     dBoxSprite.size = Vector2(aspectBox.x, aspectBox.y/3);
     dBoxSprite.position = Vector2(0, 2*aspectBox.y/3);
@@ -133,9 +132,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
         dialogueRunner?.stopLine();
         _forwardCompleter.complete();
       }
-      if(dialogueRunner == null){
-        dev.log("dialogue finished");
-        finished = true;
+      if(finished == true){
         game.switchToWorld(game.stage);
       }
     }
@@ -150,7 +147,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     dBoxSprite.animation = dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2);
     dBoxSprite.removeAll([_dialogueTextComponent!, _nameTextComponent!]);
     // Create a new dialogue text component with the new line
-    aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
+    aspectBox = game.camera.viewfinder.visibleGameSize!;
     _dialogueTextComponent = getBlankTextComponent("dialogue");
     _dialogueTextComponent!.text = line.text;
 
@@ -183,15 +180,15 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     
     leftPortrait.sprite = game.portraitMap[left]; 
     rightPortrait.sprite = game.portraitMap[right];
-    leftPortrait.scale = Vector2(3, 3);
-    leftPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.05+leftPortrait.scaledSize.x*1.2, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
-    leftPortrait.anchor = Anchor.bottomRight;
-    rightPortrait.scale = Vector2(3, 3);
-    rightPortrait.position = Vector2(_dialogueTextComponent!.scaledSize.x*.95-rightPortrait.scaledSize.x, _nameTextComponent!.position.y + _nameTextComponent!.scaledSize.y*.9);
-    rightPortrait.anchor = Anchor.bottomRight;
+    leftPortrait.anchor = Anchor.center;
+    leftPortrait.position = Vector2(aspectBox.x*.2, aspectBox.y*(2/3));
+    leftPortrait.size = Vector2(aspectBox.x*.2, aspectBox.y*.2);
+    rightPortrait.anchor = Anchor.center;
+    rightPortrait.position = Vector2(aspectBox.x*.8, aspectBox.y*(2/3));
+    rightPortrait.size = Vector2(aspectBox.x*.2, aspectBox.y*.2);
     rightPortrait.flipHorizontally();
-    dBoxSprite.add(leftPortrait);
-    dBoxSprite.add(rightPortrait);
+    _bgSprite.add(leftPortrait);
+    _bgSprite.add(rightPortrait);
   }
   @override
   FutureOr<void> onLineFinish(DialogueLine line) async {
