@@ -133,35 +133,35 @@
             "team": "Red",
             "tilePosition": [42, 20],
             "destination": [41, 20],
-            "level": 5},
+            "level": 1},
             {
             "type": "UnitCreationEvent",
-            "name": "Barbarian",
+            "name": "Hunter",
             "team": "Red",
             "tilePosition": [42, 23],
             "destination": [41, 23],
-            "level": 5},
+            "level": 1},
             {
             "type": "UnitCreationEvent",
             "name": "Barbarian",
             "team": "Red",
             "tilePosition": [42, 21],
             "destination": [46, 21],
-            "level": 5},
+            "level": 1},
             {
             "type": "UnitCreationEvent",
             "name": "Barbarian",
             "team": "Red",
             "tilePosition": [42, 20],
             "destination": [45, 22],
-            "level": 5},
+            "level": 1},
             {
             "type": "UnitCreationEvent",
-            "name": "Barbarian",
+            "name": "Brigand",
             "team": "Red",
             "tilePosition": [42, 22],
             "destination": [42, 26],
-            "level": 5}
+            "level": 1}
         ]
         ]
     }

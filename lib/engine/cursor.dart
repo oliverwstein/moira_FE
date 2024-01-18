@@ -14,7 +14,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
   Point<int> tilePosition; // Current tile position
   Vector2 targetPosition; // Target position in pixels
   bool isMoving = false;
-  double speed = 150; // Speed of cursor movement in pixels per second
+  double speed = 100; // Speed of cursor movement in pixels per second
 
   Cursor(this.tilePosition) : targetPosition = Vector2.zero();
 
