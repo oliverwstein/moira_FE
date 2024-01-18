@@ -1,168 +1,490 @@
 {
-    "Prologue":{
+    "Prologue": {
         "mapTileWidth": 62,
         "mapTileHeight": 31,
         "mapFileName": "Ch0.tmx",
-        "initialPosition": [33, 22], 
+        "initialPosition": [
+            33,
+            22
+        ],
         "events": [
-        [
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [24, 22],
-            "destination": [33, 25],
-            "level": 5
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [23, 22],
-            "destination": [32, 26],
-            "level": 5
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [21, 22],
-            "destination": [31, 25],
-            "level": 5
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [22, 22],
-            "destination": [30, 28],
-            "level": 10,
-            "items": ["Hand Axe"]
-            }
-        ],
-        [
-            {
-            "type": "UnitCreationEvent",
-            "name": "Hunter",
-            "team": "Red",
-            "tilePosition": [37, 15],
-            "destination": [37, 26],
-            "level": 1
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Hunter",
-            "team": "Red",
-            "tilePosition": [35, 15],
-            "destination": [35, 25],
-            "level": 1
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [36, 16],
-            "destination": [35, 26],
-            "level": 5
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [21, 19],
-            "destination": [27, 27],
-            "level": 5
-            }
-        ],
-        [
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [37, 15],
-            "destination": [36, 20],
-            "level": 5
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [35, 15],
-            "destination": [35, 19],
-            "level": 5
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [36, 16],
-            "destination": [36, 18],
-            "level": 5
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "Gandolf",
-            "team": "Red",
-            "tilePosition": [21, 19],
-            "destination": [32, 25],
-            "level": 20,
-            "items": ["Hand Axe"]
-            },
-            {
-            "type": "UnitCreationEvent",
-            "name": "DiMaggio",
-            "team": "Red",
-            "tilePosition": [19, 19],
-            "destination": [33, 26],
-            "level": 10
-            }
-        ],
-        [
-            {
-            "type": "DialogueEvent",
-            "bgName": "jungby_interior_dark.png",
-            "nodeName": "Opening_Jungby"}
-        ],
-        [
-            {
-            "type": "PanEvent",
-            "destination": [61, 5]},
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [42, 20],
-            "destination": [41, 20],
-            "level": 1},
-            {
-            "type": "UnitCreationEvent",
-            "name": "Hunter",
-            "team": "Red",
-            "tilePosition": [42, 23],
-            "destination": [41, 23],
-            "level": 1},
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [42, 21],
-            "destination": [46, 21],
-            "level": 1},
-            {
-            "type": "UnitCreationEvent",
-            "name": "Barbarian",
-            "team": "Red",
-            "tilePosition": [42, 20],
-            "destination": [45, 22],
-            "level": 1},
-            {
-            "type": "UnitCreationEvent",
-            "name": "Brigand",
-            "team": "Red",
-            "tilePosition": [42, 22],
-            "destination": [42, 26],
-            "level": 1}
-        ]
+            [
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        24,
+                        22
+                    ],
+                    "destination": [
+                        33,
+                        25
+                    ]
+                    
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        23,
+                        22
+                    ],
+                    "destination": [
+                        32,
+                        26
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        21,
+                        22
+                    ],
+                    "destination": [
+                        31,
+                        25
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 10,
+                    "items": [
+                        "Hand Axe"
+                    ],
+                    "tilePosition": [
+                        22,
+                        22
+                    ],
+                    "destination": [
+                        30,
+                        28
+                    ]
+                }
+            ],
+            [
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Hunter",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        37,
+                        15
+                    ],
+                    "destination": [
+                        37,
+                        26
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Hunter",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        35,
+                        15
+                    ],
+                    "destination": [
+                        35,
+                        25
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        36,
+                        16
+                    ],
+                    "destination": [
+                        35,
+                        26
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        21,
+                        19
+                    ],
+                    "destination": [
+                        27,
+                        27
+                    ]
+                }
+            ],
+            [
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        37,
+                        15
+                    ],
+                    "destination": [
+                        36,
+                        20
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        35,
+                        15
+                    ],
+                    "destination": [
+                        35,
+                        19
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 5,
+                    "tilePosition": [
+                        36,
+                        16
+                    ],
+                    "destination": [
+                        36,
+                        18
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Gandolf",
+                    "team": "Red",
+                    "level": 20,
+                    "items": [
+                        "Hand Axe"
+                    ],
+                    "tilePosition": [
+                        21,
+                        19
+                    ],
+                    "destination": [
+                        32,
+                        25
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "DiMaggio",
+                    "team": "Red",
+                    "level": 10,
+                    "tilePosition": [
+                        19,
+                        19
+                    ],
+                    "destination": [
+                        33,
+                        26
+                    ]
+                }
+            ],
+            [
+                {
+                    "type": "DialogueEvent",
+                    "bgName": "jungby_interior_dark.png",
+                    "nodeName": "Opening_Jungby"
+                }
+            ],
+            [
+                {
+                    "type": "PanEvent",
+                    "destination": [
+                        61,
+                        5
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        42,
+                        20
+                    ],
+                    "destination": [
+                        41,
+                        20
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Hunter",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        42,
+                        23
+                    ],
+                    "destination": [
+                        41,
+                        23
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        42,
+                        21
+                    ],
+                    "destination": [
+                        46,
+                        21
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Barbarian",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        42,
+                        20
+                    ],
+                    "destination": [
+                        45,
+                        22
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        42,
+                        22
+                    ],
+                    "destination": [
+                        42,
+                        26
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        40,
+                        17
+                    ],
+                    "destination": [
+                        46,
+                        11
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        40,
+                        14
+                    ],
+                    "destination": [
+                        50,
+                        14
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        44,
+                        10
+                    ],
+                    "destination": [
+                        48,
+                        7
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        40,
+                        11
+                    ],
+                    "destination": [
+                        40,
+                        11
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        35,
+                        10
+                    ],
+                    "destination": [
+                        35,
+                        10
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        31,
+                        8
+                    ],
+                    "destination": [
+                        31,
+                        8
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        34,
+                        4
+                    ],
+                    "destination": [
+                        34,
+                        4
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        35,
+                        4
+                    ],
+                    "destination": [
+                        35,
+                        4
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        12,
+                        8
+                    ],
+                    "destination": [
+                        12,
+                        8
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        11,
+                        12
+                    ],
+                    "destination": [
+                        11,
+                        12
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        24,
+                        13
+                    ],
+                    "destination": [
+                        24,
+                        13
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        24,
+                        13
+                    ],
+                    "destination": [
+                        24,
+                        13
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        21,
+                        17
+                    ],
+                    "destination": [
+                        21,
+                        17
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Brigand",
+                    "team": "Red",
+                    "level": 1,
+                    "tilePosition": [
+                        23,
+                        21
+                    ],
+                    "destination": [
+                        23,
+                        21
+                    ]
+                }
+            ]
         ]
     }
 }
