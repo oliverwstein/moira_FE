@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:flame/components.dart';
+import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
 
 abstract class Event extends Component with HasGameReference<MoiraGame>{
@@ -80,7 +81,9 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               batch.add(UnitCreationEvent(name, tilePosition, level:level, teamString: team, items:itemStrings, destination: destination));
               break;
             case 'DialogueEvent':
-              batch.add(DialogueEvent([]));
+              String bgName = eventData['bgName'];
+              String nodeName = eventData['nodeName'];
+              batch.add(DialogueEvent(bgName, nodeName));
               break;
         }
       } addEventBatch(batch);
@@ -135,14 +138,25 @@ class UnitMoveEvent extends Event {
   } 
 }
 
-class DialogueEvent extends Event {
-    List<String> dialogueLines;
+class DialogueEvent extends Event{
+  String bgName;
+  String nodeName;
+  late Dialogue dialogue;
+  DialogueEvent(this.bgName, this.nodeName){
+    dialogue = Dialogue(bgName, nodeName);
+  }
 
-    DialogueEvent(this.dialogueLines);
-
-    @override
-    Future<void> execute() async {
-        // Logic for handling dialogue
-    }
+  @override
+  Future<void> execute() async {
+    var dialogueRunner = DialogueRunner(
+        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
+    await game.add(dialogue);
+    dialogueRunner.startDialogue(nodeName);
+    game.switchToWorld(dialogue);
+  }
+  @override
+  bool checkComplete() {
+    return dialogue.finished;
+  } 
 }
 

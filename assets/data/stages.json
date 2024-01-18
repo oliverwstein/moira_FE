@@ -116,6 +116,12 @@
             "destination": [33, 26],
             "level": 10
             }
+        ],
+        [
+            {
+            "type": "DialogueEvent",
+            "bgName": "jungby_interior_dark.png",
+            "nodeName": "Opening_Jungby"}
         ]
         ]
     }
