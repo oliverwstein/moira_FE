@@ -54,7 +54,6 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   }
 
   void getCamera() {
-    dev.log("Get the dialogue camera");
     camera = game.camera;
     game.camera.world = this;
   }
@@ -71,9 +70,8 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
             align: Anchor.topLeft,
             position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
             scale: Vector2(.5, .5),
-            // size: Vector2(aspectBox.x*.95, aspectBox.y*.25),
             boxConfig: TextBoxConfig(
-              maxWidth: aspectBox.x*2,
+              maxWidth: aspectBox.x*1.9,
               timePerChar: 0.02,
               growingBox: false,
               margins: EdgeInsets.all(2),
@@ -113,7 +111,6 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
 
   @override
   Future<void> onDialogueFinish() async {
-    dev.log("onDialogueFinish");
     game.switchToWorld(game.stage);
     finished = true;
   }

@@ -484,6 +484,13 @@
                         21
                     ]
                 }
+            ],
+            [
+                {
+                    "type": "DialogueEvent",
+                    "bgName": "jungby_interior_dark.png",
+                    "nodeName": "Opening_Chalphy"
+                }
             ]
         ]
     }
