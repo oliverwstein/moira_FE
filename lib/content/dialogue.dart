@@ -30,6 +30,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   late SpriteFontRenderer fontRenderer;
   final Completer<void> _loadCompleter = Completer<void>();
   Completer<void> _forwardCompleter = Completer();
+  bool finished = false;
 
   Dialogue(this.bgSource, this.nodeName);
   
@@ -47,13 +48,6 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
       columns: 2,
       rows: 2,
     );
-    dBoxSprite = SpriteAnimationComponent(
-      animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
-      size: Vector2(aspectBox.x, aspectBox.y*.4),
-    );
-    _bgSprite.add(dBoxSprite);
-    _dialogueTextComponent = getBlankTextComponent("dialogue");
-    _nameTextComponent = getBlankTextComponent("name");
     getCamera();
   }
 
@@ -104,6 +98,13 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   }
   @override
   Future<void> onDialogueStart() async {
+    dBoxSprite = SpriteAnimationComponent(
+      animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
+      size: Vector2(aspectBox.x, aspectBox.y*.4),
+    );
+    _bgSprite.add(dBoxSprite);
+    _dialogueTextComponent = getBlankTextComponent("dialogue");
+    _nameTextComponent = getBlankTextComponent("name");
     dBoxSprite.add(_dialogueTextComponent!);
     dBoxSprite.add(_nameTextComponent!);
     _loadCompleter.complete();
@@ -112,7 +113,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   @override
   Future<void> onDialogueFinish() async {
     game.switchToWorld(game.stage);
-    // dev.log("dialogue finished");
+    finished = true;
   }
   @override
   void onGameResize(Vector2 size) {
@@ -130,9 +131,12 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     if (key is RawKeyDownEvent) {
       if (!_forwardCompleter.isCompleted){
         dialogueRunner?.stopLine();
+        _forwardCompleter.complete();
       }
       if(dialogueRunner == null){
         dev.log("dialogue finished");
+        finished = true;
+        game.switchToWorld(game.stage);
       }
     }
     return KeyEventResult.handled;

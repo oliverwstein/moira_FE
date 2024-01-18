@@ -141,16 +141,22 @@ class UnitMoveEvent extends Event {
 class DialogueEvent extends Event{
   String bgName;
   String nodeName;
-  DialogueEvent(this.bgName, this.nodeName);
+  late Dialogue dialogue;
+  DialogueEvent(this.bgName, this.nodeName){
+    dialogue = Dialogue(bgName, nodeName);
+  }
 
   @override
   Future<void> execute() async {
-    var dialogue = Dialogue(bgName, nodeName);
     var dialogueRunner = DialogueRunner(
         yarnProject: game.yarnProject, dialogueViews: [dialogue]);
     await game.add(dialogue);
     dialogueRunner.startDialogue(nodeName);
     game.switchToWorld(dialogue);
   }
+  @override
+  bool checkComplete() {
+    return dialogue.finished;
+  } 
 }
 
