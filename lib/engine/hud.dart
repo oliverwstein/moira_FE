@@ -48,10 +48,12 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>{
 
   @override
   void render(Canvas canvas) {
-  super.render(canvas);
-  // Draw the HUD box
-  final paint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
-  canvas.drawRect(size.toRect(), paint);
-  // Add more rendering logic here as needed
+    if (game.world == game.stage){
+      super.render(canvas);
+      // Draw the HUD box
+      final paint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
+      canvas.drawRect(size.toRect(), paint);
+    }
   }
+
 }
