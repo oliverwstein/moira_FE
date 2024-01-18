@@ -88,15 +88,8 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     for(var i = 0; i < portraitNames.length; i++){
       portraitMap[portraitNames[i]] = portraitSheet.getSpriteById(i);
     }
-    String prologueDialogueData =
-        await rootBundle.loadString('assets/yarn/prologue.yarn');
+    String prologueDialogueData = await rootBundle.loadString('assets/yarn/prologue.yarn');
     yarnProject.parse(prologueDialogueData);
-    var testDialogue = Dialogue("jungby_interior_dark2.png", "Opening_Jungby");
-    var dialogueRunner = DialogueRunner(
-        yarnProject: yarnProject, dialogueViews: [testDialogue]);
-    add(testDialogue);
-    dialogueRunner.startDialogue('Opening_Jungby');
-    switchToWorld(testDialogue);
     FlameAudio.bgm.initialize();
     await FlameAudio.audioCache.load('105 - Prologue (Birth of the Holy Knight).mp3');
     await FlameAudio.audioCache.load('101 - Beginning.mp3');
