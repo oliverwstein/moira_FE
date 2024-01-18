@@ -14,6 +14,7 @@ import 'package:moira/engine/engine.dart';
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
   int tilesInColumn = 14;
+  late CameraComponent camera;
   late double tileSize;
   final int mapTileWidth;
   final int mapTileHeight;
@@ -49,6 +50,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    
     FlameAudio.bgm.stop();
     FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
     calculateTileSize();
@@ -61,12 +63,18 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     hud = Hud();
     add(eventQueue);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
-    final camera = game.camera;
+    getCamera();
+  }
+  void getCamera() {
+    dev.log("Get stage camera");
+    camera = game.camera;
+    game.camera.world = this;
     camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
     camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     camera.viewfinder.anchor = Anchor.center;
     camera.viewport.add(hud);
+    
   }
 
   @override

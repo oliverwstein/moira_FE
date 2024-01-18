@@ -17,6 +17,7 @@ import 'package:moira/content/content.dart';
 class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView implements InputHandler {
   late final String bgSource;
   String nodeName;
+  late CameraComponent camera;
   late final SpriteComponent _bgSprite;
   late TextBoxComponent? _dialogueTextComponent;
   late TextBoxComponent? _nameTextComponent;
@@ -31,15 +32,12 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   Completer<void> _forwardCompleter = Completer();
 
   Dialogue(this.bgSource, this.nodeName);
-
+  
   @override
   Future<void> onLoad() async {
     ui.Image bgImage = await game.images.load(bgSource);
     _bgSprite = SpriteComponent.fromImage(bgImage);
     add(_bgSprite);
-    final camera = CameraComponent(world: this);
-    camera.viewfinder.anchor = Anchor.center;
-    game.camera = camera;
     aspectBox = Vector2(min(game.size.x, game.size.y*(4/3)), min(game.size.y, game.size.x*(3/4)));
     fontRenderer = SpriteFontRenderer.fromFont(game.font, scale: (aspectBox.x/40)/8);
     _bgSprite.size = aspectBox;
@@ -56,7 +54,17 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     _bgSprite.add(dBoxSprite);
     _dialogueTextComponent = getBlankTextComponent("dialogue");
     _nameTextComponent = getBlankTextComponent("name");
-    
+    getCamera();
+  }
+
+  void getCamera() {
+    dev.log("Get the dialogue camera");
+    camera = game.camera;
+    game.camera.world = this;
+    camera.viewport = FixedAspectRatioViewport(aspectRatio: 4/3); //Vital
+    camera.viewfinder.visibleGameSize = aspectBox;
+    camera.viewfinder.position = Vector2(0, 0);
+    camera.viewfinder.anchor = Anchor.center;
   }
 
   TextBoxComponent getBlankTextComponent(String type){
@@ -100,6 +108,12 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     dBoxSprite.add(_nameTextComponent!);
     _loadCompleter.complete();
   }
+
+  @override
+  Future<void> onDialogueFinish() async {
+    game.switchToWorld(game.stage);
+    // dev.log("dialogue finished");
+  }
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
@@ -115,11 +129,15 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     if (key is RawKeyDownEvent) {
       if (!_forwardCompleter.isCompleted){
-        _forwardCompleter.complete();
+        dialogueRunner?.stopLine();
+      }
+      if(dialogueRunner == null){
+        dev.log("dialogue finished");
       }
     }
     return KeyEventResult.handled;
   }
+
   @override
   FutureOr<bool> onLineStart(DialogueLine line) async {
     String left = game.yarnProject.nodes[nodeName]!.variables!.getVariable("\$left");

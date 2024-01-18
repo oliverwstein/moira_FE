@@ -109,7 +109,8 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     titleCard = world as TitleCard;
   }
   void switchToWorld(World newWorld) async {
-      world = newWorld; // Switch to the Stage world
+      world = newWorld;
+      camera.world = newWorld;
   }
 
   @override
