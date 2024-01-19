@@ -21,18 +21,18 @@ mixin UnitMovement on PositionComponent {
     _movementQueue.addAll(path);
   }
 
-  Vector2 getMovementVector(Movement movement) {
+  Point<int> getMovement(Movement movement) {
     switch (movement.direction) {
       case Direction.up:
-        return Vector2(0, -1);
+        return const Point(0, -1);
       case Direction.down:
-        return Vector2(0, 1);
+        return const Point(0, 1);
       case Direction.left:
-        return Vector2(-1, 0);
+        return const Point(-1, 0);
       case Direction.right:
-        return Vector2(1, 0);
+        return const Point(1, 0);
       default:
-        return Vector2.zero();
+        return const Point(0,0);
     }
   }
   List<Movement> getPath(Point<int> destination) {

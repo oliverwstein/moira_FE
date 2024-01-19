@@ -15,7 +15,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int movementRange;
   String faction;
   Point<int> tilePosition;
-  late Vector2 targetPosition; // Target position in pixels
   Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
   late SpriteAnimationComponent sprite;
@@ -135,21 +134,19 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   void update(double dt) {
     super.update(dt);
-    tilePosition = getTilePositionFromPosition();
+    // tilePosition = getTilePositionFromPosition();
     if (movementQueue.isNotEmpty) {
+      isMoving = true;
       Movement currentMovement = movementQueue.first;
-      if(!isMoving) {
-        Vector2 movementVector = getMovementVector(currentMovement);
-        targetPosition = position + movementVector * currentMovement.tileDistance.toDouble() * game.stage.tileSize;
-        isMoving = true;
-      }
-      // Use lerp to move towards the target position
-      double distance = position.distanceTo(targetPosition);
+      Point<int> movement = getMovement(currentMovement);
+      Point<int> targetTilePosition = tilePosition + movement;
+      double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
       double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
       if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
-        position = targetPosition;
+        tilePosition = targetTilePosition;
+        position = game.stage.tileMap[targetTilePosition]!.center;
+        game.stage.tileMap[targetTilePosition]!.setUnit(this);
         isMoving = false;
-        
         movementQueue.removeFirst(); // Dequeue the completed movement
 
         if (movementQueue.isNotEmpty) {
@@ -162,8 +159,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           sprite.animation = newAnimation;
         }
       } else {
-        // debugPrint("$position, $targetPosition, $dt");
-        position.moveToTarget(targetPosition, moveStep);
+        position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
     }
   }
@@ -177,30 +173,30 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       columns: 4,
       rows: 5,
     );
-
+    Vector2 spriteSize = Vector2(10, 8);
     animationMap['down'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 0, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['up'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 1, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['right'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 2, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['left'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 3, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['idle'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 4, stepTime: .5),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     sprite = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 4, stepTime: .5),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     add(sprite);
     position = game.stage.tileMap[tilePosition]!.center;
@@ -281,9 +277,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   int getStat(String stat){
     return stats[stat]!;
-  }
-  void resize() {
-    size = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
   }
 
 }
