@@ -3,7 +3,7 @@ import 'package:flame/extensions.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/engine/engine.dart';
 
-class Hud extends PositionComponent with HasGameReference<MoiraGame>{
+class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent point;
   late final TextComponent terrain;
 
@@ -34,6 +34,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>{
   @override
   void update(double dt) {
     super.update(dt);
+    if (game.world == game.stage){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
   }
@@ -48,12 +49,10 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>{
 
   @override
   void render(Canvas canvas) {
-    if (game.world == game.stage){
-      super.render(canvas);
-      // Draw the HUD box
-      final paint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
-      canvas.drawRect(size.toRect(), paint);
-    }
+    super.render(canvas);
+    // Draw the HUD box
+    final paint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
+    canvas.drawRect(size.toRect(), paint);
   }
 
 }
