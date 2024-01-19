@@ -6,6 +6,7 @@ import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/widgets.dart';
 import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
 
@@ -204,7 +205,7 @@ class StartTurnEvent extends Event{
   @override
   Future<void> execute() async {
     super.execute();
-    dev.log("StartTurnEvent execution");
+    debugPrint("StartTurnEvent execution");
     game.stage.activeFaction = game.stage.factionMap[factionName];
     game.stage.activeFaction!.startTurn();
     _isCompleted = true;
@@ -219,12 +220,18 @@ class FactionCreationEvent extends Event{
   @override
   Future<void> execute() async {
     super.execute();
-    dev.log("FactionCreationEvent execution");
+    debugPrint("FactionCreationEvent execution");
     if(human){
-      game.stage.add(Player(name, type));
+      var player = Player(name, type);
+      game.stage.add(player);
+      game.stage.factionMap[name] = player;
     } else {
-      game.stage.add(AIPlayer(name, type));
+      var player = AIPlayer(name, type);
+      game.stage.add(player);
+      game.stage.factionMap[name] = player;
     }
+    
+    
     _isCompleted = true;
   }
 }

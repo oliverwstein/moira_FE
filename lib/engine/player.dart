@@ -8,12 +8,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
   List<Unit> units = [];
   
 
-  Player(this.name, this.factionType) {
-    List<Unit> stageUnits = game.stage.children.query<Unit>();
-    for (Unit unit in stageUnits) {
-      if(unit.faction == name) units.add(unit);
-    }
-  }
+  Player(this.name, this.factionType);
 
   @override
   void update(dt){
@@ -26,19 +21,9 @@ class Player extends Component with HasGameReference<MoiraGame>{
   void startTurn() {}
 }
 
-class AIPlayer extends Component with HasGameReference<MoiraGame>{
-  String name;
-  FactionType factionType;
-  List<Unit> units = [];
-  
+class AIPlayer extends Player{
 
-  AIPlayer(this.name, this.factionType) {
-    List<Unit> stageUnits = game.stage.children.query<Unit>();
-    for (Unit unit in stageUnits) {
-      if(unit.faction == name) units.add(unit);
-    }
-  }
-
+  AIPlayer(String name, FactionType factionType) : super(name, factionType);
   @override
   void update(dt){}
 

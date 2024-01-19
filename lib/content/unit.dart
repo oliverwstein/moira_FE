@@ -129,12 +129,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     hp = getStat('hp');
     sta = getStat('sta');
-    if(game.stage.factionMap.keys.contains(faction)){
-      game.stage.factionMap[faction]!.units.add(this);
-    }
-    else{ 
-      debugPrint("Unit created for faction not in factionMap.");
-    }
   }
   
   Point<int> getTilePositionFromPosition(){
@@ -216,6 +210,13 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     for(String skillName in unitData['skills']){
       Skill skill = Skill.fromJson(skillName, this);
       // skill.attachToUnit(this, game.eventDispatcher);
+    }
+    // Add to faction:
+    if(game.stage.factionMap.keys.contains(faction)){
+      game.stage.factionMap[faction]!.units.add(this);
+    }
+    else{ 
+      debugPrint("Unit created for faction not in factionMap.");
     }
     _loadCompleter.complete();
   }
