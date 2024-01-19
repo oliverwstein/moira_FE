@@ -129,6 +129,12 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     hp = getStat('hp');
     sta = getStat('sta');
+    if(game.stage.factionMap.keys.contains(faction)){
+      game.stage.factionMap[faction]!.units.add(this);
+    }
+    else{ 
+      debugPrint("Unit created for faction not in factionMap.");
+    }
   }
   
   Point<int> getTilePositionFromPosition(){

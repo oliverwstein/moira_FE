@@ -10,6 +10,20 @@
         "events": [
             [
                 {
+                    "type": "FactionCreationEvent",
+                    "factionType": "blue",
+                    "factionName": "Sigurd",
+                    "human": true
+                },
+                {
+                    "type": "FactionCreationEvent",
+                    "factionType": "red",
+                    "factionName": "Verdane",
+                    "human": false
+                }
+            ],
+            [
+                {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
                     "faction": "Red",
@@ -549,8 +563,14 @@
                         10
                     ]
                 }
-                
+            ],
+            [
+                {
+                    "type": "StartTurnEvent",
+                    "factionName": "blue"
+                }
             ]
+
         ]
     }
 }
