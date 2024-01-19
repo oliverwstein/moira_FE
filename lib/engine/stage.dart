@@ -14,7 +14,6 @@ import 'package:moira/engine/engine.dart';
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
   int tilesInColumn = 14;
-  late CameraComponent camera;
   late double tileSize;
   final int mapTileWidth;
   final int mapTileHeight;
@@ -66,13 +65,13 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   }
   void getCamera() {
     dev.log("Get stage camera");
-    camera = game.camera;
+    game.camera;
     game.camera.world = this;
-    camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
-    camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
-    camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
-    camera.viewfinder.anchor = Anchor.center;
-    camera.viewport.add(hud);
+    game.camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
+    game.camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
+    game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
+    game.camera.viewfinder.anchor = Anchor.center;
+    game.camera.viewport.add(hud);
     
   }
 
