@@ -13,15 +13,11 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   Tile(this.point, double size, this.terrain, this.name) {
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
+  }
 
-    // textComponent = TextComponent(
-    //   text: '(${point.x}, ${point.y})',
-    //   position: Vector2(size / 2, size / 2),
-    //   anchor: Anchor.center,
-    //   textRenderer: TextPaint(style: TextStyle(fontSize: size / 5)),
-
-    // );
-    // add(textComponent);
+  @override 
+  void update(dt){
+    if(unit?.tilePosition != point) removeUnit();
   }
 
   @override

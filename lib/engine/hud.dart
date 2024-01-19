@@ -93,6 +93,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
     bool factionCheck = game.stage.activeFaction?.factionType == FactionType.blue;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
     if (worldCheck && factionCheck && unitCheck){isVisible = true;} else {isVisible = false;}
+      position = game.stage.cursor.position;
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
       hp.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}";
   }
