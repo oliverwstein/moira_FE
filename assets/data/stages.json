@@ -12,7 +12,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         24,
@@ -27,7 +27,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         23,
@@ -41,7 +41,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         21,
@@ -55,7 +55,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 10,
                     "items": [
                         "Hand Axe"
@@ -74,7 +74,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Hunter",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         37,
@@ -88,7 +88,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Hunter",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         35,
@@ -102,7 +102,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         36,
@@ -116,7 +116,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         21,
@@ -132,7 +132,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         37,
@@ -146,7 +146,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         35,
@@ -160,7 +160,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 5,
                     "tilePosition": [
                         36,
@@ -174,7 +174,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Gandolf",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 20,
                     "items": [
                         "Hand Axe"
@@ -191,7 +191,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "DiMaggio",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 10,
                     "tilePosition": [
                         19,
@@ -221,7 +221,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         42,
@@ -235,7 +235,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Hunter",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         42,
@@ -249,7 +249,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         42,
@@ -263,7 +263,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Barbarian",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         42,
@@ -277,7 +277,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         42,
@@ -291,7 +291,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         40,
@@ -305,7 +305,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         40,
@@ -319,7 +319,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         44,
@@ -333,7 +333,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         40,
@@ -347,7 +347,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         35,
@@ -361,7 +361,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         31,
@@ -375,7 +375,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         34,
@@ -389,7 +389,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         35,
@@ -403,7 +403,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         12,
@@ -417,7 +417,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         11,
@@ -431,7 +431,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         24,
@@ -445,7 +445,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         24,
@@ -459,7 +459,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         21,
@@ -473,7 +473,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Brigand",
-                    "team": "Red",
+                    "faction": "Red",
                     "level": 1,
                     "tilePosition": [
                         23,
@@ -496,7 +496,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Sigurd",
-                    "team": "Blue",
+                    "faction": "Blue",
                     "level": -1,
                     "tilePosition": [
                         59,
@@ -510,7 +510,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Alec",
-                    "team": "Blue",
+                    "faction": "Blue",
                     "level": -1,
                     "tilePosition": [
                         59,
@@ -524,7 +524,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Noish",
-                    "team": "Blue",
+                    "faction": "Blue",
                     "level": -1,
                     "tilePosition": [
                         59,
@@ -538,7 +538,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Arden",
-                    "team": "Blue",
+                    "faction": "Blue",
                     "level": -1,
                     "tilePosition": [
                         59,

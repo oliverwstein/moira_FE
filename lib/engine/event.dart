@@ -67,7 +67,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
         switch (eventData['type']) {
             case 'UnitCreationEvent':
               String name = eventData['name'];
-              String team = eventData['team'];
+              String faction = eventData['faction'];
               Point<int> tilePosition = Point(eventData['tilePosition'][0], eventData['tilePosition'][1]);
               int? level = eventData['level'];
               List<String>? itemStrings;
@@ -78,7 +78,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               if (eventData['destination'] != null) {
                 destination = Point(eventData['destination'][0], eventData['destination'][1]);
               }
-              batch.add(UnitCreationEvent(name, tilePosition, level:level, teamString: team, items:itemStrings, destination: destination));
+              batch.add(UnitCreationEvent(name, tilePosition, level:level, teamString: faction, items:itemStrings, destination: destination));
               break;
             case 'DialogueEvent':
               String bgName = eventData['bgName'];

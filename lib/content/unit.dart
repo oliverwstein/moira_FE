@@ -58,7 +58,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unitData['attacks'].addAll(classData.attacks);
     unitData['proficiencies'].addAll(classData.proficiencies);
 
-    String faction = unitData['team'];
+    String faction = unitData['faction'];
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = {};
     final Map<String, WeaponType> stringToProficiency = {
