@@ -34,7 +34,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   @override
   void update(double dt) {
     super.update(dt);
-    if (game.world == game.stage){isVisible = true;} else {isVisible = false;}
+    if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
   }

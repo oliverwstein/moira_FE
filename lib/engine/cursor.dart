@@ -61,6 +61,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
   @override
   void update(double dt) {
     super.update(dt);
+    if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
     if (isMoving) {
       Vector2 positionDelta = Vector2.all(0);
       if (position.distanceTo(targetPosition) < 0.1) { // Small threshold
