@@ -37,8 +37,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int level;
   int hp = -1;
   int sta = -1;
-  
-
+        
   factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings}) {
 
     // Extract unit data from the static map in MoiraGame
@@ -149,8 +148,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
       if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
         position = targetPosition;
-        game.stage.tileMap[tilePosition]?.setUnit(this);
         isMoving = false;
+        
         movementQueue.removeFirst(); // Dequeue the completed movement
 
         if (movementQueue.isNotEmpty) {
@@ -220,6 +219,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("Unit created for faction $faction not in factionMap.");
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
+    game.stage.tileMap[tilePosition]?.setUnit(this);
     _loadCompleter.complete();
   }
 

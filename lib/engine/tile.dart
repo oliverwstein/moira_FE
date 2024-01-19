@@ -18,15 +18,17 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
 
   @override 
   void update(dt){
-    if(unit != null && unit?.tilePosition != point) {
-      debugPrint("Removed $unit from $point tile");
-      removeUnit();}
+    if(unit != null) {
+      if (unit?.tilePosition != point){
+        debugPrint("removeUnit ${unit?.name} from $point");
+        removeUnit();
+      } 
+    }
   }
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    // await add(textComponent);
   }
   
   void resize() {
