@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
-import 'dart:developer' as dev;
 import 'dart:math';
 
-import 'package:async/async.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/widgets.dart';
 import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
 
@@ -29,7 +27,7 @@ mixin Observer {
 }
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
-  Queue<List<Event>> _eventBatches = Queue<List<Event>>();
+  final Queue<List<Event>> _eventBatches = Queue<List<Event>>();
 
   @override
   void onLoad() {
@@ -67,7 +65,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
         switch (eventData['type']) {
             case 'UnitCreationEvent':
               String name = eventData['name'];
-              String team = eventData['team'];
+              String factionName = eventData['faction'];
               Point<int> tilePosition = Point(eventData['tilePosition'][0], eventData['tilePosition'][1]);
               int? level = eventData['level'];
               List<String>? itemStrings;
@@ -78,7 +76,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               if (eventData['destination'] != null) {
                 destination = Point(eventData['destination'][0], eventData['destination'][1]);
               }
-              batch.add(UnitCreationEvent(name, tilePosition, level:level, teamString: team, items:itemStrings, destination: destination));
+              batch.add(UnitCreationEvent(name, tilePosition, factionName, level:level, items:itemStrings, destination: destination));
               break;
             case 'DialogueEvent':
               String bgName = eventData['bgName'];
@@ -89,6 +87,18 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
               batch.add(PanEvent(destination));
               break;
+            case 'StartTurnEvent':
+              String factionName = eventData['factionName'];
+              batch.add(StartTurnEvent(factionName));
+            case 'FactionCreationEvent':
+              final Map<String, FactionType> stringToFactionType = {
+                for (var type in FactionType.values) type.toString().split('.').last: type,
+              };
+              FactionType factionType = stringToFactionType[eventData['factionType']] ?? FactionType.blue;
+              String factionName = eventData["factionName"];
+              bool human = eventData["human"] ?? false;
+              batch.add(FactionCreationEvent(factionName, factionType, human:human));
+
         }
       } addEventBatch(batch);
     }
@@ -97,7 +107,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 
 class UnitCreationEvent extends Event{
   final String name;
-  final String? teamString;
+  final String factionName;
   final Point<int> tilePosition;
   int? level;
   List<String>? items;
@@ -105,13 +115,13 @@ class UnitCreationEvent extends Event{
   late final Unit unit;
   
 
-  UnitCreationEvent(this.name, this.tilePosition, {this.level, this.teamString, this.items, this.destination});
+  UnitCreationEvent(this.name, this.tilePosition, this.factionName, {this.level, this.items, this.destination});
 
   @override
   void execute() {
     super.execute();
-    dev.log("Create unit $name");
-    unit = Unit.fromJSON(tilePosition, name, level: level, teamString: teamString, itemStrings: items);
+    debugPrint("UnitCreationEvent: unit $name");
+    unit = Unit.fromJSON(tilePosition, name, factionName, level: level, itemStrings: items);
     game.stage.add(unit);
     _isCompleted = true;
     if (destination != null) {
@@ -120,7 +130,6 @@ class UnitCreationEvent extends Event{
     } else {
       destination = tilePosition;
     }
-    dev.log("Unit $name Created");
     
   }
 }
@@ -133,7 +142,7 @@ class UnitMoveEvent extends Event {
   @override
   void execute() {
     super.execute();
-    dev.log("Event: Move unit ${unit.name}");
+    debugPrint("Event: Move unit ${unit.name}");
     unit.moveTo(tilePosition);
   }
   @override
@@ -152,7 +161,7 @@ class DialogueEvent extends Event{
   @override
   Future<void> execute() async {
     super.execute();
-    dev.log("DialogueEvent execution");
+    debugPrint("DialogueEvent execution");
     dialogue = Dialogue(bgName, nodeName);
     await game.add(dialogue);
     runner = DialogueRunner(
@@ -173,7 +182,7 @@ class PanEvent extends Event{
   void execute() {
     super.execute();
     game.stage.cursor.speed = 50;
-    dev.log("Event: Pan to $destination");
+    debugPrint("Event: Pan to $destination");
     game.stage.cursor.moveTo(destination);
   }
   @override
@@ -186,3 +195,39 @@ class PanEvent extends Event{
   } 
 }
 
+class StartTurnEvent extends Event{
+  String factionName;
+  StartTurnEvent(this.factionName);
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("StartTurnEvent execution  $factionName");
+    game.stage.activeFaction = game.stage.factionMap[factionName];
+    game.stage.activeFaction!.startTurn();
+    _isCompleted = true;
+  }
+}
+
+class FactionCreationEvent extends Event{
+  String name;
+  bool human;
+  FactionType type;
+  FactionCreationEvent(this.name, this.type, {this.human = false});
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("FactionCreationEvent execution $name");
+    if(human){
+      var player = Player(name, type);
+      game.stage.add(player);
+      game.stage.factionMap[name] = player;
+    } else {
+      var player = AIPlayer(name, type);
+      game.stage.add(player);
+      game.stage.factionMap[name] = player;
+    }
+    
+    
+    _isCompleted = true;
+  }
+}

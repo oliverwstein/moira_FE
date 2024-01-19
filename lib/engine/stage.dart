@@ -1,28 +1,28 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
-import 'package:flame/flame.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:moira/engine/engine.dart';
+import 'package:moira/content/content.dart';
 
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
   int tilesInColumn = 14;
-  late CameraComponent camera;
   late double tileSize;
   final int mapTileWidth;
   final int mapTileHeight;
   final Point<int> initialPosition;
   final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
+  Player? activeFaction;
+  final Map<String, Player> factionMap = {};
   late final Cursor cursor;
   late final Hud hud;
+  late final UnitHud unitHud;
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
   EventQueue eventQueue;
@@ -60,19 +60,24 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     cursor.priority = 10;
     add(cursor);
     hud = Hud();
+    unitHud = UnitHud();
+    unitHud.priority = 20;
     add(eventQueue);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
+    children.register<Unit>();
+    children.register<Player>();
   }
   void getCamera() {
-    dev.log("Get stage camera");
-    camera = game.camera;
+    debugPrint("Get stage camera");
+    game.camera;
     game.camera.world = this;
-    camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
-    camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
-    camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
-    camera.viewfinder.anchor = Anchor.center;
-    camera.viewport.add(hud);
+    game.camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
+    game.camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
+    game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
+    game.camera.viewfinder.anchor = Anchor.center;
+    game.camera.viewport.add(hud);
+    game.stage.add(unitHud);
     
   }
 
@@ -82,7 +87,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     calculateTileSize();
     resizeStage();
   }
-  
 
   void calculateTileSize() {
     // Calculate tile size based on the game's canvas size

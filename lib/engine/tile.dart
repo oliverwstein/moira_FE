@@ -1,12 +1,11 @@
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
-import 'package:moira/engine/engine.dart';
 
 class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   final Point<int> point;
-  late final TextComponent textComponent;
+  // late final TextComponent textComponent;
   Unit? unit;
   bool get isOccupied => unit != null;
   Terrain terrain; // e.g., "grass", "water", "mountain"
@@ -15,28 +14,28 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   Tile(this.point, double size, this.terrain, this.name) {
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
+  }
 
-    textComponent = TextComponent(
-      text: '(${point.x}, ${point.y})',
-      position: Vector2(size / 2, size / 2),
-      anchor: Anchor.center,
-      textRenderer: TextPaint(style: TextStyle(fontSize: size / 5)),
-
-    );
-    add(textComponent);
+  @override 
+  void update(dt){
+    if(unit != null) {
+      if (unit?.tilePosition != point){
+        debugPrint("removeUnit ${unit?.name} from $point");
+        removeUnit();
+      } 
+    }
   }
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    await add(textComponent);
   }
   
   void resize() {
     size = Vector2.all(game.stage.tileSize);
-    if(isOccupied) unit!.resize();
   }
-    void setUnit(Unit newUnit) {
+  
+  void setUnit(Unit newUnit) {
     unit = newUnit;
   }
 

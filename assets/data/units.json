@@ -2,7 +2,7 @@
 "units": [
     {
     "name": "Sigurd",
-    "team": "blue",
+    "faction": "blue",
     "class": "Lord",
     "level": 5,
     "baseStats": {
@@ -35,7 +35,7 @@
     "proficiencies": []},
     {
     "name": "Noish",
-    "team": "blue",
+    "faction": "blue",
     "class": "Cavalier",
     "level": 3,
     "baseStats": {
@@ -68,7 +68,7 @@
     "proficiencies": []},
     {
     "name": "Alec",
-    "team": "blue",
+    "faction": "blue",
     "class": "Cavalier",
     "level": 2,
     "baseStats": {
@@ -101,7 +101,7 @@
     "proficiencies": []},
     {
     "name": "Arden",
-    "team": "blue",
+    "faction": "blue",
     "class": "Armor",
     "level": 3,
     "baseStats": {
@@ -135,7 +135,7 @@
     },
     {
     "name": "Brigand",
-    "team": "red",
+    "faction": "red",
     "class": "Brigand",
     "baseStats": {},
     "growths": {},
@@ -146,7 +146,7 @@
     },
     {
     "name": "Barbarian",
-    "team": "red",
+    "faction": "red",
     "class": "Barbarian",
     "baseStats": {},
     "growths": {},
@@ -157,7 +157,7 @@
     },
     {
     "name": "Hunter",
-    "team": "red",
+    "faction": "red",
     "class": "Hunter",
     "baseStats": {},
     "growths": {},
@@ -168,7 +168,7 @@
     },
     {
     "name": "DiMaggio",
-    "team": "red",
+    "faction": "red",
     "class": "Fighter",
     "baseStats": {},
     "growths": {},
@@ -179,7 +179,7 @@
     },
     {
     "name": "Gandolf",
-    "team": "red",
+    "faction": "red",
     "class": "Warrior",
     "baseStats": {},
     "growths": {},

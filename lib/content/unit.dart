@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -14,9 +13,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   final String name;
   final String className;
   int movementRange;
-  UnitTeam team;
+  String faction;
   Point<int> tilePosition;
-  late Vector2 targetPosition; // Target position in pixels
   Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
   late SpriteAnimationComponent sprite;
@@ -38,9 +36,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int level;
   int hp = -1;
   int sta = -1;
-  
-
-  factory Unit.fromJSON(Point<int> tilePosition, String name, {int? level, String? teamString, List<String>? itemStrings}) {
+        
+  factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings}) {
 
     // Extract unit data from the static map in MoiraGame
     var unitsJson = MoiraGame.unitMap['units'] as List;
@@ -58,12 +55,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unitData['attacks'].addAll(classData.attacks);
     unitData['proficiencies'].addAll(classData.proficiencies);
 
-    // Add Unit Team
-    final Map<String, UnitTeam> stringToUnitTeam = {
-      for (var team in UnitTeam.values) team.toString().split('.').last: team,
-    };
-    UnitTeam team = stringToUnitTeam[teamString ?? unitData['team']] ?? UnitTeam.blue;
-
+    String faction = factionName;
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = {};
     final Map<String, WeaponType> stringToProficiency = {
@@ -107,11 +99,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, team, items, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, items, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.team, this.items, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.items, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
@@ -142,19 +134,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   void update(double dt) {
     super.update(dt);
-    tilePosition = getTilePositionFromPosition();
+    // tilePosition = getTilePositionFromPosition();
     if (movementQueue.isNotEmpty) {
+      isMoving = true;
       Movement currentMovement = movementQueue.first;
-      if(!isMoving) {
-        Vector2 movementVector = getMovementVector(currentMovement);
-        targetPosition = position + movementVector * currentMovement.tileDistance.toDouble() * game.stage.tileSize;
-        isMoving = true;
-      }
-      // Use lerp to move towards the target position
-      double distance = position.distanceTo(targetPosition);
+      Point<int> movement = getMovement(currentMovement);
+      Point<int> targetTilePosition = tilePosition + movement;
+      double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
       double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
       if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
-        position = targetPosition;
+        tilePosition = targetTilePosition;
+        position = game.stage.tileMap[targetTilePosition]!.center;
+        if(!game.stage.tileMap[targetTilePosition]!.isOccupied) game.stage.tileMap[targetTilePosition]!.setUnit(this);
         isMoving = false;
         movementQueue.removeFirst(); // Dequeue the completed movement
 
@@ -162,19 +153,20 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           Movement currentMovement = movementQueue.first;
           SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
           sprite.animation = newAnimation;
+        } else {//The movement is over.
+          debugPrint("$name idle at $tilePosition");
+          SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
+          sprite.animation = newAnimation;
         }
       } else {
-        // dev.log("$position, $targetPosition, $dt");
-        position.moveToTarget(targetPosition, moveStep);
+        position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
-    } else {
-        SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
-        sprite.animation = newAnimation;
     }
   }
 
   @override
   Future<void> onLoad() async {
+    debugPrint("Load $name");
     // Load the unit image and create the animation component
     ui.Image unitImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
     unitSheet = SpriteSheet.fromColumnsAndRows(
@@ -182,30 +174,30 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       columns: 4,
       rows: 5,
     );
-
+    Vector2 spriteSize = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
     animationMap['down'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 0, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['up'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 1, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['right'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 2, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['left'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 3, stepTime: .25),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     animationMap['idle'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 4, stepTime: .5),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     sprite = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 4, stepTime: .5),
-                            size: Vector2(game.stage.tileSize*1.25, game.stage.tileSize),
+                            size: spriteSize,
                             anchor: Anchor.center);
     add(sprite);
     position = game.stage.tileMap[tilePosition]!.center;
@@ -216,6 +208,15 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       Skill skill = Skill.fromJson(skillName, this);
       // skill.attachToUnit(this, game.eventDispatcher);
     }
+    // Add to faction:
+    if(game.stage.factionMap.keys.contains(faction)){
+      game.stage.factionMap[faction]!.units.add(this);
+    }
+    else{ 
+      debugPrint("Unit created for faction $faction not in factionMap.");
+      debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
+    }
+    game.stage.tileMap[tilePosition]?.setUnit(this);
     _loadCompleter.complete();
   }
 
@@ -237,18 +238,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         if(main?.weapon?.specialAttack != null) {
           attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
         }
-        // dev.log("$name equipped ${item.name} as ${item.type}");
+        // debugPrint("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.gear:
         gear = item;
-        // dev.log("$name equipped ${item.name} as ${item.type}");
+        // debugPrint("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.treasure:
         treasure = item;
-        // dev.log("$name equipped ${item.name} as ${item.type}");
+        // debugPrint("$name equipped ${item.name} as ${item.type}");
         break;
       default:
-        // dev.log("$name can't equip ${item.name}");
+        // debugPrint("$name can't equip ${item.name}");
         break;
     }
   }
@@ -256,18 +257,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   void unequip(ItemType? type){
     switch (type) {
       case ItemType.main:
-        // dev.log("$name unequipped ${main?.name} as $type");
+        // debugPrint("$name unequipped ${main?.name} as $type");
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
         main = null;
         break;
       case ItemType.gear:
-        // dev.log("$name unequipped ${gear?.name} as $type");
+        // debugPrint("$name unequipped ${gear?.name} as $type");
         gear = null;
         break;
       case ItemType.treasure:
-        // dev.log("$name unequipped ${treasure?.name} as $type");
+        // debugPrint("$name unequipped ${treasure?.name} as $type");
         treasure = null;
         break;
       default:
@@ -277,9 +278,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   int getStat(String stat){
     return stats[stat]!;
-  }
-  void resize() {
-    size = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
   }
 
 }

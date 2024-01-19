@@ -145,7 +145,6 @@ class UnitCreationEvent extends Event {
     unit = level > 0 ? Unit.fromJSON(gridCoord, name, level: level) : Unit.fromJSON(gridCoord, name);
     game.stage.add(unit); // Add the unit to the stage
     game.stage.units.add(unit);
-    game.stage.tilesMap[gridCoord]!.setUnit(unit);
 
     // Wait for unit's onLoad to complete
     await unit.loadCompleted;
