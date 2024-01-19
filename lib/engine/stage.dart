@@ -21,6 +21,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
   Player? activeFaction = null;
+  final Map<String, Player> factionMap = {};
   late final Cursor cursor;
   late final Hud hud;
   late Vector2 playAreaSize;

@@ -22,6 +22,8 @@ class Player extends Component with HasGameReference<MoiraGame>{
   void takeTurn(){
     dev.log("$name takes their turn");
   }
+
+  void startTurn() {}
 }
 
 class AIPlayer extends Component with HasGameReference<MoiraGame>{

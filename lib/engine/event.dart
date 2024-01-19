@@ -89,6 +89,18 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
               batch.add(PanEvent(destination));
               break;
+            case 'StartTurnEvent':
+              String factionName = eventData['factionName'];
+              batch.add(StartTurnEvent(factionName));
+            case 'FactionCreationEvent':
+              final Map<String, FactionType> stringToFactionType = {
+                for (var type in FactionType.values) type.toString().split('.').last: type,
+              };
+              FactionType factionType = stringToFactionType[eventData['factionType']] ?? FactionType.blue;
+              String factionName = eventData["factionName"];
+              bool human = eventData["human"] ?? false;
+              batch.add(FactionCreationEvent(factionName, factionType, human:human));
+
         }
       } addEventBatch(batch);
     }
@@ -187,13 +199,15 @@ class PanEvent extends Event{
 }
 
 class StartTurnEvent extends Event{
-  Player faction;
-  StartTurnEvent(this.faction);
+  String factionName;
+  StartTurnEvent(this.factionName);
   @override
   Future<void> execute() async {
     super.execute();
     dev.log("StartTurnEvent execution");
-    game.stage.activeFaction = faction;
+    game.stage.activeFaction = game.stage.factionMap[factionName];
+    game.stage.activeFaction!.startTurn();
+    _isCompleted = true;
   }
 }
 
@@ -211,5 +225,6 @@ class FactionCreationEvent extends Event{
     } else {
       game.stage.add(AIPlayer(name, type));
     }
+    _isCompleted = true;
   }
 }
