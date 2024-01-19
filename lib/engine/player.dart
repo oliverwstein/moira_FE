@@ -1,6 +1,5 @@
-import 'dart:developer' as dev;
-
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 class Player extends Component with HasGameReference<MoiraGame>{
   String name;
@@ -15,7 +14,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
   }
 
   void takeTurn(){
-    dev.log("$name takes their turn");
+    debugPrint("$name takes their turn");
   }
 
   void startTurn() {}
@@ -27,7 +26,8 @@ class AIPlayer extends Player{
   @override
   void update(dt){}
 
+  @override
   void takeTurn(){
-    dev.log("$name takes their turn");
+    debugPrint("$name takes their turn");
   }
 }

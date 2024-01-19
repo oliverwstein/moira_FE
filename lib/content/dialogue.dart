@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:developer' as dev;
-import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
@@ -71,7 +68,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   TextBoxComponent getBlankTextComponent(String type){
     switch (type) {
       case "dialogue":
-        double width = .95;
+        double width = 1.9;
         double xPos = .025;
         double yPos = .1;
         return TextBoxComponent(
@@ -81,10 +78,10 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
             position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
             scale: Vector2(.5, .5),
             boxConfig: TextBoxConfig(
-              maxWidth: aspectBox.x*1.9,
+              maxWidth: aspectBox.x*width,
               timePerChar: 0.02,
               growingBox: false,
-              margins: EdgeInsets.all(2),
+              margins: const EdgeInsets.all(2),
             ));
       case "name":
         double xPos = .5;
@@ -99,7 +96,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
         scale: Vector2(.5, .5),
         boxConfig: TextBoxConfig(
           maxWidth: 2*aspectBox.x/5,
-          margins: EdgeInsets.all(2),
+          margins: const EdgeInsets.all(2),
         ));
       default:
         return TextBoxComponent();
@@ -109,7 +106,6 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   @override
   Future<void> onDialogueFinish() async {
     super.onDialogueFinish();
-    dev.log("onDialogueFinish");
     game.switchToWorld(game.stage);
     finished = true;
   }

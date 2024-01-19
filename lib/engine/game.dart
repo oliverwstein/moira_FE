@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
-
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';

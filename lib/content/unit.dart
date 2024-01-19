@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:developer' as dev;
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -40,7 +39,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int sta = -1;
   
 
-  factory Unit.fromJSON(Point<int> tilePosition, String name, {int? level, String? teamString, List<String>? itemStrings}) {
+  factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings}) {
 
     // Extract unit data from the static map in MoiraGame
     var unitsJson = MoiraGame.unitMap['units'] as List;
@@ -58,7 +57,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unitData['attacks'].addAll(classData.attacks);
     unitData['proficiencies'].addAll(classData.proficiencies);
 
-    String faction = unitData['faction'];
+    String faction = factionName;
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = {};
     final Map<String, WeaponType> stringToProficiency = {
@@ -159,7 +158,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           sprite.animation = newAnimation;
         }
       } else {
-        // dev.log("$position, $targetPosition, $dt");
+        // debugPrint("$position, $targetPosition, $dt");
         position.moveToTarget(targetPosition, moveStep);
       }
     } else {
@@ -216,7 +215,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       game.stage.factionMap[faction]!.units.add(this);
     }
     else{ 
-      debugPrint("Unit created for faction not in factionMap.");
+      debugPrint("Unit created for faction $faction not in factionMap.");
+      debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
     _loadCompleter.complete();
   }
@@ -239,18 +239,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         if(main?.weapon?.specialAttack != null) {
           attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
         }
-        // dev.log("$name equipped ${item.name} as ${item.type}");
+        // debugPrint("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.gear:
         gear = item;
-        // dev.log("$name equipped ${item.name} as ${item.type}");
+        // debugPrint("$name equipped ${item.name} as ${item.type}");
         break;
       case ItemType.treasure:
         treasure = item;
-        // dev.log("$name equipped ${item.name} as ${item.type}");
+        // debugPrint("$name equipped ${item.name} as ${item.type}");
         break;
       default:
-        // dev.log("$name can't equip ${item.name}");
+        // debugPrint("$name can't equip ${item.name}");
         break;
     }
   }
@@ -258,18 +258,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   void unequip(ItemType? type){
     switch (type) {
       case ItemType.main:
-        // dev.log("$name unequipped ${main?.name} as $type");
+        // debugPrint("$name unequipped ${main?.name} as $type");
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
         main = null;
         break;
       case ItemType.gear:
-        // dev.log("$name unequipped ${gear?.name} as $type");
+        // debugPrint("$name unequipped ${gear?.name} as $type");
         gear = null;
         break;
       case ItemType.treasure:
-        // dev.log("$name unequipped ${treasure?.name} as $type");
+        // debugPrint("$name unequipped ${treasure?.name} as $type");
         treasure = null;
         break;
       default:

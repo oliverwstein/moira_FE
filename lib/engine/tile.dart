@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
-import 'package:moira/engine/engine.dart';
 
 class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   final Point<int> point;

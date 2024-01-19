@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
-import 'package:flame/flame.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
@@ -20,7 +18,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   final Point<int> initialPosition;
   final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
-  Player? activeFaction = null;
+  Player? activeFaction;
   final Map<String, Player> factionMap = {};
   late final Cursor cursor;
   late final Hud hud;
@@ -68,7 +66,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     children.register<Player>();
   }
   void getCamera() {
-    dev.log("Get stage camera");
+    debugPrint("Get stage camera");
     game.camera;
     game.camera.world = this;
     game.camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital

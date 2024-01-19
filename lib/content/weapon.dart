@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:flame/components.dart';
 import 'package:moira/content/content.dart';
 
