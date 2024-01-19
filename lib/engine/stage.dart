@@ -22,6 +22,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   final Map<String, Player> factionMap = {};
   late final Cursor cursor;
   late final Hud hud;
+  late final UnitHud unitHud;
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
   EventQueue eventQueue;
@@ -59,6 +60,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     cursor.priority = 10;
     add(cursor);
     hud = Hud();
+    unitHud = UnitHud();
     add(eventQueue);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
@@ -74,6 +76,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     game.camera.viewfinder.anchor = Anchor.center;
     game.camera.viewport.add(hud);
+    game.camera.viewport.add(unitHud);
     
   }
 

@@ -137,6 +137,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   void update(double dt) {
     super.update(dt);
     tilePosition = getTilePositionFromPosition();
+
     if (movementQueue.isNotEmpty) {
       Movement currentMovement = movementQueue.first;
       if(!isMoving) {
