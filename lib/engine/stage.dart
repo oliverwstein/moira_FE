@@ -9,7 +9,7 @@ import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:moira/engine/engine.dart';
+import 'package:moira/content/content.dart';
 
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
@@ -62,6 +62,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     add(eventQueue);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
+    children.register<Unit>();
   }
   void getCamera() {
     dev.log("Get stage camera");
