@@ -145,7 +145,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
         tilePosition = targetTilePosition;
         position = game.stage.tileMap[targetTilePosition]!.center;
-        game.stage.tileMap[targetTilePosition]!.setUnit(this);
+        if(!game.stage.tileMap[targetTilePosition]!.isOccupied) game.stage.tileMap[targetTilePosition]!.setUnit(this);
         isMoving = false;
         movementQueue.removeFirst(); // Dequeue the completed movement
 
@@ -166,6 +166,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   @override
   Future<void> onLoad() async {
+    debugPrint("Load $name");
     // Load the unit image and create the animation component
     ui.Image unitImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
     unitSheet = SpriteSheet.fromColumnsAndRows(
@@ -173,7 +174,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       columns: 4,
       rows: 5,
     );
-    Vector2 spriteSize = Vector2(10, 8);
+    Vector2 spriteSize = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
     animationMap['down'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 0, stepTime: .25),
                             size: spriteSize,

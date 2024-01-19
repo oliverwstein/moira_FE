@@ -66,9 +66,10 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   }
 
   TextBoxComponent getBlankTextComponent(String type){
+    double scaler = 2.2;
     switch (type) {
       case "dialogue":
-        double width = 1.9;
+        double width = .95;
         double xPos = .025;
         double yPos = .1;
         return TextBoxComponent(
@@ -76,9 +77,9 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
             textRenderer: fontRenderer,
             align: Anchor.topLeft,
             position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
-            scale: Vector2(.5, .5),
+            scale: Vector2.all(1/scaler),
             boxConfig: TextBoxConfig(
-              maxWidth: aspectBox.x*width,
+              maxWidth: aspectBox.x*width*scaler,
               timePerChar: 0.02,
               growingBox: false,
               margins: const EdgeInsets.all(2),
@@ -86,16 +87,15 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
       case "name":
         double xPos = .5;
         double yPos = .025;
-
         return TextBoxComponent(
         text: "",
         textRenderer: fontRenderer,
         anchor: Anchor.topCenter,
         align: Anchor.topCenter,
         position: Vector2(aspectBox.x*xPos, aspectBox.y*yPos),
-        scale: Vector2(.5, .5),
+        scale: Vector2.all(1/scaler),
         boxConfig: TextBoxConfig(
-          maxWidth: 2*aspectBox.x/5,
+          maxWidth: 2*aspectBox.x/scaler,
           margins: const EdgeInsets.all(2),
         ));
       default:

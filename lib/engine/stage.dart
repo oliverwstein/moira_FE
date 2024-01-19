@@ -61,6 +61,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     add(cursor);
     hud = Hud();
     unitHud = UnitHud();
+    unitHud.priority = 20;
     add(eventQueue);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
@@ -76,7 +77,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     game.camera.viewfinder.anchor = Anchor.center;
     game.camera.viewport.add(hud);
-    game.camera.viewport.add(unitHud);
+    game.stage.add(unitHud);
     
   }
 

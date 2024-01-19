@@ -68,18 +68,21 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
-    position = game.stage.cursor.position;
-    anchor = Anchor.topLeft;
+    size = Vector2(game.stage.tileSize*3, game.stage.tileSize*2);
+    position = Vector2(game.stage.cursor.position.x,game.stage.cursor.position.y - game.stage.cursor.size.y);
+    anchor = Anchor.center;
+    double scaler = 20/game.stage.tileSize;
     name = TextComponent(
         text: game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name,
         position: Vector2(size.x / 2, size.y / 3),
+        scale: Vector2.all(1/scaler),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.font),
       );
     hp = TextComponent(
         text: "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}",
         position: Vector2(size.x / 2, size.y*2 / 3),
+        scale: Vector2.all(1/scaler),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.font),
       );
@@ -89,13 +92,14 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   void update(double dt) {
     super.update(dt);
+    position = Vector2(game.stage.cursor.position.x,game.stage.cursor.position.y - game.stage.cursor.size.y);
+    size = Vector2(game.stage.tileSize*3, game.stage.tileSize*2);
     bool worldCheck = game.world == game.stage;
     bool factionCheck = game.stage.activeFaction?.factionType == FactionType.blue;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
     // debugPrint("worldCheck $worldCheck, factionCheck $factionCheck, unitCheck $unitCheck");
     if (worldCheck && factionCheck && unitCheck){
-      debugPrint("Display UnitHud, size = $size, position = $position");
-      position = game.stage.cursor.position;
+      // position = game.stage.tileMap[game.stage.cursor.tilePosition]!.unit!.position;
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
       hp.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}";
       isVisible = true;
