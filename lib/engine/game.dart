@@ -93,7 +93,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     FlameAudio.bgm.initialize();
     await FlameAudio.audioCache.load('105 - Prologue (Birth of the Holy Knight).mp3');
     await FlameAudio.audioCache.load('101 - Beginning.mp3');
-    FlameAudio.bgm.play('101 - Beginning.mp3');
+    // FlameAudio.bgm.play('101 - Beginning.mp3');
     unitMap = await loadUnitData();
     itemMap = await loadItemsData();
     weaponMap = await loadWeaponsData();
