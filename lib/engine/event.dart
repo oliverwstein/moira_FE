@@ -186,3 +186,30 @@ class PanEvent extends Event{
   } 
 }
 
+class StartTurnEvent extends Event{
+  Player faction;
+  StartTurnEvent(this.faction);
+  @override
+  Future<void> execute() async {
+    super.execute();
+    dev.log("StartTurnEvent execution");
+    game.stage.activeFaction = faction;
+  }
+}
+
+class FactionCreationEvent extends Event{
+  String name;
+  bool human;
+  FactionType type;
+  FactionCreationEvent(this.name, this.type, {this.human = false});
+  @override
+  Future<void> execute() async {
+    super.execute();
+    dev.log("FactionCreationEvent execution");
+    if(human){
+      game.stage.add(Player(name, type));
+    } else {
+      game.stage.add(AIPlayer(name, type));
+    }
+  }
+}

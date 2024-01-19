@@ -20,6 +20,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   final Point<int> initialPosition;
   final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
+  Player? activeFaction = null;
   late final Cursor cursor;
   late final Hud hud;
   late Vector2 playAreaSize;
@@ -63,6 +64,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
     children.register<Unit>();
+    children.register<Player>();
   }
   void getCamera() {
     dev.log("Get stage camera");

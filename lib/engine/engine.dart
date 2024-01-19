@@ -6,6 +6,7 @@ export 'cursor.dart';
 export 'hud.dart';
 export 'movement.dart';
 export 'title_card.dart';
+export 'player.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
