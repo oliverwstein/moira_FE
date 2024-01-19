@@ -491,6 +491,65 @@
                     "bgName": "jungby_interior_dark.png",
                     "nodeName": "Opening_Chalphy"
                 }
+            ],
+            [
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Sigurd",
+                    "team": "Blue",
+                    "level": -1,
+                    "tilePosition": [
+                        59,
+                        12
+                    ],
+                    "destination": [
+                        59,
+                        13
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Noish",
+                    "team": "Blue",
+                    "level": -1,
+                    "tilePosition": [
+                        59,
+                        12
+                    ],
+                    "destination": [
+                        60,
+                        12
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Alec",
+                    "team": "Blue",
+                    "level": -1,
+                    "tilePosition": [
+                        59,
+                        12
+                    ],
+                    "destination": [
+                        58,
+                        12
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Arden",
+                    "team": "Blue",
+                    "level": -1,
+                    "tilePosition": [
+                        59,
+                        12
+                    ],
+                    "destination": [
+                        59,
+                        10
+                    ]
+                }
+                
             ]
         ]
     }
