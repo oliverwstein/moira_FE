@@ -3,13 +3,15 @@ import 'dart:developer' as dev;
 import 'package:flame/components.dart';
 import 'package:moira/content/content.dart';
 class Player extends Component with HasGameReference<MoiraGame>{
+  String name;
+  FactionType factionType;
   List<Unit> units = [];
-  UnitTeam team;
+  
 
-  Player(this.team) {
+  Player(this.name, this.factionType) {
     List<Unit> stageUnits = game.stage.children.query<Unit>();
     for (Unit unit in stageUnits) {
-      if(unit.team == team) units.add(unit);
+      if(unit.faction == name) units.add(unit);
     }
   }
 
@@ -18,6 +20,6 @@ class Player extends Component with HasGameReference<MoiraGame>{
   }
 
   void takeTurn(){
-    dev.log("$team takes their turn");
+    dev.log("$name takes their turn");
   }
 }

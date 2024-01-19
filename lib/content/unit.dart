@@ -14,7 +14,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   final String name;
   final String className;
   int movementRange;
-  UnitTeam team;
+  String faction;
   Point<int> tilePosition;
   late Vector2 targetPosition; // Target position in pixels
   Queue<Movement> movementQueue = Queue<Movement>();
@@ -58,12 +58,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unitData['attacks'].addAll(classData.attacks);
     unitData['proficiencies'].addAll(classData.proficiencies);
 
-    // Add Unit Team
-    final Map<String, UnitTeam> stringToUnitTeam = {
-      for (var team in UnitTeam.values) team.toString().split('.').last: team,
-    };
-    UnitTeam team = stringToUnitTeam[teamString ?? unitData['team']] ?? UnitTeam.blue;
-
+    String faction = unitData['team'];
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = {};
     final Map<String, WeaponType> stringToProficiency = {
@@ -107,11 +102,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, team, items, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, items, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.team, this.items, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.items, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
