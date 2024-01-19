@@ -6,7 +6,7 @@ import 'package:moira/engine/engine.dart';
 
 class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   final Point<int> point;
-  late final TextComponent textComponent;
+  // late final TextComponent textComponent;
   Unit? unit;
   bool get isOccupied => unit != null;
   Terrain terrain; // e.g., "grass", "water", "mountain"
@@ -16,20 +16,20 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
 
-    textComponent = TextComponent(
-      text: '(${point.x}, ${point.y})',
-      position: Vector2(size / 2, size / 2),
-      anchor: Anchor.center,
-      textRenderer: TextPaint(style: TextStyle(fontSize: size / 5)),
+    // textComponent = TextComponent(
+    //   text: '(${point.x}, ${point.y})',
+    //   position: Vector2(size / 2, size / 2),
+    //   anchor: Anchor.center,
+    //   textRenderer: TextPaint(style: TextStyle(fontSize: size / 5)),
 
-    );
-    add(textComponent);
+    // );
+    // add(textComponent);
   }
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    await add(textComponent);
+    // await add(textComponent);
   }
   
   void resize() {

@@ -509,7 +509,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Noish",
+                    "name": "Alec",
                     "team": "Blue",
                     "level": -1,
                     "tilePosition": [
@@ -523,7 +523,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Alec",
+                    "name": "Noish",
                     "team": "Blue",
                     "level": -1,
                     "tilePosition": [
