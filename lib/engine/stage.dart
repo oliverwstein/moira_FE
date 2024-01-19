@@ -86,7 +86,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     calculateTileSize();
     resizeStage();
   }
-  
 
   void calculateTileSize() {
     // Calculate tile size based on the game's canvas size

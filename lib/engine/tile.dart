@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 
 class Tile extends PositionComponent with HasGameReference<MoiraGame>{
@@ -17,7 +18,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
 
   @override 
   void update(dt){
-    if(unit?.tilePosition != point) removeUnit();
+    if(unit != null && unit?.tilePosition != point) {
+      debugPrint("Removed $unit from $point tile");
+      removeUnit();}
   }
 
   @override
@@ -28,9 +31,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   
   void resize() {
     size = Vector2.all(game.stage.tileSize);
-    if(isOccupied) unit!.resize();
   }
-    void setUnit(Unit newUnit) {
+  
+  void setUnit(Unit newUnit) {
     unit = newUnit;
   }
 

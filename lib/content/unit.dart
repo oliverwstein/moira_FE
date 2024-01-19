@@ -137,8 +137,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   void update(double dt) {
     super.update(dt);
     tilePosition = getTilePositionFromPosition();
-    // game.stage.tileMap[tilePosition]!.setUnit(this);
-
     if (movementQueue.isNotEmpty) {
       Movement currentMovement = movementQueue.first;
       if(!isMoving) {
@@ -151,6 +149,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
       if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
         position = targetPosition;
+        game.stage.tileMap[tilePosition]?.setUnit(this);
         isMoving = false;
         movementQueue.removeFirst(); // Dequeue the completed movement
 
@@ -158,14 +157,15 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           Movement currentMovement = movementQueue.first;
           SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
           sprite.animation = newAnimation;
+        } else {//The movement is over.
+          debugPrint("$name idle at $tilePosition");
+          SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
+          sprite.animation = newAnimation;
         }
       } else {
         // debugPrint("$position, $targetPosition, $dt");
         position.moveToTarget(targetPosition, moveStep);
       }
-    } else {
-        SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
-        sprite.animation = newAnimation;
     }
   }
 
