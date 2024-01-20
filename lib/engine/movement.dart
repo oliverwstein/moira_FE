@@ -15,12 +15,13 @@ mixin UnitMovement on PositionComponent {
   Queue<Movement> get _movementQueue => (this as Unit).movementQueue;
   Point<int> get _tilePosition => (this as Unit).tilePosition;
   MoiraGame get game;
+  Unit get unit => (this as Unit);
 
   void moveTo(Point<int> destination, [List<Movement>? path]) {
     path ??= getPath(destination);
     _movementQueue.addAll(path);
   }
-  List<Tile> findReachableTiles(Unit unit, double range) {
+  List<Tile> findReachableTiles(double range) {
     List<Tile>reachableTiles = [];
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
     var queue = Queue<_TileMovement>(); // Queue for BFS
@@ -51,6 +52,36 @@ mixin UnitMovement on PositionComponent {
       }
     }
     return reachableTiles;
+  }
+  void markAttackableTiles(List<Tile> reachableTiles) {
+    // Mark tiles attackable from the unit's current position
+    (int, int) range = unit.getCombatRange();
+    markTilesInRange(unit.tilePosition, range.$1, range.$2, TileState.attack);
+    // Mark tiles attackable from each reachable tile
+    for (var tile in reachableTiles) {
+      markTilesInRange(tile.point, range.$1, range.$2,  TileState.attack);
+    }
+  }
+  List<Tile> markTilesInRange(Point<int> centerTile, int minRange, int maxRange, TileState newState) {
+    List<Tile> tilesInRange = [];
+    for (int x = centerTile.x - maxRange.toInt(); x <= centerTile.x + maxRange.toInt(); x++) {
+      for (int y = centerTile.y - maxRange.toInt(); y <= centerTile.y + maxRange.toInt(); y++) {
+        var tilePoint = Point<int>(x, y);
+        var distance = centerTile.distanceTo(tilePoint);
+        if (distance >= minRange && distance <= maxRange) {
+          // Check if the tile is within the game bounds
+          if (x >= 0 && x < game.stage.mapTileWidth && y >= 0 && y < game.stage.mapTileHeight) {
+            var tile = game.stage.tileMap[tilePoint];
+            // Mark the tile as attackable if it's not a movement tile
+            if (tile != null && tile.state != TileState.move) {
+              tile.state = newState;
+              tilesInRange.add(tile);
+            }
+          }
+        }
+      }
+    }
+    return tilesInRange;
   }
   
 
