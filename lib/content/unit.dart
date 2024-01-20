@@ -29,7 +29,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Item? main;
   Item? treasure;
   Item? gear;
-  List<Item> items = [];
+  List<Item> inventory = [];
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
   Set<Skill> skillSet = {};
@@ -69,10 +69,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Create items for items
-    List<Item> items = [];
+    List<Item> inventory = [];
     itemStrings = itemStrings ?? [];
-    for(String itemName in itemStrings.isNotEmpty ? unitData['items'] : itemStrings){
-      items.add(Item.fromJson(itemName));
+
+    for(String itemName in itemStrings.isEmpty ? unitData['items'] : itemStrings){
+      inventory.add(Item.fromJson(itemName));
     }
 
     Map<String, Attack> attackMap = {};
@@ -101,16 +102,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, items, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.items, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
   void _postConstruction() {
-    for (Item item in items){
+    for (Item item in inventory){
       switch (item.type) {
         case ItemType.main:
           if (main == null) equip(item);

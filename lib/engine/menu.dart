@@ -143,7 +143,10 @@ class ActionMenu extends Menu {
           case "Wait":
             unit.wait();
             game.stage.menuManager.clearStack();
-
+            break;
+          case "Item":
+            game.stage.menuManager.pushMenu(InventoryMenu(unit));
+            break;
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
@@ -161,3 +164,46 @@ class ActionMenu extends Menu {
 
 }
 
+class InventoryMenu extends Menu {
+  final Unit unit;
+  late final List<String> options;
+  int selectedIndex = 0;
+  InventoryMenu(this.unit);
+
+  @override 
+  Future<void> onLoad() async {
+    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    unit.sprite.animation = newAnimation;
+    List<String> getInventoryNames() => unit.inventory.map((item) => item.name).toList();
+    options = getInventoryNames();
+  }
+
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        debugPrint("${options[selectedIndex]} Chosen");
+        switch (options[selectedIndex]){
+          case "Wait":
+            unit.wait();
+            game.stage.menuManager.clearStack();
+            break;
+          case "Item":
+            
+            break;
+        }
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        close();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp:
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+      case LogicalKeyboardKey.arrowDown:
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+    }
+    return KeyEventResult.handled;
+  }
+
+}
