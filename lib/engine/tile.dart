@@ -56,6 +56,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
     _attackAnimationComponent = SpriteAnimationComponent(
       animation: attackSheet.createAnimation(row: 0, stepTime: .2),
     );
+    _attackAnimationComponent.anchor = Anchor.center;
+    _attackAnimationComponent.position = Vector2(size.x/2, size.y/2);
+    _attackAnimationComponent.size = size*.9;
   }
   
   void resize() {

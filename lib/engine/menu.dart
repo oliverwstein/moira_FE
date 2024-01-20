@@ -34,7 +34,8 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
           debugPrint("$tile selected and tile.isOccupied = ${tile.isOccupied}");
           if(tile.isOccupied && tile.unit!.canAct) {
             game.stage.blankAllTiles();
-            tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
+            Set<Tile> reachableTiles = tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
+            tile.unit!.markAttackableTiles(reachableTiles.toList());
             // if the unit is a part of the active faction, add the MoveMenu to the stack.
             if (game.stage.factionMap[tile.unit!.faction] == game.stage.activeFaction){
               pushMenu(MoveMenu(tile.unit!, tile.point));
