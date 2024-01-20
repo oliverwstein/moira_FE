@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/widgets.dart';
 import 'package:moira/engine/engine.dart';
 
 class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
@@ -65,7 +66,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     if (isMoving) {
       Vector2 positionDelta = Vector2.all(0);
       if (position.distanceTo(targetPosition) < 0.1) { // Small threshold
-        
+        debugPrint("Cursor center at $position");
         positionDelta = targetPosition - position;
         position = targetPosition;
         isMoving = false;

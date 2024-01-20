@@ -24,13 +24,19 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
           Tile tile = game.stage.tileMap[game.stage.cursor.tilePosition]!;
-          if(tile.isOccupied && tile.unit!.canAct) {
+          debugPrint("$tile selected and tile.isOccupied = ${tile.isOccupied}");
+          if(tile.isOccupied) {
+            tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
             // add the MoveMenu to the stack.
             return KeyEventResult.handled;
           } else {
             // add the GameMenu to the stack.
             return KeyEventResult.handled;
           }
+        case LogicalKeyboardKey.keyB:
+          debugPrint("blank all tiles");
+          game.stage.blankAllTiles();
+          return KeyEventResult.handled;
         default:
           return KeyEventResult.handled;
       }
@@ -48,7 +54,7 @@ class MoveMenu extends Menu {
 
   @override 
   Future<void> onLoad() async {
-    
+
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {

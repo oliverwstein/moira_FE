@@ -156,7 +156,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
           sprite.animation = newAnimation;
         } else {//The movement is over.
-          debugPrint("$name idle at $tilePosition");
           SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
           sprite.animation = newAnimation;
         }

@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 class Movement {
   Direction direction;
@@ -21,8 +22,8 @@ mixin UnitMovement on PositionComponent {
     path ??= getPath(destination);
     _movementQueue.addAll(path);
   }
-  List<Tile> findReachableTiles(double range) {
-    List<Tile>reachableTiles = [];
+  Set<Tile> findReachableTiles(double range) {
+    Set<Tile>reachableTiles = {};
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
     var queue = Queue<_TileMovement>(); // Queue for BFS
     queue.add(_TileMovement(unit.tilePosition, range, null)); // enqueue the initial position
@@ -47,6 +48,8 @@ mixin UnitMovement on PositionComponent {
           double nextRemainingMovement = remainingMovement - cost;
           if (nextRemainingMovement > 0) {
             queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
+            reachableTiles.add(game.stage.tileMap[currentPoint]!);
+            game.stage.tileMap[currentPoint]!.state = TileState.move;
           }
         }
       }

@@ -142,6 +142,11 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     cursor.resize();
     hud.resize();
   }
+  void blankAllTiles(){
+    for (Tile tile in tileMap.values) {
+      tile.state = TileState.blank;
+    }
+  }
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -152,7 +157,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     }
     if (key is RawKeyDownEvent && !cursor.isMoving) {
       switch (key.logicalKey) {
-        case LogicalKeyboardKey.keyA:
+        case (LogicalKeyboardKey.keyA || LogicalKeyboardKey.keyB):
           debugPrint("StageHandler: Key A routed to MenuManager.");
           return menuManager.handleKeyEvent(key, keysPressed);
         default:
