@@ -183,14 +183,11 @@ class InventoryMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         debugPrint("${options[selectedIndex]} Chosen");
-        switch (options[selectedIndex]){
-          case "Wait":
-            unit.wait();
-            game.stage.menuManager.clearStack();
-            break;
-          case "Item":
-            
-            break;
+        if(unit.inventory[selectedIndex].use != null){
+          // If the item has a use, prompt if they want to use it.
+        } 
+        if (unit.inventory[selectedIndex].type != ItemType.basic) {
+          // If the item is of an equippable type, try to equip it.
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:

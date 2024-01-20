@@ -3,7 +3,7 @@ import 'package:moira/content/content.dart';
 class Item extends Component with HasGameReference<MoiraGame>{
   final String name;
   String description;
-  ItemType? type;
+  ItemType type;
   Equip? equipCond;
   Use? use;
   Weapon? weapon;
@@ -20,7 +20,7 @@ class Item extends Component with HasGameReference<MoiraGame>{
     } else {
       // Extract the properties from itemData
       String description = itemData['description'] ?? 'No description provided';
-      ItemType type = ItemType.values.firstWhere((e) => e.toString() == 'ItemType.${itemData['type']}', orElse: () => ItemType.basic); // Replace with actual logic to determine ItemType
+      ItemType type = ItemType.values.firstWhere((e) => e.toString() == 'ItemType.${itemData['type']}', orElse: () => ItemType.basic);
       
       if (itemData.containsKey("weapon")) {
         Weapon weapon = Weapon.fromJson(itemData['weapon']);
