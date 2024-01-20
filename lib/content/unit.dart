@@ -5,8 +5,8 @@ import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
-import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
+import 'package:flutter/material.dart';
 
 class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement{
   final Completer<void> _loadCompleter = Completer<void>();
@@ -21,13 +21,15 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   late final SpriteSheet unitSheet;
   late final Map<String, dynamic> unitData;
   bool isMoving = false;
+  bool _canAct = true;
+  bool get canAct => _canAct;
   final double speed = 1; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
   Item? main;
   Item? treasure;
   Item? gear;
-  List<Item> items = [];
+  List<Item> inventory = [];
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
   Set<Skill> skillSet = {};
@@ -67,10 +69,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Create items for items
-    List<Item> items = [];
+    List<Item> inventory = [];
     itemStrings = itemStrings ?? [];
-    for(String itemName in itemStrings.isNotEmpty ? unitData['items'] : itemStrings){
-      items.add(Item.fromJson(itemName));
+
+    for(String itemName in itemStrings.isEmpty ? unitData['items'] : itemStrings){
+      inventory.add(Item.fromJson(itemName));
     }
 
     Map<String, Attack> attackMap = {};
@@ -99,16 +102,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, items, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.items, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
 
   void _postConstruction() {
-    for (Item item in items){
+    for (Item item in inventory){
       switch (item.type) {
         case ItemType.main:
           if (main == null) equip(item);
@@ -131,6 +134,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Point<int> getTilePositionFromPosition(){
     return Point(position.x~/game.stage.tileSize, position.y~/game.stage.tileSize);
   }
+
+  void snapToTile(Tile tile){
+    position = tile.center;
+    tilePosition = tile.point;
+    tile.setUnit(this);
+  }
+  void wait(){
+    unit.toggleCanAct(false);
+    game.stage.blankAllTiles();
+  }
   @override
   void update(double dt) {
     super.update(dt);
@@ -138,6 +151,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
+      SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
+      sprite.animation = newAnimation;
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
@@ -154,7 +169,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
           sprite.animation = newAnimation;
         } else {//The movement is over.
-          debugPrint("$name idle at $tilePosition");
           SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
           sprite.animation = newAnimation;
         }
@@ -230,28 +244,29 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
   
   void equip(Item item){
+    if(item.equipCond != null && !item.equipCond!.check(this)) return;
     unequip(item.type);
-    switch (item.type) {
-      case ItemType.main:
-        
-        main = item;
-        if(main?.weapon?.specialAttack != null) {
-          attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
-        }
-        // debugPrint("$name equipped ${item.name} as ${item.type}");
-        break;
-      case ItemType.gear:
-        gear = item;
-        // debugPrint("$name equipped ${item.name} as ${item.type}");
-        break;
-      case ItemType.treasure:
-        treasure = item;
-        // debugPrint("$name equipped ${item.name} as ${item.type}");
-        break;
-      default:
-        // debugPrint("$name can't equip ${item.name}");
-        break;
-    }
+      switch (item.type) {
+        case ItemType.main:
+          main = item;
+          if(main?.weapon?.specialAttack != null) {
+            attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
+          }
+          debugPrint("$name equipped ${item.name} as ${item.type}");
+          break;
+        case ItemType.gear:
+          gear = item;
+          debugPrint("$name equipped ${item.name} as ${item.type}");
+          break;
+        case ItemType.treasure:
+          treasure = item;
+          debugPrint("$name equipped ${item.name} as ${item.type}");
+          break;
+        default:
+          debugPrint("$name can't equip ${item.name}");
+          break;
+      }
+    
   }
 
   void unequip(ItemType? type){
@@ -279,7 +294,88 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int getStat(String stat){
     return stats[stat]!;
   }
+  
+  (int, int) getCombatRange() {
+    int minCombatRange = 0;
+    int maxCombatRange = 0;
+    for(String attackName in attackSet.keys){
+      minCombatRange = min(minCombatRange, attackSet[attackName]!.range.$1);
+      maxCombatRange = max(maxCombatRange, attackSet[attackName]!.range.$2);
+    }
+    return (minCombatRange, maxCombatRange);
+  } 
 
+  List<String> getActions(){
+    List<String> actions = [];
+    actions.add("Attack");
+    actions.add("Item");
+    actions.add("Wait");
+    return actions;
+  }
+  void toggleCanAct(bool state) {
+    _canAct = state;
+    // Define the grayscale paint
+    final grayscalePaint = Paint()
+      ..colorFilter = const ColorFilter.matrix([
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0,      0,      0,      1, 0,
+      ]);
+
+    // Apply or remove the grayscale effect based on canAct
+    sprite.paint = canAct ? Paint() : grayscalePaint;
+  }
+
+  List<Unit> getTargets() {
+    List<Unit> targets = [];
+    (int, int) combatRange = getCombatRange();
+    for (int range = combatRange.$1; range <= combatRange.$2; range++) {
+      for (int dx = 0; dx <= range; dx++) {
+        int dy = range - dx;
+        List<Point<int>> pointsToCheck = [
+          Point(tilePosition.x + dx, tilePosition.y + dy),
+          Point(tilePosition.x - dx, tilePosition.y + dy),
+          Point(tilePosition.x + dx, tilePosition.y - dy),
+          Point(tilePosition.x - dx, tilePosition.y - dy)
+        ];
+
+        for (var point in pointsToCheck) {
+          if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
+            Tile? tile = game.stage.tileMap[point];
+            if (tile != null && tile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) {
+              targets.add(tile.unit!);
+              tile.state = TileState.attack;
+              debugPrint("${tile.unit!.name} is a target at ${tile.point}");
+            }
+          }
+        }
+      }
+    }
+    return targets;
+  }
+  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
+    Vector4 combatStats = Vector4(getStat('str').toDouble(), getStat('dex').toDouble(), getStat('mag').toDouble(), getStat('wis').toDouble());
+    int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
+    int hit = attack.hit + stats['lck']!;
+    int crit = attack.crit + stats['lck']!;
+    int fatigue = attack.fatigue;
+    if(main?.weapon != null) {
+      if(attack.magic) {
+        hit += getStat('wis')*2;
+        crit += getStat('wis')~/2;
+      } else {
+        hit += getStat('dex')*2;
+        crit += getStat('dex')~/2;
+      }
+      might += main!.weapon!.might;
+      hit += main!.weapon!.hit;
+      crit += main!.weapon!.crit;
+      fatigue += main!.weapon!.fatigue;
+      }
+    int damage = (might - ((attack.magic ? 1 : 0)*target.getStat('res') + (1-(attack.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
+    int accuracy = (hit - target.getStat('lck') - ((attack.magic ? 1 : 0)*target.getStat('wis') + (1-(attack.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
+    int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
+    return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
+  }
 }
-
-

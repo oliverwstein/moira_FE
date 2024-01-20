@@ -18,16 +18,16 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     position = Vector2(5, 5);
     anchor = Anchor.topLeft;
     point = TextComponent(
-        text: '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})',
+        text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
         position: Vector2(size.x / 2, size.y / 3),
         anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     terrain = TextComponent(
         text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
         position: Vector2(size.x / 2, size.y*2 / 3),
         anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(point);
       add(terrain);
@@ -37,15 +37,15 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   void update(double dt) {
     super.update(dt);
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
-    point.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
+    point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
   }
 
   void resize(){
     size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
-    point.textRenderer = SpriteFontRenderer.fromFont(game.font);
+    point.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     point.position = Vector2(size.x / 2, size.y*1 / 3);
-    terrain.textRenderer = SpriteFontRenderer.fromFont(game.font);
+    terrain.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     terrain.position = Vector2(size.x / 2, size.y*2 / 3);
   }
 
@@ -68,23 +68,20 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(game.stage.tileSize*3, game.stage.tileSize*2);
-    position = Vector2(game.stage.cursor.position.x,game.stage.cursor.position.y - game.stage.cursor.size.y);
-    anchor = Anchor.center;
+    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    anchor = Anchor.topLeft;
     double scaler = 20/game.stage.tileSize;
     name = TextComponent(
         text: game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name,
-        position: Vector2(size.x / 2, size.y / 3),
         scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        anchor: Anchor.topCenter,
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     hp = TextComponent(
         text: "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}",
-        position: Vector2(size.x / 2, size.y*2 / 3),
         scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        anchor: Anchor.topCenter,
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(name);
       add(hp);
@@ -92,27 +89,29 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   void update(double dt) {
     super.update(dt);
-    position = Vector2(game.stage.cursor.position.x,game.stage.cursor.position.y - game.stage.cursor.size.y);
-    size = Vector2(game.stage.tileSize*3, game.stage.tileSize*2);
+    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    position = Vector2(game.stage.cursor.position.x-game.stage.cursor.size.x, game.stage.cursor.position.y - game.stage.cursor.size.y*2.2);
     bool worldCheck = game.world == game.stage;
-    bool factionCheck = game.stage.activeFaction?.factionType == FactionType.blue;
+    bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
-    // debugPrint("worldCheck $worldCheck, factionCheck $factionCheck, unitCheck $unitCheck");
-    if (worldCheck && factionCheck && unitCheck){
-      // position = game.stage.tileMap[game.stage.cursor.tilePosition]!.unit!.position;
+    if (worldCheck && stackCheck && unitCheck){
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
+      name.anchor = Anchor.topCenter;
+      name.position = Vector2(size.x/2, 0);
       hp.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}";
+      hp.anchor = Anchor.topCenter;
+      hp.position = Vector2(size.x/2, size.y/2);
       isVisible = true;
     } else {isVisible = false;}
     
   }
 
   void resize(){
-    size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
-    name.textRenderer = SpriteFontRenderer.fromFont(game.font);
-    name.position = Vector2(size.x / 2, size.y*1 / 3);
-    hp.textRenderer = SpriteFontRenderer.fromFont(game.font);
-    hp.position = Vector2(size.x / 2, size.y*2 / 3);
+    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    name.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
+    name.position = Vector2(size.x/2, 0);
+    hp.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
+    hp.position = Vector2(size.x/2, size.y/2);
   }
 
   @override

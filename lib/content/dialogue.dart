@@ -38,7 +38,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
     _bgSprite = SpriteComponent.fromImage(bgImage,
       position: game.camera.viewfinder.position);
     add(_bgSprite);
-    fontRenderer = SpriteFontRenderer.fromFont(game.font);
+    fontRenderer = SpriteFontRenderer.fromFont(game.dialogueFont);
     _bgSprite.size = aspectBox;
     _bgSprite.anchor = Anchor.center;
     dBoxSheet = SpriteSheet.fromColumnsAndRows(
@@ -113,7 +113,7 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
     aspectBox = game.camera.viewfinder.visibleGameSize!;
-    fontRenderer = SpriteFontRenderer.fromFont(game.font);
+    fontRenderer = SpriteFontRenderer.fromFont(game.dialogueFont);
     _bgSprite.size = aspectBox;
     dBoxSprite.size = Vector2(aspectBox.x, aspectBox.y/3);
     dBoxSprite.position = Vector2(0, 2*aspectBox.y/3);

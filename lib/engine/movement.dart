@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 class Movement {
   Direction direction;
@@ -15,11 +16,84 @@ mixin UnitMovement on PositionComponent {
   Queue<Movement> get _movementQueue => (this as Unit).movementQueue;
   Point<int> get _tilePosition => (this as Unit).tilePosition;
   MoiraGame get game;
+  Unit get unit => (this as Unit);
 
   void moveTo(Point<int> destination, [List<Movement>? path]) {
     path ??= getPath(destination);
     _movementQueue.addAll(path);
   }
+  Set<Tile> findReachableTiles(double range) {
+    Set<Tile>reachableTiles = {};
+    var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
+    var queue = Queue<_TileMovement>(); // Queue for BFS
+    queue.add(_TileMovement(unit.tilePosition, range, null)); // enqueue the initial position
+    while (queue.isNotEmpty) {
+      var tileMovement = queue.removeFirst();
+      Point<int> currentPoint = tileMovement.point;
+      double remainingMovement = tileMovement.remainingMovement;
+      // Skip if a better path to this tile has already been found
+      if (visitedTiles.containsKey(currentPoint) && visitedTiles[currentPoint]!.remainingMovement >= remainingMovement) continue;
+
+      visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
+      Tile? tile = game.stage.tileMap[currentPoint];
+      if (tile!.isOccupied) { // Skip enemy-occupied tiles
+        if(game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) continue;
+      }
+
+      for (Direction direction in Direction.values) {
+        Point <int> nextPoint = currentPoint + getMovement(Movement(direction, 1));
+        Tile? nextTile = game.stage.tileMap[Point(nextPoint.x, nextPoint.y)];
+        if (nextTile != null && !(nextTile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(nextTile.unit!))) {
+          double cost = game.stage.tileMap[nextTile.point]!.getTerrainCost();
+          double nextRemainingMovement = remainingMovement - cost;
+          if (nextRemainingMovement > 0) {
+            queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
+            if (!game.stage.tileMap[currentPoint]!.isOccupied){
+              reachableTiles.add(game.stage.tileMap[currentPoint]!);
+              game.stage.tileMap[currentPoint]!.state = TileState.move;
+            }
+          }
+        }
+      }
+    }
+    return reachableTiles;
+  }
+  List<Tile> markAttackableTiles(List<Tile> reachableTiles) {
+    List<Tile> targets = [];
+    // Mark tiles attackable from the unit's current position
+    (int, int) range = unit.getCombatRange();
+    targets.addAll(markTilesInRange(unit.tilePosition, range.$1, range.$2, TileState.attack));
+    // Mark tiles attackable from each reachable tile
+    for (var tile in reachableTiles) {
+      targets.addAll(markTilesInRange(tile.point, range.$1, range.$2,  TileState.attack));
+    }
+    return targets;
+  }
+  List<Tile> markTilesInRange(Point<int> centerTile, int minRange, int maxRange, TileState newState) {
+    List<Tile> tilesInRange = [];
+    for (int x = centerTile.x - maxRange.toInt(); x <= centerTile.x + maxRange.toInt(); x++) {
+      for (int y = centerTile.y - maxRange.toInt(); y <= centerTile.y + maxRange.toInt(); y++) {
+        var tilePoint = Point<int>(x, y);
+        var distance = centerTile.distanceTo(tilePoint);
+        if (distance >= minRange && distance <= maxRange) {
+          // Check if the tile is within the game bounds
+          if (x >= 0 && x < game.stage.mapTileWidth && y >= 0 && y < game.stage.mapTileHeight) {
+            var tile = game.stage.tileMap[tilePoint];
+            // Mark the tile as attackable if it's not a movement tile
+            if (tile != null && tile.state != TileState.move) {
+              if (newState == TileState.attack && tile.isOccupied && !game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)){
+                continue;
+              }
+              tile.state = newState;
+              tilesInRange.add(tile);
+            }
+          }
+        }
+      }
+    }
+    return tilesInRange;
+  }
+  
 
   Point<int> getMovement(Movement movement) {
     switch (movement.direction) {
@@ -114,4 +188,12 @@ List<Point<int>> _getNeighbors(Point<int> point) {
   // Using Manhattan distance as the heuristic
   return (a.x - b.x).abs() + (a.y - b.y).abs().toDouble();
   }
+}
+
+class _TileMovement {
+  Point<int> point;
+  double remainingMovement;
+  Point<int>? parent; // The tile from which this one was reached
+
+  _TileMovement(this.point, this.remainingMovement, this.parent);
 }

@@ -21,6 +21,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   Player? activeFaction;
   final Map<String, Player> factionMap = {};
   late final Cursor cursor;
+  late final MenuManager menuManager;
   late final Hud hud;
   late final UnitHud unitHud;
   late Vector2 playAreaSize;
@@ -63,6 +64,8 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     unitHud = UnitHud();
     unitHud.priority = 20;
     add(eventQueue);
+    menuManager = MenuManager();
+    add(menuManager);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
     children.register<Unit>();
@@ -139,35 +142,48 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     cursor.resize();
     hud.resize();
   }
+  void blankAllTiles(){
+    for (Tile tile in tileMap.values) {
+      tile.state = TileState.blank;
+    }
+  }
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
-
-    if (key is RawKeyDownEvent && !cursor.isMoving) {
-      Point<int> direction = const Point(0, 0);
-
-      // Check each arrow key independently
-      if (keysPressed.contains(LogicalKeyboardKey.arrowLeft)) {
-        direction = Point(direction.x - 1, direction.y);
-        handled = true;
-      }
-      if (keysPressed.contains(LogicalKeyboardKey.arrowRight)) {
-        direction = Point(direction.x + 1, direction.y);
-        handled = true;
-      }
-      if (keysPressed.contains(LogicalKeyboardKey.arrowUp)) {
-        direction = Point(direction.x, direction.y - 1);
-        handled = true;
-      }
-      if (keysPressed.contains(LogicalKeyboardKey.arrowDown)) {
-        direction = Point(direction.x, direction.y + 1);
-        handled = true;
-      }
-
-      Point<int> newTilePosition = Point(cursor.tilePosition.x + direction.x, cursor.tilePosition.y + direction.y);
-      cursor.moveTo(newTilePosition);
+    if(menuManager.isNotEmpty){
+      debugPrint("StageHandler: Input routed to MenuManager.");
+      return menuManager.handleKeyEvent(key, keysPressed);
     }
+    if (key is RawKeyDownEvent && !cursor.isMoving) {
+      switch (key.logicalKey) {
+        case (LogicalKeyboardKey.keyA || LogicalKeyboardKey.keyB):
+          debugPrint("StageHandler: Key A routed to MenuManager.");
+          return menuManager.handleKeyEvent(key, keysPressed);
+        default:
+          Point<int> direction = const Point(0, 0);
+          // Check each arrow key independently
+          if (keysPressed.contains(LogicalKeyboardKey.arrowLeft)) {
+            direction = Point(direction.x - 1, direction.y);
+            handled = true;
+          }
+          if (keysPressed.contains(LogicalKeyboardKey.arrowRight)) {
+            direction = Point(direction.x + 1, direction.y);
+            handled = true;
+          }
+          if (keysPressed.contains(LogicalKeyboardKey.arrowUp)) {
+            direction = Point(direction.x, direction.y - 1);
+            handled = true;
+          }
+          if (keysPressed.contains(LogicalKeyboardKey.arrowDown)) {
+            direction = Point(direction.x, direction.y + 1);
+            handled = true;
+          }
+          Point<int> newTilePosition = Point(cursor.tilePosition.x + direction.x, cursor.tilePosition.y + direction.y);
+          cursor.moveTo(newTilePosition);
+        }
+
+      }
     if(cursor.isMoving) handled = true;
     return handled ? KeyEventResult.handled : KeyEventResult.ignored;
   }

@@ -13,7 +13,8 @@ import 'package:moira/engine/engine.dart';
 class MoiraGame extends FlameGame with KeyboardEvents {
   late Stage stage;
   late TitleCard titleCard;
-  late SpriteFont font;
+  late SpriteFont dialogueFont;
+  late SpriteFont hudFont;
   Map<String, Sprite> portraitMap = {};
   static late Map<String, dynamic> unitMap;
   static late Map<String, dynamic> itemMap;
@@ -80,7 +81,8 @@ class MoiraGame extends FlameGame with KeyboardEvents {
       Sprite charSprite = alphabetSpriteSheet.getSpriteById(i);
       glyphList.add(Glyph(char, left: charSprite.srcPosition.x, top: charSprite.srcPosition.y, width: widths[char]!.toDouble()));
     }
-    font = SpriteFont(source: images.fromCache("alphabet_spritesheet.png"), size: 16, ascent: 16, glyphs: glyphList);
+    dialogueFont = SpriteFont(source: images.fromCache("alphabet_spritesheet.png"), size: 16, ascent: 16, glyphs: glyphList);
+    hudFont = SpriteFont(source: images.fromCache("alphabet_spritesheet.png"), size: 16, ascent: 16, glyphs: glyphList);
     SpriteSheet portraitSheet = SpriteSheet(image: images.fromCache("portraits_spritesheet.png"), srcSize: Vector2(48, 64));
     List<String> portraitNames = ["", "Gerrard", "DiMaggio", "Lex", "Azel", "Gandolf", "Aideen", "Midir", "Arden", "Noish", "Alec", "Sigurd", "Oifey"];
     for(var i = 0; i < portraitNames.length; i++){
