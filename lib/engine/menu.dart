@@ -91,6 +91,7 @@ class MoveMenu extends Menu {
           // Move the unit to the tile selected by the cursor. 
           game.stage.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
           game.stage.blankAllTiles();
+          game.stage.menuManager.pushMenu(ActionMenu(unit));
           close();
         }
         return KeyEventResult.handled;
@@ -110,8 +111,37 @@ class MoveMenu extends Menu {
     if (direction != const Point(0,0)){
         Point<int> newTilePosition = Point(game.stage.cursor.tilePosition.x + direction.x, game.stage.cursor.tilePosition.y + direction.y);
         game.stage.cursor.moveTo(newTilePosition);
-      }
-      return KeyEventResult.handled;
+    }
+    return KeyEventResult.handled;
+  }
+
+}
+
+class ActionMenu extends Menu {
+  final Unit unit;
+
+  ActionMenu(this.unit);
+
+  @override 
+  Future<void> onLoad() async {
+    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    unit.sprite.animation = newAnimation;
+  }
+
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        close();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft:
+      case LogicalKeyboardKey.arrowRight:
+      case LogicalKeyboardKey.arrowUp:
+      case LogicalKeyboardKey.arrowDown:
+    }
+    return KeyEventResult.handled;
   }
 
 }
