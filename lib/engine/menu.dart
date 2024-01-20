@@ -147,6 +147,9 @@ class ActionMenu extends Menu {
           case "Item":
             game.stage.menuManager.pushMenu(InventoryMenu(unit));
             break;
+          case "Attack":
+            game.stage.menuManager.pushMenu(CombatMenu());
+            break;
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
@@ -162,6 +165,14 @@ class ActionMenu extends Menu {
     return KeyEventResult.handled;
   }
 
+}
+
+class CombatMenu extends Menu {
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    // TODO: implement handleKeyEvent
+    throw UnimplementedError();
+  }
 }
 
 class InventoryMenu extends Menu {
@@ -187,7 +198,7 @@ class InventoryMenu extends Menu {
           // If the item has a use, prompt if they want to use it.
         } 
         if (unit.inventory[selectedIndex].type != ItemType.basic) {
-          // If the item is of an equippable type, try to equip it.
+          unit.equip(unit.inventory[selectedIndex]);
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:

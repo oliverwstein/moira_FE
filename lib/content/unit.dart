@@ -245,7 +245,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   
   void equip(Item item){
     if(item.equipCond != null && !item.equipCond!.check(this)) return;
-    
     unequip(item.type);
       switch (item.type) {
         case ItemType.main:
@@ -253,18 +252,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
           }
-          // debugPrint("$name equipped ${item.name} as ${item.type}");
+          debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         case ItemType.gear:
           gear = item;
-          // debugPrint("$name equipped ${item.name} as ${item.type}");
+          debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         case ItemType.treasure:
           treasure = item;
-          // debugPrint("$name equipped ${item.name} as ${item.type}");
+          debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         default:
-          // debugPrint("$name can't equip ${item.name}");
+          debugPrint("$name can't equip ${item.name}");
           break;
       }
     
