@@ -281,6 +281,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int getStat(String stat){
     return stats[stat]!;
   }
+  
+  (int, int) getCombatRange() {
+    int minCombatRange = 0;
+    int maxCombatRange = 0;
+    for(String attackName in attackSet.keys){
+      minCombatRange = min(minCombatRange, attackSet[attackName]!.range.$1);
+      maxCombatRange = max(maxCombatRange, attackSet[attackName]!.range.$2);
+    }
+    return (minCombatRange, maxCombatRange);
+  } 
 
 }
 
