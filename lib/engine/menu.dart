@@ -89,7 +89,7 @@ class MoveMenu extends Menu {
       case LogicalKeyboardKey.keyA:
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
-          unit.moveTo(game.stage.cursor.tilePosition);
+          game.stage.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
           game.stage.blankAllTiles();
           close();
         }

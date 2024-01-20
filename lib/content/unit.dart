@@ -141,6 +141,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
+      SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
+      sprite.animation = newAnimation;
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
