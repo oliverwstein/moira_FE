@@ -66,7 +66,6 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     if (isMoving) {
       Vector2 positionDelta = Vector2.all(0);
       if (position.distanceTo(targetPosition) < 0.1) { // Small threshold
-        debugPrint("Cursor center at $position");
         positionDelta = targetPosition - position;
         position = targetPosition;
         isMoving = false;

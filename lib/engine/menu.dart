@@ -10,16 +10,19 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
 
   void pushMenu(Menu menu) {
     _menuStack.add(menu);
+    add(menu);
     menu.open();
   }
 
-  void popMenuState() {
-    _menuStack.removeLast().close();
+  void popMenu() {
+    remove(_menuStack.removeLast());
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("top of _menuStack is: ${_menuStack.firstOrNull}");
     if (isNotEmpty){
-      return _menuStack.last.handleKeyEvent(key, keysPressed);
+      if(key is RawKeyDownEvent) return _menuStack.last.handleKeyEvent(key, keysPressed);
+      return KeyEventResult.handled;
     } else {
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
@@ -28,14 +31,17 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
           if(tile.isOccupied) {
             tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
             // add the MoveMenu to the stack.
+            pushMenu(MoveMenu());
             return KeyEventResult.handled;
           } else {
             // add the GameMenu to the stack.
             return KeyEventResult.handled;
           }
         case LogicalKeyboardKey.keyB:
-          debugPrint("blank all tiles");
-          game.stage.blankAllTiles();
+          
+          if (_menuStack.isEmpty){
+            game.stage.blankAllTiles();
+          }
           return KeyEventResult.handled;
         default:
           return KeyEventResult.handled;
@@ -47,7 +53,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
 
 abstract class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
-  void close() {}
+  void close() {game.stage.menuManager.popMenu();}
 }
 
 class MoveMenu extends Menu {
@@ -58,8 +64,16 @@ class MoveMenu extends Menu {
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    // TODO: implement handleKeyEvent
-    throw UnimplementedError();
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        game.stage.blankAllTiles();
+        close();
+        return KeyEventResult.handled;
+      default:
+        return KeyEventResult.handled;
+    }
   }
 
 }
