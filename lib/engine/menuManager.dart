@@ -21,12 +21,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   }
 }
 
-class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
-  @override
-  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    // TODO: implement handleKeyEvent
-    throw UnimplementedError();
-  }
+abstract class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
   void close() {}
 }
