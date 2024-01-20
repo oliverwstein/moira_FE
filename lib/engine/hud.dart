@@ -68,22 +68,19 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(game.stage.tileSize*3, game.stage.tileSize*2);
-    position = Vector2(game.stage.cursor.position.x,game.stage.cursor.position.y - game.stage.cursor.size.y);
-    anchor = Anchor.center;
+    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    anchor = Anchor.topLeft;
     double scaler = 20/game.stage.tileSize;
     name = TextComponent(
         text: game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name,
-        position: Vector2(size.x / 2, size.y / 3),
         scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
+        anchor: Anchor.topCenter,
         textRenderer: SpriteFontRenderer.fromFont(game.font),
       );
     hp = TextComponent(
         text: "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}",
-        position: Vector2(size.x / 2, size.y*2 / 3),
         scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
+        anchor: Anchor.topCenter,
         textRenderer: SpriteFontRenderer.fromFont(game.font),
       );
       add(name);
@@ -92,27 +89,29 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   void update(double dt) {
     super.update(dt);
-    position = Vector2(game.stage.cursor.position.x,game.stage.cursor.position.y - game.stage.cursor.size.y);
-    size = Vector2(game.stage.tileSize*3, game.stage.tileSize*2);
+    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    position = Vector2(game.stage.cursor.position.x, game.stage.cursor.position.y - game.stage.cursor.size.y*2.2);
     bool worldCheck = game.world == game.stage;
     bool factionCheck = game.stage.activeFaction?.factionType == FactionType.blue;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
-    // debugPrint("worldCheck $worldCheck, factionCheck $factionCheck, unitCheck $unitCheck");
     if (worldCheck && factionCheck && unitCheck){
-      // position = game.stage.tileMap[game.stage.cursor.tilePosition]!.unit!.position;
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
+      name.anchor = Anchor.topCenter;
+      name.position = Vector2(size.x/2, 0);
       hp.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}";
+      hp.anchor = Anchor.topCenter;
+      hp.position = Vector2(size.x/2, size.y/2);
       isVisible = true;
     } else {isVisible = false;}
     
   }
 
   void resize(){
-    size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
+    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
     name.textRenderer = SpriteFontRenderer.fromFont(game.font);
-    name.position = Vector2(size.x / 2, size.y*1 / 3);
+    name.position = Vector2(size.x/2, 0);
     hp.textRenderer = SpriteFontRenderer.fromFont(game.font);
-    hp.position = Vector2(size.x / 2, size.y*2 / 3);
+    hp.position = Vector2(size.x/2, size.y/2);
   }
 
   @override
