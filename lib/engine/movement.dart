@@ -48,8 +48,10 @@ mixin UnitMovement on PositionComponent {
           double nextRemainingMovement = remainingMovement - cost;
           if (nextRemainingMovement > 0) {
             queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
-            reachableTiles.add(game.stage.tileMap[currentPoint]!);
-            game.stage.tileMap[currentPoint]!.state = TileState.move;
+            if (!game.stage.tileMap[currentPoint]!.isOccupied){
+              reachableTiles.add(game.stage.tileMap[currentPoint]!);
+              game.stage.tileMap[currentPoint]!.state = TileState.move;
+            }
           }
         }
       }
@@ -77,6 +79,9 @@ mixin UnitMovement on PositionComponent {
             var tile = game.stage.tileMap[tilePoint];
             // Mark the tile as attackable if it's not a movement tile
             if (tile != null && tile.state != TileState.move) {
+              if (newState == TileState.attack && tile.isOccupied && !game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)){
+                continue;
+              }
               tile.state = newState;
               tilesInRange.add(tile);
             }
