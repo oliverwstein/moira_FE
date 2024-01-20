@@ -65,11 +65,18 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
 
 abstract class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
-  void close() {game.stage.menuManager.popMenu();}
+  void close() {
+    game.stage.menuManager.popMenu();}
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    close();
-    return KeyEventResult.handled;
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyB:
+        close();
+        return KeyEventResult.handled;
+      default:
+        return KeyEventResult.ignored;
+    }
+    
   }
 }
 
@@ -192,10 +199,36 @@ class CombatMenu extends Menu {
     game.stage.cursor.snapToTile(targets.first.tilePosition);
   }
 
-  // @override
-  // KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-  //   return KeyEventResult.handled;
-  // }
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        // Make the attack
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        // Cancel
+        close();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp:
+        selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
+        debugPrint("${targets[selectedTargetIndex].name} Selected");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowDown:
+        selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
+        debugPrint("${targets[selectedTargetIndex].name} Selected");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft:
+        selectedAttackIndex = (selectedAttackIndex - 1) % attacks.length;
+        debugPrint("${attacks[selectedAttackIndex].name} Selected");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowRight:
+        selectedAttackIndex = (selectedAttackIndex + 1) % attacks.length;
+        debugPrint("${attacks[selectedAttackIndex].name} Selected");
+        return KeyEventResult.handled;
+      default:
+        return KeyEventResult.ignored;
+    }
+  }
 }
 
 class InventoryMenu extends Menu {
