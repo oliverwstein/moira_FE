@@ -139,6 +139,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     tilePosition = tile.point;
     tile.setUnit(this);
   }
+  void wait(){
+    unit.toggleCanAct(false);
+    game.stage.blankAllTiles();
+  }
   @override
   void update(double dt) {
     super.update(dt);

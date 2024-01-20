@@ -22,6 +22,11 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
     remove(_menuStack.removeLast());
     debugPrint("top of _menuStack is now: ${_menuStack.lastOrNull}");
   }
+
+  void clearStack(){
+    _menuStack.clear();
+    removeAll(children);
+  }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     if (isNotEmpty){
@@ -134,6 +139,12 @@ class ActionMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         debugPrint("${actions[selectedIndex]} Chosen");
+        switch (actions[selectedIndex]){
+          case "Wait":
+            unit.wait();
+            game.stage.menuManager.clearStack();
+
+        }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();
