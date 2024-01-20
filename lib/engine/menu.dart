@@ -156,8 +156,8 @@ class ActionMenu extends Menu {
             break;
           case "Attack":
             game.stage.blankAllTiles();
-            List<Tile> targetTiles = unit.markAttackableTiles([]);
-            game.stage.menuManager.pushMenu(CombatMenu(unit));
+            List<Unit> targets = unit.getTargets();
+            game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
             
 
             break;
@@ -180,26 +180,20 @@ class ActionMenu extends Menu {
 
 class CombatMenu extends Menu {
   final Unit unit;
-  late final List<Unit> targets;
-  late final List<Attack> attacks;
+  final List<Unit> targets;
+  late List<Attack> attacks;
   int selectedTargetIndex = 0;
   int selectedAttackIndex = 0;
-  CombatMenu(this.unit);
+  CombatMenu(this.unit, this.targets);
 
   @override 
   Future<void> onLoad() async {
     attacks = unit.attackSet.values.toList();
-    List<Tile> targetTiles = unit.markAttackableTiles([]);
-    targets = [];
-    for(Tile tile in targetTiles) {
-      targets.add(tile.unit!);
-      debugPrint("${tile.unit!.name} @ ${tile.point} is a target.");
-    }
+    game.stage.cursor.snapToTile(targets.first.tilePosition);
   }
 
   // @override
   // KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-  //   List<Tile> targetTiles = unit.markAttackableTiles([]);
   //   return KeyEventResult.handled;
   // }
 }

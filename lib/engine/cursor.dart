@@ -58,6 +58,11 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       isMoving = true;
     }
   }
+  void snapToTile(Point<int> newTilePosition){
+    tilePosition = newTilePosition;
+    x = newTilePosition.x * size.x;
+    y = newTilePosition.y * size.y;
+  }
 
   @override
   void update(double dt) {
