@@ -34,11 +34,22 @@ mixin UnitMovement on PositionComponent {
 
       visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
       Tile? tile = game.stage.tileMap[currentPoint];
-      if (tile!.isOccupied) {
-        
+      if (tile!.isOccupied) { // Skip enemy-occupied tiles
+        if(game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) continue;
+      }
+
+      for (Direction direction in Direction.values) {
+        Point <int> nextPoint = currentPoint + getMovement(Movement(direction, 1));
+        Tile? nextTile = game.stage.tileMap[Point(nextPoint.x, nextPoint.y)];
+        if (nextTile != null && !(nextTile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(nextTile.unit!))) {
+          double cost = game.stage.tileMap[nextTile.point]!.getTerrainCost();
+          double nextRemainingMovement = remainingMovement - cost;
+          if (nextRemainingMovement > 0) {
+            queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
+          }
+        }
       }
     }
-
     return reachableTiles;
   }
   

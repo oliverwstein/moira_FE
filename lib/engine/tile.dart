@@ -42,6 +42,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   void removeUnit() {
     unit = null;
   }
+  double getTerrainCost() {
+    return terrain.cost;
+  }
 }
 
 
