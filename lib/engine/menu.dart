@@ -18,7 +18,24 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    return _menuStack.last.handleKeyEvent(key, keysPressed);
+    if (isNotEmpty){
+      return _menuStack.last.handleKeyEvent(key, keysPressed);
+    } else {
+      switch (key) {
+        case LogicalKeyboardKey.keyA:
+          Tile tile = game.stage.tileMap[game.stage.cursor.tilePosition]!;
+          if(tile.isOccupied && tile.unit!.canAct) {
+            // add the MoveMenu to the stack.
+            return KeyEventResult.handled;
+          } else {
+            // add the GameMenu to the stack.
+            return KeyEventResult.handled;
+          }
+        default:
+          return KeyEventResult.handled;
+      }
+    }
+    
   }
 }
 
@@ -26,4 +43,5 @@ abstract class Menu extends Component with HasGameReference<MoiraGame> implement
   void open() {}
   void close() {}
 }
+
 

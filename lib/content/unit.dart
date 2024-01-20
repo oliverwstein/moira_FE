@@ -36,6 +36,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int level;
   int hp = -1;
   int sta = -1;
+  
+  bool _canAct = false;
         
   factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings}) {
 
@@ -106,6 +108,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.items, this.attackSet, this.proficiencies, this.stats){
     _postConstruction();
   }
+
+  bool get canAct => _canAct;
 
   void _postConstruction() {
     for (Item item in items){
