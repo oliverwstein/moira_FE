@@ -326,6 +326,36 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     // Apply or remove the grayscale effect based on canAct
     sprite.paint = canAct ? Paint() : grayscalePaint;
   }
+
+  List<Unit> getTargets() {
+    List<Tile> targetTiles = [];
+    (int, int) combatRange = getCombatRange();
+    for (int range = combatRange.$1; range <= combatRange.$2; range++) {
+      for (int dx = 0; dx <= range; dx++) {
+        int dy = range - dx;
+        List<Point<int>> pointsToCheck = [
+          Point(tilePosition.x + dx, tilePosition.y + dy),
+          Point(tilePosition.x - dx, tilePosition.y + dy),
+          Point(tilePosition.x + dx, tilePosition.y - dy),
+          Point(tilePosition.x - dx, tilePosition.y - dy)
+        ];
+
+        for (var point in pointsToCheck) {
+          if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
+            Tile? tile = game.stage.tileMap[point];
+            if (tile != null && tile.unit == TileState.attack && tile.isOccupied) {
+              targetTiles.add(tile);
+            }
+          }
+        }
+      }
+    }
+    List<Unit> targets = [];
+    for(Tile tile in targetTiles){
+      tile.state = TileState.attack;
+      targets.add(tile.unit!);
+      debugPrint("${tile.unit!.name} is a target at ${tile.point}");
+    }
+    return targets;
+  }
 }
-
-

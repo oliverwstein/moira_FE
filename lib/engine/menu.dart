@@ -66,6 +66,11 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
 abstract class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
   void close() {game.stage.menuManager.popMenu();}
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    close();
+    return KeyEventResult.handled;
+  }
 }
 
 class MoveMenu extends Menu {
@@ -136,6 +141,7 @@ class ActionMenu extends Menu {
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    if(unit.isMoving) return KeyEventResult.ignored;
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         debugPrint("${actions[selectedIndex]} Chosen");
@@ -145,10 +151,15 @@ class ActionMenu extends Menu {
             game.stage.menuManager.clearStack();
             break;
           case "Item":
+            game.stage.blankAllTiles();
             game.stage.menuManager.pushMenu(InventoryMenu(unit));
             break;
           case "Attack":
-            game.stage.menuManager.pushMenu(CombatMenu());
+            game.stage.blankAllTiles();
+            List<Tile> targetTiles = unit.markAttackableTiles([]);
+            game.stage.menuManager.pushMenu(CombatMenu(unit));
+            
+
             break;
         }
         return KeyEventResult.handled;
@@ -168,11 +179,29 @@ class ActionMenu extends Menu {
 }
 
 class CombatMenu extends Menu {
-  @override
-  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    // TODO: implement handleKeyEvent
-    throw UnimplementedError();
+  final Unit unit;
+  late final List<Unit> targets;
+  late final List<Attack> attacks;
+  int selectedTargetIndex = 0;
+  int selectedAttackIndex = 0;
+  CombatMenu(this.unit);
+
+  @override 
+  Future<void> onLoad() async {
+    attacks = unit.attackSet.values.toList();
+    List<Tile> targetTiles = unit.markAttackableTiles([]);
+    targets = [];
+    for(Tile tile in targetTiles) {
+      targets.add(tile.unit!);
+      debugPrint("${tile.unit!.name} @ ${tile.point} is a target.");
+    }
   }
+
+  // @override
+  // KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+  //   List<Tile> targetTiles = unit.markAttackableTiles([]);
+  //   return KeyEventResult.handled;
+  // }
 }
 
 class InventoryMenu extends Menu {

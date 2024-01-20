@@ -58,14 +58,16 @@ mixin UnitMovement on PositionComponent {
     }
     return reachableTiles;
   }
-  void markAttackableTiles(List<Tile> reachableTiles) {
+  List<Tile> markAttackableTiles(List<Tile> reachableTiles) {
+    List<Tile> targets = [];
     // Mark tiles attackable from the unit's current position
     (int, int) range = unit.getCombatRange();
-    markTilesInRange(unit.tilePosition, range.$1, range.$2, TileState.attack);
+    targets.addAll(markTilesInRange(unit.tilePosition, range.$1, range.$2, TileState.attack));
     // Mark tiles attackable from each reachable tile
     for (var tile in reachableTiles) {
-      markTilesInRange(tile.point, range.$1, range.$2,  TileState.attack);
+      targets.addAll(markTilesInRange(tile.point, range.$1, range.$2,  TileState.attack));
     }
+    return targets;
   }
   List<Tile> markTilesInRange(Point<int> centerTile, int minRange, int maxRange, TileState newState) {
     List<Tile> tilesInRange = [];
