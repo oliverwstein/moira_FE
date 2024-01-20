@@ -21,6 +21,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   Player? activeFaction;
   final Map<String, Player> factionMap = {};
   late final Cursor cursor;
+  late final MenuManager menuManager;
   late final Hud hud;
   late final UnitHud unitHud;
   late Vector2 playAreaSize;
@@ -63,6 +64,8 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     unitHud = UnitHud();
     unitHud.priority = 20;
     add(eventQueue);
+    menuManager = MenuManager();
+    add(menuManager);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
     children.register<Unit>();
@@ -143,7 +146,9 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
-
+    if(menuManager.isNotEmpty){
+      return menuManager.handleKeyEvent(key, keysPressed);
+    }
     if (key is RawKeyDownEvent && !cursor.isMoving) {
       Point<int> direction = const Point(0, 0);
 

@@ -6,6 +6,8 @@ import 'package:moira/content/content.dart';
 class MenuManager extends Component with HasGameReference<MoiraGame> implements InputHandler {
   final List<Menu> _menuStack = [];
 
+  bool get isNotEmpty => _menuStack.isNotEmpty;
+
   void pushMenu(Menu menu) {
     _menuStack.add(menu);
     menu.open();
@@ -14,10 +16,9 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   void popMenuState() {
     _menuStack.removeLast().close();
   }
-
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-   return _menuStack.last.handleKeyEvent(key, keysPressed);
+    return _menuStack.last.handleKeyEvent(key, keysPressed);
   }
 }
 
@@ -25,3 +26,4 @@ abstract class Menu extends Component with HasGameReference<MoiraGame> implement
   void open() {}
   void close() {}
 }
+
