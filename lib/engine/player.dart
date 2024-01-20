@@ -18,7 +18,13 @@ class Player extends Component with HasGameReference<MoiraGame>{
     debugPrint("$name takes their turn");
   }
 
-  void startTurn() {}
+  void startTurn() {
+  }
+  void endTurn(){
+    for(Unit unit in units){
+      unit.toggleCanAct(true);
+    }
+  }
 
   bool checkHostility(Unit unit){
     if(hostilities.contains(unit.faction)) return true;

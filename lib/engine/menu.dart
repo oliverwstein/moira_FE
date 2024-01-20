@@ -32,10 +32,13 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
         case LogicalKeyboardKey.keyA:
           Tile tile = game.stage.tileMap[game.stage.cursor.tilePosition]!;
           debugPrint("$tile selected and tile.isOccupied = ${tile.isOccupied}");
-          if(tile.isOccupied) {
+          if(tile.isOccupied && tile.unit!.canAct) {
+            game.stage.blankAllTiles();
             tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
-            // add the MoveMenu to the stack.
-            pushMenu(MoveMenu(tile.unit!, tile.point));
+            // if the unit is a part of the active faction, add the MoveMenu to the stack.
+            if (game.stage.factionMap[tile.unit!.faction] == game.stage.activeFaction){
+              pushMenu(MoveMenu(tile.unit!, tile.point));
+            }
             return KeyEventResult.handled;
           } else {
             // add the GameMenu to the stack.

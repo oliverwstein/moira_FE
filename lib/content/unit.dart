@@ -7,6 +7,7 @@ import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
+import 'package:flutter/material.dart';
 
 class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement{
   final Completer<void> _loadCompleter = Completer<void>();
@@ -21,7 +22,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   late final SpriteSheet unitSheet;
   late final Map<String, dynamic> unitData;
   bool isMoving = false;
-  bool _canAct = false;
+  bool _canAct = true;
   bool get canAct => _canAct;
   final double speed = 1; // Speed of cursor movement in pixels per second
 
@@ -291,6 +292,20 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     return (minCombatRange, maxCombatRange);
   } 
 
+  void toggleCanAct(bool state) {
+    _canAct = state;
+    // Define the grayscale paint
+    final grayscalePaint = Paint()
+      ..colorFilter = const ColorFilter.matrix([
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0,      0,      0,      1, 0,
+      ]);
+
+    // Apply or remove the grayscale effect based on canAct
+    sprite.paint = canAct ? Paint() : grayscalePaint;
+  }
 }
 
 
