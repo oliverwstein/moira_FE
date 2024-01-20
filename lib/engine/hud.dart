@@ -78,7 +78,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     hp = TextComponent(
-        text: "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}",
+        text: "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("hp")}",
         scale: Vector2.all(1/scaler),
         anchor: Anchor.topCenter,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
@@ -98,7 +98,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
       name.anchor = Anchor.topCenter;
       name.position = Vector2(size.x/2, 0);
-      hp.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}";
+      hp.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("hp")}";
       hp.anchor = Anchor.topCenter;
       hp.position = Vector2(size.x/2, size.y/2);
       isVisible = true;
