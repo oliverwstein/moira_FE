@@ -31,7 +31,6 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
           Tile tile = game.stage.tileMap[game.stage.cursor.tilePosition]!;
-          debugPrint("$tile selected and tile.isOccupied = ${tile.isOccupied}");
           if(tile.isOccupied && tile.unit!.canAct) {
             game.stage.blankAllTiles();
             Set<Tile> reachableTiles = tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
@@ -92,7 +91,6 @@ class MoveMenu extends Menu {
           game.stage.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
           game.stage.blankAllTiles();
           game.stage.menuManager.pushMenu(ActionMenu(unit));
-          close();
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
@@ -119,27 +117,32 @@ class MoveMenu extends Menu {
 
 class ActionMenu extends Menu {
   final Unit unit;
-
+  late final List<String> actions;
+  int selectedIndex = 0;
   ActionMenu(this.unit);
 
   @override 
   Future<void> onLoad() async {
     SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
     unit.sprite.animation = newAnimation;
+    actions = unit.getActions();
   }
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
+        debugPrint("${actions[selectedIndex]} Chosen");
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowLeft:
-      case LogicalKeyboardKey.arrowRight:
       case LogicalKeyboardKey.arrowUp:
+        selectedIndex = (selectedIndex - 1) % actions.length;
+        debugPrint("${actions[selectedIndex]} Selected");
       case LogicalKeyboardKey.arrowDown:
+        selectedIndex = (selectedIndex + 1) % actions.length;
+        debugPrint("${actions[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
   }

@@ -18,7 +18,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     position = Vector2(5, 5);
     anchor = Anchor.topLeft;
     point = TextComponent(
-        text: '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})',
+        text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
         position: Vector2(size.x / 2, size.y / 3),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
@@ -37,7 +37,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   void update(double dt) {
     super.update(dt);
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
-    point.text = '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})';
+    point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
   }
 

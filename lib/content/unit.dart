@@ -294,6 +294,13 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     return (minCombatRange, maxCombatRange);
   } 
 
+  List<String> getActions(){
+    List<String> actions = [];
+    actions.add("Attack");
+    actions.add("Item");
+    actions.add("Wait");
+    return actions;
+  }
   void toggleCanAct(bool state) {
     _canAct = state;
     // Define the grayscale paint
