@@ -92,9 +92,9 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
     size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
     position = Vector2(game.stage.cursor.position.x-game.stage.cursor.size.x, game.stage.cursor.position.y - game.stage.cursor.size.y*2.2);
     bool worldCheck = game.world == game.stage;
-    bool factionCheck = game.stage.activeFaction?.factionType == FactionType.blue;
+    bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
-    if (worldCheck && factionCheck && unitCheck){
+    if (worldCheck && stackCheck && unitCheck){
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
       name.anchor = Anchor.topCenter;
       name.position = Vector2(size.x/2, 0);
