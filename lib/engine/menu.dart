@@ -87,6 +87,13 @@ class MoveMenu extends Menu {
   MoveMenu(this.unit, this.startTile);
 
   @override 
+  void close() {
+    game.stage.blankAllTiles();
+    unit.snapToTile(startTile);
+    game.stage.cursor.snapToTile(unit.tilePosition);
+    super.close();
+  }
+  @override 
   Future<void> onLoad() async {
     SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
     unit.sprite.animation = newAnimation;
@@ -111,8 +118,6 @@ class MoveMenu extends Menu {
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
-        game.stage.blankAllTiles();
-        unit.snapToTile(startTile);
         close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowLeft:
@@ -140,6 +145,11 @@ class ActionMenu extends Menu {
   ActionMenu(this.unit);
 
   @override 
+  void close() {
+    super.close();
+    game.stage.menuManager._menuStack.last.close();
+  }
+  @override 
   Future<void> onLoad() async {
     SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
     unit.sprite.animation = newAnimation;
@@ -165,8 +175,6 @@ class ActionMenu extends Menu {
             game.stage.blankAllTiles();
             List<Unit> targets = unit.getTargets();
             game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
-            
-
             break;
         }
         return KeyEventResult.handled;
