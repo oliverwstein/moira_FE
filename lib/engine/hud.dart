@@ -21,13 +21,13 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
         text: '(${game.stage.cursor.tilePosition.x}, ${game.stage.cursor.tilePosition.y})',
         position: Vector2(size.x / 2, size.y / 3),
         anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     terrain = TextComponent(
         text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
         position: Vector2(size.x / 2, size.y*2 / 3),
         anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(point);
       add(terrain);
@@ -43,9 +43,9 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
 
   void resize(){
     size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
-    point.textRenderer = SpriteFontRenderer.fromFont(game.font);
+    point.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     point.position = Vector2(size.x / 2, size.y*1 / 3);
-    terrain.textRenderer = SpriteFontRenderer.fromFont(game.font);
+    terrain.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     terrain.position = Vector2(size.x / 2, size.y*2 / 3);
   }
 
@@ -75,13 +75,13 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
         text: game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name,
         scale: Vector2.all(1/scaler),
         anchor: Anchor.topCenter,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     hp = TextComponent(
         text: "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}",
         scale: Vector2.all(1/scaler),
         anchor: Anchor.topCenter,
-        textRenderer: SpriteFontRenderer.fromFont(game.font),
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(name);
       add(hp);
@@ -90,7 +90,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   void update(double dt) {
     super.update(dt);
     size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
-    position = Vector2(game.stage.cursor.position.x, game.stage.cursor.position.y - game.stage.cursor.size.y*2.2);
+    position = Vector2(game.stage.cursor.position.x-game.stage.cursor.size.x, game.stage.cursor.position.y - game.stage.cursor.size.y*2.2);
     bool worldCheck = game.world == game.stage;
     bool factionCheck = game.stage.activeFaction?.factionType == FactionType.blue;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
@@ -108,9 +108,9 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
 
   void resize(){
     size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
-    name.textRenderer = SpriteFontRenderer.fromFont(game.font);
+    name.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     name.position = Vector2(size.x/2, 0);
-    hp.textRenderer = SpriteFontRenderer.fromFont(game.font);
+    hp.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     hp.position = Vector2(size.x/2, size.y/2);
   }
 
