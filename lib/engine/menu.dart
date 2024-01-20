@@ -44,4 +44,17 @@ abstract class Menu extends Component with HasGameReference<MoiraGame> implement
   void close() {}
 }
 
+class MoveMenu extends Menu {
+
+  @override 
+  Future<void> onLoad() async {
+    
+  }
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    // TODO: implement handleKeyEvent
+    throw UnimplementedError();
+  }
+
+}
 

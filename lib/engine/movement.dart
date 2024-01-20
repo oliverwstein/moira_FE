@@ -20,6 +20,28 @@ mixin UnitMovement on PositionComponent {
     path ??= getPath(destination);
     _movementQueue.addAll(path);
   }
+  List<Tile> findReachableTiles(Unit unit, double range) {
+    List<Tile>reachableTiles = [];
+    var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
+    var queue = Queue<_TileMovement>(); // Queue for BFS
+    queue.add(_TileMovement(unit.tilePosition, range, null)); // enqueue the initial position
+    while (queue.isNotEmpty) {
+      var tileMovement = queue.removeFirst();
+      Point<int> currentPoint = tileMovement.point;
+      double remainingMovement = tileMovement.remainingMovement;
+      // Skip if a better path to this tile has already been found
+      if (visitedTiles.containsKey(currentPoint) && visitedTiles[currentPoint]!.remainingMovement >= remainingMovement) continue;
+
+      visitedTiles[Point(currentPoint.x, currentPoint.y)] = tileMovement;
+      Tile? tile = game.stage.tileMap[currentPoint];
+      if (tile!.isOccupied) {
+        
+      }
+    }
+
+    return reachableTiles;
+  }
+  
 
   Point<int> getMovement(Movement movement) {
     switch (movement.direction) {
@@ -114,4 +136,12 @@ List<Point<int>> _getNeighbors(Point<int> point) {
   // Using Manhattan distance as the heuristic
   return (a.x - b.x).abs() + (a.y - b.y).abs().toDouble();
   }
+}
+
+class _TileMovement {
+  Point<int> point;
+  double remainingMovement;
+  Point<int>? parent; // The tile from which this one was reached
+
+  _TileMovement(this.point, this.remainingMovement, this.parent);
 }

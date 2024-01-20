@@ -518,7 +518,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       }
 
     }
-
+  
     // Construct paths for each tile
     for (Point<int> tilePoint in visitedTiles.keys) {
       paths[tilePoint] = _constructPath(tilePoint, visitedTiles);
