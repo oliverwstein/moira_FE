@@ -23,7 +23,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   bool isMoving = false;
   bool _canAct = true;
   bool get canAct => _canAct;
-  final double speed = 1; // Speed of cursor movement in pixels per second
+  final double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
   Item? main;
@@ -189,28 +189,29 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       rows: 5,
     );
     Vector2 spriteSize = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
+    double stepTime = .15;
     animationMap['down'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 0, stepTime: .25),
+                            animation: unitSheet.createAnimation(row: 0, stepTime: stepTime),
                             size: spriteSize,
                             anchor: Anchor.center);
     animationMap['up'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 1, stepTime: .25),
+                            animation: unitSheet.createAnimation(row: 1, stepTime: stepTime),
                             size: spriteSize,
                             anchor: Anchor.center);
     animationMap['right'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 2, stepTime: .25),
+                            animation: unitSheet.createAnimation(row: 2, stepTime: stepTime),
                             size: spriteSize,
                             anchor: Anchor.center);
     animationMap['left'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 3, stepTime: .25),
+                            animation: unitSheet.createAnimation(row: 3, stepTime: stepTime),
                             size: spriteSize,
                             anchor: Anchor.center);
     animationMap['idle'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 4, stepTime: .5),
+                            animation: unitSheet.createAnimation(row: 4, stepTime: stepTime*2),
                             size: spriteSize,
                             anchor: Anchor.center);
     sprite = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 4, stepTime: .5),
+                            animation: unitSheet.createAnimation(row: 4, stepTime: stepTime*2),
                             size: spriteSize,
                             anchor: Anchor.center);
     add(sprite);
@@ -307,8 +308,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   List<String> getActions(){
     List<String> actions = [];
-    actions.add("Attack");
-    actions.add("Item");
+    if(unit.getTargets().isNotEmpty) actions.add("Attack");
+    if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
   }

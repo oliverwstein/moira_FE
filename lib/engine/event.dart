@@ -181,7 +181,7 @@ class PanEvent extends Event{
   @override
   void execute() {
     super.execute();
-    game.stage.cursor.speed = 50;
+    game.stage.cursor.speed = 100;
     debugPrint("Event: Pan to $destination");
     game.stage.cursor.moveTo(destination);
   }
