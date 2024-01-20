@@ -24,8 +24,6 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
 
   @override 
   void update(dt){
-    // _moveAnimationComponent.anchor = Anchor.topLeft;
-    // _moveAnimationComponent.center = center;
     if(unit != null) {
       if (unit?.tilePosition != point){
         removeUnit();
@@ -51,9 +49,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
     _moveAnimationComponent = SpriteAnimationComponent(
       animation: movementSheet.createAnimation(row: 0, stepTime: .2), 
     );
-    // _moveAnimationComponent.anchor = Anchor.topLeft;
-    // _moveAnimationComponent.center = center;
-    // debugPrint("Tile $point has center $center");
+    
+    _moveAnimationComponent.anchor = Anchor.center;
+    _moveAnimationComponent.position = Vector2(size.x/2, size.y/2);
     _moveAnimationComponent.size = size*.9;
     _attackAnimationComponent = SpriteAnimationComponent(
       animation: attackSheet.createAnimation(row: 0, stepTime: .2),
