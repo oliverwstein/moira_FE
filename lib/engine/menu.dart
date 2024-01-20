@@ -21,7 +21,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
     if (isNotEmpty){
       return _menuStack.last.handleKeyEvent(key, keysPressed);
     } else {
-      switch (key) {
+      switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
           Tile tile = game.stage.tileMap[game.stage.cursor.tilePosition]!;
           if(tile.isOccupied && tile.unit!.canAct) {
