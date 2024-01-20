@@ -212,6 +212,7 @@ class CombatMenu extends Menu {
       case LogicalKeyboardKey.arrowUp:
         selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
+        
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown:
         selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;

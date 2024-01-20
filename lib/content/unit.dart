@@ -354,4 +354,28 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     return targets;
   }
+  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
+    Vector4 combatStats = Vector4(getStat('str').toDouble(), getStat('dex').toDouble(), getStat('mag').toDouble(), getStat('wis').toDouble());
+    int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
+    int hit = attack.hit + stats['lck']!;
+    int crit = attack.crit + stats['lck']!;
+    int fatigue = attack.fatigue;
+    if(main?.weapon != null) {
+      if(attack.magic) {
+        hit += getStat('wis')*2;
+        crit += getStat('wis')~/2;
+      } else {
+        hit += getStat('dex')*2;
+        crit += getStat('dex')~/2;
+      }
+      might += main!.weapon!.might;
+      hit += main!.weapon!.hit;
+      crit += main!.weapon!.crit;
+      fatigue += main!.weapon!.fatigue;
+      }
+    int damage = (might - ((attack.magic ? 1 : 0)*target.getStat('res') + (1-(attack.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
+    int accuracy = (hit - target.getStat('lck') - ((attack.magic ? 1 : 0)*target.getStat('wis') + (1-(attack.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
+    int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
+    return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
+  }
 }
