@@ -5,7 +5,6 @@ import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
-import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 import 'package:flutter/material.dart';
 
@@ -133,6 +132,12 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   
   Point<int> getTilePositionFromPosition(){
     return Point(position.x~/game.stage.tileSize, position.y~/game.stage.tileSize);
+  }
+
+  void snapToTile(Tile tile){
+    position = tile.center;
+    tilePosition = tile.point;
+    tile.setUnit(this);
   }
   @override
   void update(double dt) {

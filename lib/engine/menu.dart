@@ -37,7 +37,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
             tile.unit!.markAttackableTiles(reachableTiles.toList());
             // if the unit is a part of the active faction, add the MoveMenu to the stack.
             if (game.stage.factionMap[tile.unit!.faction] == game.stage.activeFaction){
-              pushMenu(MoveMenu(tile.unit!, tile.point));
+              pushMenu(MoveMenu(tile.unit!, tile));
             }
             return KeyEventResult.handled;
           } else {
@@ -65,9 +65,9 @@ abstract class Menu extends Component with HasGameReference<MoiraGame> implement
 
 class MoveMenu extends Menu {
   final Unit unit;
-  final Point<int> startPoint;
+  final Tile startTile;
 
-  MoveMenu(this.unit, this.startPoint);
+  MoveMenu(this.unit, this.startTile);
 
   @override 
   Future<void> onLoad() async {
@@ -89,12 +89,13 @@ class MoveMenu extends Menu {
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
           game.stage.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
-          game.stage.blankAllTiles();
+          // game.stage.blankAllTiles();
           game.stage.menuManager.pushMenu(ActionMenu(unit));
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         game.stage.blankAllTiles();
+        unit.snapToTile(startTile);
         close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowLeft:
