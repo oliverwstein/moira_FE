@@ -22,7 +22,9 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 
   @override 
   void update(dt){
-    if(!_isStarted) execute();
+    if(!_isStarted) {
+      dispatch();
+      execute();}
     if(checkComplete()) removeFromParent();
     
     
@@ -64,7 +66,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   void mountBatch(List<Event> batch) {
     for (var event in batch) {
       if(event.trigger == null){
-        event.dispatch();
+        debugPrint("Dispatch ${event.runtimeType}");
         add(event);
       } else {
         triggerEvents.add(event);
@@ -251,7 +253,7 @@ class StartTurnEvent extends Event{
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("StartTurnEvent execution  $factionName");
+    debugPrint("StartTurnEvent: Start $turn for $factionName");
     game.stage.activeFaction = game.stage.factionMap[factionName];
     game.stage.activeFaction!.startTurn();
     _isCompleted = true;
@@ -270,7 +272,6 @@ class EndTurnEvent extends Event{
     debugPrint("EndTurnEvent execution  $factionName");
     game.stage.activeFaction!.endTurn();
     do {
-      debugPrint("Try to get the next faction after ${game.stage.turnPhase}");
       if(game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2){
         game.stage.turnPhase = ((game.stage.turnPhase.$1 + 1) % 4, 0);
         if (game.stage.turnPhase.$1 == 0) game.stage.turn++;
