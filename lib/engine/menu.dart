@@ -268,7 +268,7 @@ class StageMenu extends Menu {
         switch (options[selectedIndex]){
           case "End Turn":
             // End the turn, then close.
-            game.stage.activeFaction!.endTurn();
+            game.stage.eventQueue.add(EndTurnEvent(game.stage.activeFaction!.name));
             close();
             break;
           case "Save Game":

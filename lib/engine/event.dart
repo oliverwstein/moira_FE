@@ -215,8 +215,18 @@ class EndTurnEvent extends Event{
   Future<void> execute() async {
     super.execute();
     debugPrint("EndTurnEvent execution  $factionName");
-    game.stage.activeFaction = game.stage.factionMap[factionName];
-    game.stage.activeFaction!.startTurn();
+    game.stage.activeFaction!.endTurn();
+    do {
+      debugPrint("Try to get the next faction after ${game.stage.turnPhase}");
+      if(game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2){
+        game.stage.turnPhase = ((game.stage.turnPhase.$1 + 1) % 4, 0);
+        if (game.stage.turnPhase.$1 == 0) game.stage.turn++;
+      } else {
+        game.stage.turnPhase = ((game.stage.turnPhase.$1), game.stage.turnPhase.$2 + 1);
+      }
+    } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
+    game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
+    game.stage.eventQueue.add(StartTurnEvent(game.stage.activeFaction!.name));
     _isCompleted = true;
   }
 }
@@ -241,8 +251,6 @@ class FactionCreationEvent extends Event{
       game.stage.factionMap[name] = player;
     }
     game.stage.turnOrder[type.order].add(player);
-    
-    
     _isCompleted = true;
   }
 }

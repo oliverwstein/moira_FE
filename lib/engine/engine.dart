@@ -31,6 +31,7 @@ extension FactionOrder on FactionType {
     }
   }
 }
+
 enum TileState {blank, move, attack}
 enum Terrain {forest, path, cliff, sea, stream, fort, plain}
 enum ItemType {main, gear, treasure, basic}
