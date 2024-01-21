@@ -20,6 +20,9 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   final Map<Point<int>, Tile> tileMap = {};
   Player? activeFaction;
   final Map<String, Player> factionMap = {};
+  List<List<Player>> turnOrder = [[],[],[],[]];
+  int turn = 1;
+  (int, int) turnPhase = (0,0);
   late final Cursor cursor;
   late final MenuManager menuManager;
   late final Hud hud;

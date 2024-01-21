@@ -208,6 +208,19 @@ class StartTurnEvent extends Event{
   }
 }
 
+class EndTurnEvent extends Event{
+  String factionName;
+  EndTurnEvent(this.factionName);
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("EndTurnEvent execution  $factionName");
+    game.stage.activeFaction = game.stage.factionMap[factionName];
+    game.stage.activeFaction!.startTurn();
+    _isCompleted = true;
+  }
+}
+
 class FactionCreationEvent extends Event{
   String name;
   bool human;
@@ -217,15 +230,17 @@ class FactionCreationEvent extends Event{
   Future<void> execute() async {
     super.execute();
     debugPrint("FactionCreationEvent execution $name");
+    Player player;
     if(human){
-      var player = Player(name, type);
+      player = Player(name, type);
       game.stage.add(player);
       game.stage.factionMap[name] = player;
     } else {
-      var player = AIPlayer(name, type);
+      player = AIPlayer(name, type);
       game.stage.add(player);
       game.stage.factionMap[name] = player;
     }
+    game.stage.turnOrder[type.order].add(player);
     
     
     _isCompleted = true;

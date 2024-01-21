@@ -17,6 +17,20 @@ abstract class InputHandler {
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed);
 }
 enum FactionType {blue, red, green, yellow}
+extension FactionOrder on FactionType {
+  int get order {
+    switch (this) {
+      case FactionType.blue:
+        return 0;
+      case FactionType.yellow:
+        return 1;
+      case FactionType.red:
+        return 2;
+      case FactionType.green:
+        return 3;
+    }
+  }
+}
 enum TileState {blank, move, attack}
 enum Terrain {forest, path, cliff, sea, stream, fort, plain}
 enum ItemType {main, gear, treasure, basic}
