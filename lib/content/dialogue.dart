@@ -11,11 +11,11 @@ import 'package:flutter/widgets.dart';
 import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
 
-class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView implements InputHandler {
-  late final String bgSource;
+class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, DialogueView implements InputHandler {
+  late final String? bgSource;
   String nodeName;
   late CameraComponent camera;
-  late final SpriteComponent _bgSprite;
+  late SpriteComponent _bgSprite;
   late TextBoxComponent? _dialogueTextComponent;
   late TextBoxComponent? _nameTextComponent;
   late final SpriteSheet dBoxSheet;
@@ -34,13 +34,16 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   @override
   Future<void> onLoad() async {
     aspectBox = game.camera.viewfinder.visibleGameSize!;
-    ui.Image bgImage = await game.images.load(bgSource);
-    _bgSprite = SpriteComponent.fromImage(bgImage,
-      position: game.camera.viewfinder.position);
+    _bgSprite = SpriteComponent();
+    if(bgSource != null) {
+      ui.Image bgImage = await game.images.load(bgSource!);
+      _bgSprite = SpriteComponent.fromImage(bgImage,
+        position: game.camera.viewfinder.position);
+    } 
     add(_bgSprite);
-    fontRenderer = SpriteFontRenderer.fromFont(game.dialogueFont);
     _bgSprite.size = aspectBox;
     _bgSprite.anchor = Anchor.center;
+    fontRenderer = SpriteFontRenderer.fromFont(game.dialogueFont);
     dBoxSheet = SpriteSheet.fromColumnsAndRows(
       image: game.images.fromCache("dialogue_box_spritesheet.png"),
       columns: 2,
@@ -51,18 +54,13 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
       size: Vector2(aspectBox.x, aspectBox.y*.4),
     );
     _bgSprite.add(dBoxSprite);
+    
     _dialogueTextComponent = getBlankTextComponent("dialogue");
     _nameTextComponent = getBlankTextComponent("name");
     dBoxSprite.add(_dialogueTextComponent!);
     dBoxSprite.add(_nameTextComponent!);
     rightPortrait.flipHorizontally();
-    getCamera();
     _loadCompleter.complete();
-  }
-
-  void getCamera() {
-    camera = game.camera;
-    game.camera.world = this;
   }
 
   TextBoxComponent getBlankTextComponent(String type){
@@ -106,15 +104,15 @@ class Dialogue extends World with HasGameReference<MoiraGame>, DialogueView impl
   @override
   Future<void> onDialogueFinish() async {
     super.onDialogueFinish();
-    game.switchToWorld(game.stage);
     finished = true;
+    removeFromParent();
   }
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
     aspectBox = game.camera.viewfinder.visibleGameSize!;
     fontRenderer = SpriteFontRenderer.fromFont(game.dialogueFont);
-    _bgSprite.size = aspectBox;
+    _bgSprite!.size = aspectBox;
     dBoxSprite.size = Vector2(aspectBox.x, aspectBox.y/3);
     dBoxSprite.position = Vector2(0, 2*aspectBox.y/3);
     _dialogueTextComponent!.textRenderer = fontRenderer;

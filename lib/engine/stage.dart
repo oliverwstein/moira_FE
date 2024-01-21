@@ -68,6 +68,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     unitHud.priority = 20;
     add(eventQueue);
     menuManager = MenuManager();
+    menuManager.priority = 20;
     add(menuManager);
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
 
 class MenuManager extends Component with HasGameReference<MoiraGame> implements InputHandler {
@@ -11,8 +12,8 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   bool get isNotEmpty => _menuStack.isNotEmpty;
 
   void pushMenu(Menu menu) {
-    _menuStack.add(menu);
     add(menu);
+    _menuStack.add(menu);
     debugPrint("push ${_menuStack.lastOrNull} to _menuStack");
     menu.open();
   }
@@ -328,6 +329,29 @@ class InventoryMenu extends Menu {
         debugPrint("${options[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
+  }
+
+}
+
+class DialogueMenu extends Menu {
+  late final Dialogue dialogue;
+  late DialogueRunner runner;
+  String? bgName;
+  String nodeName;
+  DialogueMenu(this.nodeName, this.bgName);
+
+  @override
+  Future<void> onLoad() async {
+    dialogue = Dialogue(bgName, nodeName);
+    await add(dialogue);
+    runner = DialogueRunner(
+        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
+    runner.startDialogue(nodeName);
+  }
+
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    return dialogue.handleKeyEvent(key, keysPressed);
   }
 
 }

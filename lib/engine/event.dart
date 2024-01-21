@@ -81,7 +81,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             case 'DialogueEvent':
               String bgName = eventData['bgName'];
               String nodeName = eventData['nodeName'];
-              batch.add(DialogueEvent(bgName, nodeName));
+              batch.add(DialogueEvent(nodeName, bgName: bgName));
               break;
             case 'PanEvent':
               Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
@@ -152,26 +152,22 @@ class UnitMoveEvent extends Event {
 }
 
 class DialogueEvent extends Event{
-  String bgName;
+  String? bgName;
   String nodeName;
-  late Dialogue dialogue;
-  late DialogueRunner runner;
-  DialogueEvent(this.bgName, this.nodeName);
+  late DialogueMenu menu;
+  DialogueEvent(this.nodeName, {this.bgName});
 
   @override
   Future<void> execute() async {
     super.execute();
     debugPrint("DialogueEvent execution");
-    dialogue = Dialogue(bgName, nodeName);
-    await game.add(dialogue);
-    runner = DialogueRunner(
-        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
-    runner.startDialogue(nodeName);
-    game.switchToWorld(dialogue);
+    menu = DialogueMenu(nodeName, bgName);
+    game.stage.menuManager.pushMenu(menu);
+
   }
   @override
   bool checkComplete() {
-    return dialogue.finished;
+    return menu.dialogue.finished;
   } 
 }
 
