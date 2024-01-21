@@ -11,6 +11,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void execute(){
     _isStarted = true;
   }
+  List<Event> getObservers();
   bool _isStarted = false;
   bool _isCompleted = false;
   bool checkStarted(){return _isStarted;}
@@ -20,10 +21,13 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
     if(!_isStarted) execute();
     if(checkComplete()) removeFromParent();
   }
-}
-
-mixin Observer {
-    void onEvent(Event event);
+  void dispatch(Event event) {
+    for (var observer in getObservers()) {
+      observer.checkTrigger(event);
+    }
+  }
+  
+  void checkTrigger(Event event) {}
 }
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
@@ -105,6 +109,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 }
 
 class UnitCreationEvent extends Event{
+  static List<Event> _observers = [];
   final String name;
   final String factionName;
   final Point<int> tilePosition;
@@ -115,6 +120,9 @@ class UnitCreationEvent extends Event{
   
 
   UnitCreationEvent(this.name, this.tilePosition, this.factionName, {this.level, this.items, this.destination});
+  
+  @override
+  List<Event> getObservers() => _observers;
 
   @override
   void execute() {
@@ -134,9 +142,13 @@ class UnitCreationEvent extends Event{
 }
 
 class UnitMoveEvent extends Event {
+  static List<Event> _observers = [];
   final Point<int> tilePosition;
   final Unit unit;
   UnitMoveEvent(this.unit, this.tilePosition);
+
+  @override
+  List<Event> getObservers() => _observers;
 
   @override
   void execute() {
@@ -151,11 +163,13 @@ class UnitMoveEvent extends Event {
 }
 
 class DialogueEvent extends Event{
+  static List<Event> _observers = [];
   String? bgName;
   String nodeName;
   late DialogueMenu menu;
   DialogueEvent(this.nodeName, {this.bgName});
-
+  @override
+  List<Event> getObservers() => _observers;
   @override
   Future<void> execute() async {
     super.execute();
@@ -171,8 +185,11 @@ class DialogueEvent extends Event{
 }
 
 class PanEvent extends Event{
+  static List<Event> _observers = [];
   final Point<int> destination;
   PanEvent(this.destination);
+  @override
+  List<Event> getObservers() => _observers;
   @override
   void execute() {
     super.execute();
@@ -191,8 +208,11 @@ class PanEvent extends Event{
 }
 
 class StartTurnEvent extends Event{
+  static List<Event> _observers = [];
   String factionName;
   StartTurnEvent(this.factionName);
+  @override
+  List<Event> getObservers() => _observers;
   @override
   Future<void> execute() async {
     super.execute();
@@ -204,8 +224,11 @@ class StartTurnEvent extends Event{
 }
 
 class EndTurnEvent extends Event{
+  static List<Event> _observers = [];
   String factionName;
   EndTurnEvent(this.factionName);
+  @override
+  List<Event> getObservers() => _observers;
   @override
   Future<void> execute() async {
     super.execute();
@@ -227,10 +250,13 @@ class EndTurnEvent extends Event{
 }
 
 class FactionCreationEvent extends Event{
+  static List<Event> _observers = [];
   String name;
   bool human;
   FactionType type;
   FactionCreationEvent(this.name, this.type, {this.human = false});
+  @override
+  List<Event> getObservers() => _observers;
   @override
   Future<void> execute() async {
     super.execute();

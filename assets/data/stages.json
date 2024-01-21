@@ -564,6 +564,28 @@
                     ]
                 }
             ],
+            {
+                "type": "UnitCreationEvent",
+                "name": "Barbarian",
+                "faction": "Sigurd",
+                "level": 4,
+                "tilePosition": [
+                    41,
+                    0
+                ],
+                "destination": [
+                    42,
+                    3
+                ],
+                "triggers":
+                [
+                    {"StartTurnEvent":
+                        {
+                        "factionName": "Sigurd",
+                        "turn": 2}
+                    }
+                ]
+            },
             [
                 {
                     "type": "StartTurnEvent",
