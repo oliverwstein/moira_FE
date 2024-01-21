@@ -46,7 +46,8 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
             }
             return KeyEventResult.handled;
           } else {
-            // add the GameMenu to the stack.
+            // add the StageMenu to the stack.
+            pushMenu(StageMenu());
             return KeyEventResult.handled;
           }
         case LogicalKeyboardKey.keyB:
@@ -252,6 +253,41 @@ class CombatMenu extends Menu {
       default:
         return KeyEventResult.ignored;
     }
+  }
+}
+
+class StageMenu extends Menu {
+  final List<String> options = ["Save Game", "End Turn"];
+  int selectedIndex = 0;
+  StageMenu();
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        debugPrint("${options[selectedIndex]} Chosen");
+        switch (options[selectedIndex]){
+          case "End Turn":
+            // End the turn, then close.
+            
+            close();
+            break;
+          case "Save Game":
+            // @TODO add saving?
+            close();
+            break;
+        }
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        close();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp:
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+      case LogicalKeyboardKey.arrowDown:
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+    }
+    return KeyEventResult.handled;
   }
 }
 
