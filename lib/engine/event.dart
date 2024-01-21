@@ -81,7 +81,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             case 'DialogueEvent':
               String bgName = eventData['bgName'];
               String nodeName = eventData['nodeName'];
-              batch.add(DialogueEvent(bgName, nodeName));
+              batch.add(DialogueEvent(nodeName, bgName: bgName));
               break;
             case 'PanEvent':
               Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
@@ -152,26 +152,22 @@ class UnitMoveEvent extends Event {
 }
 
 class DialogueEvent extends Event{
-  String bgName;
+  String? bgName;
   String nodeName;
-  late Dialogue dialogue;
-  late DialogueRunner runner;
-  DialogueEvent(this.bgName, this.nodeName);
+  late DialogueMenu menu;
+  DialogueEvent(this.nodeName, {this.bgName});
 
   @override
   Future<void> execute() async {
     super.execute();
     debugPrint("DialogueEvent execution");
-    dialogue = Dialogue(bgName, nodeName);
-    await game.add(dialogue);
-    runner = DialogueRunner(
-        yarnProject: game.yarnProject, dialogueViews: [dialogue]);
-    runner.startDialogue(nodeName);
-    game.switchToWorld(dialogue);
+    menu = DialogueMenu(nodeName, bgName);
+    game.stage.menuManager.pushMenu(menu);
+
   }
   @override
   bool checkComplete() {
-    return dialogue.finished;
+    return menu.dialogue.finished;
   } 
 }
 
@@ -181,7 +177,7 @@ class PanEvent extends Event{
   @override
   void execute() {
     super.execute();
-    game.stage.cursor.speed = 50;
+    game.stage.cursor.speed = 100;
     debugPrint("Event: Pan to $destination");
     game.stage.cursor.moveTo(destination);
   }
@@ -208,6 +204,29 @@ class StartTurnEvent extends Event{
   }
 }
 
+class EndTurnEvent extends Event{
+  String factionName;
+  EndTurnEvent(this.factionName);
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("EndTurnEvent execution  $factionName");
+    game.stage.activeFaction!.endTurn();
+    do {
+      debugPrint("Try to get the next faction after ${game.stage.turnPhase}");
+      if(game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2){
+        game.stage.turnPhase = ((game.stage.turnPhase.$1 + 1) % 4, 0);
+        if (game.stage.turnPhase.$1 == 0) game.stage.turn++;
+      } else {
+        game.stage.turnPhase = ((game.stage.turnPhase.$1), game.stage.turnPhase.$2 + 1);
+      }
+    } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
+    game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
+    game.stage.eventQueue.add(StartTurnEvent(game.stage.activeFaction!.name));
+    _isCompleted = true;
+  }
+}
+
 class FactionCreationEvent extends Event{
   String name;
   bool human;
@@ -217,17 +236,17 @@ class FactionCreationEvent extends Event{
   Future<void> execute() async {
     super.execute();
     debugPrint("FactionCreationEvent execution $name");
+    Player player;
     if(human){
-      var player = Player(name, type);
+      player = Player(name, type);
       game.stage.add(player);
       game.stage.factionMap[name] = player;
     } else {
-      var player = AIPlayer(name, type);
+      player = AIPlayer(name, type);
       game.stage.add(player);
       game.stage.factionMap[name] = player;
     }
-    
-    
+    game.stage.turnOrder[type.order].add(player);
     _isCompleted = true;
   }
 }
