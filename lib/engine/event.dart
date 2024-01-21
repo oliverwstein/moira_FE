@@ -32,7 +32,10 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 
   void dispatch() {
     for (var observer in getObservers()) {
-      observer.trigger?.check(this);
+      if(observer.trigger!.check(this)){
+        debugPrint("Event $observer triggered!");
+      }
+
     }
   }
 }
