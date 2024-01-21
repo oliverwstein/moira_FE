@@ -43,7 +43,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 
   void mountBatch(List<Event> batch) {
-    // Execute each event in the current batch
     for (var event in batch) {
       add(event);
     }

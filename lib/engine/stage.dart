@@ -162,7 +162,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     if (key is RawKeyDownEvent && !cursor.isMoving) {
       switch (key.logicalKey) {
         case (LogicalKeyboardKey.keyA || LogicalKeyboardKey.keyB):
-          debugPrint("StageHandler: Key A routed to MenuManager.");
           return menuManager.handleKeyEvent(key, keysPressed);
         default:
           Point<int> direction = const Point(0, 0);
