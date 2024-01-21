@@ -564,17 +564,10 @@
                     ]
                 },
                 {
-                    "type": "UnitCreationEvent",
-                    "unitName": "Barbarian",
-                    "faction": "Sigurd",
-                    "level": 4,
-                    "tilePosition": [
-                        41,
-                        0
-                    ],
+                    "type": "PanEvent",
                     "destination": [
-                        42,
-                        3
+                        38,
+                        0
                     ],
                     "triggers":
                     [
