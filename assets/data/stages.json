@@ -25,7 +25,7 @@
             [
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -40,7 +40,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -54,7 +54,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -68,7 +68,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 10,
                     "items": [
@@ -87,7 +87,7 @@
             [
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Hunter",
+                    "unitName": "Hunter",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -101,7 +101,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Hunter",
+                    "unitName": "Hunter",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -115,7 +115,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -129,7 +129,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -145,7 +145,7 @@
             [
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -159,7 +159,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -173,7 +173,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 5,
                     "tilePosition": [
@@ -187,7 +187,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Gandolf",
+                    "unitName": "Gandolf",
                     "faction": "Verdane",
                     "level": 20,
                     "items": [
@@ -204,7 +204,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "DiMaggio",
+                    "unitName": "DiMaggio",
                     "faction": "Verdane",
                     "level": 10,
                     "tilePosition": [
@@ -234,7 +234,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -248,7 +248,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Hunter",
+                    "unitName": "Hunter",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -262,7 +262,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -276,7 +276,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Barbarian",
+                    "unitName": "Barbarian",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -290,7 +290,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -304,7 +304,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -318,7 +318,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -332,7 +332,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -346,7 +346,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -360,7 +360,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -374,7 +374,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -388,7 +388,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -402,7 +402,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -416,7 +416,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -430,7 +430,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -444,7 +444,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -458,7 +458,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -472,7 +472,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -486,7 +486,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Brigand",
+                    "unitName": "Brigand",
                     "faction": "Verdane",
                     "level": 1,
                     "tilePosition": [
@@ -509,7 +509,7 @@
             [
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Sigurd",
+                    "unitName": "Sigurd",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
@@ -523,7 +523,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Alec",
+                    "unitName": "Alec",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
@@ -537,7 +537,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Noish",
+                    "unitName": "Noish",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
@@ -551,7 +551,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Arden",
+                    "unitName": "Arden",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
@@ -562,33 +562,34 @@
                         59,
                         10
                     ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Barbarian",
+                    "faction": "Sigurd",
+                    "level": 4,
+                    "tilePosition": [
+                        41,
+                        0
+                    ],
+                    "destination": [
+                        42,
+                        3
+                    ],
+                    "triggers":
+                    [
+                        {"StartTurnEvent":
+                            {
+                            "factionName": "Sigurd",
+                            "turn": 2}
+                        }
+                    ]
                 }
             ],
-            {
-                "type": "UnitCreationEvent",
-                "name": "Barbarian",
-                "faction": "Sigurd",
-                "level": 4,
-                "tilePosition": [
-                    41,
-                    0
-                ],
-                "destination": [
-                    42,
-                    3
-                ],
-                "triggers":
-                [
-                    {"StartTurnEvent":
-                        {
-                        "factionName": "Sigurd",
-                        "turn": 2}
-                    }
-                ]
-            },
             [
                 {
                     "type": "StartTurnEvent",
+                    "turn": 1,
                     "factionName": "Sigurd"
                 }
             ]

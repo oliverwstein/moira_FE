@@ -4,34 +4,49 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flutter/widgets.dart';
-import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
 
 abstract class Event extends Component with HasGameReference<MoiraGame>{
-  void execute(){
-    _isStarted = true;
-  }
-  List<Event> getObservers();
+  Trigger? trigger;
   bool _isStarted = false;
   bool _isCompleted = false;
   bool checkStarted(){return _isStarted;}
   bool checkComplete(){return _isCompleted;}
+  Event({this.trigger});
+  void execute(){
+    _isStarted = true;
+    if (trigger != null) debugPrint("Trigger found!");
+  }
+
+  List<Event> getObservers();
+
   @override 
   void update(dt){
     if(!_isStarted) execute();
     if(checkComplete()) removeFromParent();
+    
+    
   }
-  void dispatch(Event event) {
+
+  void dispatch() {
     for (var observer in getObservers()) {
-      observer.checkTrigger(event);
+      observer.trigger?.check(this);
     }
   }
-  
-  void checkTrigger(Event event) {}
+}
+
+class DummyEvent extends Event {
+  @override
+  List<Event> getObservers() {
+    // TODO: implement getObservers
+    throw UnimplementedError();
+  }
+
 }
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
   final Queue<List<Event>> _eventBatches = Queue<List<Event>>();
+  final List<Event> triggerEvents = [];
 
   @override
   void onLoad() {
@@ -48,7 +63,12 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 
   void mountBatch(List<Event> batch) {
     for (var event in batch) {
-      add(event);
+      if(event.trigger == null){
+        event.dispatch();
+        add(event);
+      } else {
+        triggerEvents.add(event);
+      }
     }
   }
 
@@ -65,51 +85,65 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
     for (List<dynamic> eventBatch in jsonData) {
       List<Event> batch = [];
       for (Map eventData in eventBatch){
+        Event event;
         switch (eventData['type']) {
-            case 'UnitCreationEvent':
-              String name = eventData['name'];
-              String factionName = eventData['faction'];
-              Point<int> tilePosition = Point(eventData['tilePosition'][0], eventData['tilePosition'][1]);
-              int? level = eventData['level'];
-              List<String>? itemStrings;
-              if (eventData['items'] != null) {
-                itemStrings = List<String>.from(eventData['items']);
-              }
-              Point<int>? destination;
-              if (eventData['destination'] != null) {
-                destination = Point(eventData['destination'][0], eventData['destination'][1]);
-              }
-              batch.add(UnitCreationEvent(name, tilePosition, factionName, level:level, items:itemStrings, destination: destination));
-              break;
-            case 'DialogueEvent':
-              String bgName = eventData['bgName'];
-              String nodeName = eventData['nodeName'];
-              batch.add(DialogueEvent(nodeName, bgName: bgName));
-              break;
-            case 'PanEvent':
-              Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
-              batch.add(PanEvent(destination));
-              break;
-            case 'StartTurnEvent':
-              String factionName = eventData['factionName'];
-              batch.add(StartTurnEvent(factionName));
-            case 'FactionCreationEvent':
-              final Map<String, FactionType> stringToFactionType = {
-                for (var type in FactionType.values) type.toString().split('.').last: type,
-              };
-              FactionType factionType = stringToFactionType[eventData['factionType']] ?? FactionType.blue;
-              String factionName = eventData["factionName"];
-              bool human = eventData["human"] ?? false;
-              batch.add(FactionCreationEvent(factionName, factionType, human:human));
-
+          case 'UnitCreationEvent':
+            String name = eventData['unitName'];
+            String factionName = eventData['faction'];
+            Point<int> tilePosition = Point(eventData['tilePosition'][0], eventData['tilePosition'][1]);
+            int? level = eventData['level'];
+            List<String>? itemStrings;
+            if (eventData['items'] != null) {
+              itemStrings = List<String>.from(eventData['items']);
+            }
+            Point<int>? destination;
+            if (eventData['destination'] != null) {
+              destination = Point(eventData['destination'][0], eventData['destination'][1]);
+            }
+            event = UnitCreationEvent(name, tilePosition, factionName, level:level, items:itemStrings, destination: destination);
+            break;
+          case 'DialogueEvent':
+            String bgName = eventData['bgName'];
+            String nodeName = eventData['nodeName'];
+            event = DialogueEvent(nodeName, bgName: bgName);
+            break;
+          case 'PanEvent':
+            Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
+            event = PanEvent(destination);
+            break;
+          case 'StartTurnEvent':
+            String factionName = eventData['factionName'];
+            int turn = eventData['turn'];
+            event = StartTurnEvent(factionName, turn);
+            break;
+          case 'FactionCreationEvent':
+            final Map<String, FactionType> stringToFactionType = {
+              for (var type in FactionType.values) type.toString().split('.').last: type,
+            };
+            FactionType factionType = stringToFactionType[eventData['factionType']] ?? FactionType.blue;
+            String factionName = eventData["factionName"];
+            bool human = eventData["human"] ?? false;
+            event = FactionCreationEvent(factionName, factionType, human:human);
+            break;
+          default:
+            // Add a dummy event.
+            event = DummyEvent();
         }
-      } addEventBatch(batch);
+        List<dynamic> triggerList = eventData['triggers'] ?? [];
+        Trigger? eventTrigger;
+        if (triggerList.isNotEmpty) {
+          eventTrigger = Trigger.fromJson(triggerList.first, event);
+          event.trigger = eventTrigger;
+          }
+        batch.add(event);
+        addEventBatch(batch);
+      }
     }
   }
 }
 
 class UnitCreationEvent extends Event{
-  static List<Event> _observers = [];
+  static List<Event> observers = [];
   final String name;
   final String factionName;
   final Point<int> tilePosition;
@@ -119,10 +153,10 @@ class UnitCreationEvent extends Event{
   late final Unit unit;
   
 
-  UnitCreationEvent(this.name, this.tilePosition, this.factionName, {this.level, this.items, this.destination});
+  UnitCreationEvent(this.name, this.tilePosition, this.factionName, {this.level, this.items, this.destination, Trigger? trigger}) : super(trigger: trigger);
   
   @override
-  List<Event> getObservers() => _observers;
+  List<Event> getObservers() => observers;
 
   @override
   void execute() {
@@ -142,13 +176,13 @@ class UnitCreationEvent extends Event{
 }
 
 class UnitMoveEvent extends Event {
-  static List<Event> _observers = [];
+  static List<Event> observers = [];
   final Point<int> tilePosition;
   final Unit unit;
-  UnitMoveEvent(this.unit, this.tilePosition);
+  UnitMoveEvent(this.unit, this.tilePosition, {Trigger? trigger}) : super(trigger: trigger);
 
   @override
-  List<Event> getObservers() => _observers;
+  List<Event> getObservers() => observers;
 
   @override
   void execute() {
@@ -163,13 +197,13 @@ class UnitMoveEvent extends Event {
 }
 
 class DialogueEvent extends Event{
-  static List<Event> _observers = [];
+  static List<Event> observers = [];
   String? bgName;
   String nodeName;
   late DialogueMenu menu;
-  DialogueEvent(this.nodeName, {this.bgName});
+  DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger}) : super(trigger: trigger);
   @override
-  List<Event> getObservers() => _observers;
+  List<Event> getObservers() => observers;
   @override
   Future<void> execute() async {
     super.execute();
@@ -185,11 +219,11 @@ class DialogueEvent extends Event{
 }
 
 class PanEvent extends Event{
-  static List<Event> _observers = [];
+  static List<Event> observers = [];
   final Point<int> destination;
-  PanEvent(this.destination);
+  PanEvent(this.destination, {Trigger? trigger}) : super(trigger: trigger);
   @override
-  List<Event> getObservers() => _observers;
+  List<Event> getObservers() => observers;
   @override
   void execute() {
     super.execute();
@@ -208,11 +242,12 @@ class PanEvent extends Event{
 }
 
 class StartTurnEvent extends Event{
-  static List<Event> _observers = [];
+  static List<Event> observers = [];
   String factionName;
-  StartTurnEvent(this.factionName);
+  int turn;
+  StartTurnEvent(this.factionName, this.turn, {Trigger? trigger}) : super(trigger: trigger);
   @override
-  List<Event> getObservers() => _observers;
+  List<Event> getObservers() => observers;
   @override
   Future<void> execute() async {
     super.execute();
@@ -224,11 +259,11 @@ class StartTurnEvent extends Event{
 }
 
 class EndTurnEvent extends Event{
-  static List<Event> _observers = [];
+  static List<Event> observers = [];
   String factionName;
-  EndTurnEvent(this.factionName);
+  EndTurnEvent(this.factionName, {Trigger? trigger}) : super(trigger: trigger);
   @override
-  List<Event> getObservers() => _observers;
+  List<Event> getObservers() => observers;
   @override
   Future<void> execute() async {
     super.execute();
@@ -244,19 +279,19 @@ class EndTurnEvent extends Event{
       }
     } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
     game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
-    game.stage.eventQueue.add(StartTurnEvent(game.stage.activeFaction!.name));
+    game.stage.eventQueue.add(StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn));
     _isCompleted = true;
   }
 }
 
 class FactionCreationEvent extends Event{
-  static List<Event> _observers = [];
+  static List<Event> observers = [];
   String name;
   bool human;
   FactionType type;
-  FactionCreationEvent(this.name, this.type, {this.human = false});
+  FactionCreationEvent(this.name, this.type, {this.human = false, Trigger? trigger}) : super(trigger: trigger);
   @override
-  List<Event> getObservers() => _observers;
+  List<Event> getObservers() => observers;
   @override
   Future<void> execute() async {
     super.execute();
