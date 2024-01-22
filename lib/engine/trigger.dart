@@ -33,6 +33,10 @@ class Trigger extends Component {
         UnitCreationEvent.observers.add(event);
         String name = triggerData["UnitCreationEvent"]["name"];
         return Trigger._byName(name);
+      case "UnitMoveEvent":
+        UnitMoveEvent.observers.add(event);
+        String name = triggerData["UnitMoveEvent"]["name"];
+        return Trigger._byName(name);
       default:
         return Trigger._dummy();
     }

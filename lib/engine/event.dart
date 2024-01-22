@@ -9,6 +9,7 @@ import 'package:moira/content/content.dart';
 abstract class Event extends Component with HasGameReference<MoiraGame>{
   Trigger? trigger;
   String? name;
+  bool _isTriggered = false;
   bool _isStarted = false;
   bool _isCompleted = false;
   bool checkStarted(){return _isStarted;}
@@ -36,11 +37,12 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 
   void dispatch() {
     for (var observer in getObservers()) {
-      debugPrint("$observer");
+      debugPrint("Dispatch $this to ${observer.runtimeType}");
       if(observer.trigger!.check(this)){
+        observer._isTriggered = true;
         observer._isStarted = false;
         observer._isCompleted = false;
-        game.stage.eventQueue.add(observer);
+        game.stage.eventQueue.addEventBatch([observer]);
       }
 
     }
@@ -75,10 +77,10 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 
   void mountBatch(List<Event> batch) {
     for (var event in batch) {
-      if(event.trigger == null){
-        add(event);
-      } else {
-        triggerEvents.add(event);
+      if(event.trigger == null){add(event);}
+      else {
+        if(event._isTriggered){ add(event);}
+        else {triggerEvents.add(event);} 
       }
     }
   }
@@ -182,7 +184,7 @@ class UnitCreationEvent extends Event{
     game.stage.add(unit);
     _isCompleted = true;
     if (destination != null) {
-      var moveEvent = UnitMoveEvent(unit, destination!);
+      var moveEvent = UnitMoveEvent(unit, destination!, name: name);
       game.stage.eventQueue.add(moveEvent);
     } else {
       destination = tilePosition;
