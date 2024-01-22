@@ -165,7 +165,42 @@
         "skills": [],
         "items": ["Axe"],
         "attacks": [],
-        "proficiencies": ["Axe"]},
+        "proficiencies": ["Axe"]
+    },
+    {
+        "name": "Azel",
+        "faction": "blue",
+        "class": "Mage",
+        "level": 1,
+        "baseStats": {
+            "hp": 30,
+            "sta": 22,
+            "str": 0,
+            "def": 2,
+            "dex": 7,
+            "spe": 10,
+            "mag": 10,
+            "res": 7,
+            "wis": 7,
+            "lck": 2
+        },
+        "growths": {
+            "hp": 70,
+            "sta": 60,
+            "str": 10,
+            "def": 20,
+            "dex": 20,
+            "spe": 50,
+            "mag": 45,
+            "res": 20,
+            "wis": 20,
+            "lck": 25
+        },
+        "skills": [],
+        "items": [],
+        "attacks": ["Fire"],
+        "proficiencies": ["Staff", "Book"]
+    },
     {
     "name": "Brigand",
     "faction": "red",
