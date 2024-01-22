@@ -220,7 +220,7 @@
             [
                 {
                     "type": "DialogueEvent",
-                    "bgName": "jungby_interior_dark.png",
+                    "bgName": "jungby_interior.png",
                     "nodeName": "Opening_Jungby"
                 }
             ],
@@ -502,7 +502,7 @@
             [
                 {
                     "type": "DialogueEvent",
-                    "bgName": "jungby_interior_dark.png",
+                    "bgName": "chalphy_interior.png",
                     "nodeName": "Opening_Chalphy"
                 }
             ],
