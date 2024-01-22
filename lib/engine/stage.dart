@@ -12,7 +12,7 @@ import 'package:moira/content/content.dart';
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
   int tilesInColumn = 14;
-  double tileSize = 16;
+  static double tileSize = 16;
   final int mapTileWidth;
   final int mapTileHeight;
   final Point<int> initialPosition;

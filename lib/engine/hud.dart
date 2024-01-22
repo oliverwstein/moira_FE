@@ -14,7 +14,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
+    size = Vector2(Stage.tileSize*6, Stage.tileSize*6);
     position = Vector2(5, 5);
     anchor = Anchor.topLeft;
     point = TextComponent(
@@ -42,7 +42,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   }
 
   void resize(){
-    size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
+    size = Vector2(Stage.tileSize*6, Stage.tileSize*6);
     point.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     point.position = Vector2(size.x / 2, size.y*1 / 3);
     terrain.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
@@ -70,7 +70,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
     super.onLoad();
     size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
     anchor = Anchor.topLeft;
-    double scaler = 20/game.stage.tileSize;
+    double scaler = 20/Stage.tileSize;
     name = TextComponent(
         text: game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name,
         scale: Vector2.all(1/scaler),

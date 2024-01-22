@@ -132,7 +132,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
   
   Point<int> getTilePositionFromPosition(){
-    return Point(position.x~/game.stage.tileSize, position.y~/game.stage.tileSize);
+    return Point(position.x~/Stage.tileSize, position.y~/Stage.tileSize);
   }
 
   void snapToTile(Tile tile){
@@ -156,7 +156,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
-      double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
+      double moveStep = speed*Stage.tileSize/16;
       if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
         tilePosition = targetTilePosition;
         position = game.stage.tileMap[targetTilePosition]!.center;
@@ -187,7 +187,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       columns: 4,
       rows: 5,
     );
-    Vector2 spriteSize = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
+    Vector2 spriteSize = Vector2(Stage.tileSize*1.25, Stage.tileSize);
     double stepTime = .15;
     animationMap['down'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 0, stepTime: stepTime),

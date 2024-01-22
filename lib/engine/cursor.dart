@@ -31,7 +31,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     );
     _animationComponent = SpriteAnimationComponent(
       animation: cursorSheet.createAnimation(row: 0, stepTime: 0.2),
-      size: Vector2.all(game.stage.tileSize),
+      size: Vector2.all(Stage.tileSize),
     );
 
     // Set the initial position of the cursor
@@ -79,7 +79,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
         position.lerp(targetPosition, min(1, speed * dt / position.distanceTo(targetPosition)));
         positionDelta = position - currentPosition;
       }
-      Rect boundingBox = game.camera.visibleWorldRect.deflate(game.stage.tileSize);
+      Rect boundingBox = game.camera.visibleWorldRect.deflate(Stage.tileSize);
       if (!boundingBox.contains(position.toOffset())) {
         Rect playArea = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
           if(playArea.contains((position).toOffset())){
@@ -89,9 +89,4 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     }
   }
 
-  void resize() {
-    Tile tile = game.stage.tileMap[tilePosition]!;
-    size = Vector2.all(game.stage.tileSize);
-    position = tile.position;
-  }
 }
