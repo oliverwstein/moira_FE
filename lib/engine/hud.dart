@@ -68,7 +68,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
     anchor = Anchor.topLeft;
     double scaler = 20/Stage.tileSize;
     name = TextComponent(
@@ -89,8 +89,8 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   void update(double dt) {
     super.update(dt);
-    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
-    position = Vector2(game.stage.cursor.position.x-game.stage.cursor.size.x, game.stage.cursor.position.y - game.stage.cursor.size.y*2.2);
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
+    position = Vector2(game.stage.cursor.position.x-Stage.tileSize, game.stage.cursor.position.y - Stage.tileSize*2.2);
     bool worldCheck = game.world == game.stage;
     bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
@@ -107,7 +107,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   }
 
   void resize(){
-    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
     name.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     name.position = Vector2(size.x/2, 0);
     hp.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
