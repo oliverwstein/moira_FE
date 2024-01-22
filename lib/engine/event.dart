@@ -248,15 +248,13 @@ class PanEvent extends Event{
   @override
   void execute() {
     super.execute();
-    game.stage.cursor.speed = 100;
     debugPrint("Event: Pan to $destination");
-    game.camera.follow(game.stage.cursor, snap: false, maxSpeed: 100);
+    game.camera.follow(game.stage.cursor, snap: false, maxSpeed: 300);
     game.stage.cursor.moveTo(destination);
   }
   @override
   bool checkComplete() {
     if(!game.stage.cursor.isMoving){
-      game.stage.cursor.speed = 300;
       game.camera.stop();
       return true;
     }

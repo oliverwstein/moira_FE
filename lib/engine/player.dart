@@ -48,19 +48,25 @@ class Player extends Component with HasGameReference<MoiraGame>{
 }
 
 class AIPlayer extends Player{
-
+  bool startedTurn = false;
   AIPlayer(String name, FactionType factionType) : super(name, factionType);
   @override
   void update(dt){
     super.update(dt);
-    if(game.stage.activeFaction == this && game.stage.eventQueue.eventBatches.isEmpty){
-      takeTurn();
-    }
   }
-
+  @override
+  void startTurn() {
+    startedTurn = true;
+    takeTurn();
+  }
+  @override
+  void endTurn() {
+    startedTurn = false;
+  }
   @override
   void takeTurn(){
     debugPrint("$name takes their turn");
     game.stage.eventQueue.addEventBatch([EndTurnEvent(name)]);
+    
   }
 }
