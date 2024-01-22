@@ -82,7 +82,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     game.camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     game.camera.viewfinder.anchor = Anchor.center;
-    game.camera.viewport.add(hud);
+    game.stage.add(hud);
     game.stage.add(unitHud);
     
   }

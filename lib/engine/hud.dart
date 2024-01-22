@@ -15,9 +15,10 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(Stage.tileSize*6, Stage.tileSize*6);
-    position = Vector2(5, 5);
+    position = game.camera.viewfinder.visibleWorldRect!.topLeft.toVector2();
     anchor = Anchor.topLeft;
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*3);
+    priority = 25;
     point = TextComponent(
         text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
         position: Vector2(size.x / 2, size.y * (1 / 4)),
@@ -44,6 +45,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   @override
   void update(double dt) {
     super.update(dt);
+    position = game.camera.viewfinder.visibleWorldRect!.topLeft.toVector2();
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
@@ -105,14 +107,6 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
       isVisible = true;
     } else {isVisible = false;}
     
-  }
-
-  void resize(){
-    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
-    name.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    name.position = Vector2(size.x/2, 0);
-    hp.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    hp.position = Vector2(size.x/2, size.y/2);
   }
 
   @override
