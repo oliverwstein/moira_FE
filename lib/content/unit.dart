@@ -175,7 +175,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
-    }
+    } game.stage.tileMap[tilePosition]!.setUnit(this);
   }
 
   @override
