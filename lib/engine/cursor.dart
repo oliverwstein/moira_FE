@@ -60,8 +60,8 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
   }
   void snapToTile(Point<int> newTilePosition){
     tilePosition = newTilePosition;
-    x = newTilePosition.x * size.x;
-    y = newTilePosition.y * size.y;
+    x = newTilePosition.x * Stage.tileSize;
+    y = newTilePosition.y * Stage.tileSize;
   }
 
   @override

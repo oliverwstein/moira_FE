@@ -8,6 +8,7 @@ import 'package:moira/engine/engine.dart';
 class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent point;
   late final TextComponent terrain;
+  late final TextComponent menu;
 
   Hud();
   
@@ -19,18 +20,25 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     anchor = Anchor.topLeft;
     point = TextComponent(
         text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
-        position: Vector2(size.x / 2, size.y / 3),
+        position: Vector2(size.x / 2, 0),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     terrain = TextComponent(
         text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
-        position: Vector2(size.x / 2, size.y*2 / 3),
+        position: Vector2(size.x / 2, size.y * 1 / 3),
+        anchor: Anchor.center,
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
+      );
+    menu = TextComponent(
+        text: '',
+        position: Vector2(size.x / 2, size.y * 2 / 3),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(point);
       add(terrain);
+      add(menu);
   }
 
   @override
@@ -39,6 +47,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
+    menu.text = "(${game.stage.menuManager.last?.runtimeType})";
   }
 
   void resize(){

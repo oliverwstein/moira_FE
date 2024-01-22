@@ -10,6 +10,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   final List<Menu> _menuStack = [];
 
   bool get isNotEmpty => _menuStack.isNotEmpty;
+  Menu? get last => _menuStack.lastOrNull;
 
   void pushMenu(Menu menu) {
     add(menu);
