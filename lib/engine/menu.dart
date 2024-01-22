@@ -117,7 +117,7 @@ class MoveMenu extends Menu {
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
           game.stage.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
-          // game.stage.blankAllTiles();
+          game.stage.blankAllTiles();
           game.stage.menuManager.pushMenu(ActionMenu(unit));
         }
         return KeyEventResult.handled;
@@ -171,13 +171,14 @@ class ActionMenu extends Menu {
             unit.wait();
             game.stage.menuManager.clearStack();
             break;
-          case "Item":
+          case "Items":
             game.stage.blankAllTiles();
+            debugPrint("${actions[selectedIndex]} Chosen");
             game.stage.menuManager.pushMenu(InventoryMenu(unit));
             break;
           case "Attack":
             game.stage.blankAllTiles();
-            List<Unit> targets = unit.getTargets();
+            List<Unit> targets = unit.getTargets(unit.tilePosition);
             game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
             break;
         }

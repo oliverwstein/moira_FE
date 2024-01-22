@@ -19,9 +19,9 @@ Aideen: Please, I want as many of you to get out of this alive as possible.
 
 Midir: None of us are going anywhere, my lady. We're here for you till the very end. Even if it means our lives.
 
-Aideen: Damn you, my valiant Midir. 
+Aideen: I was afraid of that.
 <<set $left = "">>
-Aideen: ...and thank you.
+Aideen: ...and I thank you.
 <<stop>>
 ===
 

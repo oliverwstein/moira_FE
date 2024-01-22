@@ -20,19 +20,19 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     anchor = Anchor.topLeft;
     point = TextComponent(
         text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
-        position: Vector2(size.x / 2, 0),
+        position: Vector2(size.x / 2, size.y * (1 / 4)),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     terrain = TextComponent(
         text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
-        position: Vector2(size.x / 2, size.y * 1 / 3),
+        position: Vector2(size.x / 2, size.y * (2 / 4)),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     menu = TextComponent(
         text: '',
-        position: Vector2(size.x / 2, size.y * 2 / 3),
+        position: Vector2(size.x / 2, size.y * (3 / 4)),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
@@ -48,14 +48,6 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
     menu.text = "(${game.stage.menuManager.last?.runtimeType})";
-  }
-
-  void resize(){
-    size = Vector2(Stage.tileSize*6, Stage.tileSize*6);
-    point.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    point.position = Vector2(size.x / 2, size.y*1 / 3);
-    terrain.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    terrain.position = Vector2(size.x / 2, size.y*2 / 3);
   }
 
   @override

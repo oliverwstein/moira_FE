@@ -307,7 +307,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   List<String> getActions(){
     List<String> actions = [];
-    if(unit.getTargets().isNotEmpty) actions.add("Attack");
+    if(unit.getTargets(game.stage.cursor.tilePosition).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
@@ -327,7 +327,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
-  List<Unit> getTargets() {
+  List<Unit> getTargets(Point<int> tilePosition) {
     List<Unit> targets = [];
     (int, int) combatRange = getCombatRange();
     for (int range = combatRange.$1; range <= combatRange.$2; range++) {
@@ -341,6 +341,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         ];
 
         for (var point in pointsToCheck) {
+          debugPrint("Check point $point");
           if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
             Tile? tile = game.stage.tileMap[point];
             if (tile != null && tile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) {
