@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
+import 'package:flame/experimental.dart' as exp;
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -82,6 +83,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     game.camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     game.camera.viewfinder.anchor = Anchor.center;
+    game.camera.setBounds(exp.Rectangle.fromLTWH(0, 0, game.stage.playAreaSize.x, game.stage.playAreaSize.y), considerViewport: true);
     game.stage.add(hud);
     game.stage.add(unitHud);
     
