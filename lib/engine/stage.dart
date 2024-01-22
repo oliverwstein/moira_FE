@@ -12,7 +12,7 @@ import 'package:moira/content/content.dart';
 class Stage extends World with HasGameReference<MoiraGame> implements InputHandler {
   int tilesInRow = 16;
   int tilesInColumn = 14;
-  late double tileSize;
+  double tileSize = 16;
   final int mapTileWidth;
   final int mapTileHeight;
   final Point<int> initialPosition;
@@ -56,7 +56,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     await super.onLoad();
     FlameAudio.bgm.stop();
     // FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
-    calculateTileSize();
     tiles = await flame_tiled.TiledComponent.load(mapFileName, Vector2.all(tileSize));
     add(tiles);
     createTiles();
@@ -86,19 +85,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     game.camera.viewport.add(hud);
     game.stage.add(unitHud);
     
-  }
-
-  @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    calculateTileSize();
-    resizeStage();
-  }
-
-  void calculateTileSize() {
-    // Calculate tile size based on the game's canvas size
-    final gameSize = game.canvasSize;
-    tileSize = min(gameSize.x / mapTileWidth, gameSize.y / mapTileHeight);
   }
 
   void createTiles() {
@@ -136,15 +122,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     };
     // Perform the lookup and return
     return stringToTerrain[input.toLowerCase()] ?? Terrain.plain;
-  }
-
-
-  void resizeStage() {
-    tileMap.forEach((point, tile) {
-      tile.resize();
-    });
-    cursor.resize();
-    hud.resize();
   }
   void blankAllTiles(){
     for (Tile tile in tileMap.values) {
