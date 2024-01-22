@@ -187,7 +187,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       columns: 4,
       rows: 5,
     );
-    Vector2 spriteSize = Vector2(Stage.tileSize*1.25, Stage.tileSize);
+    Vector2 spriteSize = Vector2(unitImage.width/4, unitImage.height/5);
     double stepTime = .15;
     animationMap['down'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 0, stepTime: stepTime),
