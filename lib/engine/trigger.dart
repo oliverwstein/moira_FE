@@ -24,7 +24,7 @@ class Trigger extends Component {
         if (name != null) return Trigger._byName(name);
         return Trigger._dialogue(nodeName);
       case "PanEvent":
-        Point<int> destination = Point(triggerData["PanEvent"]["destination"][0], triggerData["PanEvent"]["destination"][1]);
+        Point<int>? destination = Point(triggerData["PanEvent"]["destination"][0], triggerData["PanEvent"]["destination"][1]);
         PanEvent.observers.add(event);
         String? name = triggerData["PanEvent"]["name"];
         if (name != null) return Trigger._byName(name);

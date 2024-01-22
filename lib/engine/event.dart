@@ -3,6 +3,8 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/experimental.dart';
+import 'package:flame/src/experimental/geometry/shapes/shape.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 
@@ -60,7 +62,7 @@ class DummyEvent extends Event {
 }
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
-  final Queue<List<Event>> _eventBatches = Queue<List<Event>>();
+  final Queue<List<Event>> eventBatches = Queue<List<Event>>();
   final List<Event> triggerEvents = [];
 
   @override
@@ -69,7 +71,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 
   void addEventBatch(List<Event> eventBatch) {
-    _eventBatches.add(eventBatch);
+    eventBatches.add(eventBatch);
   }
 
   List<Event> currentBatch(){
@@ -89,8 +91,8 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   @override
   void update(double dt) {
     if(currentBatch().isEmpty){
-      if(_eventBatches.isNotEmpty){
-        mountBatch(_eventBatches.removeFirst());
+      if(eventBatches.isNotEmpty){
+        mountBatch(eventBatches.removeFirst());
       }
     }
   }
@@ -246,14 +248,14 @@ class PanEvent extends Event{
   @override
   void execute() {
     super.execute();
-    game.stage.cursor.speed = 100;
     debugPrint("Event: Pan to $destination");
+    game.camera.follow(game.stage.cursor, snap: false, maxSpeed: 300);
     game.stage.cursor.moveTo(destination);
   }
   @override
   bool checkComplete() {
     if(!game.stage.cursor.isMoving){
-      game.stage.cursor.speed = 300;
+      game.camera.stop();
       return true;
     }
     return false;

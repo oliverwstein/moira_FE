@@ -7,6 +7,7 @@
 <<character Arden>>
 <<character Azel>>
 <<character Lex>>
+<<character Gandolf>>
 title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
@@ -91,5 +92,14 @@ Lex: A-ha! Face is getting red there, buddy! You little player you.
 Azel: Lex, knock it off! Now come on, let's get going.
 <<set $left = "">>
 Lex: Hahahaa...Alright, let's do this. Finally, a chance to kick some ass.
+<<stop>>
+===
+
+title: Gandolf_Midir_Prefight
+---
+<<local $left = "" as String>>
+<<local $right = "Gandolf" as String>>
+Gandolf: You dogs still haven't broken through this puny castle yet? Useless! 
+Gandolf: I'll show you how it's done.
 <<stop>>
 ===
