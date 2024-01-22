@@ -662,6 +662,21 @@
                             "turn": 1}
                         }
                     ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Gandolf_Midir_Prefight",
+                    "triggers":
+                    [
+                        {"PanEvent":
+                            {
+                            "destination": [
+                                33,
+                                22
+                            ],
+                            "name":"JungbyPanT1"}
+                        }
+                    ]
                 }
 
             ]
