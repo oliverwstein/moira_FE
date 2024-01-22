@@ -7,15 +7,18 @@ class Trigger extends Component {
   Trigger(this.check);
 
   factory Trigger.fromJson(dynamic triggerData, Event event) {
+    String? name = triggerData.keys.first["name"];
     switch (triggerData.keys.first) {
       case "StartTurnEvent":
         int turn = triggerData["StartTurnEvent"]["turn"];
         String factionName = triggerData["StartTurnEvent"]["factionName"];
         StartTurnEvent.observers.add(event);
+        if (name != null) return Trigger._byName(name);
         return Trigger._startTurn(turn, factionName);
       case "DialogueEvent":
         String nodeName = triggerData["DialogueEvent"]["nodeName"];
         DialogueEvent.observers.add(event);
+        if (name != null) return Trigger._byName(name);
         return Trigger._dialogue(nodeName);
       default:
         return Trigger._dummy();
@@ -38,4 +41,11 @@ class Trigger extends Component {
   });
 
   Trigger._dummy() : check = ((Event event) => false);
+  
+  Trigger._byName(String name) : check = ((Event event) {
+    if (event.name != null) {
+      return event.name == name;
+    }
+    return false;
+  });
 }

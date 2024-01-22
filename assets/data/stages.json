@@ -565,6 +565,7 @@
                 },
                 {
                     "type": "PanEvent",
+                    "name": "LexAzelPan",
                     "destination": [
                         38,
                         0
