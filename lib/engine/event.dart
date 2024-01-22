@@ -36,16 +36,17 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   }
 
   void dispatch() {
+    List<Event> batch = [];
     for (var observer in getObservers()) {
       debugPrint("Dispatch $this to ${observer.runtimeType}");
       if(observer.trigger!.check(this)){
         observer._isTriggered = true;
         observer._isStarted = false;
         observer._isCompleted = false;
-        game.stage.eventQueue.addEventBatch([observer]);
+        batch.add(observer);
       }
-
     }
+  game.stage.eventQueue.addEventBatch(batch);
   }
 }
 
