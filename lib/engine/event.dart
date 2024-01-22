@@ -115,7 +115,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             event = UnitCreationEvent(name, tilePosition, factionName, level:level, items:itemStrings, destination: destination, name: eventName);
             break;
           case 'DialogueEvent':
-            String bgName = eventData['bgName'];
+            String? bgName = eventData['bgName'];
             String nodeName = eventData['nodeName'];
             String? eventName = eventData['name'] ?? nodeName;
             event = DialogueEvent(nodeName, bgName: bgName, name: eventName);
@@ -223,7 +223,7 @@ class DialogueEvent extends Event{
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("DialogueEvent execution");
+    debugPrint("DialogueEvent execution $nodeName $bgName");
     menu = DialogueMenu(nodeName, bgName);
     game.stage.menuManager.pushMenu(menu);
 

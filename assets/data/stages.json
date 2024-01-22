@@ -628,6 +628,17 @@
                             "name":"LexAzelPan"}
                         }
                     ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Lex_Azel_Arrival",
+                    "triggers":
+                    [
+                        {"UnitCreationEvent":
+                            {
+                            "name":"Lex"}
+                        }
+                    ]
                 }
             ],
             [

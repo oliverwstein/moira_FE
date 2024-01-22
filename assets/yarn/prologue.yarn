@@ -5,6 +5,8 @@
 <<character Alec>>
 <<character Oifey>>
 <<character Arden>>
+<<character Azel>>
+<<character Lex>>
 title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
@@ -27,7 +29,7 @@ title: Opening_Chalphy
 ---
 <<local $left = "Sigurd" as String>>
 <<local $right = "Noish" as String>>
-Sigurd: Adean is in trouble. Gandolf's army has laid siege to Jungby Castle. 
+Sigurd: Aideen is in trouble. Gandolf's army has laid siege to Jungby Castle. 
 Sigurd: Noish, I'm going to go and see if I can do something. You're in charge while I'm gone.
 Noish: Sir...you're not planning on going alone, are you!?
 Sigurd: Grandbell's military is already en route to Isaac. There really is no one left to call on. 
@@ -63,5 +65,31 @@ Arden: Hrmph. I can live with the strong and reliable part, but leave the slow b
 Sigurd: Arden, can we count on you? You're the only who can aptly handle the castle's defense.
 Arden: Alright, I'll do it. But you gotta promise to take me to battle with you sometimes.
 Sigurd: Will do. Alright, let's make our way to the villages, and then we're off to Jungby!
+<<stop>>
+===
+
+title: Lex_Azel_Arrival
+---
+<<local $left = "Azel" as String>>
+<<local $right = "Lex" as String>>
+Azel: Lex, looks like we made it in time.
+
+Lex: Geez...Looks like Sigurd is taking on the entire Verdane army! He'll sure be happy to see us. You just can't stay out of these things, can you, Azel...
+
+Azel: Yeah, but with the military on engagement to Isaac, Grandbell's completely strapped! Sigurd and the few soldiers left in Chalphy are out here fighting for their lives! I can't just leave them hanging...
+
+Lex: Oh really...I'm not quite buying your story, Azel. What aren't you telling me?
+
+Azel:Wh-what're you talking about!?
+
+Lex: I'd surmise that you're all worked up about Lady Aideen of Jungby. I know you like her.
+
+Azel: Y-you're nuts!
+
+Lex: A-ha! Face is getting red there, buddy! You little player you.
+
+Azel: Lex, knock it off! Now come on, let's get going.
+<<set $left = "">>
+Lex: Hahahaa...Alright, let's do this. Finally, a chance to kick some ass.
 <<stop>>
 ===

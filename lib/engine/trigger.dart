@@ -29,6 +29,10 @@ class Trigger extends Component {
         String? name = triggerData["PanEvent"]["name"];
         if (name != null) return Trigger._byName(name);
         return Trigger._pan(destination);
+      case "UnitCreationEvent":
+        UnitCreationEvent.observers.add(event);
+        String name = triggerData["UnitCreationEvent"]["name"];
+        return Trigger._byName(name);
       default:
         return Trigger._dummy();
     }
