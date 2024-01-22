@@ -220,7 +220,7 @@
             [
                 {
                     "type": "DialogueEvent",
-                    "bgName": "jungby_interior_dark.png",
+                    "bgName": "jungby_interior.png",
                     "nodeName": "Opening_Jungby"
                 }
             ],
@@ -502,7 +502,7 @@
             [
                 {
                     "type": "DialogueEvent",
-                    "bgName": "jungby_interior_dark.png",
+                    "bgName": "chalphy_interior.png",
                     "nodeName": "Opening_Chalphy"
                 }
             ],
@@ -581,16 +581,16 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Azel",
-                    "unitName": "Azel",
+                    "name": "Lex",
+                    "unitName": "Lex",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
-                        41,
+                        40,
                         0
                     ],
                     "destination": [
-                        43,
+                        42,
                         3
                     ],
                     "triggers":
@@ -606,16 +606,16 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Lex",
-                    "unitName": "Lex",
+                    "name": "Azel",
+                    "unitName": "Azel",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
-                        40,
+                        41,
                         0
                     ],
                     "destination": [
-                        42,
+                        43,
                         3
                     ],
                     "triggers":

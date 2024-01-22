@@ -33,7 +33,7 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   
   @override
   Future<void> onLoad() async {
-    aspectBox = game.camera.viewfinder.visibleGameSize!;
+    aspectBox = Vector2(Stage.tileSize*game.stage.tilesInRow, Stage.tileSize*game.stage.tilesInColumn);
     position = game.camera.viewfinder.position;
     size = aspectBox;
     anchor = Anchor.center;
@@ -54,6 +54,8 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
     dBoxSprite = SpriteAnimationComponent(
       animation: dBoxSheet.createAnimation(row: speakerSide, stepTime: 0.2),
       size: Vector2(aspectBox.x, aspectBox.y*.4),
+      position: Vector2(aspectBox.x/2, aspectBox.y*.6),
+      anchor: Anchor.topCenter
     );
     add(dBoxSprite);
     
@@ -66,7 +68,7 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   }
 
   TextBoxComponent getBlankTextComponent(String type){
-    double scaler = 2.2;
+    double scaler = 1.2;
     switch (type) {
       case "dialogue":
         double width = .95;
@@ -82,11 +84,11 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
               maxWidth: aspectBox.x*width*scaler,
               timePerChar: 0.02,
               growingBox: false,
-              margins: const EdgeInsets.all(2),
+              margins: const EdgeInsets.all(5),
             ));
       case "name":
         double xPos = .5;
-        double yPos = .025;
+        double yPos = .035*scaler;
         return TextBoxComponent(
         text: "",
         textRenderer: fontRenderer,
@@ -108,17 +110,6 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
     super.onDialogueFinish();
     finished = true;
     removeFromParent();
-  }
-  @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    aspectBox = game.camera.viewfinder.visibleGameSize!;
-    fontRenderer = SpriteFontRenderer.fromFont(game.dialogueFont);
-    // if(_bgSprite != null) _bgSprite!.size = aspectBox;
-    dBoxSprite.size = Vector2(aspectBox.x, aspectBox.y/3);
-    dBoxSprite.position = Vector2(0, 2*aspectBox.y/3);
-    _dialogueTextComponent!.textRenderer = fontRenderer;
-    _nameTextComponent!.textRenderer = fontRenderer;
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -172,10 +163,10 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
     leftPortrait.sprite = game.portraitMap[left]; 
     rightPortrait.sprite = game.portraitMap[right];
     leftPortrait.anchor = Anchor.center;
-    leftPortrait.position = Vector2(aspectBox.x*.2, aspectBox.y*(2/3));
+    leftPortrait.position = Vector2(aspectBox.x*.2, aspectBox.y*.618);
     leftPortrait.size = Vector2(aspectBox.x*.2, aspectBox.y*.2);
     rightPortrait.anchor = Anchor.center;
-    rightPortrait.position = Vector2(aspectBox.x*.8, aspectBox.y*(2/3));
+    rightPortrait.position = Vector2(aspectBox.x*.8, aspectBox.y*.618);
     rightPortrait.size = Vector2(aspectBox.x*.2, aspectBox.y*.2);
     add(leftPortrait);
     add(rightPortrait);

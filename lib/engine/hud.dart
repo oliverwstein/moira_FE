@@ -8,45 +8,48 @@ import 'package:moira/engine/engine.dart';
 class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent point;
   late final TextComponent terrain;
+  late final TextComponent menu;
 
   Hud();
   
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
-    position = Vector2(5, 5);
+    position = game.camera.viewfinder.visibleWorldRect!.topLeft.toVector2();
     anchor = Anchor.topLeft;
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*3);
+    priority = 25;
     point = TextComponent(
         text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
-        position: Vector2(size.x / 2, size.y / 3),
+        position: Vector2(size.x / 2, size.y * (1 / 4)),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     terrain = TextComponent(
         text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
-        position: Vector2(size.x / 2, size.y*2 / 3),
+        position: Vector2(size.x / 2, size.y * (2 / 4)),
+        anchor: Anchor.center,
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
+      );
+    menu = TextComponent(
+        text: '',
+        position: Vector2(size.x / 2, size.y * (3 / 4)),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(point);
       add(terrain);
+      add(menu);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
+    position = game.camera.viewfinder.visibleWorldRect!.topLeft.toVector2();
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
-  }
-
-  void resize(){
-    size = Vector2(game.stage.tileSize*6, game.stage.tileSize*6);
-    point.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    point.position = Vector2(size.x / 2, size.y*1 / 3);
-    terrain.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    terrain.position = Vector2(size.x / 2, size.y*2 / 3);
+    menu.text = "(${game.stage.menuManager.last?.runtimeType})";
   }
 
   @override
@@ -68,9 +71,9 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
     anchor = Anchor.topLeft;
-    double scaler = 20/game.stage.tileSize;
+    double scaler = 20/Stage.tileSize;
     name = TextComponent(
         text: game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name,
         scale: Vector2.all(1/scaler),
@@ -89,8 +92,8 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   @override
   void update(double dt) {
     super.update(dt);
-    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
-    position = Vector2(game.stage.cursor.position.x-game.stage.cursor.size.x, game.stage.cursor.position.y - game.stage.cursor.size.y*2.2);
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
+    position = Vector2(game.stage.cursor.position.x-Stage.tileSize, game.stage.cursor.position.y - Stage.tileSize*2.2);
     bool worldCheck = game.world == game.stage;
     bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
@@ -104,14 +107,6 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
       isVisible = true;
     } else {isVisible = false;}
     
-  }
-
-  void resize(){
-    size = Vector2(game.stage.cursor.size.x*3, game.stage.cursor.size.y*2);
-    name.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    name.position = Vector2(size.x/2, 0);
-    hp.textRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    hp.position = Vector2(size.x/2, size.y/2);
   }
 
   @override

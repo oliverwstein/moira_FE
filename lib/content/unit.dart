@@ -132,7 +132,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
   
   Point<int> getTilePositionFromPosition(){
-    return Point(position.x~/game.stage.tileSize, position.y~/game.stage.tileSize);
+    return Point(position.x~/Stage.tileSize, position.y~/Stage.tileSize);
   }
 
   void snapToTile(Tile tile){
@@ -156,7 +156,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
-      double moveStep = speed*game.stage.tileSize/16;//game.stage.tileSize / dt;
+      double moveStep = speed*Stage.tileSize/16;
       if (distance < moveStep) { // Using a small threshold like 1.0 to ensure we reach the target
         tilePosition = targetTilePosition;
         position = game.stage.tileMap[targetTilePosition]!.center;
@@ -175,7 +175,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
-    }
+    } game.stage.tileMap[tilePosition]!.setUnit(this);
   }
 
   @override
@@ -187,7 +187,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       columns: 4,
       rows: 5,
     );
-    Vector2 spriteSize = Vector2(game.stage.tileSize*1.25, game.stage.tileSize);
+    Vector2 spriteSize = Vector2(unitImage.width/4, unitImage.height/5);
     double stepTime = .15;
     animationMap['down'] = SpriteAnimationComponent(
                             animation: unitSheet.createAnimation(row: 0, stepTime: stepTime),
@@ -307,7 +307,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   List<String> getActions(){
     List<String> actions = [];
-    if(unit.getTargets().isNotEmpty) actions.add("Attack");
+    if(unit.getTargets(game.stage.cursor.tilePosition).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
@@ -327,7 +327,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
-  List<Unit> getTargets() {
+  List<Unit> getTargets(Point<int> tilePosition) {
     List<Unit> targets = [];
     (int, int) combatRange = getCombatRange();
     for (int range = combatRange.$1; range <= combatRange.$2; range++) {
@@ -341,6 +341,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         ];
 
         for (var point in pointsToCheck) {
+          debugPrint("Check point $point");
           if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
             Tile? tile = game.stage.tileMap[point];
             if (tile != null && tile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) {
