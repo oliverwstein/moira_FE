@@ -34,7 +34,6 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   @override
   Future<void> onLoad() async {
     aspectBox = Vector2(Stage.tileSize*game.stage.tilesInRow, Stage.tileSize*game.stage.tilesInColumn);
-    debugPrint("aspectBox size is $aspectBox");
     position = game.camera.viewfinder.position;
     size = aspectBox;
     anchor = Anchor.center;

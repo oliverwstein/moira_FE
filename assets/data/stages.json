@@ -581,8 +581,8 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Azel",
-                    "unitName": "Azel",
+                    "name": "Lex",
+                    "unitName": "Lex",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
@@ -590,7 +590,7 @@
                         0
                     ],
                     "destination": [
-                        43,
+                        42,
                         3
                     ],
                     "triggers":
@@ -606,16 +606,16 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Lex",
-                    "unitName": "Lex",
+                    "name": "Azel",
+                    "unitName": "Azel",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
-                        40,
+                        41,
                         0
                     ],
                     "destination": [
-                        42,
+                        43,
                         3
                     ],
                     "triggers":
