@@ -578,6 +578,56 @@
                             "turn": 2}
                         }
                     ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Azel",
+                    "unitName": "Barbarian",
+                    "faction": "Sigurd",
+                    "level": -1,
+                    "tilePosition": [
+                        41,
+                        0
+                    ],
+                    "destination": [
+                        43,
+                        3
+                    ],
+                    "triggers":
+                    [
+                        {"PanEvent":
+                            {"destination": [
+                                38,
+                                0
+                            ],
+                            "name":"LexAzelPan"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Lex",
+                    "unitName": "Hunter",
+                    "faction": "Sigurd",
+                    "level": -1,
+                    "tilePosition": [
+                        40,
+                        0
+                    ],
+                    "destination": [
+                        42,
+                        3
+                    ],
+                    "triggers":
+                    [
+                        {"PanEvent":
+                            {"destination": [
+                                38,
+                                0
+                            ],
+                            "name":"LexAzelPan"}
+                        }
+                    ]
                 }
             ],
             [

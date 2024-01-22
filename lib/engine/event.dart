@@ -24,17 +24,20 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   @override 
   void update(dt){
     if(!_isStarted) {
-      dispatch();
-      execute();}
-    if(checkComplete()) removeFromParent();
+      execute();
+      debugPrint("Dispatch $runtimeType");
+      }
+    if(checkComplete()) {
+      removeFromParent();
+      dispatch();}
     
     
   }
 
   void dispatch() {
     for (var observer in getObservers()) {
+      debugPrint("$observer");
       if(observer.trigger!.check(this)){
-        debugPrint("Event $observer triggered!");
         observer._isStarted = false;
         observer._isCompleted = false;
         game.stage.eventQueue.add(observer);
@@ -73,7 +76,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   void mountBatch(List<Event> batch) {
     for (var event in batch) {
       if(event.trigger == null){
-        debugPrint("Dispatch ${event.runtimeType}");
         add(event);
       } else {
         triggerEvents.add(event);
@@ -95,7 +97,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
       List<Event> batch = [];
       for (Map eventData in eventBatch){
         Event event;
-        String? eventName = eventData['name'];
         switch (eventData['type']) {
           case 'UnitCreationEvent':
             String name = eventData['unitName'];
