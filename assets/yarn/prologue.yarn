@@ -99,6 +99,7 @@ title: Gandolf_Midir_Prefight
 ---
 <<local $left = "" as String>>
 <<local $right = "Gandolf" as String>>
-Gandolf: You dogs still haven't broken through this puny castle yet? Useless! I'll show you how it's done.
+Gandolf: You dogs still haven't broken through this puny castle yet? Useless! 
+Gandolf: I'll show you how it's done.
 <<stop>>
 ===

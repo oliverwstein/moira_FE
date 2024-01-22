@@ -53,6 +53,7 @@ class AIPlayer extends Player{
   @override
   void update(dt){
     super.update(dt);
+    if (startedTurn && game.stage.eventQueue.eventBatches.isEmpty) game.stage.eventQueue.addEventBatch([EndTurnEvent(name)]);
   }
   @override
   void startTurn() {
@@ -64,9 +65,7 @@ class AIPlayer extends Player{
     startedTurn = false;
   }
   @override
-  void takeTurn(){
+  Future<void> takeTurn() async {
     debugPrint("$name takes their turn");
-    game.stage.eventQueue.addEventBatch([EndTurnEvent(name)]);
-    
   }
 }
