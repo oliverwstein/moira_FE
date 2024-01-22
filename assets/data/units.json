@@ -134,6 +134,39 @@
     "proficiencies": ["Sword"]
     },
     {
+        "name": "Lex",
+        "faction": "blue",
+        "class": "Cavalier",
+        "level": 4,
+        "baseStats": {
+            "hp": 33,
+            "sta": 30,
+            "str": 10,
+            "def": 9,
+            "dex": 10,
+            "spe": 11,
+            "mag": 0,
+            "res": 2,
+            "wis": 2,
+            "lck": 8
+        },
+        "growths": {
+            "hp": 90,
+            "sta": 90,
+            "str": 40,
+            "def": 50,
+            "dex": 25,
+            "spe": 25,
+            "mag": 5,
+            "res": 5,
+            "wis": 10,
+            "lck": 20
+        },
+        "skills": [],
+        "items": ["Axe"],
+        "attacks": [],
+        "proficiencies": ["Axe"]},
+    {
     "name": "Brigand",
     "faction": "red",
     "class": "Brigand",
