@@ -582,7 +582,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Azel",
-                    "unitName": "Barbarian",
+                    "unitName": "Azel",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
@@ -607,7 +607,7 @@
                 {
                     "type": "UnitCreationEvent",
                     "name": "Lex",
-                    "unitName": "Hunter",
+                    "unitName": "Lex",
                     "faction": "Sigurd",
                     "level": -1,
                     "tilePosition": [
@@ -626,6 +626,17 @@
                                 0
                             ],
                             "name":"LexAzelPan"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Lex_Azel_Arrival",
+                    "triggers":
+                    [
+                        {"UnitCreationEvent":
+                            {
+                            "name":"Lex"}
                         }
                     ]
                 }

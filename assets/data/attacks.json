@@ -96,6 +96,18 @@
                 "magic": true,
                 "range": [1, 2],
                 "effects": []
+            },
+            "Fire":
+            {
+                "description" : "Fuego.",
+                "scaling" : [0.0, 0.0, 0.9, 0.2],
+                "weaponType" : ["Staff", "Book"],
+                "might": 5,
+                "hit": 10,
+                "fatigue": 1,
+                "magic": true,
+                "range": [1, 2],
+                "effects": []
             }
         }
 }
