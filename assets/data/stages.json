@@ -3,9 +3,9 @@
         "mapTileWidth": 62,
         "mapTileHeight": 31,
         "mapFileName": "Ch0.tmx",
-        "initialPosition": [
-            33,
-            22
+        "initialPoint": [
+            32,
+            24
         ],
         "events": [
             [

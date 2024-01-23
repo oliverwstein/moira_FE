@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
@@ -83,33 +84,38 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       if (!boundingBox.contains(position.toOffset())) {
         Rect playArea = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
           if(playArea.contains((position).toOffset())){
-            game.camera.moveBy(positionDelta);
+            game.camera.moveBy(positionDelta, speed: 300);
           }
       }
     }
   }
-  Vector2 centerCamera() {
-  // Calculate the centered position
-  Vector2 centeredPosition = Vector2(tilePosition.x.toDouble(), tilePosition.y.toDouble()) * Stage.tileSize;
-  centeredPosition.add(Vector2(Stage.tileSize / 2, Stage.tileSize / 2)); // Center on the tile
-
-  // Adjust for camera view size
-  centeredPosition.sub(game.camera.viewport.size / 2);
-
-  // Ensure the camera does not go outside the bounding box of the stage
-  Rect stageBounds = Rect.fromLTWH(0, 0, game.stage.mapTileWidth * Stage.tileSize, game.stage.mapTileHeight * Stage.tileSize);
-  Rect cameraBounds = Rect.fromCenter(center: centeredPosition.toOffset(), width: game.camera.viewport.size.x, height: game.camera.viewport.size.y);
-
-  // Adjust if camera bounds exceed stage bounds
-  if (!stageBounds.contains(cameraBounds.topLeft)) {
-    centeredPosition.x = max(centeredPosition.x, stageBounds.left + game.camera.viewport.size.x / 2);
-    centeredPosition.y = max(centeredPosition.y, stageBounds.top + game.camera.viewport.size.y / 2);
+  Vector2 centerCameraOn(Point<int> newTilePosition) {
+    Vector2 crudePosition = Vector2(newTilePosition.x*Stage.tileSize, newTilePosition.y*Stage.tileSize);
+    Rect playBox = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
+    Rect centeredRect = Rect.fromCenter(
+      center: crudePosition.toOffset(),
+      width: game.camera.visibleWorldRect.width,
+      height: game.camera.visibleWorldRect.height
+    );
+    double dx = 0;
+    if (centeredRect.left < playBox.left) {
+      dx = (playBox.left - centeredRect.left);
+    } else if (centeredRect.right > playBox.right) {
+      dx = (playBox.right - centeredRect.right);
+    }
+    double dy = 0;
+    if (centeredRect.top < playBox.top) {
+      dy = (playBox.top - centeredRect.top);
+    } else if (centeredRect.bottom > playBox.bottom) {
+      dy = (playBox.bottom - centeredRect.bottom);
+    }
+    debugPrint("($dx, $dy)");
+    Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
+    Point<int> centeredPoint = Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize);
+    debugPrint("Point to center at: $centeredPoint");
+    game.camera.moveTo(centeredPosition, speed: 300);
+    return centeredPosition;
+    
+    
   }
-  if (!stageBounds.contains(cameraBounds.bottomRight)) {
-    centeredPosition.x = min(centeredPosition.x, stageBounds.right - game.camera.viewport.size.x / 2);
-    centeredPosition.y = min(centeredPosition.y, stageBounds.bottom - game.camera.viewport.size.y / 2);
-  }
-  return centeredPosition;
-}
-
 }

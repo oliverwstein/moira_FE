@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/src/experimental/geometry/shapes/shape.dart';
 import 'package:flutter/widgets.dart';
@@ -244,6 +245,7 @@ class DialogueEvent extends Event{
 class PanEvent extends Event{
   static List<Event> observers = [];
   final Point<int> destination;
+  late final Vector2 centeredPosition;
   PanEvent(this.destination, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() => observers;
@@ -251,12 +253,14 @@ class PanEvent extends Event{
   void execute() {
     super.execute();
     debugPrint("Event: Pan to $destination");
-    // game.camera.moveTo(game.stage.tileMap[destination]!.position, speed: 300);
-    game.stage.cursor.moveTo(destination);
+    game.stage.cursor.snapToTile(destination);
+    centeredPosition = game.stage.cursor.centerCameraOn(destination);
+    
+    
   }
   @override
   bool checkComplete() {
-    if(!game.stage.cursor.isMoving){
+    if(absoluteError(centeredPosition, game.camera.viewfinder.position) < 1){
       return true;
     }
     return false;
