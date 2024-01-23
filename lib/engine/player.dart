@@ -72,8 +72,9 @@ class AIPlayer extends Player{
     super.takeTurn();
     for (var unit in game.stage.activeFaction!.units) {
       if (unit.canAct) {
-        // game.stage.cursor.snapToTile(unit.tilePosition);
-        await Future.delayed(const Duration(milliseconds: 250));
+        game.camera.moveTo(unit.position, speed: 400);
+        game.stage.cursor.moveTo(unit.tilePosition);
+        await Future.delayed(const Duration(milliseconds: 100));
         unit.wait();
       }
     }

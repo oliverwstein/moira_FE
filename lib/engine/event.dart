@@ -291,21 +291,11 @@ class TakeTurnEvent extends Event{
   Future<void> execute() async {
     super.execute();
     debugPrint("TakeTurnEvent: Take ${game.stage.turn} for $factionName");
-    for (var unit in game.stage.activeFaction!.units) {
-      if (unit.canAct) {
-        // game.stage.cursor.snapToTile(unit.tilePosition);
-        await Future.delayed(const Duration(milliseconds: 250));
-        unit.wait();
-      }
-    }
+    game.stage.activeFaction!.takeTurn();
+    _isCompleted = true;
+    debugPrint("TakeTurnEvent Complete");
   }
-  @override
-  bool checkComplete() {
-    if(game.stage.activeFaction!.unitsAllMoved()){
-      return true;
-    }
-    return false;
-  } 
+
 }
 
 class EndTurnEvent extends Event{
@@ -328,8 +318,9 @@ class EndTurnEvent extends Event{
       }
     } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
     game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
-    game.eventQueue.addEventBatch([StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn)]);
     _isCompleted = true;
+    game.eventQueue.addEventBatch([StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn)]);
+    
   }
 }
 
