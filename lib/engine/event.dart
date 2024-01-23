@@ -20,6 +20,8 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void execute(){
     _isStarted = true;
     if (trigger != null) debugPrint("Trigger found!");
+    dispatch();
+
   }
 
   List<Event> getObservers();
@@ -28,11 +30,10 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void update(dt){
     if(!_isStarted) {
       execute();
-      debugPrint("Dispatch $runtimeType");
       }
     if(checkComplete()) {
       removeFromParent();
-      dispatch();}
+      }
     
     
   }
@@ -40,7 +41,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void dispatch() {
     List<Event> batch = [];
     for (var observer in getObservers()) {
-      debugPrint("Dispatch $this to ${observer.runtimeType}");
+      debugPrint("Dispatch $name to ${observer.runtimeType}");
       if(observer.trigger!.check(this)){
         observer._isTriggered = true;
         observer._isStarted = false;
@@ -249,13 +250,12 @@ class PanEvent extends Event{
   void execute() {
     super.execute();
     debugPrint("Event: Pan to $destination");
-    game.camera.follow(game.stage.cursor, snap: false, maxSpeed: 300);
+    game.camera.moveTo(game.stage.tileMap[destination]!.position, speed: 300);
     game.stage.cursor.moveTo(destination);
   }
   @override
   bool checkComplete() {
     if(!game.stage.cursor.isMoving){
-      game.camera.stop();
       return true;
     }
     return false;
@@ -276,7 +276,33 @@ class StartTurnEvent extends Event{
     game.stage.activeFaction = game.stage.factionMap[factionName];
     game.stage.activeFaction!.startTurn();
     _isCompleted = true;
+    
   }
+}
+
+class TakeTurnEvent extends Event{
+  static List<Event> observers = [];
+  String factionName;
+  TakeTurnEvent(this.factionName, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() => observers;
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("TakeTurnEvent: Take ${game.stage.turn} for $factionName");
+    for (var unit in game.stage.activeFaction!.units) {
+      if (unit.canAct) {
+        // game.stage.cursor.snapToTile(unit.tilePosition);
+        await Future.delayed(const Duration(milliseconds: 250));
+        unit.wait();
+      }
+    }
+  }
+  @override
+  bool checkComplete() {
+    if(game.stage.activeFaction!.unitsAllMoved()) return true;
+    return false;
+  } 
 }
 
 class EndTurnEvent extends Event{
@@ -299,7 +325,7 @@ class EndTurnEvent extends Event{
       }
     } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
     game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
-    game.stage.eventQueue.add(StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn));
+    game.stage.eventQueue.addEventBatch([StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn)]);
     _isCompleted = true;
   }
 }
@@ -328,5 +354,23 @@ class FactionCreationEvent extends Event{
     }
     game.stage.turnOrder[type.order].add(player);
     _isCompleted = true;
+  }
+}
+
+class CombatEvent extends Event {
+  static List<Event> observers = [];
+  final Unit attacker;
+  final Unit defender;
+  CombatEvent(this.attacker, this.defender, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+  }
+  @override
+  bool checkComplete() {
+    return true;
   }
 }
