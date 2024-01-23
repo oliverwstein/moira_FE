@@ -75,13 +75,13 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   }
   void getCamera() {
     debugPrint("Get stage camera");
-    game.camera;
     game.camera.world = this;
     game.camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
     game.camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
     game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
     game.camera.viewfinder.anchor = Anchor.center;
-    game.camera.setBounds(exp.Rectangle.fromLTWH(0, 0, game.stage.playAreaSize.x, game.stage.playAreaSize.y), considerViewport: true);
+    // game.camera.setBounds(exp.Rectangle.fromLTWH(game.stage.tiles.absoluteTopLeftPosition.x, game.stage.tiles.absoluteTopLeftPosition.y, game.stage.playAreaSize.x+Stage.tileSize, game.stage.playAreaSize.y+Stage.tileSize), considerViewport: true);
+    // game.camera.follow(cursor);
     game.stage.add(hud);
     game.stage.add(unitHud);
     

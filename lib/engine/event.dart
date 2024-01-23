@@ -251,7 +251,7 @@ class PanEvent extends Event{
   void execute() {
     super.execute();
     debugPrint("Event: Pan to $destination");
-    game.camera.moveTo(game.stage.tileMap[destination]!.position, speed: 300);
+    // game.camera.moveTo(game.stage.tileMap[destination]!.position, speed: 300);
     game.stage.cursor.moveTo(destination);
   }
   @override

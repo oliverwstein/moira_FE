@@ -88,5 +88,28 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       }
     }
   }
+  Vector2 centerCamera() {
+  // Calculate the centered position
+  Vector2 centeredPosition = Vector2(tilePosition.x.toDouble(), tilePosition.y.toDouble()) * Stage.tileSize;
+  centeredPosition.add(Vector2(Stage.tileSize / 2, Stage.tileSize / 2)); // Center on the tile
+
+  // Adjust for camera view size
+  centeredPosition.sub(game.camera.viewport.size / 2);
+
+  // Ensure the camera does not go outside the bounding box of the stage
+  Rect stageBounds = Rect.fromLTWH(0, 0, game.stage.mapTileWidth * Stage.tileSize, game.stage.mapTileHeight * Stage.tileSize);
+  Rect cameraBounds = Rect.fromCenter(center: centeredPosition.toOffset(), width: game.camera.viewport.size.x, height: game.camera.viewport.size.y);
+
+  // Adjust if camera bounds exceed stage bounds
+  if (!stageBounds.contains(cameraBounds.topLeft)) {
+    centeredPosition.x = max(centeredPosition.x, stageBounds.left + game.camera.viewport.size.x / 2);
+    centeredPosition.y = max(centeredPosition.y, stageBounds.top + game.camera.viewport.size.y / 2);
+  }
+  if (!stageBounds.contains(cameraBounds.bottomRight)) {
+    centeredPosition.x = min(centeredPosition.x, stageBounds.right - game.camera.viewport.size.x / 2);
+    centeredPosition.y = min(centeredPosition.y, stageBounds.bottom - game.camera.viewport.size.y / 2);
+  }
+  return centeredPosition;
+}
 
 }

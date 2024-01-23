@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -13,10 +14,11 @@ class TitleCard extends World with HasGameReference<MoiraGame> implements InputH
     _spriteComponent = SpriteComponent.fromImage(game.images.fromCache('title_card.png'));
     add(_spriteComponent);
     _spriteComponent.anchor = Anchor.center;
-    _spriteComponent.size = game.canvasSize;
+    // _spriteComponent.size = game.canvasSize;
     debugPrint("Await Stage!");
     game.stage = await Stage.fromJson('Prologue'); // Load the Stage asynchronously
     debugPrint("Stage is initialized!");
+    game.camera.viewport = FixedAspectRatioViewport(aspectRatio: 16/14); //Vital
    _loadCompleter.complete();
   }
 
