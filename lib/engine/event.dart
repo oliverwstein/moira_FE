@@ -29,7 +29,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void update(dt){
     if(!_isStarted) {
       execute();
-      game.eventQueue.addEventBatch(dispatch());
+      game.eventQueue.addEventBatchToHead(dispatch());
       }
     if(checkComplete()) {
       removeFromParent();
@@ -72,6 +72,9 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 
   void addEventBatch(List<Event> eventBatch) {
     eventBatches.add(eventBatch);
+  }
+  void addEventBatchToHead(List<Event> eventBatch) {
+    eventBatches.addFirst(eventBatch);
   }
 
   List<Event> currentBatch(){

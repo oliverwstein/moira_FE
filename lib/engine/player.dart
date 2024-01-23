@@ -56,16 +56,11 @@ class AIPlayer extends Player{
   @override
   void update(dt){
     super.update(dt);
-    if(game.stage.activeFaction == this){
-      if(unitsAllMoved()) game.eventQueue.addEventBatch([EndTurnEvent(name)]);
-      // if(game.stage.eventQueue.currentBatch().isEmpty) {
-      //   game.stage.eventQueue.addEventBatch([TakeTurnEvent(name)]);
-      // }
-    }
   }
   @override
   void startTurn() {
     super.startTurn();
+    game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   @override
   void endTurn() {
@@ -82,5 +77,6 @@ class AIPlayer extends Player{
         unit.wait();
       }
     }
+    game.eventQueue.addEventBatch([EndTurnEvent(name)]);
   }
 }
