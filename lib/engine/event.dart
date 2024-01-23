@@ -20,7 +20,6 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void execute(){
     _isStarted = true;
     if (trigger != null) debugPrint("Trigger found!");
-    dispatch();
 
   }
 
@@ -30,6 +29,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void update(dt){
     if(!_isStarted) {
       execute();
+      game.eventQueue.addEventBatch(dispatch());
       }
     if(checkComplete()) {
       removeFromParent();
@@ -38,7 +38,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
     
   }
 
-  void dispatch() {
+  List<Event> dispatch() {
     List<Event> batch = [];
     for (var observer in getObservers()) {
       debugPrint("Dispatch $name to ${observer.runtimeType}");
@@ -49,7 +49,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
         batch.add(observer);
       }
     }
-  game.stage.eventQueue.addEventBatch(batch);
+  return batch;
   }
 }
 
@@ -64,7 +64,6 @@ class DummyEvent extends Event {
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
   final Queue<List<Event>> eventBatches = Queue<List<Event>>();
-  final List<Event> triggerEvents = [];
 
   @override
   void onLoad() {
@@ -84,7 +83,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
       if(event.trigger == null){add(event);}
       else {
         if(event._isTriggered){ add(event);}
-        else {triggerEvents.add(event);} 
       }
     }
   }
@@ -189,7 +187,7 @@ class UnitCreationEvent extends Event{
     _isCompleted = true;
     if (destination != null) {
       var moveEvent = UnitMoveEvent(unit, destination!, name: name);
-      game.stage.eventQueue.add(moveEvent);
+      game.eventQueue.add(moveEvent);
     } else {
       destination = tilePosition;
     }
@@ -274,9 +272,9 @@ class StartTurnEvent extends Event{
     super.execute();
     debugPrint("StartTurnEvent: Start $turn for $factionName");
     game.stage.activeFaction = game.stage.factionMap[factionName];
-    game.stage.activeFaction!.startTurn();
+    await Future.delayed(const Duration(milliseconds: 500));
     _isCompleted = true;
-    
+    game.stage.activeFaction!.startTurn();
   }
 }
 
@@ -300,7 +298,9 @@ class TakeTurnEvent extends Event{
   }
   @override
   bool checkComplete() {
-    if(game.stage.activeFaction!.unitsAllMoved()) return true;
+    if(game.stage.activeFaction!.unitsAllMoved()){
+      return true;
+    }
     return false;
   } 
 }
@@ -325,7 +325,7 @@ class EndTurnEvent extends Event{
       }
     } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
     game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
-    game.stage.eventQueue.addEventBatch([StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn)]);
+    game.eventQueue.addEventBatch([StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn)]);
     _isCompleted = true;
   }
 }

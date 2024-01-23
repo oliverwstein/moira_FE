@@ -57,11 +57,10 @@ class AIPlayer extends Player{
   void update(dt){
     super.update(dt);
     if(game.stage.activeFaction == this){
-
-      if (game.stage.eventQueue.eventBatches.isEmpty) {
-        game.stage.eventQueue.addEventBatch([TakeTurnEvent(name)]);
-        if(unitsAllMoved()) game.stage.eventQueue.addEventBatch([EndTurnEvent(name)]);
-      };
+      if(unitsAllMoved()) game.eventQueue.addEventBatch([EndTurnEvent(name)]);
+      // if(game.stage.eventQueue.currentBatch().isEmpty) {
+      //   game.stage.eventQueue.addEventBatch([TakeTurnEvent(name)]);
+      // }
     }
   }
   @override
@@ -76,5 +75,12 @@ class AIPlayer extends Player{
   @override
   Future<void> takeTurn() async {
     super.takeTurn();
+    for (var unit in game.stage.activeFaction!.units) {
+      if (unit.canAct) {
+        // game.stage.cursor.snapToTile(unit.tilePosition);
+        await Future.delayed(const Duration(milliseconds: 250));
+        unit.wait();
+      }
+    }
   }
 }

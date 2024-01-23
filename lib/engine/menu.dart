@@ -116,7 +116,7 @@ class MoveMenu extends Menu {
       case LogicalKeyboardKey.keyA:
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
-          game.stage.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
+          game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
           game.stage.blankAllTiles();
           game.stage.menuManager.pushMenu(ActionMenu(unit));
         }
@@ -272,7 +272,7 @@ class StageMenu extends Menu {
         switch (options[selectedIndex]){
           case "End Turn":
             // End the turn, then close.
-            game.stage.eventQueue.add(EndTurnEvent(game.stage.activeFaction!.name));
+            game.eventQueue.add(EndTurnEvent(game.stage.activeFaction!.name));
             close();
             break;
           case "Save Game":

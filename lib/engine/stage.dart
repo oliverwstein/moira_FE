@@ -30,10 +30,10 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   late final UnitHud unitHud;
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
-  EventQueue eventQueue;
-  Stage(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName, this.eventQueue);
+  dynamic data;
+  Stage(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName, this.data);
 
-  Stage._internal(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName, this.eventQueue);
+  Stage._internal(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName, this.data);
 
   // Static async method to create an instance from JSON
   static Future<Stage> fromJson(String mapFileName) async {
@@ -46,11 +46,9 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     final Point<int> initialPosition = Point(data['initialPosition'][0], data['initialPosition'][1]);
 
     final tmxFile = data['mapFileName'] as String;
-    final EventQueue eventQueue = EventQueue();
-    eventQueue.loadEventsFromJson(data['events']);
 
     // Create and return a new instance
-    return Stage._internal(mapTileWidth, mapTileHeight, initialPosition, tmxFile, eventQueue);
+    return Stage._internal(mapTileWidth, mapTileHeight, initialPosition, tmxFile, data);
   }
   @override
   Future<void> onLoad() async {
@@ -66,7 +64,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     hud = Hud();
     unitHud = UnitHud();
     unitHud.priority = 20;
-    add(eventQueue);
+    game.eventQueue.loadEventsFromJson(data['events']);
     menuManager = MenuManager();
     menuManager.priority = 20;
     add(menuManager);
