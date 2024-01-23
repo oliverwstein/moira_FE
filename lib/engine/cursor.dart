@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
@@ -83,10 +84,35 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       if (!boundingBox.contains(position.toOffset())) {
         Rect playArea = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
           if(playArea.contains((position).toOffset())){
-            game.camera.moveBy(positionDelta);
+            game.camera.moveBy(positionDelta, speed: 300);
           }
       }
     }
   }
-
+  Vector2 centerCameraOn(Point<int> newTilePosition) {
+    Vector2 crudePosition = Vector2(newTilePosition.x*Stage.tileSize, newTilePosition.y*Stage.tileSize);
+    Rect playBox = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
+    Rect centeredRect = Rect.fromCenter(
+      center: crudePosition.toOffset(),
+      width: game.camera.visibleWorldRect.width,
+      height: game.camera.visibleWorldRect.height
+    );
+    double dx = 0;
+    if (centeredRect.left < playBox.left) {
+      dx = (playBox.left - centeredRect.left);
+    } else if (centeredRect.right > playBox.right) {
+      dx = (playBox.right - centeredRect.right);
+    }
+    double dy = 0;
+    if (centeredRect.top < playBox.top) {
+      dy = (playBox.top - centeredRect.top);
+    } else if (centeredRect.bottom > playBox.bottom) {
+      dy = (playBox.bottom - centeredRect.bottom);
+    }
+    Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
+    game.camera.moveTo(centeredPosition, speed: 300);
+    return centeredPosition;
+    
+    
+  }
 }

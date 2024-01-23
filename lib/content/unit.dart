@@ -252,18 +252,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
           }
-          debugPrint("$name equipped ${item.name} as ${item.type}");
+          // debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         case ItemType.gear:
           gear = item;
-          debugPrint("$name equipped ${item.name} as ${item.type}");
+          // debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         case ItemType.treasure:
           treasure = item;
-          debugPrint("$name equipped ${item.name} as ${item.type}");
+          // debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         default:
-          debugPrint("$name can't equip ${item.name}");
+          // debugPrint("$name can't equip ${item.name}");
           break;
       }
     
@@ -341,7 +341,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         ];
 
         for (var point in pointsToCheck) {
-          debugPrint("Check point $point");
           if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
             Tile? tile = game.stage.tileMap[point];
             if (tile != null && tile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) {

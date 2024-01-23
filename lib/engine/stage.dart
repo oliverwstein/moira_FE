@@ -16,7 +16,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   static double tileSize = 16;
   final int mapTileWidth;
   final int mapTileHeight;
-  final Point<int> initialPosition;
+  final Point<int> initialPoint;
   final String mapFileName;
   final Map<Point<int>, Tile> tileMap = {};
   Player? activeFaction;
@@ -31,9 +31,9 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   late Vector2 playAreaSize;
   late final flame_tiled.TiledComponent tiles;
   dynamic data;
-  Stage(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName, this.data);
+  Stage(this.mapTileWidth, this.mapTileHeight, this.initialPoint, this.mapFileName, this.data);
 
-  Stage._internal(this.mapTileWidth, this.mapTileHeight, this.initialPosition, this.mapFileName, this.data);
+  Stage._internal(this.mapTileWidth, this.mapTileHeight, this.initialPoint, this.mapFileName, this.data);
 
   // Static async method to create an instance from JSON
   static Future<Stage> fromJson(String mapFileName) async {
@@ -43,22 +43,23 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
 
     final mapTileWidth = data['mapTileWidth'] as int;
     final mapTileHeight = data['mapTileHeight'] as int;
-    final Point<int> initialPosition = Point(data['initialPosition'][0], data['initialPosition'][1]);
+    final Point<int> initialPoint = Point(data['initialPoint'][0], data['initialPoint'][1]);
 
     final tmxFile = data['mapFileName'] as String;
 
     // Create and return a new instance
-    return Stage._internal(mapTileWidth, mapTileHeight, initialPosition, tmxFile, data);
+    return Stage._internal(mapTileWidth, mapTileHeight, initialPoint, tmxFile, data);
   }
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     FlameAudio.bgm.stop();
-    // FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
+    FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
+    playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     tiles = await flame_tiled.TiledComponent.load(mapFileName, Vector2.all(tileSize));
     add(tiles);
     createTiles();
-    cursor = Cursor(initialPosition);
+    cursor = Cursor(initialPoint);
     cursor.priority = 10;
     add(cursor);
     hud = Hud();
@@ -68,20 +69,17 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     menuManager = MenuManager();
     menuManager.priority = 20;
     add(menuManager);
-    playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     getCamera();
     children.register<Unit>();
     children.register<Player>();
   }
   void getCamera() {
     debugPrint("Get stage camera");
-    game.camera;
     game.camera.world = this;
     game.camera.viewport = FixedAspectRatioViewport(aspectRatio: tilesInRow/tilesInColumn); //Vital
     game.camera.viewfinder.visibleGameSize = Vector2(tilesInRow*tileSize, tilesInColumn*tileSize);
-    game.camera.viewfinder.position = Vector2(initialPosition.x*tileSize, initialPosition.y*tileSize);
+    game.camera.viewfinder.position = Vector2(initialPoint.x*tileSize, initialPoint.y*tileSize);
     game.camera.viewfinder.anchor = Anchor.center;
-    game.camera.setBounds(exp.Rectangle.fromLTWH(0, 0, game.stage.playAreaSize.x, game.stage.playAreaSize.y), considerViewport: true);
     game.stage.add(hud);
     game.stage.add(unitHud);
     
@@ -133,7 +131,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
     if(menuManager.isNotEmpty){
-      debugPrint("StageHandler: Input routed to MenuManager.");
       return menuManager.handleKeyEvent(key, keysPressed);
     }
     if (key is RawKeyDownEvent && !cursor.isMoving) {

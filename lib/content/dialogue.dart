@@ -178,7 +178,7 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   }
   Future<void> _advance(DialogueLine line) {
     var characterName = line.character?.name ?? '';
-    debugPrint('$characterName: ${line.text}');
+    // debugPrint('$characterName: ${line.text}');
     return _forwardCompleter.future;
   }
 }
