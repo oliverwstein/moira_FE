@@ -17,6 +17,10 @@ class Player extends Component with HasGameReference<MoiraGame>{
   void takeTurn(){
     debugPrint("$name takes their turn");
   }
+  bool unitsAllMoved(){
+    if (units.every((unit) => unit.canAct == false)) return true;
+    return false;
+  }
 
   void startTurn() {
   }
@@ -48,24 +52,32 @@ class Player extends Component with HasGameReference<MoiraGame>{
 }
 
 class AIPlayer extends Player{
-  bool startedTurn = false;
   AIPlayer(String name, FactionType factionType) : super(name, factionType);
   @override
   void update(dt){
     super.update(dt);
-    if (startedTurn && game.stage.eventQueue.eventBatches.isEmpty) game.stage.eventQueue.addEventBatch([EndTurnEvent(name)]);
   }
   @override
   void startTurn() {
-    startedTurn = true;
-    takeTurn();
+    super.startTurn();
+    game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   @override
   void endTurn() {
-    startedTurn = false;
+    super.endTurn();
   }
+
   @override
   Future<void> takeTurn() async {
-    debugPrint("$name takes their turn");
+    super.takeTurn();
+    for (var unit in game.stage.activeFaction!.units) {
+      if (unit.canAct) {
+        game.camera.moveTo(unit.position, speed: 400);
+        game.stage.cursor.moveTo(unit.tilePosition);
+        await Future.delayed(const Duration(milliseconds: 100));
+        unit.wait();
+      }
+    }
+    game.eventQueue.addEventBatch([EndTurnEvent(name)]);
   }
 }

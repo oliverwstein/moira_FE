@@ -15,6 +15,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   late TitleCard titleCard;
   late SpriteFont dialogueFont;
   late SpriteFont hudFont;
+  final EventQueue eventQueue = EventQueue();
   Map<String, Sprite> portraitMap = {};
   static late Map<String, dynamic> unitMap;
   static late Map<String, dynamic> itemMap;
@@ -100,6 +101,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     attackMap = await loadAttacksData();
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
+    add(eventQueue);
 
     
     
