@@ -211,7 +211,7 @@ class UnitMoveEvent extends Event {
   @override
   void execute() {
     super.execute();
-    debugPrint("Event: Move unit ${unit.name}");
+    debugPrint("UnitMoveEvent: Move unit ${unit.name}");
     unit.moveTo(tilePosition);
   }
   @override
@@ -252,7 +252,7 @@ class PanEvent extends Event{
   @override
   void execute() {
     super.execute();
-    debugPrint("Event: Pan to $destination");
+    debugPrint("PanEvent: Pan to $destination");
     game.stage.cursor.snapToTile(destination);
     centeredPosition = game.stage.cursor.centerCameraOn(destination);
     
@@ -297,7 +297,6 @@ class TakeTurnEvent extends Event{
     debugPrint("TakeTurnEvent: Take ${game.stage.turn} for $factionName");
     game.stage.activeFaction!.takeTurn();
     _isCompleted = true;
-    debugPrint("TakeTurnEvent Complete");
   }
 
 }

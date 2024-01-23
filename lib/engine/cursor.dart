@@ -109,10 +109,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     } else if (centeredRect.bottom > playBox.bottom) {
       dy = (playBox.bottom - centeredRect.bottom);
     }
-    debugPrint("($dx, $dy)");
     Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
-    Point<int> centeredPoint = Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize);
-    debugPrint("Point to center at: $centeredPoint");
     game.camera.moveTo(centeredPosition, speed: 300);
     return centeredPosition;
     
