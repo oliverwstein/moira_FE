@@ -18,11 +18,9 @@ class Trigger extends Component {
         if (name != null) return Trigger._byName(name);
         return Trigger._startTurn(turn, factionName);
       case "DialogueEvent":
-        String nodeName = triggerData["DialogueEvent"]["nodeName"];
+        String name = triggerData["DialogueEvent"]["nodeName"] ?? triggerData["DialogueEvent"]["name"];
         DialogueEvent.observers.add(event);
-        String? name = triggerData["DialogueEvent"]["name"];
-        if (name != null) return Trigger._byName(name);
-        return Trigger._dialogue(nodeName);
+        return Trigger._byName(name);
       case "PanEvent":
         Point<int>? destination = Point(triggerData["PanEvent"]["destination"][0], triggerData["PanEvent"]["destination"][1]);
         PanEvent.observers.add(event);
