@@ -354,11 +354,12 @@ class FactionCreationEvent extends Event{
   }
 }
 
-class CombatEvent extends Event {
+class StartCombatEvent extends Event {
   static List<Event> observers = [];
   final Unit attacker;
   final Unit defender;
-  CombatEvent(this.attacker, this.defender, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  Attack attack;
+  StartCombatEvent(this.attacker, this.defender, this.attack, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() => observers;
 
