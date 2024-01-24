@@ -60,6 +60,7 @@ class AIPlayer extends Player{
   @override
   void startTurn() {
     super.startTurn();
+    debugPrint("AIPlayer: startTurn for $name");
     game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   @override

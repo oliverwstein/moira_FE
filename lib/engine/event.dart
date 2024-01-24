@@ -277,7 +277,7 @@ class StartTurnEvent extends Event{
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("StartTurnEvent: Start $turn for $factionName");
+    debugPrint("StartTurnEvent: Start turn $turn for $factionName");
     game.stage.activeFaction = game.stage.factionMap[factionName];
     await Future.delayed(const Duration(milliseconds: 500));
     _isCompleted = true;

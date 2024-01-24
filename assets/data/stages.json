@@ -25,7 +25,7 @@
                     "type": "FactionCreationEvent",
                     "factionType": "green",
                     "factionName": "Jungby",
-                    "human": true
+                    "human": false
                 }
             ],
             [
@@ -234,6 +234,10 @@
                     "unitName": "Midir",
                     "faction": "Jungby",
                     "tilePosition": [
+                        32,
+                        24
+                    ], 
+                    "destination": [
                         32,
                         23
                     ], 
