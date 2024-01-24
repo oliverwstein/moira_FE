@@ -54,7 +54,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   Future<void> onLoad() async {
     await super.onLoad();
     FlameAudio.bgm.stop();
-    FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
+    // FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     tiles = await flame_tiled.TiledComponent.load(mapFileName, Vector2.all(tileSize));
     add(tiles);

@@ -279,6 +279,37 @@
             "wis": 0,
             "lck": 2
         }
+    },
+    "Bow Knight": {
+        "description": "A mounted archer.",
+        "movementRange": 8,
+        "skills": ["Canto"],
+        "attacks": [],
+        "proficiencies": ["Bow"],
+        "growths": {
+            "hp": 80,
+            "sta": 60,
+            "str": 30,
+            "def": 20,
+            "dex": 40,
+            "spe": 40,
+            "mag": 5,
+            "res": 5,
+            "wis": 10,
+            "lck": 10
+        },
+        "baseStats": {
+            "hp": 30,
+            "sta": 25,
+            "str": 7,
+            "def": 6,
+            "dex": 6,
+            "spe": 6,
+            "mag": 0,
+            "res": 1,
+            "wis": 1,
+            "lck": 5
+        }
     }
     }
 }

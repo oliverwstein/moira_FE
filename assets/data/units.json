@@ -202,6 +202,40 @@
         "proficiencies": ["Staff", "Book"]
     },
     {
+        "name": "Midir",
+        "faction": "green",
+        "class": "Bow Knight",
+        "level": 2,
+        "baseStats": {
+            "hp": 32,
+            "sta": 30,
+            "str": 9,
+            "def": 7,
+            "dex": 8,
+            "spe": 10,
+            "mag": 0,
+            "res": 2,
+            "wis": 2,
+            "lck": 4
+        },
+        "growths": {
+            "hp": 60,
+            "sta": 70,
+            "str": 30,
+            "def": 30,
+            "dex": 35,
+            "spe": 40,
+            "mag": 5,
+            "res": 5,
+            "wis": 20,
+            "lck": 10
+        },
+        "skills": [],
+        "items": ["Bow"],
+        "attacks": [],
+        "proficiencies": ["Bow"]
+    },
+    {
     "name": "Brigand",
     "faction": "red",
     "class": "Brigand",

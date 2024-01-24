@@ -11,7 +11,7 @@
             [
                 {
                     "type": "FactionCreationEvent",
-                    "factionType": "Sigurd",
+                    "factionType": "blue",
                     "factionName": "Sigurd",
                     "human": true
                 },
@@ -20,6 +20,12 @@
                     "factionType": "red",
                     "factionName": "Evans",
                     "human": false
+                },
+                {
+                    "type": "FactionCreationEvent",
+                    "factionType": "green",
+                    "factionName": "Jungby",
+                    "human": true
                 }
             ],
             [
@@ -222,6 +228,22 @@
                     "type": "DialogueEvent",
                     "bgName": "jungby_interior.png",
                     "nodeName": "Opening_Jungby"
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Midir",
+                    "faction": "Jungby",
+                    "tilePosition": [
+                        33,
+                        24
+                    ], 
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {"name": "Opening_Jungby"}
+                        }
+                    ]
+
                 }
             ],
             [
