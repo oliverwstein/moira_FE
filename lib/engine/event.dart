@@ -356,19 +356,116 @@ class FactionCreationEvent extends Event{
 
 class StartCombatEvent extends Event {
   static List<Event> observers = [];
-  final Unit attacker;
-  final Unit defender;
-  Attack attack;
-  StartCombatEvent(this.attacker, this.defender, this.attack, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  final Combat combat;
+  StartCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() => observers;
 
   @override
   Future<void> execute() async {
     super.execute();
+    debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    game.eventQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender, combat.attack)]);
+    Attack? counterAttack = combat.defender.getCounter(combat.getCombatDistance());
+    if(counterAttack != null) {
+      game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker, counterAttack)]);}
+    combat.addFollowUp();
+    _isCompleted = true;
   }
+}
+
+class AttackEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  final Unit unit;
+  final Unit target;
+  Attack attack;
+  AttackEvent(this.combat, this.unit, this.target, this.attack, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  bool checkComplete() {
-    return true;
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("AttackEvent: ${unit.name} against ${target.name}");
+    Random rng = Random();
+    var vals = unit.attackCalc(attack, target);
+    if (vals.accuracy > 0) {
+      if (rng.nextInt(100) + 1 <= vals.accuracy) {
+        // Attack hits
+        game.eventQueue.addEventBatchToHead([HitEvent(combat, unit, target, vals.critRate)]);
+      } else {
+        game.eventQueue.addEventBatchToHead([MissEvent(combat, unit, target)]);
+      }
+    }
+  }
+}
+
+class HitEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  final Unit unit;
+  final Unit target;
+  final int critRate;
+  
+  HitEvent(this.combat, this.unit, this.target, this.critRate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("HitEvent: ${unit.name} against ${target.name}");
+    game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
+
+  }
+}
+
+class MissEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  final Unit unit;
+  final Unit target;
+  
+  MissEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("MissEvent: ${unit.name} against ${target.name}");
+  }
+}
+
+class CritEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  final Unit unit;
+  final Unit target;
+  
+  CritEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("CritEvent: ${unit.name} against ${target.name}");
+  }
+}
+
+class DamageEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  final Unit unit;
+  DamageEvent(this.combat, this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("DamageEvent: ${unit.name} takes ${combat.damage} damage.");
   }
 }

@@ -378,4 +378,14 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
     return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
   }
+
+  Attack? getCounter(int combatDistance) {
+    // For now, just return the first attack in attackSet within combat range, if any.
+    for (Attack attack in attackSet.values){
+      if(attack.range.$1<=combatDistance && attack.range.$2 >=combatDistance){
+        return attack;
+      }
+    }
+    return null;
+  }
 }
