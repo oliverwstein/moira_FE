@@ -509,6 +509,7 @@ class DeathEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("DeathEvent: ${unit.name} has died.");
+    unit.die();
     _isCompleted = true;
   }
 }

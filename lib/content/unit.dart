@@ -389,4 +389,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     return null;
   }
+
+  void die() {
+    game.stage.tileMap[tilePosition]!.removeUnit();
+    removeFromParent();
+  }
 }
