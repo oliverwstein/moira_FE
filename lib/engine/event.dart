@@ -22,7 +22,6 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void execute(){
     _isStarted = true;
     if (trigger != null) debugPrint("Trigger found!");
-
   }
 
   List<Event> getObservers();
