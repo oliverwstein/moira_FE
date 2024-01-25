@@ -217,6 +217,7 @@ class CombatMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Make the attack
+        add(Combat(unit, targets[selectedTargetIndex], attacks[selectedAttackIndex]));
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         // Cancel

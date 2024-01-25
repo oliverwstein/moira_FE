@@ -370,6 +370,23 @@ class StartCombatEvent extends Event {
     if(counterAttack != null) {
       game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker, counterAttack)]);}
     combat.addFollowUp();
+    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
+    _isCompleted = true;
+  }
+}
+
+class EndCombatEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    combat.removeFromParent();
     _isCompleted = true;
   }
 }
@@ -398,6 +415,7 @@ class AttackEvent extends Event {
         game.eventQueue.addEventBatchToHead([MissEvent(combat, unit, target)]);
       }
     }
+    _isCompleted = true;
   }
 }
 
@@ -417,7 +435,7 @@ class HitEvent extends Event {
     super.execute();
     debugPrint("HitEvent: ${unit.name} against ${target.name}");
     game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
-
+    _isCompleted = true;
   }
 }
 
@@ -435,6 +453,7 @@ class MissEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("MissEvent: ${unit.name} against ${target.name}");
+    _isCompleted = true;
   }
 }
 
@@ -452,6 +471,7 @@ class CritEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("CritEvent: ${unit.name} against ${target.name}");
+    _isCompleted = true;
   }
 }
 
@@ -467,5 +487,6 @@ class DamageEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("DamageEvent: ${unit.name} takes ${combat.damage} damage.");
+    _isCompleted = true;
   }
 }
