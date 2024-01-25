@@ -49,7 +49,7 @@ class StartCombatEvent extends Event {
       game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker, counterAttack)]);}
     combat.addFollowUp();
     game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
-    complete();
+    completeEvent();
   }
 }
 
@@ -65,7 +65,7 @@ class EndCombatEvent extends Event {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     combat.removeFromParent();
-    complete();
+    completeEvent();
   }
 }
 
@@ -94,7 +94,7 @@ class AttackEvent extends Event {
         game.eventQueue.addEventBatchToHead([MissEvent(combat, unit, target)]);
       }
     }
-    complete();
+    completeEvent();
   }
 }
 
@@ -115,7 +115,7 @@ class HitEvent extends Event {
     debugPrint("HitEvent: ${unit.name} hits ${target.name}");
     combat.damage = vals.damage;
     game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
-    complete();
+    completeEvent();
   }
 }
 
@@ -133,7 +133,7 @@ class MissEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("MissEvent: ${unit.name} misses ${target.name}");
-    complete();
+    completeEvent();
   }
 }
 
@@ -151,7 +151,7 @@ class CritEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("CritEvent: ${unit.name} lands a critical hit on ${target.name}");
-    complete();
+    completeEvent();
   }
 }
 
@@ -170,6 +170,6 @@ class DamageEvent extends Event {
     unit.hp = (unit.hp - combat.damage).clamp(0, unit.getStat("hp"));
     debugPrint("DamageEvent: ${unit.name} now has ${unit.hp} hp.");
     debugPrint("DamageEvent: Observer Count: ${getObservers().length}");
-    complete();
+    completeEvent();
   }
 }

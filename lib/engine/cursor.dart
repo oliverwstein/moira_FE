@@ -112,7 +112,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
     Point<int> centeredPoint = Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize);
     game.camera.moveTo(centeredPosition, speed: 300);
-    snapToTile(centeredPoint);
+    moveTo(centeredPoint);
     return centeredPosition;
     
     

@@ -15,8 +15,10 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   bool _isTriggered = false;
   bool _isStarted = false;
   bool _isCompleted = false;
-  start() {_isStarted = true;}
-  complete() {_isCompleted = true;}
+  triggerEvent() {_isTriggered = true;}
+  startEvent() {_isStarted = true;}
+  completeEvent() {_isCompleted = true;}
+  bool checkTriggered(){return (_isTriggered || trigger == null);}
   bool checkStarted(){return _isStarted;}
   bool checkComplete(){return _isCompleted;}
   Event({this.trigger, this.name});
@@ -30,15 +32,15 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 
   @override 
   void update(dt){
+    if(!checkTriggered()) return;
     if(!_isStarted) {
       execute();
-      game.eventQueue.addEventBatchToHead(dispatch());
+      return;
       }
     if(checkComplete()) {
+      game.eventQueue.addEventBatch(dispatch());
       removeFromParent();
       }
-    
-    
   }
 
   List<Event> dispatch() {
@@ -81,24 +83,31 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 
   List<Event> currentBatch(){
-    return children.query<Event>();
+    List<Event> batch = children.query<Event>();
+    List<Event> currentBatch = [];
+    for (Event event in batch){
+      if(event.checkTriggered()) currentBatch.add(event);
+    }
+    return currentBatch;
   }
 
   void mountBatch(List<Event> batch) {
     for (var event in batch) {
-      if(event.trigger == null){add(event);}
-      else {
-        if(event._isTriggered){ add(event);}
-      }
+      if(event.trigger == null){
+        event.triggerEvent();}
+      add(event);
     }
   }
 
   @override
   void update(double dt) {
+    // debugPrint("Current batch is: ${currentBatch().length}");
     if(currentBatch().isEmpty){
       if(eventBatches.isNotEmpty){
         mountBatch(eventBatches.removeFirst());
       }
+    } else {
+      debugPrint("Current batch is: ${currentBatch().first.name}");
     }
   }
 
@@ -182,7 +191,10 @@ class UnitCreationEvent extends Event{
   UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   void execute() {
@@ -190,15 +202,19 @@ class UnitCreationEvent extends Event{
     debugPrint("UnitCreationEvent: unit $name");
     unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items);
     game.stage.add(unit);
-    complete();
     if (destination != null) {
       var moveEvent = UnitMoveEvent(unit, destination!, name: name);
       game.eventQueue.add(moveEvent);
     } else {
       destination = tilePosition;
     }
-    
   }
+  @override
+  bool checkComplete() {
+    if(checkStarted()) return (unit.tilePosition == destination);
+    return false;
+    
+  } 
 }
 
 class UnitMoveEvent extends Event {
@@ -208,7 +224,10 @@ class UnitMoveEvent extends Event {
   UnitMoveEvent(this.unit, this.tilePosition, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
 
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   void execute() {
@@ -218,7 +237,8 @@ class UnitMoveEvent extends Event {
   }
   @override
   bool checkComplete() {
-    return (unit.tilePosition == tilePosition);
+    if(checkStarted()) return (unit.tilePosition == tilePosition);
+    return false;
   } 
 }
 
@@ -229,7 +249,10 @@ class DialogueEvent extends Event{
   late DialogueMenu menu;
   DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
   @override
   Future<void> execute() async {
     super.execute();
@@ -240,7 +263,8 @@ class DialogueEvent extends Event{
   }
   @override
   bool checkComplete() {
-    return menu.dialogue.finished;
+    if(checkStarted()) return menu.dialogue.finished;
+    return false;
   } 
 }
 
@@ -250,19 +274,24 @@ class PanEvent extends Event{
   late final Vector2 centeredPosition;
   PanEvent(this.destination, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
   @override
   void execute() {
     super.execute();
     debugPrint("PanEvent: Pan to $destination");
-    game.stage.cursor.snapToTile(destination);
+    // game.stage.cursor.snapToTile(destination);
     centeredPosition = game.stage.cursor.centerCameraOn(destination);
     
     
   }
   @override
   bool checkComplete() {
-    if(absoluteError(centeredPosition, game.camera.viewfinder.position) < 1){
+    if(checkStarted() && _isCompleted) return true;
+    if(absoluteError(centeredPosition, game.stage.cursor.position) < 1){
+      _isCompleted = true;
       return true;
     }
     return false;
@@ -275,14 +304,17 @@ class StartTurnEvent extends Event{
   int turn;
   StartTurnEvent(this.factionName, this.turn, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
   @override
   Future<void> execute() async {
     super.execute();
     debugPrint("StartTurnEvent: Start turn $turn for $factionName");
     game.stage.activeFaction = game.stage.factionMap[factionName];
     await Future.delayed(const Duration(milliseconds: 500));
-    complete();
+    completeEvent();
     game.stage.activeFaction!.startTurn();
   }
 }
@@ -292,13 +324,16 @@ class TakeTurnEvent extends Event{
   String factionName;
   TakeTurnEvent(this.factionName, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
   @override
   Future<void> execute() async {
     super.execute();
     debugPrint("TakeTurnEvent: Take ${game.stage.turn} for $factionName");
     game.stage.activeFaction!.takeTurn();
-    complete();
+    completeEvent();
   }
 
 }
@@ -308,7 +343,10 @@ class EndTurnEvent extends Event{
   String factionName;
   EndTurnEvent(this.factionName, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
   @override
   Future<void> execute() async {
     super.execute();
@@ -323,8 +361,10 @@ class EndTurnEvent extends Event{
       }
     } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
     game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
-    complete();
-    game.eventQueue.addEventBatch([StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn)]);
+    completeEvent();
+    StartTurnEvent startTurn = StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn);
+    game.eventQueue.addEventBatch([startTurn]);
+    
     
   }
 }
@@ -336,7 +376,10 @@ class FactionCreationEvent extends Event{
   FactionType type;
   FactionCreationEvent(this.factionName, this.type, {this.human = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
   @override
   Future<void> execute() async {
     super.execute();
@@ -352,7 +395,7 @@ class FactionCreationEvent extends Event{
       game.stage.factionMap[factionName] = player;
     }
     game.stage.turnOrder[type.order].add(player);
-    complete();
+    completeEvent();
   }
 }
 
@@ -361,13 +404,16 @@ class DeathEvent extends Event {
   final Unit unit;
   DeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
     super.execute();
     debugPrint("DeathEvent: ${unit.name} has died.");
     unit.die();
-    complete();
+    completeEvent();
   }
 }
