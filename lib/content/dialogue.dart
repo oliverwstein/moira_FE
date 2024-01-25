@@ -30,7 +30,10 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   bool finished = false;
 
   Dialogue(this.bgSource, this.nodeName);
-  
+  @override
+  void update(dt){
+    position = game.camera.viewfinder.position;
+  }
   @override
   Future<void> onLoad() async {
     aspectBox = Vector2(Stage.tileSize*game.stage.tilesInRow, Stage.tileSize*game.stage.tilesInColumn);
@@ -177,7 +180,7 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
     return super.onLineFinish(line);
   }
   Future<void> _advance(DialogueLine line) {
-    var characterName = line.character?.name ?? '';
+    // var characterName = line.character?.name ?? '';
     // debugPrint('$characterName: ${line.text}');
     return _forwardCompleter.future;
   }

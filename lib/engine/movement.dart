@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 class Movement {
   Direction direction;

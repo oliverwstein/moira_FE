@@ -2,11 +2,9 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
-import 'package:flutter/widgets.dart';
 import 'package:moira/engine/engine.dart';
 
 class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
@@ -112,7 +110,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
     Point<int> centeredPoint = Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize);
     game.camera.moveTo(centeredPosition, speed: 300);
-    snapToTile(centeredPoint);
+    moveTo(centeredPoint);
     return centeredPosition;
     
     

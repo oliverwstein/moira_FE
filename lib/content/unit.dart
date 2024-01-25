@@ -218,10 +218,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     anchor = Anchor.center;
   
     // Create skills for skillset
-    for(String skillName in unitData['skills']){
-      Skill skill = Skill.fromJson(skillName, this);
+    // for(String skillName in unitData['skills']){
+      // Skill skill = Skill.fromJson(skillName, this);
       // skill.attachToUnit(this, game.eventDispatcher);
-    }
+    // }
     // Add to faction:
     if(game.stage.factionMap.keys.contains(faction)){
       game.stage.factionMap[faction]!.units.add(this);
@@ -231,7 +231,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
     game.stage.tileMap[tilePosition]?.setUnit(this);
-    add(Trigger.death(this));
     _loadCompleter.complete();
   }
 
