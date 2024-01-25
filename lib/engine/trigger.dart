@@ -48,14 +48,6 @@ class Trigger extends Component {
     return false;
   });
 
-  Trigger._dialogue(String nodeName) : check = ((Event event) {
-    debugPrint("Check DialogueEvent");
-    if (event is DialogueEvent) {
-      return event.nodeName == nodeName;
-    }
-    return false;
-  });
-
   Trigger._pan(Point<int> destination) : check = ((Event event) {
     debugPrint("Check PanEvent");
     if (event is PanEvent) {

@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:flame/experimental.dart' as exp;
 import 'package:flame_tiled/flame_tiled.dart' as flame_tiled;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
