@@ -108,8 +108,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
       if(eventBatches.isNotEmpty){
         mountBatch(eventBatches.removeFirst());
       }
-    } else {
-      debugPrint("Current batch is: ${currentBatch().first.name}");
     }
   }
 

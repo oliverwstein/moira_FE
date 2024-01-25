@@ -37,7 +37,10 @@ class StartCombatEvent extends Event {
   final Combat combat;
   StartCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
@@ -58,7 +61,10 @@ class EndCombatEvent extends Event {
   final Combat combat;
   EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
@@ -77,7 +83,10 @@ class AttackEvent extends Event {
   Attack attack;
   AttackEvent(this.combat, this.unit, this.target, this.attack, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
@@ -106,8 +115,12 @@ class HitEvent extends Event {
   final ({int accuracy, int critRate, int damage, int fatigue}) vals;
   
   HitEvent(this.combat, this.unit, this.target, this.vals, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
@@ -127,7 +140,10 @@ class MissEvent extends Event {
   
   MissEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
@@ -145,7 +161,10 @@ class CritEvent extends Event {
   
   CritEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
@@ -161,7 +180,10 @@ class DamageEvent extends Event {
   final Unit unit;
   DamageEvent(this.combat, this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  List<Event> getObservers() => observers;
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    return observers;
+  }
 
   @override
   Future<void> execute() async {
