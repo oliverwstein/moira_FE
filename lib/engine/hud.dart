@@ -3,7 +3,6 @@ import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
-import 'package:moira/engine/engine.dart';
 
 class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent point;
@@ -15,7 +14,8 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    position = game.camera.viewfinder.visibleWorldRect!.topLeft.toVector2();
+    // ignore: invalid_use_of_internal_member
+    position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
     anchor = Anchor.topLeft;
     size = Vector2(Stage.tileSize*3, Stage.tileSize*3);
     priority = 25;
@@ -45,7 +45,8 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   @override
   void update(double dt) {
     super.update(dt);
-    position = game.camera.viewfinder.visibleWorldRect!.topLeft.toVector2();
+    // ignore: invalid_use_of_internal_member
+    position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;

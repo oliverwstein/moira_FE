@@ -3,9 +3,6 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
-import 'package:flame/experimental.dart';
-import 'package:flame/src/experimental/geometry/shapes/shape.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
@@ -64,7 +61,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 class DummyEvent extends Event {
   @override
   List<Event> getObservers() {
-    // TODO: implement getObservers
+    // Ignore
     throw UnimplementedError();
   }
 
@@ -122,6 +119,8 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
       if(eventBatches.isNotEmpty){
         mountBatch(eventBatches.removeFirst());
       }
+    } else {
+      debugPrint("Current batch length is: ${currentBatch().length}, starts with: ${currentBatch().first}");
     }
   }
 
@@ -328,7 +327,7 @@ class StartTurnEvent extends Event{
     super.execute();
     debugPrint("StartTurnEvent: Start turn $turn for $factionName");
     game.stage.activeFaction = game.stage.factionMap[factionName];
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 1000));
     completeEvent();
     game.stage.activeFaction!.startTurn();
   }

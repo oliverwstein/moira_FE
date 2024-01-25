@@ -2,11 +2,9 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
-import 'package:flutter/widgets.dart';
 import 'package:moira/engine/engine.dart';
 
 class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
