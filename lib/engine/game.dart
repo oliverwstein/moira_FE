@@ -102,6 +102,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
     add(eventQueue);
+    DeathEvent.initialize(eventQueue);
 
     
     

@@ -191,7 +191,7 @@ class DamageEvent extends Event {
     debugPrint("DamageEvent: ${unit.name} takes ${combat.damage} damage.");
     unit.hp = (unit.hp - combat.damage).clamp(0, unit.getStat("hp"));
     debugPrint("DamageEvent: ${unit.name} now has ${unit.hp} hp.");
-    debugPrint("DamageEvent: Observer Count: ${getObservers().length}");
+    game.eventQueue.dispatchEvent(this);
     completeEvent();
   }
 }

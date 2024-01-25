@@ -39,6 +39,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
       }
     if(checkComplete()) {
       game.eventQueue.addEventBatch(dispatch());
+      game.eventQueue.dispatchEvent(this);
       removeFromParent();
       }
   }
@@ -71,6 +72,19 @@ class DummyEvent extends Event {
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
   final Queue<List<Event>> eventBatches = Queue<List<Event>>();
+
+  final Map<Type, List<dynamic>> _classObservers = {};
+
+  void registerClassObserver<T extends Event>(void Function(T) observer) {
+    final observersOfType = _classObservers[T] as List<void Function(T)>? ?? [];
+    observersOfType.add(observer);
+    _classObservers[T] = observersOfType;
+  }
+
+  void dispatchEvent<T extends Event>(T event) {
+    final observersOfType = _classObservers[T] as List<void Function(T)>?;
+    observersOfType?.forEach((observer) => observer(event));
+  }
 
   @override
   void onLoad() {
@@ -110,6 +124,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
       }
     }
   }
+
 
   void loadEventsFromJson(dynamic jsonData) {
     for (List<dynamic> eventBatch in jsonData) {
@@ -402,6 +417,17 @@ class FactionCreationEvent extends Event{
 class DeathEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<DamageEvent>((damageEvent) {
+      if (damageEvent.unit.hp <= 0) {
+        // Trigger DeathEvent
+        var deathEvent = DeathEvent(damageEvent.unit);
+        EventQueue eventQueue = damageEvent.findParent() as EventQueue;
+        eventQueue.addEventBatchToHead([deathEvent]);
+      }
+    });
+  }
+
   DeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {

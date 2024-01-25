@@ -231,7 +231,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
     game.stage.tileMap[tilePosition]?.setUnit(this);
-    add(Trigger.death(this));
     _loadCompleter.complete();
   }
 
