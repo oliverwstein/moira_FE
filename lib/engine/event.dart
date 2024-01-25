@@ -405,12 +405,13 @@ class AttackEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("AttackEvent: ${unit.name} against ${target.name}");
+    combat.damage = 0;
     Random rng = Random();
     var vals = unit.attackCalc(attack, target);
     if (vals.accuracy > 0) {
       if (rng.nextInt(100) + 1 <= vals.accuracy) {
         // Attack hits
-        game.eventQueue.addEventBatchToHead([HitEvent(combat, unit, target, vals.critRate)]);
+        game.eventQueue.addEventBatchToHead([HitEvent(combat, unit, target, vals)]);
       } else {
         game.eventQueue.addEventBatchToHead([MissEvent(combat, unit, target)]);
       }
@@ -424,16 +425,17 @@ class HitEvent extends Event {
   final Combat combat;
   final Unit unit;
   final Unit target;
-  final int critRate;
+  final ({int accuracy, int critRate, int damage, int fatigue}) vals;
   
-  HitEvent(this.combat, this.unit, this.target, this.critRate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  HitEvent(this.combat, this.unit, this.target, this.vals, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() => observers;
 
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("HitEvent: ${unit.name} against ${target.name}");
+    debugPrint("HitEvent: ${unit.name} hits ${target.name}");
+    combat.damage = vals.damage;
     game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
     _isCompleted = true;
   }
@@ -452,7 +454,7 @@ class MissEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("MissEvent: ${unit.name} against ${target.name}");
+    debugPrint("MissEvent: ${unit.name} misses ${target.name}");
     _isCompleted = true;
   }
 }
@@ -470,7 +472,7 @@ class CritEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("CritEvent: ${unit.name} against ${target.name}");
+    debugPrint("CritEvent: ${unit.name} lands a critical hit on ${target.name}");
     _isCompleted = true;
   }
 }
@@ -487,6 +489,26 @@ class DamageEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("DamageEvent: ${unit.name} takes ${combat.damage} damage.");
+    unit.hp = (unit.hp - combat.damage).clamp(0, unit.getStat("hp"));
+    debugPrint("DamageEvent: ${unit.name} now has ${unit.hp} hp.");
+    debugPrint("DamageEvent: Observer Count: ${getObservers().length}");
+    _isCompleted = true;
+  }
+}
+
+class DeathEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  DeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  // DeathEvent.watcher(this.unit, {String? name}) : super(trigger: Trigger.death(unit), name: name);
+
+  @override
+  List<Event> getObservers() => observers;
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("DeathEvent: ${unit.name} has died.");
     _isCompleted = true;
   }
 }
