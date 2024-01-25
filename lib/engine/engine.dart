@@ -9,6 +9,7 @@ export 'movement.dart';
 export 'title_card.dart';
 export 'player.dart';
 export 'menu.dart';
+export 'combat.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 

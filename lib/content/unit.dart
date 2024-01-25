@@ -231,6 +231,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
     game.stage.tileMap[tilePosition]?.setUnit(this);
+    add(Trigger.death(this));
     _loadCompleter.complete();
   }
 
@@ -377,5 +378,20 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     int accuracy = (hit - target.getStat('lck') - ((attack.magic ? 1 : 0)*target.getStat('wis') + (1-(attack.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
     int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
     return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
+  }
+
+  Attack? getCounter(int combatDistance) {
+    // For now, just return the first attack in attackSet within combat range, if any.
+    for (Attack attack in attackSet.values){
+      if(attack.range.$1<=combatDistance && attack.range.$2 >=combatDistance){
+        return attack;
+      }
+    }
+    return null;
+  }
+
+  void die() {
+    game.stage.tileMap[tilePosition]!.removeUnit();
+    removeFromParent();
   }
 }
