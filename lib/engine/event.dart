@@ -6,19 +6,19 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/src/experimental/geometry/shapes/shape.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 
 abstract class Event extends Component with HasGameReference<MoiraGame>{
   Trigger? trigger;
   String? name;
-  bool _isTriggered = false;
   bool _isStarted = false;
   bool _isCompleted = false;
-  triggerEvent() {_isTriggered = true;}
+  triggerEvent() {trigger = null;}
   startEvent() {_isStarted = true;}
   completeEvent() {_isCompleted = true;}
-  bool checkTriggered(){return (_isTriggered || trigger == null);}
+  bool checkTriggered(){return (trigger == null);}
   bool checkStarted(){return _isStarted;}
   bool checkComplete(){return _isCompleted;}
   Event({this.trigger, this.name});
@@ -47,11 +47,13 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
     List<Event> batch = [];
     for (var observer in getObservers()) {
       debugPrint("Dispatch $name to ${observer.runtimeType}");
-      if(observer.trigger!.check(this)){
-        observer._isTriggered = true;
-        observer._isStarted = false;
-        observer._isCompleted = false;
-        batch.add(observer);
+      if(observer.trigger != null) {
+        if(observer.trigger!.check(this)){
+          observer.triggerEvent();
+          observer._isStarted = false;
+          observer._isCompleted = false;
+          batch.add(observer);
+        }
       }
     }
   return batch;
