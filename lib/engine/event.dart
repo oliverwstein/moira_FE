@@ -28,7 +28,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   List<Event> getObservers();
 
   @override 
-  void update(dt){
+  Future<void> update(double dt) async {
     if(!checkTriggered()) return;
     if(!_isStarted) {
       execute();
@@ -113,7 +113,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 
   @override
-  void update(double dt) {
+  Future<void> update(double dt) async {
     // debugPrint("Current batch is: ${currentBatch().length}");
     if(currentBatch().isEmpty){
       if(eventBatches.isNotEmpty){
