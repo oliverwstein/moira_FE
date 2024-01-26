@@ -397,3 +397,21 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     removeFromParent();
   }
 }
+
+class ExhaustUnitEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  ExhaustUnitEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    unit.wait();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}

@@ -78,6 +78,7 @@ class EndCombatEvent extends Event {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     combat.removeFromParent();
+    game.eventQueue.addEventBatch([ExhaustUnitEvent(combat.attacker)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

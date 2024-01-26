@@ -68,8 +68,12 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     super.update(dt);
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue && game.eventQueue.currentBatch().isEmpty){isVisible = true;} else {isVisible = false;}
     if(position != targetPosition) {
-      game.camera.moveTo(centerCameraOn(tilePosition), speed: 300);
-      position.lerp(targetPosition, 1/4);}
+      if(!game.stage.menuManager.isNotEmpty){
+        game.camera.moveTo(centerCameraOn(tilePosition), speed: 300);
+      }
+      position.lerp(targetPosition, 1/4);
+    }
+      
   }
 
   Vector2 centerCameraOn(Point<int> newTilePosition) {
