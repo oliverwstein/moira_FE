@@ -31,6 +31,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
     if (isNotEmpty){
       debugPrint("Active menu is: ${_menuStack.last.runtimeType}");
       if(key is RawKeyDownEvent) return _menuStack.last.handleKeyEvent(key, keysPressed);
@@ -112,6 +113,7 @@ class MoveMenu extends Menu {
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     Point<int> direction = const Point(0, 0);
+    debugPrint("MoveMenu given key ${key.logicalKey.keyLabel} to handle.");
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
@@ -162,6 +164,7 @@ class ActionMenu extends Menu {
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
     if(unit.isMoving) return KeyEventResult.ignored;
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
@@ -214,6 +217,7 @@ class CombatMenu extends Menu {
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("CombatMenu given key ${key.logicalKey.keyLabel} to handle.");
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Make the attack
@@ -267,6 +271,7 @@ class StageMenu extends Menu {
   StageMenu();
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("StageMenu given key ${key.logicalKey.keyLabel} to handle.");
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         debugPrint("${options[selectedIndex]} Chosen");
@@ -274,6 +279,7 @@ class StageMenu extends Menu {
           case "End Turn":
             // End the turn, then close.
             game.eventQueue.addEventBatch([EndTurnEvent(game.stage.activeFaction!.name)]);
+            // Note: it is not faster to create and execute the event manually.
             close();
             break;
           case "Save Game":

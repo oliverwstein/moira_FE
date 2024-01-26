@@ -27,7 +27,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   List<Event> getObservers();
 
   @override 
-  Future<void> update(double dt) async {
+  void update(double dt) {
     if(!checkTriggered()) return;
     if(!_isStarted) {
       execute();
@@ -43,7 +43,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   List<Event> dispatch() {
     List<Event> batch = [];
     for (var observer in getObservers()) {
-      debugPrint("Dispatch $name to ${observer.runtimeType}");
+      // debugPrint("Dispatch $name to ${observer.runtimeType}");
       if(observer.trigger != null) {
         if(observer.trigger!.check(this)){
           observer.triggerEvent();
@@ -99,7 +99,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 
   @override
-  Future<void> update(double dt) async {
+  void update(double dt) {
     if(currentBatch().isEmpty){
       if(eventBatches.isNotEmpty){
         eventBatches.removeFirst().forEach(add);
@@ -189,7 +189,7 @@ class UnitCreationEvent extends Event{
   
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -221,7 +221,7 @@ class UnitMoveEvent extends Event {
 
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -246,7 +246,7 @@ class DialogueEvent extends Event{
   DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
   @override
@@ -272,7 +272,7 @@ class PanEvent extends Event{
   PanEvent(this.destination, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
   @override
@@ -302,7 +302,7 @@ class StartTurnEvent extends Event{
   StartTurnEvent(this.factionName, this.turn, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
   @override
@@ -311,8 +311,8 @@ class StartTurnEvent extends Event{
     debugPrint("StartTurnEvent: Start turn $turn for $factionName");
     game.stage.activeFaction = game.stage.factionMap[factionName];
     await Future.delayed(const Duration(milliseconds: 1000));
-    completeEvent();
     game.stage.activeFaction!.startTurn();
+    completeEvent();
   }
 }
 
@@ -322,7 +322,7 @@ class TakeTurnEvent extends Event{
   TakeTurnEvent(this.factionName, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
   @override
@@ -341,11 +341,11 @@ class EndTurnEvent extends Event{
   EndTurnEvent(this.factionName, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
   @override
-  Future<void> execute() async {
+  void execute() {
     super.execute();
     debugPrint("EndTurnEvent execution  $factionName");
     game.stage.activeFaction!.endTurn();
@@ -374,7 +374,7 @@ class FactionCreationEvent extends Event{
   FactionCreationEvent(this.factionName, this.type, {this.human = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
   @override
@@ -413,7 +413,7 @@ class DeathEvent extends Event {
   DeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 

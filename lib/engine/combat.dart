@@ -38,7 +38,7 @@ class StartCombatEvent extends Event {
   StartCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -62,7 +62,7 @@ class EndCombatEvent extends Event {
   EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -84,7 +84,7 @@ class AttackEvent extends Event {
   AttackEvent(this.combat, this.unit, this.target, this.attack, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -118,7 +118,7 @@ class HitEvent extends Event {
   
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -141,7 +141,7 @@ class MissEvent extends Event {
   MissEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -162,7 +162,7 @@ class CritEvent extends Event {
   CritEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -181,7 +181,7 @@ class DamageEvent extends Event {
   DamageEvent(this.combat, this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
