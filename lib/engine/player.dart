@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
@@ -74,8 +76,8 @@ class AIPlayer extends Player{
     for (var unit in game.stage.activeFaction!.units) {
       if (unit.canAct) {
         Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
-        game.camera.moveTo(centeredPosition, speed: 400);
-        await Future.delayed(const Duration(milliseconds: 100));
+        game.stage.cursor.moveTo(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize));
+        await Future.delayed(const Duration(milliseconds: 300));
         unit.wait();
       }
     }
