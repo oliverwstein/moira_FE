@@ -208,7 +208,9 @@ class UnitCreationEvent extends Event{
   }
   @override
   bool checkComplete() {
-    if(checkStarted()) return true;
+    if(checkStarted()) {
+      game.eventQueue.dispatchEvent(this);
+      return true;}
     return false;
   } 
 }
@@ -233,7 +235,9 @@ class UnitMoveEvent extends Event {
   }
   @override
   bool checkComplete() {
-    if(checkStarted()) return (unit.tilePosition == tilePosition);
+    if(checkStarted()) {
+      game.eventQueue.dispatchEvent(this);
+      return (unit.tilePosition == tilePosition);}
     return false;
   } 
 }
@@ -260,6 +264,7 @@ class DialogueEvent extends Event{
   @override
   bool checkComplete() {
     if(checkStarted()) {
+      game.eventQueue.dispatchEvent(this);
       return menu.dialogue.finished;}
     return false;
   } 
@@ -286,8 +291,11 @@ class PanEvent extends Event{
   }
   @override
   bool checkComplete() {
-    if(checkStarted() && _isCompleted) return true;
+    if(checkStarted() && _isCompleted) {
+      game.eventQueue.dispatchEvent(this);
+      return true;}
     if(absoluteError(centeredPosition, game.stage.cursor.position) < 1){
+      game.eventQueue.dispatchEvent(this);
       _isCompleted = true;
       return true;
     }
@@ -313,6 +321,7 @@ class StartTurnEvent extends Event{
     await Future.delayed(const Duration(milliseconds: 1000));
     game.stage.activeFaction!.startTurn();
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -331,6 +340,7 @@ class TakeTurnEvent extends Event{
     debugPrint("TakeTurnEvent: Take ${game.stage.turn} for $factionName");
     game.stage.activeFaction!.takeTurn();
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 
 }
@@ -359,6 +369,7 @@ class EndTurnEvent extends Event{
     } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
     game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
     StartTurnEvent startTurn = StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn);
     game.eventQueue.addEventBatch([startTurn]);
     
@@ -392,6 +403,7 @@ class FactionCreationEvent extends Event{
       game.stage.factionMap[factionName] = player;
     }
     game.stage.turnOrder[type.order].add(player);
+    game.eventQueue.dispatchEvent(this);
     completeEvent();
   }
 }
@@ -423,5 +435,6 @@ class DeathEvent extends Event {
     debugPrint("DeathEvent: ${unit.name} has died.");
     unit.die();
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }

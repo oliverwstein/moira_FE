@@ -96,6 +96,7 @@ class MoveMenu extends Menu {
     game.stage.blankAllTiles();
     unit.snapToTile(startTile);
     game.stage.cursor.snapToTile(unit.tilePosition);
+    game.camera.moveTo(game.stage.cursor.position, speed: 300);
     super.close();
   }
   @override 
@@ -119,7 +120,7 @@ class MoveMenu extends Menu {
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
           game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
-          game.stage.cursor.centerCameraOn(game.stage.cursor.tilePosition);
+          game.camera.moveTo(game.stage.cursor.position, speed: 300);
           game.stage.blankAllTiles();
           game.stage.menuManager.pushMenu(ActionMenu(unit));
         }

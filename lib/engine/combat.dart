@@ -53,6 +53,7 @@ class StartCombatEvent extends Event {
     combat.addFollowUp();
     game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -72,6 +73,7 @@ class EndCombatEvent extends Event {
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     combat.removeFromParent();
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -104,6 +106,7 @@ class AttackEvent extends Event {
       }
     }
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -152,6 +155,7 @@ class MissEvent extends Event {
     super.execute();
     debugPrint("MissEvent: ${unit.name} misses ${target.name}");
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -166,11 +170,11 @@ class CritEvent extends Event {
       if (hitEvent.vals.critRate > 0) {
         Random rng = Random();
         if (rng.nextInt(100) + 1 <= hitEvent.vals.critRate) {
-          hitEvent.combat.damage *= 3;
+          CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
+          EventQueue eventQueue = hitEvent.findParent() as EventQueue;
+          eventQueue.addEventBatchToHead([critEvent]);
         }
-        CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
-        EventQueue eventQueue = hitEvent.findParent() as EventQueue;
-        eventQueue.addEventBatchToHead([critEvent]);
+        
       }
     });
   }
@@ -186,7 +190,9 @@ class CritEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("CritEvent: ${unit.name} lands a critical hit on ${target.name}");
+    combat.damage *= 3;
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
