@@ -12,9 +12,15 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   String? name;
   bool _isStarted = false;
   bool _isCompleted = false;
-  triggerEvent() {trigger = null;}
-  startEvent() {_isStarted = true;}
-  completeEvent() {_isCompleted = true;}
+  triggerEvent() {
+    debugPrint("Trigger $runtimeType $name");
+    trigger = null;}
+  startEvent() {
+    debugPrint("Start $runtimeType $name");
+    _isStarted = true;}
+  completeEvent() {
+    debugPrint("Complete $runtimeType $name");
+    _isCompleted = true;}
   bool checkTriggered(){return (trigger == null);}
   bool checkStarted(){return _isStarted;}
   bool checkComplete(){return _isCompleted;}
@@ -28,6 +34,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 
   @override 
   void update(double dt) {
+    // debugPrint("Update $runtimeType $name; triggered: ${trigger == null}, started: $_isStarted, completed: $_isCompleted");
     if(!checkTriggered()) return;
     if(!_isStarted) {
       execute();
@@ -88,10 +95,10 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 
   void addEventBatch(List<Event> eventBatch) {
-    eventBatches.add(eventBatch);
+    if(eventBatch.isNotEmpty) eventBatches.add(eventBatch);
   }
   void addEventBatchToHead(List<Event> eventBatch) {
-    eventBatches.addFirst(eventBatch);
+    if(eventBatch.isNotEmpty) eventBatches.addFirst(eventBatch);
   }
 
   List<Event> currentBatch() {
@@ -101,8 +108,11 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   @override
   void update(double dt) {
     if(currentBatch().isEmpty){
+      debugPrint("Update eventQueue - currentBatch() empty");
       if(eventBatches.isNotEmpty){
-        eventBatches.removeFirst().forEach(add);
+        List<Event> batch = eventBatches.removeFirst();
+        batch.forEach(add);
+        debugPrint("Update eventQueue - new eventBatch $batch");
       }
     }
   }
