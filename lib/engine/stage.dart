@@ -129,7 +129,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     bool handled = false;
-    if(menuManager.isNotEmpty){
+    if(menuManager.isNotEmpty && key is RawKeyDownEvent){
       return menuManager.handleKeyEvent(key, keysPressed);
     }
     if (key is RawKeyDownEvent && !cursor.isMoving) {
