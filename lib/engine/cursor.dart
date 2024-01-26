@@ -57,6 +57,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       isMoving = true;
     }
   }
+  
   void snapToTile(Point<int> newTilePosition){
     tilePosition = newTilePosition;
     x = newTilePosition.x * Stage.tileSize;
@@ -110,7 +111,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
     Point<int> centeredPoint = Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize);
     game.camera.moveTo(centeredPosition, speed: 300);
-    moveTo(centeredPoint);
+    moveTo(centeredPoint); // Move to, rather than SnapTo, so that the event ends at a convenient time.
     return centeredPosition;
     
     

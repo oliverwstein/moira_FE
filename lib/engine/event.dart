@@ -105,15 +105,12 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
 
   void mountBatch(List<Event> batch) {
     for (var event in batch) {
-      if(event.trigger == null){
-        event.triggerEvent();}
       add(event);
     }
   }
 
   @override
   Future<void> update(double dt) async {
-    // debugPrint("Current batch is: ${currentBatch().length}");
     if(currentBatch().isEmpty){
       if(eventBatches.isNotEmpty){
         mountBatch(eventBatches.removeFirst());
@@ -275,7 +272,8 @@ class DialogueEvent extends Event{
   }
   @override
   bool checkComplete() {
-    if(checkStarted()) return menu.dialogue.finished;
+    if(checkStarted()) {
+      return menu.dialogue.finished;}
     return false;
   } 
 }
