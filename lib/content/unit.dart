@@ -22,6 +22,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   late final Map<String, dynamic> unitData;
   bool isMoving = false;
   bool _canAct = true;
+  bool dead = false;
   bool get canAct => _canAct;
   final double speed = 2; // Speed of cursor movement in pixels per second
 
@@ -391,6 +392,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
 
   void die() {
+    dead = true;
     game.stage.tileMap[tilePosition]!.removeUnit();
     removeFromParent();
   }

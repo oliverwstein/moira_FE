@@ -19,6 +19,12 @@ class Combat extends Component with HasGameReference<MoiraGame>{
   void onLoad(){
     game.eventQueue.addEventBatch([StartCombatEvent(this)]);
   }
+
+  @override
+  void update(dt) {
+
+  }
+
   int getCombatDistance(){
     return (attacker.tilePosition.x - defender.tilePosition.x).abs() + (attacker.tilePosition.y - defender.tilePosition.y).abs();
   }
@@ -93,6 +99,11 @@ class AttackEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
+    if (combat.attacker.dead || combat.defender.dead) {
+      debugPrint("Combat ended due to death.");
+      completeEvent();
+      return;
+    }
     debugPrint("AttackEvent: ${unit.name} against ${target.name}");
     combat.damage = 0;
     Random rng = Random();
@@ -129,7 +140,6 @@ class HitEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("HitEvent: ${unit.name} hits ${target.name}");
-    debugPrint("Critical hit rate: ${vals.critRate}");
     combat.damage = vals.damage;
     game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
     game.eventQueue.dispatchEvent(this);
@@ -215,5 +225,36 @@ class DamageEvent extends Event {
     debugPrint("DamageEvent: ${unit.name} now has ${unit.hp} hp.");
     game.eventQueue.dispatchEvent(this);
     completeEvent();
+  }
+}
+
+class DeathEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<DamageEvent>((damageEvent) {
+      if (damageEvent.unit.hp <= 0) {
+        // Trigger DeathEvent
+        var deathEvent = DeathEvent(damageEvent.unit);
+        EventQueue eventQueue = damageEvent.findParent() as EventQueue;
+        eventQueue.addEventBatchToHead([deathEvent]);
+      }
+    });
+  }
+
+  DeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("DeathEvent: ${unit.name} has died.");
+    unit.die();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
