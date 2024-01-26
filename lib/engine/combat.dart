@@ -19,6 +19,12 @@ class Combat extends Component with HasGameReference<MoiraGame>{
   void onLoad(){
     game.eventQueue.addEventBatch([StartCombatEvent(this)]);
   }
+
+  @override
+  void update(dt) {
+
+  }
+
   int getCombatDistance(){
     return (attacker.tilePosition.x - defender.tilePosition.x).abs() + (attacker.tilePosition.y - defender.tilePosition.y).abs();
   }
@@ -38,7 +44,7 @@ class StartCombatEvent extends Event {
   StartCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -53,6 +59,7 @@ class StartCombatEvent extends Event {
     combat.addFollowUp();
     game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -62,7 +69,7 @@ class EndCombatEvent extends Event {
   EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -71,7 +78,9 @@ class EndCombatEvent extends Event {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     combat.removeFromParent();
+    game.eventQueue.addEventBatch([ExhaustUnitEvent(combat.attacker)]);
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -84,13 +93,18 @@ class AttackEvent extends Event {
   AttackEvent(this.combat, this.unit, this.target, this.attack, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
   @override
   Future<void> execute() async {
     super.execute();
+    if (combat.attacker.dead || combat.defender.dead) {
+      debugPrint("Combat ended due to death.");
+      completeEvent();
+      return;
+    }
     debugPrint("AttackEvent: ${unit.name} against ${target.name}");
     combat.damage = 0;
     Random rng = Random();
@@ -104,6 +118,7 @@ class AttackEvent extends Event {
       }
     }
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -118,7 +133,7 @@ class HitEvent extends Event {
   
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -128,6 +143,7 @@ class HitEvent extends Event {
     debugPrint("HitEvent: ${unit.name} hits ${target.name}");
     combat.damage = vals.damage;
     game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
+    game.eventQueue.dispatchEvent(this);
     completeEvent();
   }
 }
@@ -141,7 +157,7 @@ class MissEvent extends Event {
   MissEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -150,6 +166,7 @@ class MissEvent extends Event {
     super.execute();
     debugPrint("MissEvent: ${unit.name} misses ${target.name}");
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -158,11 +175,25 @@ class CritEvent extends Event {
   final Combat combat;
   final Unit unit;
   final Unit target;
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<HitEvent>((hitEvent) {
+      debugPrint("Critical hit rate: ${hitEvent.vals.critRate}");
+      if (hitEvent.vals.critRate > 0) {
+        Random rng = Random();
+        if (rng.nextInt(100) + 1 <= hitEvent.vals.critRate) {
+          CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
+          EventQueue eventQueue = hitEvent.findParent() as EventQueue;
+          eventQueue.addEventBatchToHead([critEvent]);
+        }
+        
+      }
+    });
+  }
   
   CritEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 
@@ -170,7 +201,9 @@ class CritEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("CritEvent: ${unit.name} lands a critical hit on ${target.name}");
+    combat.damage *= 3;
     completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }
 
@@ -181,7 +214,7 @@ class DamageEvent extends Event {
   DamageEvent(this.combat, this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered() && event.checkComplete()));
+    observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
 

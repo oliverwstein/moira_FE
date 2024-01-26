@@ -41,7 +41,7 @@ class Trigger extends Component {
   }
 
   Trigger._startTurn(int turn, String factionName) : check = ((Event event) {
-    debugPrint("Check StartTurnEvent");
+    // debugPrint("Check StartTurnEvent");
     if (event is StartTurnEvent) {
       return event.factionName == factionName && event.turn == turn;
     }
@@ -49,7 +49,7 @@ class Trigger extends Component {
   });
 
   Trigger._pan(Point<int> destination) : check = ((Event event) {
-    debugPrint("Check PanEvent");
+    // debugPrint("Check PanEvent");
     if (event is PanEvent) {
       return event.destination == destination;
     }
@@ -59,7 +59,7 @@ class Trigger extends Component {
   Trigger._dummy() : check = ((Event event) => false);
   
   Trigger._byName(String name) : check = ((Event event) {
-    debugPrint("Check Event by name $name");
+    // debugPrint("Check Event by name $name");
     if (event.name != null) {
       return event.name == name;
     }
