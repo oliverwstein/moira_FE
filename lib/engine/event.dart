@@ -94,29 +94,16 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
     eventBatches.addFirst(eventBatch);
   }
 
-  List<Event> currentBatch(){
-    List<Event> batch = children.query<Event>();
-    List<Event> currentBatch = [];
-    for (Event event in batch){
-      if(event.checkTriggered()) currentBatch.add(event);
-    }
-    return currentBatch;
-  }
-
-  void mountBatch(List<Event> batch) {
-    for (var event in batch) {
-      add(event);
-    }
+  List<Event> currentBatch() {
+    return children.query<Event>().where((event) => event.checkTriggered()).toList();
   }
 
   @override
   Future<void> update(double dt) async {
     if(currentBatch().isEmpty){
       if(eventBatches.isNotEmpty){
-        mountBatch(eventBatches.removeFirst());
+        eventBatches.removeFirst().forEach(add);
       }
-    } else {
-      // debugPrint("Current batch length is: ${currentBatch().length}, starts with: ${currentBatch().first}");
     }
   }
 
