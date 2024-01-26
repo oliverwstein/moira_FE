@@ -129,6 +129,7 @@ class HitEvent extends Event {
     debugPrint("Critical hit rate: ${vals.critRate}");
     combat.damage = vals.damage;
     game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
+    game.eventQueue.dispatchEvent(this);
     completeEvent();
   }
 }
@@ -167,9 +168,8 @@ class CritEvent extends Event {
         if (rng.nextInt(100) + 1 <= hitEvent.vals.critRate) {
           hitEvent.combat.damage *= 3;
         }
-        // Trigger CritEvent
         CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
-        EventQueue eventQueue = critEvent.findParent() as EventQueue;
+        EventQueue eventQueue = hitEvent.findParent() as EventQueue;
         eventQueue.addEventBatchToHead([critEvent]);
       }
     });

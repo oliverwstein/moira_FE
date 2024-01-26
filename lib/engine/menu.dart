@@ -119,6 +119,7 @@ class MoveMenu extends Menu {
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
           game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
+          game.stage.cursor.centerCameraOn(game.stage.cursor.tilePosition);
           game.stage.blankAllTiles();
           game.stage.menuManager.pushMenu(ActionMenu(unit));
         }

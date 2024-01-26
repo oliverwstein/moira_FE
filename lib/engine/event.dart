@@ -37,7 +37,6 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
       }
     if(checkComplete()) {
       game.eventQueue.addEventBatch(dispatch());
-      game.eventQueue.dispatchEvent(this);
       removeFromParent();
       }
   }
