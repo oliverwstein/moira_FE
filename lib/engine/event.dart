@@ -108,11 +108,8 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   @override
   void update(double dt) {
     if(currentBatch().isEmpty){
-      debugPrint("Update eventQueue - currentBatch() empty");
       if(eventBatches.isNotEmpty){
-        List<Event> batch = eventBatches.removeFirst();
-        batch.forEach(add);
-        debugPrint("Update eventQueue - new eventBatch $batch");
+        eventBatches.removeFirst().forEach(add);;
       }
     }
   }
