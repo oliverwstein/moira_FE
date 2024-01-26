@@ -665,7 +665,7 @@
                     "nodeName": "Lex_Azel_Arrival",
                     "triggers":
                     [
-                        {"UnitCreationEvent":
+                        {"UnitMoveEvent":
                             {
                             "name":"Lex"}
                         }
