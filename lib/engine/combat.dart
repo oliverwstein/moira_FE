@@ -126,6 +126,7 @@ class HitEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("HitEvent: ${unit.name} hits ${target.name}");
+    debugPrint("Critical hit rate: ${vals.critRate}");
     combat.damage = vals.damage;
     game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
     completeEvent();
@@ -158,6 +159,21 @@ class CritEvent extends Event {
   final Combat combat;
   final Unit unit;
   final Unit target;
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<HitEvent>((hitEvent) {
+      debugPrint("Critical hit rate: ${hitEvent.vals.critRate}");
+      if (hitEvent.vals.critRate > 0) {
+        Random rng = Random();
+        if (rng.nextInt(100) + 1 <= hitEvent.vals.critRate) {
+          hitEvent.combat.damage *= 3;
+        }
+        // Trigger CritEvent
+        CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
+        EventQueue eventQueue = critEvent.findParent() as EventQueue;
+        eventQueue.addEventBatchToHead([critEvent]);
+      }
+    });
+  }
   
   CritEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override

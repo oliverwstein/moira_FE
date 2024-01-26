@@ -13,13 +13,10 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   bool _isStarted = false;
   bool _isCompleted = false;
   triggerEvent() {
-    debugPrint("Trigger $runtimeType $name");
     trigger = null;}
   startEvent() {
-    debugPrint("Start $runtimeType $name");
     _isStarted = true;}
   completeEvent() {
-    debugPrint("Complete $runtimeType $name");
     _isCompleted = true;}
   bool checkTriggered(){return (trigger == null);}
   bool checkStarted(){return _isStarted;}
@@ -27,14 +24,12 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   Event({this.trigger, this.name});
   void execute(){
     _isStarted = true;
-    if (trigger != null) debugPrint("Trigger found!");
   }
 
   List<Event> getObservers();
 
   @override 
   void update(double dt) {
-    // debugPrint("Update $runtimeType $name; triggered: ${trigger == null}, started: $_isStarted, completed: $_isCompleted");
     if(!checkTriggered()) return;
     if(!_isStarted) {
       execute();
@@ -50,7 +45,6 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   List<Event> dispatch() {
     List<Event> batch = [];
     for (var observer in getObservers()) {
-      // debugPrint("Dispatch $name to ${observer.runtimeType}");
       if(observer.trigger != null) {
         if(observer.trigger!.check(this)){
           observer.triggerEvent();
