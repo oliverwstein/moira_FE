@@ -84,3 +84,106 @@ class AIPlayer extends Player{
     game.eventQueue.addEventBatch([EndTurnEvent(name)]);
   }
 }
+
+class StartTurnEvent extends Event{
+  static List<Event> observers = [];
+  String factionName;
+  int turn;
+  StartTurnEvent(this.factionName, this.turn, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("StartTurnEvent: Start turn $turn for $factionName");
+    game.stage.activeFaction = game.stage.factionMap[factionName];
+    await Future.delayed(const Duration(milliseconds: 1000));
+    game.stage.activeFaction!.startTurn();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class TakeTurnEvent extends Event{
+  static List<Event> observers = [];
+  String factionName;
+  TakeTurnEvent(this.factionName, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("TakeTurnEvent: Take ${game.stage.turn} for $factionName");
+    game.stage.activeFaction!.takeTurn();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+
+}
+
+class EndTurnEvent extends Event{
+  static List<Event> observers = [];
+  String factionName;
+  EndTurnEvent(this.factionName, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  void execute() {
+    super.execute();
+    debugPrint("EndTurnEvent execution  $factionName");
+    game.stage.activeFaction!.endTurn();
+    do {
+      if(game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2){
+        game.stage.turnPhase = ((game.stage.turnPhase.$1 + 1) % 4, 0);
+        if (game.stage.turnPhase.$1 == 0) game.stage.turn++;
+      } else {
+        game.stage.turnPhase = ((game.stage.turnPhase.$1), game.stage.turnPhase.$2 + 1);
+      }
+    } while (game.stage.turnOrder[game.stage.turnPhase.$1].length == game.stage.turnPhase.$2);
+    game.stage.activeFaction = game.stage.turnOrder[game.stage.turnPhase.$1][game.stage.turnPhase.$2];
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+    StartTurnEvent startTurn = StartTurnEvent(game.stage.activeFaction!.name, game.stage.turn);
+    game.eventQueue.addEventBatch([startTurn]);  
+  }
+}
+
+class FactionCreationEvent extends Event{
+  static List<Event> observers = [];
+  String factionName;
+  bool human;
+  FactionType type;
+  FactionCreationEvent(this.factionName, this.type, {this.human = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("FactionCreationEvent execution $name");
+    Player player;
+    if(human){
+      player = Player(factionName, type);
+      game.stage.add(player);
+      game.stage.factionMap[factionName] = player;
+    } else {
+      player = AIPlayer(factionName, type);
+      game.stage.add(player);
+      game.stage.factionMap[factionName] = player;
+    }
+    game.stage.turnOrder[type.order].add(player);
+    game.eventQueue.dispatchEvent(this);
+    completeEvent();
+  }
+}
