@@ -273,7 +273,7 @@ class DialogueEvent extends Event{
 class PanEvent extends Event{
   static List<Event> observers = [];
   final Point<int> destination;
-  late final Vector2 centeredPosition;
+  late final Vector2 destinationPosition;
   PanEvent(this.destination, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
@@ -284,17 +284,15 @@ class PanEvent extends Event{
   void execute() {
     super.execute();
     debugPrint("PanEvent: Pan to $destination");
-    // game.stage.cursor.snapToTile(destination);
-    centeredPosition = game.stage.cursor.centerCameraOn(destination);
-    
-    
+    game.stage.cursor.snapToTile(destination);
+    destinationPosition = game.stage.cursor.centerCameraOn(destination);
   }
   @override
   bool checkComplete() {
     if(checkStarted() && _isCompleted) {
       game.eventQueue.dispatchEvent(this);
       return true;}
-    if(absoluteError(centeredPosition, game.stage.cursor.position) < 1){
+    if(absoluteError(game.camera.viewfinder.position, destinationPosition) < 1){
       game.eventQueue.dispatchEvent(this);
       _isCompleted = true;
       return true;

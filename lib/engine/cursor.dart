@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/material.dart';
 import 'package:moira/engine/engine.dart';
 
 class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
@@ -49,13 +50,10 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       max(0, min(newTilePosition.x, game.stage.mapTileWidth - 1)),
       max(0, min(newTilePosition.y, game.stage.mapTileHeight - 1))
     );
-
-    // Update only if the position has changed
-    if (tilePosition != boundedPosition) {
-      tilePosition = boundedPosition;
-      targetPosition = game.stage.tileMap[boundedPosition]!.position;
-      isMoving = true;
-    }
+     debugPrint("move to $boundedPosition");
+    tilePosition = boundedPosition;
+    targetPosition = Vector2(tilePosition.x*Stage.tileSize, tilePosition.y*Stage.tileSize);
+    
   }
   
   void snapToTile(Point<int> newTilePosition){
@@ -68,26 +66,10 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
   void update(double dt) {
     super.update(dt);
     if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue && game.eventQueue.currentBatch().isEmpty){isVisible = true;} else {isVisible = false;}
-    if (isMoving) {
-      Vector2 positionDelta = Vector2.all(0);
-      if (position.distanceTo(targetPosition) < 0.1) { // Small threshold
-        positionDelta = targetPosition - position;
-        position = targetPosition;
-        isMoving = false;
-      } else {
-        Vector2 currentPosition = position.clone();
-        position.lerp(targetPosition, min(1, speed * dt / position.distanceTo(targetPosition)));
-        positionDelta = position - currentPosition;
-      }
-      Rect boundingBox = game.camera.visibleWorldRect.deflate(Stage.tileSize);
-      if (!boundingBox.contains(position.toOffset())) {
-        Rect playArea = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
-          if(playArea.contains((position).toOffset())){
-            game.camera.moveBy(positionDelta, speed: 300);
-          }
-      }
-    }
+    game.camera.moveTo(centerCameraOn(tilePosition), speed: 300);
+    if(position != targetPosition) position.lerp(targetPosition, 1/4);
   }
+
   Vector2 centerCameraOn(Point<int> newTilePosition) {
     Vector2 crudePosition = Vector2(newTilePosition.x*Stage.tileSize, newTilePosition.y*Stage.tileSize);
     Rect playBox = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
@@ -109,9 +91,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       dy = (playBox.bottom - centeredRect.bottom);
     }
     Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
-    Point<int> centeredPoint = Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize);
     game.camera.moveTo(centeredPosition, speed: 300);
-    moveTo(centeredPoint); // Move to, rather than SnapTo, so that the event ends at a convenient time.
     return centeredPosition;
     
     
