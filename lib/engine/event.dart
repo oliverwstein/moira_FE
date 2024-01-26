@@ -119,7 +119,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
         mountBatch(eventBatches.removeFirst());
       }
     } else {
-      debugPrint("Current batch length is: ${currentBatch().length}, starts with: ${currentBatch().first}");
+      // debugPrint("Current batch length is: ${currentBatch().length}, starts with: ${currentBatch().first}");
     }
   }
 
@@ -224,9 +224,8 @@ class UnitCreationEvent extends Event{
   }
   @override
   bool checkComplete() {
-    if(checkStarted()) return (unit.tilePosition == destination);
+    if(checkStarted()) return true;
     return false;
-    
   } 
 }
 
