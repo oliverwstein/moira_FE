@@ -228,8 +228,7 @@ class ActionMenu extends Menu {
         debugPrint("${actions[selectedIndex]} Chosen");
         switch (actions[selectedIndex]){
           case "Wait":
-            unit.wait();
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: true)]);
             game.stage.menuManager.clearStack();
             break;
           case "Items":
