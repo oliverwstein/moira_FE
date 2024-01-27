@@ -35,7 +35,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   List<Item> inventory = [];
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
-  Set<Skill> skillSet = {};
+  Set<Skill> skillSet;
   bool hasSkill(Skill skill) => skillSet.contains(skill);
   Set<WeaponType> proficiencies = {};
   Map<String, int> stats = {};
@@ -72,6 +72,15 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       if (prof != null){proficiencies.add(prof);}
     }
     
+    Set<Skill> skillSet = {};
+    final Map<String, Skill> stringToSkill = {
+      for (Skill skill in Skill.values) skill.toString(): skill,
+    };
+    for (String skillString in unitData['skills']){
+      Skill? skill = stringToSkill[skillString];
+      if (skill != null){skillSet.add(skill);}
+    }
+
     // Create items for items
     List<Item> inventory = [];
     itemStrings = itemStrings ?? [];
@@ -106,11 +115,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, skillSet, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
     _postConstruction();
   }
 
@@ -222,11 +231,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     position = game.stage.tileMap[tilePosition]!.center;
     anchor = Anchor.center;
   
-    // Create skills for skillset
-    // for(String skillName in unitData['skills']){
-      // Skill skill = Skill.fromJson(skillName, this);
-      // skill.attachToUnit(this, game.eventDispatcher);
-    // }
     // Add to faction:
     if(game.stage.factionMap.keys.contains(faction)){
       game.stage.factionMap[faction]!.units.add(this);

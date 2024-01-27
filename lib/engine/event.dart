@@ -102,7 +102,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   void update(double dt) {
     if(currentBatch().isEmpty){
       if(eventBatches.isNotEmpty){
-        eventBatches.removeFirst().forEach(add);;
+        eventBatches.removeFirst().forEach(add);
       }
     }
   }

@@ -64,7 +64,7 @@ class CantoEvent extends Event {
     if (game.stage.factionMap[unit.faction] == game.stage.activeFaction){
       game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
     }
-    //@TODO: I'll need to set something up that allows the AI to use Canto too.
+    // @TODO: I'll need to set something up that allows the AI to use Canto too.
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
