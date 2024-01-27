@@ -37,7 +37,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   List<Effect> effectSet = [];
   Set<Skill> skillSet;
   bool hasSkill(Skill skill) => skillSet.contains(skill);
-  Set<WeaponType> proficiencies = {};
+  Set<WeaponType> proficiencies;
   Map<String, int> stats = {};
   int level;
   int hp = -1;
@@ -63,15 +63,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
     String faction = factionName;
     // Add weapon proficiencies
-    Set<WeaponType> proficiencies = {};
-    final Map<String, WeaponType> stringToProficiency = {
-      for (WeaponType weaponType in WeaponType.values) weaponType.toString().split('.').last: weaponType,
-    };
-    for (String weaponTypeString in unitData['proficiencies']){
-      WeaponType? prof = stringToProficiency[weaponTypeString];
-      if (prof != null){proficiencies.add(prof);}
-    }
-    
+    Set<WeaponType> proficiencies = getWeaponTypesFromNames(unitData["proficiencies"].cast<String>());
     Set<Skill> skillSet = getSkillsFromNames(unitData["skills"].cast<String>());
 
     // Create items for items
