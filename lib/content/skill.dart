@@ -26,6 +26,9 @@ class VantageEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
+    Unit temp = combat.attacker;
+    combat.attacker = combat.defender;
+    combat.defender = temp;
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
