@@ -3,13 +3,30 @@ import 'package:moira/content/content.dart';
 
 enum Skill {canto, pavise, vantage}
 
-abstract class SkillHandler {
-  void execute(Unit unit);
-}
-
-class Canto extends SkillHandler {
+class VantageEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<StartCombatEvent>((combatEvent) {
+      if (combatEvent.combat.defender.hasSkill(Skill.vantage)) {
+        VantageEvent vantageEvent = VantageEvent(combatEvent.combat);
+        EventQueue eventQueue = combatEvent.game.eventQueue;
+        eventQueue.addEventBatchToHead([vantageEvent]);
+      }
+    });
+  }
+  
+  VantageEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
-  void execute(Unit unit) {
-    // Implementation for Canto
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }

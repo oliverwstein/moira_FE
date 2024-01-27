@@ -197,7 +197,7 @@ class CritEvent extends Event {
         Random rng = Random();
         if (rng.nextInt(100) + 1 <= hitEvent.vals.critRate) {
           CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
-          EventQueue eventQueue = hitEvent.findParent() as EventQueue;
+          EventQueue eventQueue = hitEvent.game.eventQueue;
           eventQueue.addEventBatchToHead([critEvent]);
         }
         

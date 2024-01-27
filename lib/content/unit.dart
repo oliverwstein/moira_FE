@@ -35,6 +35,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
   Set<Skill> skillSet = {};
+  bool hasSkill(Skill skill) => skillSet.contains(skill);
   Set<WeaponType> proficiencies = {};
   Map<String, int> stats = {};
   int level;
@@ -437,7 +438,7 @@ class DeathEvent extends Event {
       if (damageEvent.unit.hp <= 0) {
         // Trigger DeathEvent
         var deathEvent = DeathEvent(damageEvent.unit);
-        EventQueue eventQueue = damageEvent.findParent() as EventQueue;
+        EventQueue eventQueue = damageEvent.game.eventQueue;
         eventQueue.addEventBatchToHead([deathEvent]);
       }
     });
