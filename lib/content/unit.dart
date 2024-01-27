@@ -27,6 +27,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   final double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
+  Attack? attack;
   Item? main;
   Item? treasure;
   Item? gear;

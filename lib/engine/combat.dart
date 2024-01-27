@@ -63,6 +63,31 @@ class StartCombatEvent extends Event {
   }
 }
 
+class CombatRoundEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  CombatRoundEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("CombatRoundEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    game.eventQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender, combat.attack)]);
+    Attack? counterAttack = combat.defender.getCounter(combat.getCombatDistance());
+    if(counterAttack != null) {
+      game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker, counterAttack)]);}
+    combat.addFollowUp();
+    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
 class EndCombatEvent extends Event {
   static List<Event> observers = [];
   final Combat combat;
