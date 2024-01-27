@@ -13,6 +13,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   final String name;
   final String className;
   int movementRange;
+  double remainingMovement = - 1;
   String faction;
   Point<int> tilePosition;
   Queue<Movement> movementQueue = Queue<Movement>();
@@ -132,6 +133,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     hp = getStat('hp');
     sta = getStat('sta');
+    remainingMovement = movementRange.toDouble();
   }
   
   Point<int> getTilePositionFromPosition(){

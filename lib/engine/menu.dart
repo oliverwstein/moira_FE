@@ -141,7 +141,65 @@ class MoveMenu extends Menu {
     }
     return KeyEventResult.handled;
   }
+}
 
+class CantoMenu extends Menu {
+  final Unit unit;
+  final Tile startTile;
+
+  CantoMenu(this.unit, this.startTile);
+
+  @override 
+  void close() {
+    game.stage.blankAllTiles();
+    unit.snapToTile(startTile);
+    game.stage.cursor.snapToTile(unit.tilePosition);
+    super.close();
+  }
+  @override 
+  Future<void> onLoad() async {
+    SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
+    unit.sprite.animation = newAnimation;
+  }
+  @override
+  void onRemove() {
+    super.onRemove();
+    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    unit.sprite.animation = newAnimation;
+  }
+
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    Point<int> direction = const Point(0, 0);
+    debugPrint("MoveMenu given key ${key.logicalKey.keyLabel} to handle.");
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
+          // Move the unit to the tile selected by the cursor. 
+          game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
+          game.stage.blankAllTiles();
+          close();
+        }
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        game.stage.blankAllTiles();
+        close();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft:
+        direction = Point(direction.x - 1, direction.y);
+      case LogicalKeyboardKey.arrowRight:
+        direction = Point(direction.x + 1, direction.y);
+      case LogicalKeyboardKey.arrowUp:
+        direction = Point(direction.x, direction.y - 1);
+      case LogicalKeyboardKey.arrowDown:
+        direction = Point(direction.x, direction.y + 1);
+    }
+    if (direction != const Point(0,0)){
+        Point<int> newTilePosition = Point(game.stage.cursor.tilePosition.x + direction.x, game.stage.cursor.tilePosition.y + direction.y);
+        game.stage.cursor.moveTo(newTilePosition);
+    }
+    return KeyEventResult.handled;
+  }
 }
 
 class ActionMenu extends Menu {

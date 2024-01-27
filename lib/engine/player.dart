@@ -29,6 +29,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
   void endTurn(){
     for(Unit unit in units){
       unit.toggleCanAct(true);
+      unit.remainingMovement = unit.movementRange.toDouble();
     }
   }
 

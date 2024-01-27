@@ -119,6 +119,7 @@ mixin UnitMovement on PositionComponent {
       Point<int> current = openSet.reduce((a, b) => fScore[a]! < fScore[b]! ? a : b);
 
       if (current == destination) {
+        unit.remainingMovement = unit.movementRange - gScore[destination]!;
         return _reconstructPath(cameFrom, current);
       }
 
