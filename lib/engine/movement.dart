@@ -47,7 +47,7 @@ mixin UnitMovement on PositionComponent {
           double nextRemainingMovement = remainingMovement - cost;
           if (nextRemainingMovement > 0) {
             queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
-            if (!game.stage.tileMap[currentPoint]!.isOccupied){
+            if (!game.stage.tileMap[currentPoint]!.isOccupied || game.stage.tileMap[currentPoint]!.unit == unit){
               reachableTiles.add(game.stage.tileMap[currentPoint]!);
               game.stage.tileMap[currentPoint]!.state = TileState.move;
             }

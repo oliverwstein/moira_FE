@@ -114,7 +114,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
    // Private constructor for creating instances
   Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
     _postConstruction();
-    debugPrint("$name $skillSet");
   }
 
   void _postConstruction() {
@@ -494,6 +493,7 @@ class ExhaustUnitEvent extends Event {
     unit.wait();
     completeEvent();
     game.eventQueue.dispatchEvent(this);
+   
   }
 }
 
