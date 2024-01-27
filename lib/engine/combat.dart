@@ -8,13 +8,8 @@ enum Damage {physical, magical, noncombat}
 class Combat extends Component with HasGameReference<MoiraGame>{
   Unit attacker;
   Unit defender;
-  Attack attack;
-  Attack? counterAttack;
   int damage = 0;
-  Combat(this.attacker, this.defender, this.attack){
-    counterAttack = defender.getCounter(getCombatDistance());
-  }
-
+  Combat(this.attacker, this.defender);
   @override
   void onLoad(){
     game.eventQueue.addEventBatch([StartCombatEvent(this)]);
@@ -25,8 +20,8 @@ class Combat extends Component with HasGameReference<MoiraGame>{
 
   }
 
-  int getCombatDistance(){
-    return (attacker.tilePosition.x - defender.tilePosition.x).abs() + (attacker.tilePosition.y - defender.tilePosition.y).abs();
+  static int getCombatDistance(unit, target){
+    return (unit.tilePosition.x - target.tilePosition.x).abs() + (unit.tilePosition.y - target.tilePosition.y).abs();
   }
 
   void addFollowUp() {

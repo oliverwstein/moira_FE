@@ -231,32 +231,34 @@ class CombatMenu extends Menu {
       case LogicalKeyboardKey.arrowUp:
         selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown:
         selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowLeft:
         selectedAttackIndex = (selectedAttackIndex - 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        unit.attack = attacks[selectedAttackIndex];
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowRight:
         selectedAttackIndex = (selectedAttackIndex + 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        unit.attack = attacks[selectedAttackIndex];
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;

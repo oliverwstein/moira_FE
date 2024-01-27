@@ -357,36 +357,48 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     return targets;
   }
-  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
+  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(target){
     Vector4 combatStats = Vector4(getStat('str').toDouble(), getStat('dex').toDouble(), getStat('mag').toDouble(), getStat('wis').toDouble());
-    int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
-    int hit = attack.hit + stats['lck']!;
-    int crit = attack.crit + stats['lck']!;
-    int fatigue = attack.fatigue;
-    if(main?.weapon != null) {
-      if(attack.magic) {
-        hit += getStat('wis')*2;
-        crit += getStat('wis')~/2;
-      } else {
-        hit += getStat('dex')*2;
-        crit += getStat('dex')~/2;
+    attack = getAttack(Combat.getCombatDistance(unit, target));
+    if(attack == null) {
+      return (damage: 0, accuracy: 0, critRate: 0, fatigue: 0);
+    } else {
+      Attack atk = attack!; // Create local non-nullable atk to avoid having to use null checks everywhere.
+      int might = (atk.might + (atk.scaling.dot(combatStats))).toInt();
+      int hit = atk.hit + stats['lck']!;
+      int crit = atk.crit + stats['lck']!;
+      int fatigue = atk.fatigue;
+      if(main?.weapon != null) {
+        if(atk.magic) {
+          hit += getStat('wis')*2;
+          crit += getStat('wis')~/2;
+        } else {
+          hit += getStat('dex')*2;
+          crit += getStat('dex')~/2;
+        }
+        might += main!.weapon!.might;
+        hit += main!.weapon!.hit;
+        crit += main!.weapon!.crit;
+        fatigue += main!.weapon!.fatigue;
+        }
+      int damage = (might - ((atk.magic ? 1 : 0)*target.getStat('res') + (1-(atk.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
+      int accuracy = (hit - target.getStat('lck') - ((atk.magic ? 1 : 0)*target.getStat('wis') + (1-(atk.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
+      int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
+      return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
       }
-      might += main!.weapon!.might;
-      hit += main!.weapon!.hit;
-      crit += main!.weapon!.crit;
-      fatigue += main!.weapon!.fatigue;
-      }
-    int damage = (might - ((attack.magic ? 1 : 0)*target.getStat('res') + (1-(attack.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
-    int accuracy = (hit - target.getStat('lck') - ((attack.magic ? 1 : 0)*target.getStat('wis') + (1-(attack.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
-    int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
-    return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
+    
   }
 
-  Attack? getCounter(int combatDistance) {
-    // For now, just return the first attack in attackSet within combat range, if any.
-    for (Attack attack in attackSet.values){
-      if(attack.range.$1<=combatDistance && attack.range.$2 >=combatDistance){
-        return attack;
+  Attack? getAttack(int combatDistance) {
+    // if the unit's current attack is valid for the combatDistance, use that.
+    // if not, for now just try to find the first attack they can make. 
+    if (attack != null && attack!.range.$1 <= combatDistance && attack!.range.$2 >= combatDistance){
+      return attack;
+    } else {
+      for (Attack attack in attackSet.values){
+        if(attack.range.$1<=combatDistance && attack.range.$2 >=combatDistance){
+          return attack;
+        }
       }
     }
     return null;
