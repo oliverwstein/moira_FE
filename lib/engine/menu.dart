@@ -228,15 +228,18 @@ class CombatMenu extends Menu {
       case LogicalKeyboardKey.keyA:
         // Make the attack
         add(Combat(unit, targets[selectedTargetIndex]));
+        game.stage.cursor.snapToTile(unit.tilePosition);
         game.stage.menuManager.clearStack();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         // Cancel
         close();
+        game.stage.cursor.snapToTile(unit.tilePosition);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowUp: // Change target
         selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
         targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
         var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
         var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
@@ -246,6 +249,7 @@ class CombatMenu extends Menu {
       case LogicalKeyboardKey.arrowDown: // Change target
         selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
         targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
         var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
         var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
