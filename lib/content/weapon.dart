@@ -4,7 +4,24 @@ import 'package:flame/components.dart';
 import 'package:moira/content/content.dart';
 
 enum WeaponType {Sword, Axe, Lance, Knife, Staff, Book, Bow}
+extension WeaponTypeExtension on WeaponType {
+  // Method to get the weapon type name with the first letter capitalized
+  String get name => toString().split('.').last;
 
+  // Static method to get a weapon type by its name
+  static WeaponType? fromName(String name) {
+    try {
+      return WeaponType.values.firstWhere((weaponType) => weaponType.toString().split('.').last.toLowerCase() == name.toLowerCase());
+    } catch (e) {
+      return null; // Return null if no matching weapon type is found
+    }
+  }
+}
+Set<WeaponType> getWeaponTypesFromNames(List<String> weaponTypeNames) {
+  return weaponTypeNames.map((name) => WeaponTypeExtension.fromName(name))
+                        .whereType<WeaponType>()
+                        .toSet();
+}
 class Weapon extends Component with HasGameReference<MoiraGame>{
   late WeaponType weaponType; // The type of the weapon. 
   late int might; // The base power of the weapon. 

@@ -13,6 +13,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   final String name;
   final String className;
   int movementRange;
+  double remainingMovement = - 1;
   String faction;
   Point<int> tilePosition;
   Queue<Movement> movementQueue = Queue<Movement>();
@@ -27,14 +28,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   final double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
+  Attack? attack;
   Item? main;
   Item? treasure;
   Item? gear;
   List<Item> inventory = [];
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
-  Set<Skill> skillSet = {};
-  Set<WeaponType> proficiencies = {};
+  Set<Skill> skillSet;
+  bool hasSkill(Skill skill) => skillSet.contains(skill);
+  Set<WeaponType> proficiencies;
   Map<String, int> stats = {};
   int level;
   int hp = -1;
@@ -60,15 +63,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
     String faction = factionName;
     // Add weapon proficiencies
-    Set<WeaponType> proficiencies = {};
-    final Map<String, WeaponType> stringToProficiency = {
-      for (WeaponType weaponType in WeaponType.values) weaponType.toString().split('.').last: weaponType,
-    };
-    for (String weaponTypeString in unitData['proficiencies']){
-      WeaponType? prof = stringToProficiency[weaponTypeString];
-      if (prof != null){proficiencies.add(prof);}
-    }
-    
+    Set<WeaponType> proficiencies = getWeaponTypesFromNames(unitData["proficiencies"].cast<String>());
+    Set<Skill> skillSet = getSkillsFromNames(unitData["skills"].cast<String>());
+
     // Create items for items
     List<Item> inventory = [];
     itemStrings = itemStrings ?? [];
@@ -103,11 +100,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, skillSet, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
     _postConstruction();
   }
 
@@ -130,6 +127,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     hp = getStat('hp');
     sta = getStat('sta');
+    remainingMovement = movementRange.toDouble();
   }
   
   Point<int> getTilePositionFromPosition(){
@@ -218,11 +216,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     position = game.stage.tileMap[tilePosition]!.center;
     anchor = Anchor.center;
   
-    // Create skills for skillset
-    // for(String skillName in unitData['skills']){
-      // Skill skill = Skill.fromJson(skillName, this);
-      // skill.attachToUnit(this, game.eventDispatcher);
-    // }
     // Add to faction:
     if(game.stage.factionMap.keys.contains(faction)){
       game.stage.factionMap[faction]!.units.add(this);
@@ -356,36 +349,48 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     return targets;
   }
-  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
+  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(target){
     Vector4 combatStats = Vector4(getStat('str').toDouble(), getStat('dex').toDouble(), getStat('mag').toDouble(), getStat('wis').toDouble());
-    int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
-    int hit = attack.hit + stats['lck']!;
-    int crit = attack.crit + stats['lck']!;
-    int fatigue = attack.fatigue;
-    if(main?.weapon != null) {
-      if(attack.magic) {
-        hit += getStat('wis')*2;
-        crit += getStat('wis')~/2;
-      } else {
-        hit += getStat('dex')*2;
-        crit += getStat('dex')~/2;
+    attack = getAttack(Combat.getCombatDistance(unit, target));
+    if(attack == null) {
+      return (damage: 0, accuracy: 0, critRate: 0, fatigue: 0);
+    } else {
+      Attack atk = attack!; // Create local non-nullable atk to avoid having to use null checks everywhere.
+      int might = (atk.might + (atk.scaling.dot(combatStats))).toInt();
+      int hit = atk.hit + stats['lck']!;
+      int crit = atk.crit + stats['lck']!;
+      int fatigue = atk.fatigue;
+      if(main?.weapon != null) {
+        if(atk.magic) {
+          hit += getStat('wis')*2;
+          crit += getStat('wis')~/2;
+        } else {
+          hit += getStat('dex')*2;
+          crit += getStat('dex')~/2;
+        }
+        might += main!.weapon!.might;
+        hit += main!.weapon!.hit;
+        crit += main!.weapon!.crit;
+        fatigue += main!.weapon!.fatigue;
+        }
+      int damage = (might - ((atk.magic ? 1 : 0)*target.getStat('res') + (1-(atk.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
+      int accuracy = (hit - target.getStat('lck') - ((atk.magic ? 1 : 0)*target.getStat('wis') + (1-(atk.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
+      int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
+      return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
       }
-      might += main!.weapon!.might;
-      hit += main!.weapon!.hit;
-      crit += main!.weapon!.crit;
-      fatigue += main!.weapon!.fatigue;
-      }
-    int damage = (might - ((attack.magic ? 1 : 0)*target.getStat('res') + (1-(attack.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
-    int accuracy = (hit - target.getStat('lck') - ((attack.magic ? 1 : 0)*target.getStat('wis') + (1-(attack.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
-    int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
-    return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
+    
   }
 
-  Attack? getCounter(int combatDistance) {
-    // For now, just return the first attack in attackSet within combat range, if any.
-    for (Attack attack in attackSet.values){
-      if(attack.range.$1<=combatDistance && attack.range.$2 >=combatDistance){
-        return attack;
+  Attack? getAttack(int combatDistance) {
+    // if the unit's current attack is valid for the combatDistance, use that.
+    // if not, for now just try to find the first attack they can make. 
+    if (attack != null && attack!.range.$1 <= combatDistance && attack!.range.$2 >= combatDistance){
+      return attack;
+    } else {
+      for (Attack attack in attackSet.values){
+        if(attack.range.$1<=combatDistance && attack.range.$2 >=combatDistance){
+          return attack;
+        }
       }
     }
     return null;
@@ -397,11 +402,79 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     removeFromParent();
   }
 }
+class UnitCreationEvent extends Event{
+  static List<Event> observers = [];
+  final String unitName;
+  final String factionName;
+  final Point<int> tilePosition;
+  int? level;
+  List<String>? items;
+  Point<int>? destination;
+  late final Unit unit;
+  
+
+  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  void execute() {
+    super.execute();
+    debugPrint("UnitCreationEvent: unit $name");
+    unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items);
+    game.stage.add(unit);
+    if (destination != null) {
+      var moveEvent = UnitMoveEvent(unit, destination!, name: name);
+      game.eventQueue.add(moveEvent);
+    } else {
+      destination = tilePosition;
+    }
+  }
+  @override
+  bool checkComplete() {
+    if(checkStarted()) {
+      game.eventQueue.dispatchEvent(this);
+      return true;}
+    return false;
+  } 
+}
+
+class UnitMoveEvent extends Event {
+  static List<Event> observers = [];
+  final Point<int> tilePosition;
+  final Unit unit;
+  UnitMoveEvent(this.unit, this.tilePosition, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  void execute() {
+    super.execute();
+    debugPrint("UnitMoveEvent: Move unit ${unit.name}");
+    unit.moveTo(tilePosition);
+  }
+  @override
+  bool checkComplete() {
+    if(checkStarted()) {
+      game.eventQueue.dispatchEvent(this);
+      return (unit.tilePosition == tilePosition);}
+    return false;
+  } 
+}
 
 class ExhaustUnitEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
-  ExhaustUnitEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  bool manual;
+  ExhaustUnitEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -413,6 +486,7 @@ class ExhaustUnitEvent extends Event {
     unit.wait();
     completeEvent();
     game.eventQueue.dispatchEvent(this);
+   
   }
 }
 
@@ -424,7 +498,7 @@ class DeathEvent extends Event {
       if (damageEvent.unit.hp <= 0) {
         // Trigger DeathEvent
         var deathEvent = DeathEvent(damageEvent.unit);
-        EventQueue eventQueue = damageEvent.findParent() as EventQueue;
+        EventQueue eventQueue = damageEvent.game.eventQueue;
         eventQueue.addEventBatchToHead([deathEvent]);
       }
     });

@@ -8,13 +8,8 @@ enum Damage {physical, magical, noncombat}
 class Combat extends Component with HasGameReference<MoiraGame>{
   Unit attacker;
   Unit defender;
-  Attack attack;
-  Attack? counterAttack;
   int damage = 0;
-  Combat(this.attacker, this.defender, this.attack){
-    counterAttack = defender.getCounter(getCombatDistance());
-  }
-
+  Combat(this.attacker, this.defender);
   @override
   void onLoad(){
     game.eventQueue.addEventBatch([StartCombatEvent(this)]);
@@ -25,15 +20,17 @@ class Combat extends Component with HasGameReference<MoiraGame>{
 
   }
 
-  int getCombatDistance(){
-    return (attacker.tilePosition.x - defender.tilePosition.x).abs() + (attacker.tilePosition.y - defender.tilePosition.y).abs();
+  static int getCombatDistance(unit, target){
+    return (unit.tilePosition.x - target.tilePosition.x).abs() + (unit.tilePosition.y - target.tilePosition.y).abs();
   }
 
   void addFollowUp() {
-    if (attacker.getStat("spe")>= defender.getStat("spe") + 4){
-      game.eventQueue.addEventBatch([AttackEvent(this, attacker, defender, attack)]);
-    } else if (attacker.getStat("spe")<= defender.getStat("spe") - 4){
-      if (counterAttack != null) game.eventQueue.addEventBatch([AttackEvent(this, defender, attacker, counterAttack!)]);
+    (Unit, Unit)? followUp = (attacker.getStat("spe") >= defender.getStat("spe") + 4) ? (attacker, defender) :
+                  (defender.getStat("spe") >= attacker.getStat("spe") + 4) ? (defender, attacker) : null;
+    if(followUp == null) {
+      return;
+    } else {
+      game.eventQueue.addEventBatch([AttackEvent(this, followUp.$1, followUp.$2)]);
     }
   }
 }
@@ -52,10 +49,29 @@ class StartCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    game.eventQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender, combat.attack)]);
-    Attack? counterAttack = combat.defender.getCounter(combat.getCombatDistance());
-    if(counterAttack != null) {
-      game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker, counterAttack)]);}
+    game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
+    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class CombatRoundEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  CombatRoundEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("CombatRoundEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    game.eventQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender)]);
+    game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
     combat.addFollowUp();
     game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
@@ -89,8 +105,7 @@ class AttackEvent extends Event {
   final Combat combat;
   final Unit unit;
   final Unit target;
-  Attack attack;
-  AttackEvent(this.combat, this.unit, this.target, this.attack, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  AttackEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -108,7 +123,7 @@ class AttackEvent extends Event {
     debugPrint("AttackEvent: ${unit.name} against ${target.name}");
     combat.damage = 0;
     Random rng = Random();
-    var vals = unit.attackCalc(attack, target);
+    var vals = unit.attackCalc(target);
     if (vals.accuracy > 0) {
       if (rng.nextInt(100) + 1 <= vals.accuracy) {
         // Attack hits
@@ -182,7 +197,7 @@ class CritEvent extends Event {
         Random rng = Random();
         if (rng.nextInt(100) + 1 <= hitEvent.vals.critRate) {
           CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
-          EventQueue eventQueue = hitEvent.findParent() as EventQueue;
+          EventQueue eventQueue = hitEvent.game.eventQueue;
           eventQueue.addEventBatchToHead([critEvent]);
         }
         

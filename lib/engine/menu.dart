@@ -141,7 +141,64 @@ class MoveMenu extends Menu {
     }
     return KeyEventResult.handled;
   }
+}
 
+class CantoMenu extends Menu {
+  final Unit unit;
+  final Tile startTile;
+
+  CantoMenu(this.unit, this.startTile);
+
+  @override 
+  void close() {
+    game.stage.blankAllTiles();
+    unit.snapToTile(startTile);
+    super.close();
+  }
+  @override 
+  Future<void> onLoad() async {
+    SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
+    unit.sprite.animation = newAnimation;
+  }
+  @override
+  void onRemove() {
+    super.onRemove();
+    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    unit.sprite.animation = newAnimation;
+  }
+
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    Point<int> direction = const Point(0, 0);
+    debugPrint("MoveMenu given key ${key.logicalKey.keyLabel} to handle.");
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
+          // Move the unit to the tile selected by the cursor. 
+          game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
+          game.stage.blankAllTiles();
+          game.stage.menuManager.clearStack();
+        }
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        game.stage.blankAllTiles();
+        game.stage.menuManager.clearStack();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft:
+        direction = Point(direction.x - 1, direction.y);
+      case LogicalKeyboardKey.arrowRight:
+        direction = Point(direction.x + 1, direction.y);
+      case LogicalKeyboardKey.arrowUp:
+        direction = Point(direction.x, direction.y - 1);
+      case LogicalKeyboardKey.arrowDown:
+        direction = Point(direction.x, direction.y + 1);
+    }
+    if (direction != const Point(0,0)){
+        Point<int> newTilePosition = Point(game.stage.cursor.tilePosition.x + direction.x, game.stage.cursor.tilePosition.y + direction.y);
+        game.stage.cursor.moveTo(newTilePosition);
+    }
+    return KeyEventResult.handled;
+  }
 }
 
 class ActionMenu extends Menu {
@@ -171,7 +228,7 @@ class ActionMenu extends Menu {
         debugPrint("${actions[selectedIndex]} Chosen");
         switch (actions[selectedIndex]){
           case "Wait":
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: true)]);
             game.stage.menuManager.clearStack();
             break;
           case "Items":
@@ -212,7 +269,13 @@ class CombatMenu extends Menu {
   @override 
   Future<void> onLoad() async {
     attacks = unit.attackSet.values.toList();
+    // @TODO: attacks should really be generated on a by-target basis. 
     game.stage.cursor.snapToTile(targets.first.tilePosition);
+    targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
+    var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+    var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
+    debugPrint("Unit attack numbers are $unitAttackNumbers");
+    debugPrint("Target attack numbers are $targetAttackNumbers");
   }
 
   @override
@@ -221,42 +284,50 @@ class CombatMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Make the attack
-        add(Combat(unit, targets[selectedTargetIndex], attacks[selectedAttackIndex]));
+        add(Combat(unit, targets[selectedTargetIndex]));
+        game.stage.cursor.snapToTile(unit.tilePosition);
         game.stage.menuManager.clearStack();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         // Cancel
         close();
+        game.stage.cursor.snapToTile(unit.tilePosition);
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowUp:
+      case LogicalKeyboardKey.arrowUp: // Change target
         selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
+        targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowDown:
+      case LogicalKeyboardKey.arrowDown: // Change target
         selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
+        targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowLeft:
+      case LogicalKeyboardKey.arrowLeft: // Change attack
         selectedAttackIndex = (selectedAttackIndex - 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        unit.attack = attacks[selectedAttackIndex];
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowRight:
+      case LogicalKeyboardKey.arrowRight: // Change attack
         selectedAttackIndex = (selectedAttackIndex + 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
-        var unitAttackNumbers = unit.attackCalc(attacks[selectedAttackIndex], targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(targets[selectedTargetIndex].attackSet.values.first, unit);
+        unit.attack = attacks[selectedAttackIndex];
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
