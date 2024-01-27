@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 
 enum Skill {canto, pavise, vantage}
@@ -58,12 +59,12 @@ class CantoEvent extends Event {
   Future<void> execute() async {
     super.execute();
     game.stage.blankAllTiles();
-    // Set<Tile> reachableTiles = unit.findReachableTiles(unit.toDouble());
-    // tile.unit!.markAttackableTiles(reachableTiles.toList());
-    // // if the unit is a part of the active faction, add the MoveMenu to the stack.
-    // if (game.stage.factionMap[tile.unit!.faction] == game.stage.activeFaction){
-    //   pushMenu(MoveMenu(tile.unit!, tile));
-    // }
+    debugPrint("Canto: unit's remaining movement is: ${unit.remainingMovement}");
+    unit.findReachableTiles(unit.remainingMovement);
+    if (game.stage.factionMap[unit.faction] == game.stage.activeFaction){
+      game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
+    }
+    //@TODO: I'll need to set something up that allows the AI to use Canto too.
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
