@@ -68,7 +68,7 @@ class DummyEvent extends Event {
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
   final Queue<List<Event>> eventBatches = Queue<List<Event>>();
-
+  bool processing = false;
   final Map<Type, List<dynamic>> _classObservers = {};
 
   void registerClassObserver<T extends Event>(void Function(T) observer) {
@@ -103,6 +103,9 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
     if(currentBatch().isEmpty){
       if(eventBatches.isNotEmpty){
         eventBatches.removeFirst().forEach(add);
+        processing = true;
+      } else {
+        processing = false;
       }
     }
   }
