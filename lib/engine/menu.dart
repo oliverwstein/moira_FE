@@ -212,7 +212,13 @@ class CombatMenu extends Menu {
   @override 
   Future<void> onLoad() async {
     attacks = unit.attackSet.values.toList();
+    // @TODO: attacks should really be generated on a by-target basis. 
     game.stage.cursor.snapToTile(targets.first.tilePosition);
+    targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
+    var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
+    var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
+    debugPrint("Unit attack numbers are $unitAttackNumbers");
+    debugPrint("Target attack numbers are $targetAttackNumbers");
   }
 
   @override
@@ -221,30 +227,32 @@ class CombatMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Make the attack
-        add(Combat(unit, targets[selectedTargetIndex], attacks[selectedAttackIndex]));
+        add(Combat(unit, targets[selectedTargetIndex]));
         game.stage.menuManager.clearStack();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         // Cancel
         close();
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowUp:
+      case LogicalKeyboardKey.arrowUp: // Change target
         selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
+        targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
         var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
         var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowDown:
+      case LogicalKeyboardKey.arrowDown: // Change target
         selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
         debugPrint("${targets[selectedTargetIndex].name} Selected");
+        targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
         var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
         var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowLeft:
+      case LogicalKeyboardKey.arrowLeft: // Change attack
         selectedAttackIndex = (selectedAttackIndex - 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
         unit.attack = attacks[selectedAttackIndex];
@@ -253,7 +261,7 @@ class CombatMenu extends Menu {
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowRight:
+      case LogicalKeyboardKey.arrowRight: // Change attack
         selectedAttackIndex = (selectedAttackIndex + 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
         unit.attack = attacks[selectedAttackIndex];
