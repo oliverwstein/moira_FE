@@ -72,14 +72,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       if (prof != null){proficiencies.add(prof);}
     }
     
-    Set<Skill> skillSet = {};
-    final Map<String, Skill> stringToSkill = {
-      for (Skill skill in Skill.values) skill.toString(): skill,
-    };
-    for (String skillString in unitData['skills']){
-      Skill? skill = stringToSkill[skillString];
-      if (skill != null){skillSet.add(skill);}
-    }
+    Set<Skill> skillSet = getSkillsFromNames(unitData["skills"].cast<String>());
 
     // Create items for items
     List<Item> inventory = [];
@@ -121,6 +114,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
    // Private constructor for creating instances
   Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
     _postConstruction();
+    debugPrint("$name $skillSet");
   }
 
   void _postConstruction() {

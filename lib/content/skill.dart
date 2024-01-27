@@ -3,6 +3,24 @@ import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 
 enum Skill {canto, pavise, vantage}
+extension SkillExtension on Skill {
+  // Method to get the skill name with the first letter capitalized
+  String get name => toString().split('.').last.replaceFirstMapped(RegExp(r'[a-zA-Z]'), (match) => match.group(0)!.toUpperCase());
+
+  // Static method to get a skill by its name
+  static Skill? fromName(String name) {
+    try {
+      return Skill.values.firstWhere((skill) => skill.name.toLowerCase() == name.toLowerCase());
+    } catch (e) {
+      return null; // Return null if no matching skill is found
+    }
+  }
+}
+Set<Skill> getSkillsFromNames(List<String> skillNames) {
+  return skillNames.map((name) => SkillExtension.fromName(name))
+                   .whereType<Skill>()
+                   .toSet();
+}
 
 class VantageEvent extends Event {
   static List<Event> observers = [];
