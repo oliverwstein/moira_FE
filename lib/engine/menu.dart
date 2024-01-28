@@ -103,6 +103,12 @@ class MoveMenu extends Menu {
     SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
     unit.sprite.animation = newAnimation;
   }
+  
+  @override
+  void open(){
+    super.open();
+    unit.getCombatEventOptions();
+  }
   @override
   void onRemove() {
     super.onRemove();

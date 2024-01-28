@@ -46,7 +46,7 @@ mixin UnitBehavior on PositionComponent {
     // If the unit is neutral, it should consider unit.level + expectedDamageDealt - expectedDamageTaken; it wants a fight to its advantage.
     // If the unit is cowardly, it should consider unit.level + expectedDamageDealt - expectedDamageTaken**2; it wants a fight where it won't get hurt.
     double expectedDamageDealt = unit.getBestAttackOnTarget(target, getAttacksOnTarget(target, distance));
-    double expectedDamageTaken = target.getBestAttack(unit, getAttacksOnTarget(unit, distance));
+    double expectedDamageTaken = target.getBestAttackOnTarget(unit, getAttacksOnTarget(unit, distance));
     if(expectedDamageDealt >= target.hp) expectedDamageTaken = 0;
     // For now, just have all the units follow the neutral rules.
     return (unit.level + expectedDamageDealt - expectedDamageTaken);
@@ -68,8 +68,8 @@ mixin UnitBehavior on PositionComponent {
     unit.attack = attacks.first;
     for (Attack attack in attacks){
       var attackCalc = unit.attackCalc(target, attack);
-      double expectedAttackDamage = attackCalc.damage*attackCalc.accuracy + attackCalc.damage*attackCalc.accuracy*attackCalc.critRate*3;
-      if(expectedDamage < expectedAttackDamage){
+      double expectedAttackDamage = (attackCalc.damage*attackCalc.accuracy + attackCalc.damage*attackCalc.accuracy*attackCalc.critRate*.03)/100;
+      if(expectedAttackDamage > expectedDamage){
         expectedDamage = expectedAttackDamage;
         unit.attack = attack;
       }
