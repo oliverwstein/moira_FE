@@ -21,6 +21,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
   }
+  static int getDistance(Point<int> a, Point<int> b){
+    return (a.x - b.x).abs() + (a.y - b.y).abs();
+  }
 
   @override 
   void update(dt){

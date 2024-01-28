@@ -6,6 +6,7 @@ export 'tile.dart';
 export 'cursor.dart';
 export 'hud.dart';
 export 'movement.dart';
+export 'behavior.dart';
 export 'title_card.dart';
 export 'player.dart';
 export 'menu.dart';

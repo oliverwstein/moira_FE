@@ -272,8 +272,8 @@ class CombatMenu extends Menu {
     // @TODO: attacks should really be generated on a by-target basis. 
     game.stage.cursor.snapToTile(targets.first.tilePosition);
     targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
-    var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
-    var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
+    var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
+    var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
     debugPrint("Unit attack numbers are $unitAttackNumbers");
     debugPrint("Target attack numbers are $targetAttackNumbers");
   }
@@ -298,8 +298,8 @@ class CombatMenu extends Menu {
         debugPrint("${targets[selectedTargetIndex].name} Selected");
         game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
         targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
-        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
@@ -308,8 +308,8 @@ class CombatMenu extends Menu {
         debugPrint("${targets[selectedTargetIndex].name} Selected");
         game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
         targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
-        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
@@ -317,8 +317,8 @@ class CombatMenu extends Menu {
         selectedAttackIndex = (selectedAttackIndex - 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
         unit.attack = attacks[selectedAttackIndex];
-        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;
@@ -326,8 +326,8 @@ class CombatMenu extends Menu {
         selectedAttackIndex = (selectedAttackIndex + 1) % attacks.length;
         debugPrint("${attacks[selectedAttackIndex].name} Selected");
         unit.attack = attacks[selectedAttackIndex];
-        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex]);
-        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit);
+        var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
+        var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
         return KeyEventResult.handled;

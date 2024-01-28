@@ -123,7 +123,7 @@ class AttackEvent extends Event {
     debugPrint("AttackEvent: ${unit.name} against ${target.name}");
     combat.damage = 0;
     Random rng = Random();
-    var vals = unit.attackCalc(target);
+    var vals = unit.attackCalc(target, unit.attack);
     if (vals.accuracy > 0) {
       if (rng.nextInt(100) + 1 <= vals.accuracy) {
         // Attack hits
