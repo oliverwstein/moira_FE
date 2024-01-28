@@ -21,7 +21,7 @@ mixin UnitMovement on PositionComponent {
     path ??= getPath(destination);
     _movementQueue.addAll(path);
   }
-  Set<Tile> findReachableTiles(double range) {
+  Set<Tile> findReachableTiles(double range, {bool markTiles = true}) {
     Set<Tile>reachableTiles = {};
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
     var queue = Queue<_TileMovement>(); // Queue for BFS
@@ -49,7 +49,7 @@ mixin UnitMovement on PositionComponent {
             queue.add(_TileMovement(nextPoint, nextRemainingMovement, currentPoint));
             if (!game.stage.tileMap[currentPoint]!.isOccupied || game.stage.tileMap[currentPoint]!.unit == unit){
               reachableTiles.add(game.stage.tileMap[currentPoint]!);
-              game.stage.tileMap[currentPoint]!.state = TileState.move;
+              if (markTiles) game.stage.tileMap[currentPoint]!.state = TileState.move;
             }
           }
         }
