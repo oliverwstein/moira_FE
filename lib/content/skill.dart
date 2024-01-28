@@ -78,8 +78,8 @@ class CantoEvent extends Event {
     super.execute();
     game.stage.blankAllTiles();
     debugPrint("Canto: unit's remaining movement is: ${unit.remainingMovement}");
-    unit.findReachableTiles(unit.remainingMovement);
-    if (game.stage.factionMap[unit.faction] == game.stage.activeFaction){
+    if (game.stage.factionMap[unit.faction] == game.stage.activeFaction && game.stage.activeFaction is! AIPlayer){
+      unit.findReachableTiles(unit.remainingMovement);
       game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
     }
     // @TODO: I'll need to set something up that allows the AI to use Canto too.
