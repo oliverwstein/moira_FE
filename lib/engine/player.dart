@@ -78,7 +78,12 @@ class AIPlayer extends Player{
         Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
         game.stage.cursor.moveTo(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize));
         await Future.delayed(const Duration(milliseconds: 300));
-        unit.wait();
+        var rankedTiles = unit.rankOpenTiles();
+        debugPrint("${rankedTiles.firstOrNull}");
+        // for(Event event in rankedTiles.first.events){
+        //   game.eventQueue.addEventBatch([event]);
+        // }
+        game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
       }
     }
     game.eventQueue.addEventBatch([EndTurnEvent(name)]);

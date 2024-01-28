@@ -12,13 +12,14 @@ mixin UnitBehavior on PositionComponent {
 
 
   List<({List<Event> events, double score})> rankOpenTiles() {
-  List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement.toDouble());
+  List<Tile> openTiles = getTilesInMoveRange(unit.movementRange.toDouble());
   var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));
-
+  debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
+  Random rng = Random();
   int count = 0;
   for (Tile tile in openTiles) {
     List<Event> eventList = [];
-    double tileScore = getTileDefenseScore(tile);
+    double tileScore = getTileDefenseScore(tile) + rng.nextDouble()-.5;
 
     if (tile.point != unit.tilePosition) {
       eventList.add(UnitMoveEvent(unit, tile.point));
@@ -32,6 +33,7 @@ mixin UnitBehavior on PositionComponent {
     }
 
     rankedTiles[count] = (events: eventList, score: tileScore);
+    count++;
   }
 
   rankedTiles.sort((a, b) => b.score.compareTo(a.score)); // Sort by score in descending order
@@ -86,7 +88,7 @@ mixin UnitBehavior on PositionComponent {
 
   double getBestAttackOnTarget(Unit target, List<Attack> attacks){
     double expectedDamage = 0;
-    unit.attack = attacks.first;
+    unit.attack = attacks.firstOrNull;
     for (Attack attack in attacks){
       var attackCalc = unit.attackCalc(target, attack);
       double expectedAttackDamage = (attackCalc.damage*attackCalc.accuracy + attackCalc.damage*attackCalc.accuracy*attackCalc.critRate*.03)/100;
