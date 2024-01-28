@@ -103,11 +103,11 @@ class MoveMenu extends Menu {
     SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
     unit.sprite.animation = newAnimation;
   }
-  
+
   @override
   void open(){
     super.open();
-    unit.getCombatEventOptions();
+    // unit.getCombatEventOptions();
   }
   @override
   void onRemove() {
@@ -290,7 +290,7 @@ class CombatMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Make the attack
-        add(Combat(unit, targets[selectedTargetIndex]));
+        game.eventQueue.addEventBatch([StartCombatEvent(unit, targets[selectedTargetIndex])]);
         game.stage.cursor.snapToTile(unit.tilePosition);
         game.stage.menuManager.clearStack();
         return KeyEventResult.handled;

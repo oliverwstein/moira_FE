@@ -10,10 +10,6 @@ class Combat extends Component with HasGameReference<MoiraGame>{
   Unit defender;
   int damage = 0;
   Combat(this.attacker, this.defender);
-  @override
-  void onLoad(){
-    game.eventQueue.addEventBatch([StartCombatEvent(this)]);
-  }
 
   @override
   void update(dt) {
@@ -37,8 +33,12 @@ class Combat extends Component with HasGameReference<MoiraGame>{
 
 class StartCombatEvent extends Event {
   static List<Event> observers = [];
-  final Combat combat;
-  StartCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  final Unit unit;
+  final Unit target;
+  late final Combat combat;
+  StartCombatEvent(this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name){
+    combat = Combat(unit, target);
+  }
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

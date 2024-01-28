@@ -10,16 +10,37 @@ mixin UnitBehavior on PositionComponent {
   MoiraGame get game;
   Unit get unit => (this as Unit);
 
-  void getCombatEventOptions(){
-    List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement.toDouble());
-    for(Tile tile in openTiles){
-      var bestTarget = bestTargetFrom(tile);
-      if(bestTarget != null) {
-        debugPrint("Best target from ${tile.point} is ${bestTarget.target.name}, score: ${bestTarget.score}");
-      }
+
+  List<({List<Event> events, double score})> rankOpenTiles() {
+  List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement.toDouble());
+  var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));
+
+  int count = 0;
+  for (Tile tile in openTiles) {
+    List<Event> eventList = [];
+    double tileScore = getTileDefenseScore(tile);
+
+    if (tile.point != unit.tilePosition) {
+      eventList.add(UnitMoveEvent(unit, tile.point));
     }
+
+    var bestTarget = bestTargetFrom(tile);
+    if (bestTarget != null) {
+      debugPrint("Best target from ${tile.point} is ${bestTarget.target.name}, score: ${bestTarget.score}");
+      eventList.add(StartCombatEvent(unit, bestTarget.target));
+      tileScore += bestTarget.score;
+    }
+
+    rankedTiles[count] = (events: eventList, score: tileScore);
   }
 
+  rankedTiles.sort((a, b) => b.score.compareTo(a.score)); // Sort by score in descending order
+  return rankedTiles;
+}
+
+  double getTileDefenseScore(Tile tile){
+    return tile.getTerrainDefense() + tile.getTerrainAvoid()/10;
+  }
   List<Tile> getTilesInMoveRange(double range){
     return unit.findReachableTiles(range, markTiles: false).toList();
   }
