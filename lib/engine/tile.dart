@@ -65,7 +65,17 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   Terrain terrain; // e.g., "grass", "water", "mountain"
   String name; // Defaults to the terrain name if there is no name.
   TileState state = TileState.blank;
-  Tile(this.point, double size, this.terrain, this.name) {
+  // Factory constructor
+  factory Tile(Point<int> point, double size, Terrain terrain, String name) {
+    if (name == "Center") {
+      return Town(point, size, terrain, name);
+    } else {
+      return Tile._internal(point, size, terrain, name);
+    }
+  }
+
+  // Internal constructor for Tile
+  Tile._internal(this.point, double size, this.terrain, this.name) {
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
   }
@@ -158,4 +168,19 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   }
 }
 
+class Town extends Tile {
+  bool open;
+  int loot;
+  // Constructor for the Town class. 
+  // Inherits properties and methods from Tile and adds specific properties for Town.
+  Town(Point<int> point, double size, Terrain terrain, String name, {this.open = true, this.loot = 10}) 
+    : super._internal(point, size, terrain, name);
 
+  void toggleOpen() {
+    open = !open;
+  }
+
+  void updateLoot(int newLoot) {
+    loot = newLoot;
+  }
+}
