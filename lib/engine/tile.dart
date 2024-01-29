@@ -4,6 +4,52 @@ import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
+enum TileState {blank, move, attack}
+enum Terrain {forest, path, cliff, sea, stream, fort, plain}
+extension TerrainEffects on Terrain {
+  double get cost {
+    switch (this) {
+      case Terrain.forest:
+        return 2;
+      case Terrain.cliff:
+        return 10;
+      case Terrain.sea:
+        return 100;
+      case Terrain.stream:
+        return 20;
+      case Terrain.path:
+        return .7;
+      default:
+        return 1;
+    }
+  }
+
+  int get avoid {
+    switch (this) {
+      case Terrain.forest:
+        return 20;
+      case Terrain.fort:
+        return 30;
+      case Terrain.path:
+        return -10;
+      default:
+        return 0;
+    }
+  }
+
+  int get defense {
+    switch (this) {
+      case Terrain.fort:
+        return 2;
+      case Terrain.forest:
+        return 1;
+      case Terrain.path:
+        return -1;
+      default:
+        return 0;
+    }
+  }
+}
 
 class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   late final SpriteAnimationComponent _moveAnimationComponent;
@@ -20,6 +66,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   Tile(this.point, double size, this.terrain, this.name) {
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
+  }
+  static int getDistance(Point<int> a, Point<int> b){
+    return (a.x - b.x).abs() + (a.y - b.y).abs();
   }
 
   @override 
@@ -72,8 +121,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   void removeUnit() {
     unit = null;
   }
-  double getTerrainCost() {
-    return terrain.cost;
+  double getTerrainCost() {return terrain.cost;}
+  int getTerrainAvoid() {return terrain.avoid;}
+  int getTerrainDefense() {return terrain.defense;
   }
   @override
   void render(Canvas canvas) {

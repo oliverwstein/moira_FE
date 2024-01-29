@@ -8,7 +8,7 @@ import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 import 'package:flutter/material.dart';
 
-class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement{
+class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior{
   final Completer<void> _loadCompleter = Completer<void>();
   final String name;
   final String className;
@@ -349,16 +349,15 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     return targets;
   }
-  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(target){
+  ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Unit target, Attack? attack){
     Vector4 combatStats = Vector4(getStat('str').toDouble(), getStat('dex').toDouble(), getStat('mag').toDouble(), getStat('wis').toDouble());
-    attack = getAttack(Combat.getCombatDistance(unit, target));
-    if(attack == null) {
-      return (damage: 0, accuracy: 0, critRate: 0, fatigue: 0);
-    } else {
-      Attack atk = attack!; // Create local non-nullable atk to avoid having to use null checks everywhere.
+    
+    if(attack == null) {return (damage: 0, accuracy: 0, critRate: 0, fatigue: 0);}
+    else {
+      Attack atk = attack; // Create local non-nullable atk to avoid having to use null checks everywhere.
       int might = (atk.might + (atk.scaling.dot(combatStats))).toInt();
-      int hit = atk.hit + stats['lck']!;
-      int crit = atk.crit + stats['lck']!;
+      int hit = atk.hit + getStat('lck');
+      int crit = atk.crit + getStat('lck');
       int fatigue = atk.fatigue;
       if(main?.weapon != null) {
         if(atk.magic) {
@@ -373,12 +372,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         crit += main!.weapon!.crit;
         fatigue += main!.weapon!.fatigue;
         }
-      int damage = (might - ((atk.magic ? 1 : 0)*target.getStat('res') + (1-(atk.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
-      int accuracy = (hit - target.getStat('lck') - ((atk.magic ? 1 : 0)*target.getStat('wis') + (1-(atk.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
+      int damage = (might - ((atk.magic ? 1 : 0)*target.getStat('res') + (1-(atk.magic ? 1 : 0))*target.getStat('def')) - game.stage.tileMap[target.tilePosition]!.getTerrainDefense()).toInt().clamp(0, 100);
+      int accuracy = (hit - target.getStat('lck') - ((atk.magic ? 1 : 0)*target.getStat('wis') + (1-(atk.magic ? 1 : 0))*target.getStat('dex')) - game.stage.tileMap[target.tilePosition]!.getTerrainAvoid()).toInt().clamp(1, 99);
       int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
       return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
-      }
-    
+    }
   }
 
   Attack? getAttack(int combatDistance) {

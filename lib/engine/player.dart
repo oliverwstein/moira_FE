@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 class Player extends Component with HasGameReference<MoiraGame>{
+  bool takingTurn = false;
   String name;
   FactionType factionType;
   List<Unit> units = [];
@@ -18,6 +19,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
 
   void takeTurn(){
     debugPrint("$name takes their turn");
+    takingTurn = true;
   }
   bool unitsAllMoved(){
     if (units.every((unit) => unit.canAct == false)) return true;
@@ -27,6 +29,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
   void startTurn() {
   }
   void endTurn(){
+    takingTurn = false;
     for(Unit unit in units){
       unit.toggleCanAct(true);
     }
@@ -54,35 +57,40 @@ class Player extends Component with HasGameReference<MoiraGame>{
 }
 
 class AIPlayer extends Player{
+  List<Unit> unitsToCommand = [];
   AIPlayer(String name, FactionType factionType) : super(name, factionType);
   @override
   void update(dt){
     super.update(dt);
+    if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isNotEmpty){
+      Unit unit = unitsToCommand.removeLast();
+      unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
+      Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
+      game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
+      var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
+      debugPrint("${rankedTiles.firstOrNull}");
+      for(Event event in rankedTiles.first.events){
+        game.eventQueue.addEventBatch([event]);
+      }
+      game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    }
+    if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isEmpty) {
+      game.eventQueue.addEventBatch([EndTurnEvent(name)]);
+      }
   }
+
   @override
   void startTurn() {
     super.startTurn();
     debugPrint("AIPlayer: startTurn for $name");
     game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
+    unitsToCommand = game.stage.activeFaction!.units.toList();
   }
   @override
   void endTurn() {
     super.endTurn();
   }
 
-  @override
-  Future<void> takeTurn() async {
-    super.takeTurn();
-    for (var unit in game.stage.activeFaction!.units) {
-      if (unit.canAct) {
-        Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
-        game.stage.cursor.moveTo(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize));
-        await Future.delayed(const Duration(milliseconds: 300));
-        unit.wait();
-      }
-    }
-    game.eventQueue.addEventBatch([EndTurnEvent(name)]);
-  }
 }
 
 class StartTurnEvent extends Event{
