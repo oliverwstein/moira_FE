@@ -67,7 +67,7 @@ class AIPlayer extends Player{
       unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
       Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
       game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
-      var rankedTiles = unit.rankOpenTiles();
+      var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
       debugPrint("${rankedTiles.firstOrNull}");
       for(Event event in rankedTiles.first.events){
         game.eventQueue.addEventBatch([event]);

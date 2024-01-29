@@ -107,7 +107,7 @@ class MoveMenu extends Menu {
   @override
   void open(){
     super.open();
-    var rankedTiles = unit.rankOpenTiles();
+    var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
     debugPrint("${rankedTiles.first}");
   }
   @override
