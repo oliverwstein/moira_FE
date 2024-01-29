@@ -63,6 +63,7 @@ class AIPlayer extends Player{
     super.update(dt);
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isNotEmpty){
       Unit unit = unitsToCommand.removeLast();
+      unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
       Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
       game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
       var rankedTiles = unit.rankOpenTiles();
