@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
@@ -81,10 +83,18 @@ class CantoEvent extends Event {
     if (game.stage.factionMap[unit.faction]!.takingTurn && game.stage.activeFaction is! AIPlayer){
       unit.findReachableTiles(unit.remainingMovement);
       game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
-    } else {
-
+    } else if (game.stage.factionMap[unit.faction]!.takingTurn && game.stage.activeFaction is AIPlayer){
+      List<Tile> openTiles = unit.getTilesInMoveRange(unit.remainingMovement);
+      Random rng = Random();
+      Tile bestTile = game.stage.tileMap[unit.tilePosition]!;
+      double bestScore = unit.getTileDefenseScore(bestTile) + rng.nextDouble()-.5;
+      for (Tile tile in openTiles) {
+        double tileScore = unit.getTileDefenseScore(tile) + rng.nextDouble()-.5;
+        if (tileScore > bestScore) {bestTile = tile; bestScore = tileScore;}
+      }
+      game.eventQueue.addEventBatchToHead([UnitMoveEvent(unit, bestTile.point)]);
     }
-    // @TODO: I'll need to set something up that allows the AI to use Canto too.
+    
 
     completeEvent();
     game.eventQueue.dispatchEvent(this);
