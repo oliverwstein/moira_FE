@@ -29,6 +29,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
   void startTurn() {
   }
   void endTurn(){
+    takingTurn = false;
     for(Unit unit in units){
       unit.toggleCanAct(true);
     }
@@ -75,7 +76,6 @@ class AIPlayer extends Player{
     }
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isEmpty) {
       game.eventQueue.addEventBatch([EndTurnEvent(name)]);
-      takingTurn = false;
       }
   }
 
