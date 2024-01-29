@@ -176,11 +176,31 @@ class Town extends Tile {
   Town(Point<int> point, double size, Terrain terrain, String name, {this.open = true, this.loot = 10}) 
     : super._internal(point, size, terrain, name);
 
-  void toggleOpen() {
-    open = !open;
+  void close() {
+    open = false;
   }
 
   void updateLoot(int newLoot) {
     loot = newLoot;
+  }
+}
+
+class VisitEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final Town town;
+  VisitEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    town.close; 
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
   }
 }

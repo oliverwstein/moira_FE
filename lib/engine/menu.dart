@@ -248,6 +248,13 @@ class ActionMenu extends Menu {
             List<Unit> targets = unit.getTargetsAt(unit.tilePosition);
             game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
             break;
+          case "Visit":
+            game.stage.blankAllTiles();
+            game.eventQueue.addEventBatch([VisitEvent(unit, game.stage.tileMap[unit.tilePosition]! as Town)]);
+            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.stage.menuManager.clearStack();
+            
+            break;
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
