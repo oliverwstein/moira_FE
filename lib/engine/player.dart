@@ -27,6 +27,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
   }
 
   void startTurn() {
+    game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   void endTurn(){
     takingTurn = false;
@@ -86,7 +87,6 @@ class AIPlayer extends Player{
   void startTurn() {
     super.startTurn();
     debugPrint("AIPlayer: startTurn for $name");
-    game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
     unitsToCommand = game.stage.activeFaction!.units.toList();
   }
   @override
