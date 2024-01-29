@@ -41,7 +41,7 @@ List<({List<Event> events, double score})> getCombatEventsAndScores(List<Tile> o
 }
 
 List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
-  List<Tile> openTiles = getTilesInMoveRange(unit.movementRange.toDouble());
+  List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement);
   debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
 
   var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));

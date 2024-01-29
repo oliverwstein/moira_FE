@@ -84,15 +84,11 @@ class CantoEvent extends Event {
       unit.findReachableTiles(unit.remainingMovement);
       game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
     } else if (game.stage.factionMap[unit.faction]!.takingTurn && game.stage.activeFaction is AIPlayer){
-      List<Tile> openTiles = unit.getTilesInMoveRange(unit.remainingMovement);
-      Random rng = Random();
-      Tile bestTile = game.stage.tileMap[unit.tilePosition]!;
-      double bestScore = unit.getTileDefenseScore(bestTile) + rng.nextDouble()-.5;
-      for (Tile tile in openTiles) {
-        double tileScore = unit.getTileDefenseScore(tile) + rng.nextDouble()-.5;
-        if (tileScore > bestScore) {bestTile = tile; bestScore = tileScore;}
+      var rankedTiles = unit.rankOpenTiles(["Move"]);
+      if (rankedTiles.isNotEmpty) {
+        var bestTileEvent = rankedTiles.first;
+        game.eventQueue.addEventBatchToHead(bestTileEvent.events);
       }
-      game.eventQueue.addEventBatchToHead([UnitMoveEvent(unit, bestTile.point)]);
     }
     
 
