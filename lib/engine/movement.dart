@@ -22,7 +22,7 @@ mixin UnitMovement on PositionComponent {
     _movementQueue.addAll(path);
   }
   Set<Tile> findReachableTiles(double range, {bool markTiles = true}) {
-    Set<Tile>reachableTiles = {};
+    Set<Tile>reachableTiles = {game.stage.tileMap[unit.tilePosition]!};
     var visitedTiles = <Point<int>, _TileMovement>{}; // Tracks visited tiles and their data
     var queue = Queue<_TileMovement>(); // Queue for BFS
     queue.add(_TileMovement(unit.tilePosition, range, null)); // enqueue the initial position

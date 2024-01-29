@@ -69,14 +69,17 @@ class AIPlayer extends Player{
       game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
       var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
       debugPrint("${rankedTiles.firstOrNull}");
-      for(Event event in rankedTiles.first.events){
-        game.eventQueue.addEventBatch([event]);
+      if(rankedTiles.firstOrNull != null){
+        for(Event event in rankedTiles.first.events){
+          game.eventQueue.addEventBatch([event]);
+        }
       }
+      
       game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
     }
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isEmpty) {
       game.eventQueue.addEventBatch([EndTurnEvent(name)]);
-      }
+    }
   }
 
   @override
