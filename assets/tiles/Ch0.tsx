@@ -718,6 +718,7 @@
  </tile>
  <tile id="143">
   <properties>
+   <property name="name" value="Center"/>
    <property name="terrain" value="Town"/>
   </properties>
  </tile>
@@ -818,6 +819,7 @@
  </tile>
  <tile id="163">
   <properties>
+   <property name="name" value="Center"/>
    <property name="terrain" value="Town"/>
   </properties>
  </tile>
@@ -2413,6 +2415,7 @@
  </tile>
  <tile id="482">
   <properties>
+   <property name="name" value="Center"/>
    <property name="terrain" value="Town"/>
   </properties>
  </tile>
@@ -4783,6 +4786,7 @@
  </tile>
  <tile id="951">
   <properties>
+   <property name="name" value="Center"/>
    <property name="terrain" value="Town"/>
   </properties>
  </tile>
@@ -9479,6 +9483,7 @@
  </tile>
  <tile id="1887">
   <properties>
+   <property name="name" value="Center"/>
    <property name="terrain" value="Town"/>
   </properties>
  </tile>
