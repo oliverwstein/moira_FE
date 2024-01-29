@@ -3090,13 +3090,13 @@
  <tile id="617">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="618">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="619">
@@ -3397,7 +3397,7 @@
  <tile id="678">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="679">
@@ -3409,7 +3409,7 @@
  <tile id="680">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="681">
@@ -3710,19 +3710,19 @@
  <tile id="740">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="741">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="742">
   <properties>
    <property name="name" value="Chalphy"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="743">
@@ -3754,13 +3754,13 @@
  <tile id="748">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="749">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="750">
@@ -4064,7 +4064,7 @@
  <tile id="809">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="810">
@@ -4076,7 +4076,7 @@
  <tile id="811">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="812">
@@ -4377,19 +4377,19 @@
  <tile id="871">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="872">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="873">
   <properties>
    <property name="name" value="Evans"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="874">
@@ -7011,13 +7011,13 @@
  <tile id="1396">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="1397">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="1398">
@@ -7319,7 +7319,7 @@
  <tile id="1457">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="1458">
@@ -7331,7 +7331,7 @@
  <tile id="1459">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="1460">
@@ -7634,19 +7634,19 @@
  <tile id="1519">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="1520">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="1521">
   <properties>
    <property name="name" value="Jungby"/>
-   <property name="terrain" value="Plain"/>
+   <property name="terrain" value="Rampart"/>
   </properties>
  </tile>
  <tile id="1522">

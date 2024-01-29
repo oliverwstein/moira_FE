@@ -5,7 +5,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 enum TileState {blank, move, attack}
-enum Terrain {forest, path, cliff, sea, stream, fort, plain}
+enum Terrain {forest, path, cliff, sea, stream, fort, gate, rampart, plain}
 extension TerrainEffects on Terrain {
   double get cost {
     switch (this) {
@@ -14,6 +14,8 @@ extension TerrainEffects on Terrain {
       case Terrain.cliff:
         return 10;
       case Terrain.sea:
+        return 100;
+      case Terrain.rampart:
         return 100;
       case Terrain.stream:
         return 20;
