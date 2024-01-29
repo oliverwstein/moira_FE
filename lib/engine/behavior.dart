@@ -71,7 +71,7 @@ List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes
   }
 
   ({Unit target, double score})? bestTargetFrom(Tile tile){
-    List<Unit> targets = unit.getTargets(tile.point);
+    List<Unit> targets = unit.getTargetsAt(tile.point);
     Unit? bestTarget;
     double bestCombatScore = 0;
     for(Unit target in targets){

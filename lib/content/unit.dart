@@ -300,13 +300,13 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     return (minCombatRange, maxCombatRange);
   } 
 
-  List<String> getActions(){
+  List<String> getActionsAt(Point<int> point){
     List<String> actions = [];
-    if(game.stage.tileMap[tilePosition]! is Town) {
-      Town town = game.stage.tileMap[tilePosition]! as Town;
+    if(game.stage.tileMap[point]! is Town) {
+      Town town = game.stage.tileMap[point]! as Town;
       if (town.open) actions.add("Visit");
     }
-    if(unit.getTargets(game.stage.cursor.tilePosition).isNotEmpty) actions.add("Attack");
+    if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
@@ -326,7 +326,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
-  List<Unit> getTargets(Point<int> tilePosition) {
+  List<Unit> getTargetsAt(Point<int> tilePosition) {
     List<Unit> targets = [];
     (int, int) combatRange = getCombatRange();
     for (int range = combatRange.$1; range <= combatRange.$2; range++) {

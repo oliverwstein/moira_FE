@@ -223,7 +223,7 @@ class ActionMenu extends Menu {
   Future<void> onLoad() async {
     SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
     unit.sprite.animation = newAnimation;
-    actions = unit.getActions();
+    actions = unit.getActionsAt(game.stage.cursor.tilePosition);
   }
 
   @override
@@ -245,7 +245,7 @@ class ActionMenu extends Menu {
             break;
           case "Attack":
             game.stage.blankAllTiles();
-            List<Unit> targets = unit.getTargets(unit.tilePosition);
+            List<Unit> targets = unit.getTargetsAt(unit.tilePosition);
             game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
             break;
         }
