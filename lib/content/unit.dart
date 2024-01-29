@@ -302,6 +302,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   List<String> getActions(){
     List<String> actions = [];
+    if(game.stage.tileMap[tilePosition]! is Town) {
+      Town town = game.stage.tileMap[tilePosition]! as Town;
+      if (town.open) actions.add("Visit");
+    }
     if(unit.getTargets(game.stage.cursor.tilePosition).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
