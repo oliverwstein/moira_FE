@@ -71,9 +71,11 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   TileState state = TileState.blank;
   // Factory constructor
   factory Tile(Point<int> point, double size, Terrain terrain, String name) {
-    if (name == "Center") {
+    if (name == "Center" && terrain == Terrain.town) {
       return TownCenter(point, size, terrain, name);
-    } else {
+    } else if (terrain == Terrain.town) {
+      return Town(point, size, terrain, name);}
+    else{
       return Tile._internal(point, size, terrain, name);
     }
   }
