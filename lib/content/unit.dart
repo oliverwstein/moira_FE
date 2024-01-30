@@ -313,6 +313,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     actions.add("Wait");
     return actions;
   }
+  
   void toggleCanAct(bool state) {
     _canAct = state;
     // Define the grayscale paint

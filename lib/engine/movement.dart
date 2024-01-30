@@ -108,20 +108,17 @@ mixin UnitMovement on PositionComponent {
         return const Point(0,0);
     }
   }
-  List<Movement> getPath(Point<int> destination) {
-    Map<Point<int>, Point<int>> cameFrom = {};
-    Map<Point<int>, double> gScore = {_tilePosition: 0};
-    Map<Point<int>, double> fScore = {_tilePosition: _heuristicCost(_tilePosition, destination)};
 
-    var openSet = {_tilePosition};
+  ({List<Movement> path, Map<Point<int>, double> gScores}) _aStar(Point<int> destination, {Point<int>? source}){
+    Map<Point<int>, Point<int>> cameFrom = {};
+    source ??= _tilePosition;
+    Map<Point<int>, double> gScore = {source: 0};
+    Map<Point<int>, double> fScore = {source: _heuristicCost(source, destination)};
+
+    var openSet = {source};
 
     while (openSet.isNotEmpty) {
       Point<int> current = openSet.reduce((a, b) => fScore[a]! < fScore[b]! ? a : b);
-
-      if (current == destination) {
-        unit.remainingMovement = (unit.movementRange - gScore[destination]!).clamp(0, unit.movementRange.toDouble());
-        return _reconstructPath(cameFrom, current);
-      }
 
       openSet.remove(current);
 
@@ -137,9 +134,20 @@ mixin UnitMovement on PositionComponent {
           }
         }
       }
+    if (current == destination) {
+        unit.remainingMovement = (unit.movementRange - gScore[destination]!).clamp(0, unit.movementRange.toDouble());
+        return (path: _reconstructPath(cameFrom, current), gScores: gScore);
+      }
     }
+    return (path: [], gScores: {});
+  }
 
-    return []; // return empty path if destination is not reachable
+  List<Movement> getPath(Point<int> destination) {
+    return _aStar(destination).path;
+  }
+
+  Map<Point<int>, double> getGScores(Point<int> destination, Point<int> source) {
+    return _aStar(destination, source: source).gScores;
   }
 
   List<Movement> _reconstructPath(Map<Point<int>, Point<int>> cameFrom, Point<int> current) {

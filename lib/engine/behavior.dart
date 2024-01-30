@@ -23,7 +23,7 @@ mixin UnitBehavior on PositionComponent {
   });
 }
 
-List<({List<Event> events, double score})> getCombatEventsAndScores(List<Tile> openTiles) {
+  List<({List<Event> events, double score})> getCombatEventsAndScores(List<Tile> openTiles) {
   return List.generate(openTiles.length, (index) {
     var tile = openTiles[index];
     List<Event> eventList = [];
@@ -40,10 +40,10 @@ List<({List<Event> events, double score})> getCombatEventsAndScores(List<Tile> o
   });
 }
 
-List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
+  List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
   List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement);
+  var gScores = unit.getGScores(unit.tilePosition, Point(15, 10));
   debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
-
   var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));
   if (eventTypes.contains("Move")) {
     var moveResults = getMoveEventsAndScores(openTiles);
@@ -62,10 +62,10 @@ List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes
   return rankedTiles;
 }
 
-
   double getTileDefenseScore(Tile tile){
     return tile.getTerrainDefense() + tile.getTerrainAvoid()/10;
   }
+  
   List<Tile> getTilesInMoveRange(double range){
     return unit.findReachableTiles(range, markTiles: false).toList();
   }
@@ -91,12 +91,11 @@ List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes
     // If the unit is brave, it should consider unit.level + expectedDamageDealt + expectedDamageTaken; it wants a good fight.
     // If the unit is neutral, it should consider unit.level + expectedDamageDealt - expectedDamageTaken; it wants a fight to its advantage.
     // If the unit is cowardly, it should consider unit.level + expectedDamageDealt - expectedDamageTaken**2; it wants a fight where it won't get hurt.
+    // But for now, just have all the units follow the neutral rules.
     double expectedDamageDealt = unit.getBestAttackOnTarget(target, getAttacksOnTarget(target, distance));
     double expectedDamageTaken = target.getBestAttackOnTarget(unit, getAttacksOnTarget(unit, distance));
     if(expectedDamageDealt >= target.hp) expectedDamageTaken = 0;
-    // For now, just have all the units follow the neutral rules.
     return (unit.level + expectedDamageDealt - expectedDamageTaken);
-
   }
 
   List<Attack> getAttacksOnTarget(Unit target, combatDistance){
