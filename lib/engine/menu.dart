@@ -253,7 +253,12 @@ class ActionMenu extends Menu {
             game.eventQueue.addEventBatch([VisitEvent(unit, game.stage.tileMap[unit.tilePosition]! as TownCenter)]);
             game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
-            
+            break;
+          case "Ransack":
+            game.stage.blankAllTiles();
+            game.eventQueue.addEventBatch([RansackEvent(unit, game.stage.tileMap[unit.tilePosition]! as TownCenter)]);
+            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.stage.menuManager.clearStack();
             break;
         }
         return KeyEventResult.handled;

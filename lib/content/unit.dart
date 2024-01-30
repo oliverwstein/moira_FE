@@ -306,6 +306,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     if(game.stage.tileMap[point]! is TownCenter) {
       TownCenter town = game.stage.tileMap[point]! as TownCenter;
       if (town.open) actions.add("Visit");
+      if (town.open) actions.add("Ransack");
     }
     if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
