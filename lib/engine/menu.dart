@@ -250,7 +250,7 @@ class ActionMenu extends Menu {
             break;
           case "Visit":
             game.stage.blankAllTiles();
-            game.eventQueue.addEventBatch([VisitEvent(unit, game.stage.tileMap[unit.tilePosition]! as Town)]);
+            game.eventQueue.addEventBatch([VisitEvent(unit, game.stage.tileMap[unit.tilePosition]! as TownCenter)]);
             game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
             

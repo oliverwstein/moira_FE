@@ -68,7 +68,7 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   // Factory constructor
   factory Tile(Point<int> point, double size, Terrain terrain, String name) {
     if (name == "Center") {
-      return Town(point, size, terrain, name);
+      return TownCenter(point, size, terrain, name);
     } else {
       return Tile._internal(point, size, terrain, name);
     }
@@ -168,27 +168,61 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   }
 }
 
-class Town extends Tile {
+class TownCenter extends Tile{
+  late SpriteComponent closedSprite;
+  late final SpriteSheet stateSheet;
   bool open;
   int loot;
   // Constructor for the Town class. 
   // Inherits properties and methods from Tile and adds specific properties for Town.
-  Town(Point<int> point, double size, Terrain terrain, String name, {this.open = true, this.loot = 10}) 
+  TownCenter(Point<int> point, double size, Terrain terrain, String name, {this.open = true, this.loot = 10}) 
     : super._internal(point, size, terrain, name);
 
   void close() {
     open = false;
   }
+  @override
+  void render(Canvas canvas){
+    super.render(canvas);
+    if(!open) add(closedSprite);
+
+  }
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    ui.Image statesImages = await game.images.load('states_set.png');
+    stateSheet = SpriteSheet.fromColumnsAndRows(
+      image: statesImages,
+      columns: 3,
+      rows: 3,
+    );
+    closedSprite = SpriteComponent(
+      sprite: stateSheet.getSprite(2, 0), 
+      size: size,
+    );
+    
+    closedSprite.anchor = Anchor.center;
+    closedSprite.position = Vector2(size.x/2, size.y/2);
+    
+  }
 
   void updateLoot(int newLoot) {
     loot = newLoot;
+    if(loot == 0) close();
   }
+}
+class Village extends Tile {
+  int condition = 2;
+  // Constructor for the Village class. 
+  // Inherits properties and methods from Tile and adds specific properties for Town.
+  Village(Point<int> point, double size, Terrain terrain, String name) 
+    : super._internal(point, size, terrain, name);
 }
 
 class VisitEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
-  final Town town;
+  final TownCenter town;
   VisitEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
@@ -199,7 +233,7 @@ class VisitEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    town.close; 
+    town.close(); 
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

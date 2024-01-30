@@ -56,7 +56,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     // FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
     playAreaSize = Vector2(mapTileWidth*tileSize, mapTileHeight*tileSize);
     tiles = await flame_tiled.TiledComponent.load(mapFileName, Vector2.all(tileSize));
-    tiles;
     add(tiles);
     createTiles();
     cursor = Cursor(initialPoint);
