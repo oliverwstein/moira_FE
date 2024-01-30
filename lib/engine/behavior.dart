@@ -172,7 +172,7 @@ class UnitActionEvent extends Event {
 class Order {
   final Unit unit;
   Order(this.unit);
-  void execute() {
+  void command() {
     unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
     var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
     debugPrint("${rankedTiles.firstOrNull}");
