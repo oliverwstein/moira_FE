@@ -25,6 +25,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   bool _canAct = true;
   bool dead = false;
   bool get canAct => _canAct;
+  Queue<Order> orders = Queue<Order>();
   final double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
@@ -313,7 +314,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     actions.add("Wait");
     return actions;
   }
-  
+
   void toggleCanAct(bool state) {
     _canAct = state;
     // Define the grayscale paint

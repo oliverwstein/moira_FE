@@ -151,5 +151,36 @@ class UnitOrderEvent extends Event {
   }
 }
 
+class UnitActionEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  UnitActionEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+   
+  }
+}
+
 class Order {
+  final Unit unit;
+  Order(this.unit);
+  void execute() {
+    unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
+    var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
+    debugPrint("${rankedTiles.firstOrNull}");
+    if(rankedTiles.firstOrNull != null){
+      for(Event event in rankedTiles.first.events){
+        unit.game.eventQueue.addEventBatch([event]);
+      }
+    }
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
 }
