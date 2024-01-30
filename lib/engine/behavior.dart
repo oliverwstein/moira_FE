@@ -11,6 +11,7 @@ mixin UnitBehavior on PositionComponent {
   Unit get unit => (this as Unit);
 
 
+
   List<({List<Event> events, double score})> getMoveEventsAndScores(List<Tile> openTiles) {
   return List.generate(openTiles.length, (index) {
     var tile = openTiles[index];
@@ -40,9 +41,17 @@ mixin UnitBehavior on PositionComponent {
   });
 }
 
+
   List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
   List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement);
   var gScores = unit.getGScores(unit.tilePosition, Point(15, 10));
+  // var closerTiles = {};
+  // for (Tile tile in openTiles){
+  //   if (gScores.keys.contains(tile.point)){
+  //     closerTiles[tile.point] = gScores[tile.point];
+  //     debugPrint("${tile.point} has gScore ${gScores[tile.point]}.");
+  //   }
+  // }
   debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
   var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));
   if (eventTypes.contains("Move")) {
@@ -121,4 +130,26 @@ mixin UnitBehavior on PositionComponent {
     }
     return expectedDamage;
   }
+}
+
+class UnitOrderEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final Order order;
+  UnitOrderEvent(this.unit, this.order, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+   
+  }
+}
+
+class Order {
 }
