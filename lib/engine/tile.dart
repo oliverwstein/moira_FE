@@ -184,6 +184,13 @@ class TownCenter extends Tile{
   TownCenter(Point<int> point, double size, Terrain terrain, String name, {this.open = true, this.loot = 10}) 
     : super._internal(point, size, terrain, name);
 
+  static TownCenter? getNearestTown(Unit unit) {
+  var openTowns = unit.game.stage.children.query<TownCenter>().where((town) => town.open);
+  return openTowns.isNotEmpty 
+    ? openTowns.reduce((nearest, town) => 
+        unit.getPathDistance(town.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? town : nearest) 
+    : null;
+  }
   void close() {
     open = false;
   }
@@ -329,3 +336,4 @@ class RansackEvent extends Event {
     game.eventQueue.dispatchEvent(this);
   }
 }
+

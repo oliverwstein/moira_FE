@@ -149,6 +149,9 @@ mixin UnitMovement on PositionComponent {
   Map<Point<int>, double> getGScores(Point<int> destination, Point<int> source) {
     return _aStar(destination, source: source).gScores;
   }
+  double getPathDistance(Point<int> destination, Point<int> source) {
+    return _aStar(destination, source: source).gScores[destination] ?? double.infinity;
+  }
 
   List<Movement> _reconstructPath(Map<Point<int>, Point<int>> cameFrom, Point<int> current) {
     List<Movement> totalPath = [];

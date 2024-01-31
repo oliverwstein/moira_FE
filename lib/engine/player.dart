@@ -67,7 +67,9 @@ class AIPlayer extends Player{
       Unit unit = unitsToCommand.removeLast();
       Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
       game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
-      if(unit.orders.isEmpty) Order(unit).command();
+      if (unit.className == "Brigand") RansackOrder(unit).command();
+      else{if(unit.orders.isEmpty) Order(unit).command();}
+      
     }
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isEmpty) {
       game.eventQueue.addEventBatch([EndTurnEvent(name)]);

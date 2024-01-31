@@ -44,14 +44,6 @@ mixin UnitBehavior on PositionComponent {
 
   List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
   List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement);
-  var gScores = unit.getGScores(unit.tilePosition, Point(15, 10));
-  // var closerTiles = {};
-  // for (Tile tile in openTiles){
-  //   if (gScores.keys.contains(tile.point)){
-  //     closerTiles[tile.point] = gScores[tile.point];
-  //     debugPrint("${tile.point} has gScore ${gScores[tile.point]}.");
-  //   }
-  // }
   debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
   var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));
   if (eventTypes.contains("Move")) {
@@ -184,3 +176,38 @@ class Order {
     unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
   }
 }
+
+class RansackOrder extends Order {
+  RansackOrder(super.unit);
+
+  @override
+  void command(){
+    unit.remainingMovement = unit.movementRange.toDouble();
+    TownCenter? nearestTown = TownCenter.getNearestTown(unit);
+    if(nearestTown == null) {super.command();}
+    else {
+      List<Tile> openTiles = unit.getTilesInMoveRange(unit.remainingMovement);
+      if(openTiles.contains(nearestTown)){
+        if(nearestTown.isOccupied && unit.game.stage.factionMap[nearestTown.unit!.faction]!.checkHostility(unit)){
+          // @TODO: Make the unit move to attack the unit on the tile.
+        } else if(nearestTown.isOccupied && !unit.game.stage.factionMap[nearestTown.unit!.faction]!.checkHostility(unit)){
+          // Eh, it's taken care of. 
+          super.command();
+        } else{
+          unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestTown.point)]);
+        }
+      } else {
+        Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, nearestTown.point);
+        var closerTiles = {};
+        for (Tile tile in openTiles){
+          if (gScores.keys.contains(tile.point)){
+            closerTiles[tile.point] = gScores[tile.point];
+            debugPrint("${tile.point} has score ${closerTiles[tile.point]}");
+          }
+        }
+      }
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    }
+  }
+}
+  
