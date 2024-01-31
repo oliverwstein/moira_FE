@@ -45,7 +45,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int hp = -1;
   int sta = -1;
         
-  factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings}) {
+  factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings, List<String>? orderStrings}) {
 
     // Extract unit data from the static map in MoiraGame
     var unitsJson = MoiraGame.unitMap['units'] as List;
@@ -62,11 +62,13 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unitData['skills'].addAll(classData.skills);
     unitData['attacks'].addAll(classData.attacks);
     unitData['proficiencies'].addAll(classData.proficiencies);
-
     String faction = factionName;
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = getWeaponTypesFromNames(unitData["proficiencies"].cast<String>());
     Set<Skill> skillSet = getSkillsFromNames(unitData["skills"].cast<String>());
+
+    orderStrings = orderStrings ?? [];
+    orderStrings.addAll(classData.orders);
 
     // Create items for items
     List<Item> inventory = [];

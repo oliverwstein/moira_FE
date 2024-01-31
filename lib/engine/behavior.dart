@@ -169,9 +169,18 @@ class UnitActionEvent extends Event {
 }
 
 class Order {
-  final Unit unit;
-  Order(this.unit);
-  void command() {
+  Order();
+  factory Order.create(String orderType) {
+    switch (orderType) {
+        case 'Ransack':
+            return RansackOrder();
+        case 'Guard':
+            return GuardOrder();
+        default:
+            throw ArgumentError('Invalid order type: $orderType');
+    }
+  }
+  void command(Unit unit) {
     unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
     var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
     if(rankedTiles.firstOrNull != null){
@@ -184,17 +193,17 @@ class Order {
 }
 
 class RansackOrder extends Order {
-  RansackOrder(super.unit);
+  RansackOrder();
 
   @override
-  void command(){
+  void command(Unit unit){
     unit.remainingMovement = unit.movementRange.toDouble();
     var tile = unit.tile;
     if(tile is TownCenter && tile.open) {
       unit.game.eventQueue.addEventBatch([RansackEvent(unit, tile)]);
     } else {
       TownCenter? nearestTown = TownCenter.getNearestTown(unit);
-      if(nearestTown == null) {super.command();}
+      if(nearestTown == null) {super.command(unit);}
       else {
         List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
         if(openTiles.contains(nearestTown)){
@@ -222,10 +231,10 @@ class RansackOrder extends Order {
 }
 
 class GuardOrder extends Order {
-  GuardOrder(super.unit);
+  GuardOrder();
 
   @override
-  void command(){
+  void command(Unit unit){
     unit.makeBestAttackAt(unit.tile);
   }
 }

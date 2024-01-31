@@ -131,6 +131,7 @@
         "skills": [],
         "attacks": [],
         "proficiencies": ["Axe"],
+        "orders": ["Ransack"],
         "growths": {
             "hp": 90,
             "sta": 50,
