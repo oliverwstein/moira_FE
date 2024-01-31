@@ -288,6 +288,7 @@ class CombatMenu extends Menu {
   @override 
   Future<void> onLoad() async {
     attacks = unit.attackSet.values.toList();
+    unit.attack = attacks.first;
     // @TODO: attacks should really be generated on a by-target basis. 
     game.stage.cursor.snapToTile(targets.first.tilePosition);
     targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));

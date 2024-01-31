@@ -95,7 +95,7 @@ mixin UnitBehavior on PositionComponent {
     // But for now, just have all the units follow the neutral rules.
     double expectedDamageDealt = unit.getBestAttackOnTarget(target, getAttacksOnTarget(target, distance));
     double expectedDamageTaken = target.getBestAttackOnTarget(unit, getAttacksOnTarget(unit, distance));
-    if(expectedDamageDealt >= target.hp) expectedDamageTaken = 0;
+    if(unit.level + expectedDamageDealt >= target.hp) expectedDamageTaken = 0;
     return (unit.level + expectedDamageDealt - expectedDamageTaken);
   }
 
