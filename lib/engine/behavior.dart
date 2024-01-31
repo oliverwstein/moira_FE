@@ -89,14 +89,15 @@ mixin UnitBehavior on PositionComponent {
 
   double judgeCombatAtDistance(target, distance){
     // behavioral states: brave, neutral, cowardly. 
-    // If the unit is brave, it should consider unit.level + expectedDamageDealt + expectedDamageTaken; it wants a good fight.
-    // If the unit is neutral, it should consider unit.level + expectedDamageDealt - expectedDamageTaken; it wants a fight to its advantage.
-    // If the unit is cowardly, it should consider unit.level + expectedDamageDealt - expectedDamageTaken**2; it wants a fight where it won't get hurt.
+    // If the unit is brave, it should consider unit.level + expectedDamageDealt*2 + expectedDamageTaken; it wants a good fight.
+    // If the unit is neutral, it should consider unit.level + expectedDamageDealt*2 - expectedDamageTaken; it wants a fight to its advantage.
+    // If the unit is cowardly, it should consider unit.level + expectedDamageDealt*2 - expectedDamageTaken**2; it wants a fight where it won't get hurt.
     // But for now, just have all the units follow the neutral rules.
     double expectedDamageDealt = unit.getBestAttackOnTarget(target, getAttacksOnTarget(target, distance));
     double expectedDamageTaken = target.getBestAttackOnTarget(unit, getAttacksOnTarget(unit, distance));
-    if(unit.level + expectedDamageDealt >= target.hp) expectedDamageTaken = 0;
-    return (unit.level + expectedDamageDealt - expectedDamageTaken);
+    if(expectedDamageDealt >= target.hp) expectedDamageTaken = 0;
+    double score = unit.level + expectedDamageDealt*2 - expectedDamageTaken;
+    return (score);
   }
 
   List<Attack> getAttacksOnTarget(Unit target, combatDistance){
