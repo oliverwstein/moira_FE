@@ -183,31 +183,32 @@ class RansackOrder extends Order {
   @override
   void command(){
     unit.remainingMovement = unit.movementRange.toDouble();
-    TownCenter? nearestTown = TownCenter.getNearestTown(unit);
-    if(nearestTown == null) {super.command();}
-    else {
-      List<Tile> openTiles = unit.getTilesInMoveRange(unit.remainingMovement);
-      if(openTiles.contains(nearestTown)){
-        if(nearestTown.isOccupied && unit.game.stage.factionMap[nearestTown.unit!.faction]!.checkHostility(unit)){
-          // @TODO: Make the unit move to attack the unit on the tile.
-        } else if(nearestTown.isOccupied && !unit.game.stage.factionMap[nearestTown.unit!.faction]!.checkHostility(unit)){
-          // Eh, it's taken care of. 
-          super.command();
-        } else{
+    var tile = unit.game.stage.tileMap[unit.tilePosition]!;
+    if(tile is TownCenter && tile.open) {
+      unit.game.eventQueue.addEventBatch([RansackEvent(unit, tile)]);
+    } else {
+      TownCenter? nearestTown = TownCenter.getNearestTown(unit);
+      if(nearestTown == null) {super.command();}
+      else {
+        List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+        if(openTiles.contains(nearestTown)){
           unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestTown.point)]);
-        }
-      } else {
-        Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, nearestTown.point);
-        var closerTiles = {};
-        for (Tile tile in openTiles){
-          if (gScores.keys.contains(tile.point)){
-            closerTiles[tile.point] = gScores[tile.point];
-            debugPrint("${tile.point} has score ${closerTiles[tile.point]}");
+        } 
+        else {
+          Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, nearestTown.point);
+          var closerTiles = {};
+          for (Tile tile in openTiles){
+            if (gScores.keys.contains(tile.point)){
+              closerTiles[tile.point] = gScores[tile.point];
+            }
           }
+          Point<int> bestMove = closerTiles.entries
+                                    .reduce((curr, next) => curr.value < next.value ? curr : next)
+                                    .key;
+          unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, bestMove)]);
         }
       }
-    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
-    }
+    } unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
   }
 }
   

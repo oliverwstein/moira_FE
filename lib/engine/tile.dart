@@ -185,7 +185,7 @@ class TownCenter extends Tile{
     : super._internal(point, size, terrain, name);
 
   static TownCenter? getNearestTown(Unit unit) {
-  var openTowns = unit.game.stage.children.query<TownCenter>().where((town) => town.open);
+  var openTowns = unit.game.stage.children.query<TownCenter>().where((town) => town.open && !town.isOccupied);
   return openTowns.isNotEmpty 
     ? openTowns.reduce((nearest, town) => 
         unit.getPathDistance(town.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? town : nearest) 
@@ -332,6 +332,7 @@ class RansackEvent extends Event {
   Future<void> execute() async {
     super.execute();
     town.ransack(); 
+    debugPrint("RansackEvent: ${unit.name} ransacks town at ${town.point}.");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
