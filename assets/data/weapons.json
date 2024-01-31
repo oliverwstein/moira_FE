@@ -5,7 +5,7 @@
             {
                 "weaponType" : "Sword",
                 "might": 5,
-                "hit": 50,
+                "hit": 15,
                 "crit": 5,
                 "fatigue": 1,
                 "effects": [],
@@ -24,8 +24,8 @@
             {
                 "weaponType" : "Lance",
                 "might": 7,
-                "hit": 25,
-                "fatigue": 1,
+                "hit": 20,
+                "fatigue": 2,
                 "effects": [],
                 "specialAttack": "Stab"
             },
@@ -38,14 +38,14 @@
             {
                 "weaponType" : "Axe",
                 "might": 8,
-                "hit": 10,
+                "hit": 5,
                 "specialAttack": "Throw"
             },
             "Bow":
             {
                 "weaponType" : "Bow",
                 "might": 10,
-                "hit": 30,
+                "hit": 10,
                 "specialAttack": "Shoot"
             }
         }

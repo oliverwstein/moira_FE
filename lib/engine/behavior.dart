@@ -44,7 +44,7 @@ mixin UnitBehavior on PositionComponent {
 
   List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
   List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement);
-  debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
+  // debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
   var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));
   if (eventTypes.contains("Move")) {
     var moveResults = getMoveEventsAndScores(openTiles);
@@ -167,7 +167,6 @@ class Order {
   void command() {
     unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
     var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
-    debugPrint("${rankedTiles.firstOrNull}");
     if(rankedTiles.firstOrNull != null){
       for(Event event in rankedTiles.first.events){
         unit.game.eventQueue.addEventBatch([event]);
@@ -193,6 +192,7 @@ class RansackOrder extends Order {
         List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
         if(openTiles.contains(nearestTown)){
           unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestTown.point)]);
+          unit.game.eventQueue.addEventBatch([RansackEvent(unit, nearestTown)]);
         } 
         else {
           Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, nearestTown.point);

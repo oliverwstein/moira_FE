@@ -31,7 +31,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
+    // debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
     if (isNotEmpty){
       debugPrint("Active menu is: ${_menuStack.last.runtimeType}");
       if(key is RawKeyDownEvent) return _menuStack.last.handleKeyEvent(key, keysPressed);
