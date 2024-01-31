@@ -230,12 +230,36 @@ class RansackOrder extends Order {
   }
 }
 
+/// Do not move, but attack enemies within range if possible. 
 class GuardOrder extends Order {
   GuardOrder();
 
   @override
   void command(Unit unit){
     unit.makeBestAttackAt(unit.tile);
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+/// Move to attack any enemy units that come within range, but otherwise do not move. 
+class DefendOrder extends Order {
+  DefendOrder();
+
+  @override
+  void command(Unit unit){
+    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+    var combatResults = unit.getCombatEventsAndScores(openTiles);
+    // Add the best combatResult event list to the queue.
+    unit.game.eventQueue.addEventBatch(combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events);
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
   }
 }
   
+/// Move towards any enemy castle, attacking enemies along the way.
+class InvadeOrder extends Order {
+  InvadeOrder();
+
+  @override
+  void command(Unit unit){
+  }
+}

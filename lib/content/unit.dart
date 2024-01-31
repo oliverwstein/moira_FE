@@ -69,6 +69,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
     orderStrings = orderStrings ?? [];
     orderStrings.addAll(classData.orders);
+    Queue<Order> orders = Queue<Order>();
+    for (String orderString in orderStrings){
+      orders.add(Order.create(orderString));
+    }
 
     // Create items for items
     List<Item> inventory = [];
@@ -104,11 +108,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, skillSet, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
     _postConstruction();
   }
 
