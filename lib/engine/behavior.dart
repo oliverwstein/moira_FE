@@ -123,6 +123,12 @@ mixin UnitBehavior on PositionComponent {
     }
     return expectedDamage;
   }
+  void makeBestAttackAt(Tile tile) {
+    ({double score, Unit target})? target = unit.bestTargetFrom(tile);
+    if(target != null) {
+      unit.game.eventQueue.addEventBatch([StartCombatEvent(unit, target.target)]);
+    }
+  }
 }
 
 class UnitOrderEvent extends Event {
@@ -183,7 +189,7 @@ class RansackOrder extends Order {
   @override
   void command(){
     unit.remainingMovement = unit.movementRange.toDouble();
-    var tile = unit.game.stage.tileMap[unit.tilePosition]!;
+    var tile = unit.tile;
     if(tile is TownCenter && tile.open) {
       unit.game.eventQueue.addEventBatch([RansackEvent(unit, tile)]);
     } else {
@@ -209,7 +215,18 @@ class RansackOrder extends Order {
           unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, bestMove)]);
         }
       }
-    } unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    }
+
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+class GuardOrder extends Order {
+  GuardOrder(super.unit);
+
+  @override
+  void command(){
+    unit.makeBestAttackAt(unit.tile);
   }
 }
   

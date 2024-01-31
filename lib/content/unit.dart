@@ -16,6 +16,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   double remainingMovement = - 1;
   String faction;
   Point<int> tilePosition;
+  Tile get tile => game.stage.tileMap[tilePosition]!;
   Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
   late SpriteAnimationComponent sprite;
@@ -175,7 +176,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
-    } game.stage.tileMap[tilePosition]!.setUnit(this);
+    } unit.tile.setUnit(this);
   }
 
   @override
@@ -214,7 +215,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
                             size: spriteSize,
                             anchor: Anchor.center);
     add(sprite);
-    position = game.stage.tileMap[tilePosition]!.center;
+    position = unit.tile.center;
     anchor = Anchor.center;
   
     // Add to faction:
@@ -225,7 +226,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("Unit created for faction $faction not in factionMap.");
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
-    game.stage.tileMap[tilePosition]?.setUnit(this);
+    unit.tile.setUnit(this);
     debugPrint("Unit $name loaded.");
     _loadCompleter.complete();
   }
@@ -404,7 +405,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void die() {
     dead = true;
-    game.stage.tileMap[tilePosition]!.removeUnit();
+    unit.tile.removeUnit();
     game.stage.factionMap[faction]!.units.remove(this);
     removeFromParent();
   }
