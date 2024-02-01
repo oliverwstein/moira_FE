@@ -215,7 +215,7 @@ class Order {
         unit.game.eventQueue.addEventBatch([event]);
       }
     }
-    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }
 
@@ -245,7 +245,7 @@ class RansackOrder extends Order {
         }
       }
     }
-    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }
 
@@ -257,7 +257,7 @@ class GuardOrder extends Order {
   void command(Unit unit){
     debugPrint("${unit.name} ordered to Guard");
     unit.makeBestAttackAt(unit.tile);
-    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }
 
@@ -272,7 +272,7 @@ class DefendOrder extends Order {
     var combatResults = unit.getCombatEventsAndScores(openTiles);
     // Add the best combatResult event list to the queue.
     unit.game.eventQueue.addEventBatch(combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events);
-    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }
   
@@ -300,6 +300,6 @@ class InvadeOrder extends Order {
         unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
       }
     }
-    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }

@@ -499,11 +499,11 @@ class UnitMoveEvent extends Event {
   } 
 }
 
-class ExhaustUnitEvent extends Event {
+class UnitExhaustEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   bool manual;
-  ExhaustUnitEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitExhaustEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

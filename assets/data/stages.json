@@ -730,6 +730,17 @@
                             "name":"Gandolf_Midir_Prefight"}
                         }
                     ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Gandolf_Midir_Fight",
+                    "triggers":
+                    [
+                        {"StartCombatEvent":
+                            {
+                            "name":"StartCombat_Gandolf_Midir"}
+                        }
+                    ]
                 }
             ]
         ]

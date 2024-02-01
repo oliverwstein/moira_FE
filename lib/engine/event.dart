@@ -25,6 +25,65 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void execute(){
     _isStarted = true;
   }
+  static List getObserversByClassName(String eventClassName){
+    // UPDATE THIS WHENEVER YOU CREATE A NEW EVENT CLASS
+    switch (eventClassName) {
+    case 'UnitCreationEvent':
+      return UnitCreationEvent.observers;
+    case 'UnitMoveEvent':
+      return UnitMoveEvent.observers;
+    case 'UnitExhaustEvent':
+      return UnitExhaustEvent.observers;
+    case 'DeathEvent':
+      return DeathEvent.observers;
+    case 'UnitOrderEvent':
+      return UnitOrderEvent.observers;
+    case 'UnitActionEvent':
+      return UnitActionEvent.observers;
+    case 'StartCombatEvent':
+      return StartCombatEvent.observers;
+    case 'CombatRoundEvent':
+      return CombatRoundEvent.observers;
+    case 'EndCombatEvent':
+      return EndCombatEvent.observers;
+    case 'AttackEvent':
+      return AttackEvent.observers;
+    case 'HitEvent':
+      return HitEvent.observers;
+    case 'MissEvent':
+      return MissEvent.observers;
+    case 'CritEvent':
+      return CritEvent.observers;
+    case 'DamageEvent':
+      return DamageEvent.observers;
+    case 'StartTurnEvent':
+      return StartTurnEvent.observers;
+    case 'TakeTurnEvent':
+      return TakeTurnEvent.observers;
+    case 'EndTurnEvent':
+      return EndTurnEvent.observers;
+    case 'FactionCreationEvent':
+      return FactionCreationEvent.observers;
+    case 'VisitEvent':
+      return VisitEvent.observers;
+    case 'RansackEvent':
+      return RansackEvent.observers;
+    case 'BesiegeEvent':
+      return BesiegeEvent.observers;
+    case 'SeizeEvent':
+      return SeizeEvent.observers;
+    case 'DialogueEvent':
+      return DialogueEvent.observers;
+    case 'PanEvent':
+      return PanEvent.observers;
+    case 'VantageEvent':
+      return VantageEvent.observers;
+    case 'CantoEvent':
+      return CantoEvent.observers;
+    default:
+      return [];
+    }
+  }
 
   List<Event> getObservers();
 

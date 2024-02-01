@@ -38,7 +38,7 @@ class StartCombatEvent extends Event {
   final Unit target;
   final bool duel;
   late final Combat combat;
-  StartCombatEvent(this.unit, this.target, {Trigger? trigger, String? name, this.duel = false}) : super(trigger: trigger, name: name){
+  StartCombatEvent(this.unit, this.target, {Trigger? trigger, String? name, this.duel = false}) : super(trigger: trigger, name: name ?? "StartCombat_${unit.name}_${target.name}"){
     combat = Combat(unit, target, duel: duel);
   }
   @override
@@ -51,6 +51,7 @@ class StartCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    if(duel) debugPrint("Duel! $name");
     game.add(combat);
     game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
     game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
@@ -108,7 +109,7 @@ class EndCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    game.eventQueue.addEventBatch([ExhaustUnitEvent(combat.attacker)]);
+    game.eventQueue.addEventBatch([UnitExhaustEvent(combat.attacker)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

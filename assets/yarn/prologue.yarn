@@ -12,13 +12,13 @@ title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
 <<local $right = "Aideen" as String>>
-Midir: My lady, the castle is surrounded. We will make them pay in blood, but it's only a matter of time.
+Midir: My lady, the castle is surrounded. They will pay in blood, but it's only a matter of time.
 
 Aideen: I do not ask you to die for me, Midir. Your blood is not the measure of my honor. 
 
 Aideen: Please, I want as many of you to get out of this alive as possible.
 
-Midir: None of us are going anywhere, my lady. We're here for you till the very end. Even if it means our lives.
+Midir: I have already sent the men out, to carry word of this surprise attack. But they will have you only over my corpse.
 
 Aideen: I was afraid of that.
 <<set $left = "">>
@@ -77,7 +77,8 @@ Azel: Lex, looks like we made it in time.
 
 Lex: Geez...Looks like Sigurd is taking on the entire Verdane army! He'll sure be happy to see us. You just can't stay out of these things, can you, Azel...
 
-Azel: Yeah, but with the military on engagement to Isaac, Grandbell's completely strapped! Sigurd and the few soldiers left in Chalphy are out here fighting for their lives! I can't just leave them hanging...
+Azel: Yeah, but with the military on engagement to Isaac, Grandbell's completely strapped! 
+Azel: Sigurd and the few soldiers left in Chalphy are out here fighting for their lives! I can't just leave them hanging...
 
 Lex: Oh really...I'm not quite buying your story, Azel. What aren't you telling me?
 
@@ -101,5 +102,14 @@ title: Gandolf_Midir_Prefight
 <<local $right = "Gandolf" as String>>
 Gandolf: You dogs still haven't broken through this puny castle yet? Useless! 
 Gandolf: I'll show you how it's done.
+<<stop>>
+===
+
+title: Gandolf_Midir_Fight
+---
+<<local $left = "Gandolf" as String>>
+<<local $right = "Midir" as String>>
+Gandolf: You held out pretty well for being on your own, but it's over. Prepare to die!
+Midir: So it goes. Lady Aideen...
 <<stop>>
 ===

@@ -59,12 +59,12 @@ class CantoEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<ExhaustUnitEvent>((exhaustUnitEvent) {
+    eventQueue.registerClassObserver<UnitExhaustEvent>((UnitExhaustEvent) {
       debugPrint("Canto Check");
-      if (exhaustUnitEvent.unit.hasSkill(Skill.canto) && exhaustUnitEvent.unit.remainingMovement >= .7 && exhaustUnitEvent.manual == false) {
+      if (UnitExhaustEvent.unit.hasSkill(Skill.canto) && UnitExhaustEvent.unit.remainingMovement >= .7 && UnitExhaustEvent.manual == false) {
         debugPrint("Canto Check Succeeds");
-        CantoEvent cantoEvent = CantoEvent(exhaustUnitEvent.unit);
-        EventQueue eventQueue = exhaustUnitEvent.game.eventQueue;
+        CantoEvent cantoEvent = CantoEvent(UnitExhaustEvent.unit);
+        EventQueue eventQueue = UnitExhaustEvent.game.eventQueue;
         eventQueue.addEventBatchToHead([cantoEvent]);
       }
     });

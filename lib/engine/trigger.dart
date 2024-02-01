@@ -36,7 +36,9 @@ class Trigger extends Component {
         String name = triggerData["UnitMoveEvent"]["name"];
         return Trigger._byName(name);
       default:
-        return Trigger._dummy();
+        String name = triggerData[triggerData.keys.first]["name"];
+        Event.getObserversByClassName(triggerData.keys.first).add(event);
+        return Trigger._byName(name);
     }
   }
 

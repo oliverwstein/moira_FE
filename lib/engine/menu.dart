@@ -236,7 +236,7 @@ class ActionMenu extends Menu {
         game.stage.blankAllTiles();
         switch (actions[selectedIndex]){
           case "Wait":
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: true)]);
+            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);
             game.stage.menuManager.clearStack();
             break;
           case "Items":
@@ -249,12 +249,12 @@ class ActionMenu extends Menu {
             break;
           case "Visit":
             game.eventQueue.addEventBatch([VisitEvent(unit, unit.tile as TownCenter)]);
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
             break;
           case "Ransack":
             game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
             break;
           case "Seize":
