@@ -233,33 +233,36 @@ class ActionMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         debugPrint("${actions[selectedIndex]} Chosen");
+        game.stage.blankAllTiles();
         switch (actions[selectedIndex]){
           case "Wait":
             game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: true)]);
             game.stage.menuManager.clearStack();
             break;
           case "Items":
-            game.stage.blankAllTiles();
             debugPrint("${actions[selectedIndex]} Chosen");
             game.stage.menuManager.pushMenu(InventoryMenu(unit));
             break;
           case "Attack":
-            game.stage.blankAllTiles();
             List<Unit> targets = unit.getTargetsAt(unit.tilePosition);
             game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
             break;
           case "Visit":
-            game.stage.blankAllTiles();
             game.eventQueue.addEventBatch([VisitEvent(unit, unit.tile as TownCenter)]);
             game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
             break;
           case "Ransack":
-            game.stage.blankAllTiles();
             game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
             game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
             break;
+          case "Seize":
+            game.eventQueue.addEventBatch([SeizeEvent(unit, unit.tile as CastleGate)]);
+          case "Besiege":
+            // Create a variant of the CombatMenu called BesiegeMenu. 
+            //For now, just trigger a besiege event.
+            game.eventQueue.addEventBatch([BesiegeEvent(unit, unit.tile as CastleGate)]);
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
