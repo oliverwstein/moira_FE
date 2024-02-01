@@ -224,6 +224,7 @@ class RansackOrder extends Order {
 
   @override
   void command(Unit unit){
+    debugPrint("${unit.name} ordered to Ransack");
     unit.remainingMovement = unit.movementRange.toDouble();
     var tile = unit.tile;
     if(tile is TownCenter && tile.open) {
@@ -254,6 +255,7 @@ class GuardOrder extends Order {
 
   @override
   void command(Unit unit){
+    debugPrint("${unit.name} ordered to Guard");
     unit.makeBestAttackAt(unit.tile);
     unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
   }
@@ -265,6 +267,7 @@ class DefendOrder extends Order {
 
   @override
   void command(Unit unit){
+    debugPrint("${unit.name} ordered to Defend");
     List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
     var combatResults = unit.getCombatEventsAndScores(openTiles);
     // Add the best combatResult event list to the queue.
@@ -280,18 +283,19 @@ class InvadeOrder extends Order {
 
   @override
   void command(Unit unit){
-    CastleGate? nearestEnemyCastle = CastleGate.getNearestCastle(unit, targetName);
-    if(nearestEnemyCastle == null) {
+    CastleGate? nearestCastle = CastleGate.getNearestCastle(unit, targetName);
+    debugPrint("${unit.name} ordered to invade ${nearestCastle?.name}");
+    if(nearestCastle == null) {
       // @TODO: If the nearestEnemyCastle is null, 
       // it should really go to the next order in the queue, not the basic order.
       super.command(unit);}
     else {
       List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
-      if(openTiles.contains(nearestEnemyCastle)){
-        unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestEnemyCastle.point)]);
+      if(openTiles.contains(nearestCastle)){
+        unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestCastle.point)]);
         // @TODO: Then add a Seize or Besiege event depending on whether the fort is occupied.
       } else {
-        Point<int> bestMove = unit.moveTowardsTarget(nearestEnemyCastle.point, openTiles);
+        Point<int> bestMove = unit.moveTowardsTarget(nearestCastle.point, openTiles);
         unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
       }
     }

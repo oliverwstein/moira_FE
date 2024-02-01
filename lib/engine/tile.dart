@@ -305,12 +305,10 @@ class CastleGate extends Tile {
   late final SpriteSheet stateSheet;
   final String factionName;
   FactionType get factionType => FactionOrder.fromName(factionName) ?? FactionType.red;
-  // Constructor for the Village class. 
-  // Inherits properties and methods from Tile and adds specific properties for Town.
   CastleGate(Point<int> point, double size, Terrain terrain, String name, this.factionName) 
     : super._internal(point, size, terrain, name);
   static CastleGate? getNearestCastle(Unit unit, String factionName) {
-    var castleGates = unit.game.stage.children.query<CastleGate>().where((gate) => gate.factionName == factionName);
+    var castleGates = unit.game.stage.children.query<CastleGate>().where((gate) => gate.name == factionName);
     return castleGates.isNotEmpty 
       ? castleGates.reduce((nearest, gate) => 
           unit.getPathDistance(gate.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? gate : nearest) 
