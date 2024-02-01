@@ -193,6 +193,19 @@ class DialogueEvent extends Event{
   String nodeName;
   late DialogueMenu menu;
   DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<UnitDeathEvent>((deathEvent) {
+      if (deathEvent.game.yarnProject.nodes.keys.contains("${deathEvent.unit.name}_Death_Quote")) {
+        debugPrint("Death Quote found for ${deathEvent.unit.name}");
+        // Trigger UnitDeathEvent
+        var deathQuoteEvent = DialogueEvent("${deathEvent.unit.name}_Death_Quote");
+        EventQueue eventQueue = deathEvent.game.eventQueue;
+        eventQueue.addEventBatchToHead([deathQuoteEvent]);
+      }
+    });
+  }
+
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

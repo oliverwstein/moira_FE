@@ -54,7 +54,6 @@ class StartCombatEvent extends Event {
     if(duel) debugPrint("Duel! $name");
     game.add(combat);
     game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
-    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
@@ -71,6 +70,7 @@ class CombatRoundEvent extends Event {
       if (endCombatEvent.combat.duel && !endCombatEvent.combat.attacker.dead && !endCombatEvent.combat.defender.dead) {
         CombatRoundEvent newCombatRoundEvent = CombatRoundEvent(endCombatEvent.combat);
         EventQueue eventQueue = endCombatEvent.game.eventQueue;
+        debugPrint("Add duel round: ${endCombatEvent.combat.attacker.name} against ${endCombatEvent.combat.defender.name}");
         eventQueue.addEventBatchToHead([newCombatRoundEvent]);
       } else {
         endCombatEvent.combat.removeFromParent();
@@ -91,6 +91,7 @@ class CombatRoundEvent extends Event {
     game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
     combat.addFollowUp();
     completeEvent();
+    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     game.eventQueue.dispatchEvent(this);
   }
 }

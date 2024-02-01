@@ -116,7 +116,8 @@ Midir: So it goes. Lady Aideen...
 
 title: Midir_Death_Quote
 ---
-<<local $left = "Gandolf" as String>>
+<<local $left = "" as String>>
+<<local $right = "Midir" as String>>
 Midir: Forgive me, my lady.
 <<stop>>
 ===
