@@ -320,15 +320,16 @@ class CastleGate extends Tile {
     );
     flagSprite = SpriteComponent(
       sprite: stateSheet.getSprite(3, factionType.order), 
-      size: size,
+      size: Vector2.all(Stage.tileSize),
       anchor: Anchor.center,
-      position: Vector2(3*size.x/2, size.y/2),
+      position: Vector2(size.x*1.5, size.y/2),
     );
   }
   @override
   void render(Canvas canvas) {
     super.render(canvas);
     flagSprite.sprite = stateSheet.getSprite(3, factionType.order);
+    add(flagSprite);
   }
 }
 

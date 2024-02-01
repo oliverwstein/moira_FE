@@ -26,9 +26,9 @@ extension FactionOrder on FactionType {
       case FactionType.blue:
         return 0;
       case FactionType.red:
-        return 2;
+        return 1;
       case FactionType.green:
-        return 3;
+        return 2;
     }
   }
   String get name => toString().split('.').last.replaceFirstMapped(RegExp(r'[a-zA-Z]'), (match) => match.group(0)!.toUpperCase());
