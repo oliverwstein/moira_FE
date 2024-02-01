@@ -314,7 +314,7 @@
                         46,
                         21
                     ],
-                    "orders": ["Invade"]
+                    "orders": ["Invade_Chalphy"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -329,7 +329,7 @@
                         45,
                         22
                     ],
-                    "orders": ["Invade"]
+                    "orders": ["Invade_Chalphy"]
                 },
                 {
                     "type": "UnitCreationEvent",

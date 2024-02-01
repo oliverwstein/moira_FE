@@ -191,8 +191,9 @@ class FactionCreationEvent extends Event{
 
 class Order {
   Order();
-  factory Order.create(String orderType, [dynamic target]) {
-    switch (orderType) {
+  factory Order.create(String orderType) {
+    var inputs = orderType.split("_");
+    switch (inputs[0]) {
       case 'Ransack':
         return RansackOrder();
       case 'Guard':
@@ -200,8 +201,8 @@ class Order {
       case 'Defend':
         return DefendOrder();
       case 'Invade':
-        assert(target != null);
-        return InvadeOrder(target);
+        assert(inputs.length == 2);
+        return InvadeOrder(inputs[1]);
       default:
         throw ArgumentError('Invalid order type: $orderType');
     }
