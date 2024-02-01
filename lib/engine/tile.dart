@@ -78,7 +78,9 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
     } else if (terrain == Terrain.gate) {
         String castleName = name.split("_")[0];
         String factionName = name.split("_")[1];
-        return CastleGate(point, size, terrain, castleName, factionName);}
+        return CastleGate(point, size, terrain, castleName, factionName);
+    } else if (terrain == Terrain.fort) {
+        return CastleFort(point, size, terrain, name);}
     else{
       return Tile._internal(point, size, terrain, name);
     }
@@ -348,9 +350,7 @@ class CastleGate extends Tile {
 }
 
 class CastleFort extends Tile {
-  final String factionName;
-  FactionType get factionType => FactionOrder.fromName(factionName) ?? FactionType.red;
-  CastleFort(Point<int> point, double size, Terrain terrain, String name, this.factionName) 
+  CastleFort(Point<int> point, double size, Terrain terrain, String name) 
     : super._internal(point, size, terrain, name);
 }
 
