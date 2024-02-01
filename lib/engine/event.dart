@@ -164,6 +164,12 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             String? eventName = eventData['name'] ?? factionName;
             event = FactionCreationEvent(factionName, factionType, human:human, name: eventName);
             break;
+          case 'BesiegeEvent':
+            String castleName = eventData['castle'];
+            CastleGate? gate = CastleGate.getCastleByName(game, castleName);
+            assert(gate != null);
+            event = BesiegeEvent(gate!);
+            break;
           default:
             // Add a dummy event.
             event = DummyEvent();

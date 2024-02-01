@@ -316,6 +316,10 @@ class CastleGate extends Tile {
           unit.getPathDistance(gate.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? gate : nearest) 
       : null;
   }
+  static CastleGate? getCastleByName(MoiraGame game, String castleName) {
+    return game.stage.children.query<CastleGate>().where((gate) => gate.name == castleName).firstOrNull;
+    // There should only ever be one gate per castleName.
+  }
   void cedeTo(String newFactionName){
     factionName = newFactionName;
   }
@@ -393,9 +397,8 @@ class RansackEvent extends Event {
 
 class BesiegeEvent extends Event {
   static List<Event> observers = [];
-  final Unit unit;
   final CastleGate gate;
-  BesiegeEvent(this.unit, this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  BesiegeEvent(this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -405,6 +408,7 @@ class BesiegeEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
+    Unit unit = gate.unit!;
     assert(gate.factionName != unit.controller.name);
     if(!gate.fort.isOccupied){
       unit.game.eventQueue.addEventBatch([SeizeEvent(unit, gate)]);

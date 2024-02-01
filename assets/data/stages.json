@@ -718,6 +718,17 @@
                             "name":"JungbyPanT1"}
                         }
                     ]
+                }, 
+                {
+                    "type": "BesiegeEvent",
+                    "castle": "Jungby",
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name":"Gandolf_Midir_Prefight"}
+                        }
+                    ]
                 }
             ]
         ]

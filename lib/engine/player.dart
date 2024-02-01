@@ -293,7 +293,7 @@ class InvadeOrder extends Order {
       List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
       if(openTiles.contains(nearestCastle)){
         unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestCastle.point)]);
-        unit.game.eventQueue.addEventBatch([BesiegeEvent(unit, nearestCastle)]);
+        unit.game.eventQueue.addEventBatch([BesiegeEvent(nearestCastle)]);
         // @TODO: Then add a Besiege event depending on whether the fort is occupied.
       } else {
         Point<int> bestMove = unit.moveTowardsTarget(nearestCastle.point, openTiles);

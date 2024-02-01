@@ -262,7 +262,7 @@ class ActionMenu extends Menu {
           case "Besiege":
             // Create a variant of the CombatMenu called BesiegeMenu. 
             //For now, just trigger a besiege event.
-            game.eventQueue.addEventBatch([BesiegeEvent(unit, unit.tile as CastleGate)]);
+            game.eventQueue.addEventBatch([BesiegeEvent(unit.tile as CastleGate)]);
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
