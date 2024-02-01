@@ -405,8 +405,40 @@ class BesiegeEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    // gate.ransack(); 
-    debugPrint("BesiegeEvent: ${unit.name} besieges castle ${gate.name}.");
+    assert(gate.factionName != unit.controller.name);
+    if(!gate.fort.isOccupied){
+      unit.game.eventQueue.addEventBatch([SeizeEvent(unit, gate)]);
+      gate.cedeTo(unit.controller.name);
+    } else {
+      debugPrint("BesiegeEvent: ${unit.name} besieges castle ${gate.name}.");
+      // This is for the AI; Player units besieging a fort do so via menus, 
+      // though the event should still be involved.
+      // Note: besieging lets the unit use any attack in their attackSet.
+      unit.getBestAttackOnTarget(gate.fort.unit!, unit.attackSet.values.toList());
+      unit.game.eventQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!)]);
+    }
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class SeizeEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final CastleGate gate;
+  SeizeEvent(this.unit, this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    assert(gate.factionName != unit.controller.name);
+    gate.cedeTo(unit.controller.name);
+    debugPrint("SeizeEvent: ${unit.name} seizes castle ${gate.name} for ${unit.controller.name}.");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
