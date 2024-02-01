@@ -9,7 +9,8 @@ class Combat extends Component with HasGameReference<MoiraGame>{
   Unit attacker;
   Unit defender;
   int damage = 0;
-  Combat(this.attacker, this.defender);
+  bool duel;
+  Combat(this.attacker, this.defender, {this.duel = false});
 
   @override
   void update(dt) {
@@ -35,9 +36,10 @@ class StartCombatEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   final Unit target;
+  final bool duel;
   late final Combat combat;
-  StartCombatEvent(this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name){
-    combat = Combat(unit, target);
+  StartCombatEvent(this.unit, this.target, {Trigger? trigger, String? name, this.duel = false}) : super(trigger: trigger, name: name){
+    combat = Combat(unit, target, duel: duel);
   }
   @override
   List<Event> getObservers() {
@@ -51,50 +53,10 @@ class StartCombatEvent extends Event {
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     game.add(combat);
     game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
+    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
-}
-
-class StartDuelEvent extends Event {
-  static List<Event> observers = [];
-  final Unit unit;
-  final Unit target;
-  late final Combat combat;
-  StartDuelEvent(this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name){
-    combat = Combat(unit, target);
-  }
-  @override
-  List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered()));
-    return observers;
-  }
-
-  @override
-  Future<void> execute() async {
-    super.execute();
-    debugPrint("StartDuelEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    game.add(combat);
-    game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
-    game.eventQueue.dispatchEvent(this);
-  }
-  @override
-  bool checkComplete() {
-    if(checkStarted()) {
-      if (combat.attacker.dead || combat.defender.dead) {
-        // Check if one of the combatants is dead 
-        debugPrint("Duel ended.");
-        completeEvent();
-        game.eventQueue.dispatchEvent(this);
-        return true;
-      } else if (game.eventQueue.children.query<CombatRoundEvent>().isEmpty){
-        // Check if there is a CombatRoundEvent in progress.
-        // If not, add another CombatRoundEvent to the head of the queue.
-        game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
-      }
-    }
-    return false;
-  } 
 }
 
 class CombatRoundEvent extends Event {
@@ -102,6 +64,18 @@ class CombatRoundEvent extends Event {
   final Combat combat;
   CombatRoundEvent(this.combat, {Trigger? trigger, String? name}) 
     : super(trigger: trigger, name: name ?? "CombatRound_${combat.attacker.name}_${combat.defender.name}");
+
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
+      if (endCombatEvent.combat.duel && !endCombatEvent.combat.attacker.dead && !endCombatEvent.combat.defender.dead) {
+        CombatRoundEvent newCombatRoundEvent = CombatRoundEvent(endCombatEvent.combat);
+        EventQueue eventQueue = endCombatEvent.game.eventQueue;
+        eventQueue.addEventBatchToHead([newCombatRoundEvent]);
+      } else {
+        endCombatEvent.combat.removeFromParent();
+      }
+    });
+  }
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -115,7 +89,6 @@ class CombatRoundEvent extends Event {
     game.eventQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender)]);
     game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
     combat.addFollowUp();
-    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
@@ -135,7 +108,6 @@ class EndCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    combat.removeFromParent();
     game.eventQueue.addEventBatch([ExhaustUnitEvent(combat.attacker)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
