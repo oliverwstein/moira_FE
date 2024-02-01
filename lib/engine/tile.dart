@@ -338,6 +338,13 @@ class CastleGate extends Tile {
   }
 }
 
+class CastleFort extends Tile {
+  final String factionName;
+  FactionType get factionType => FactionOrder.fromName(factionName) ?? FactionType.red;
+  CastleFort(Point<int> point, double size, Terrain terrain, String name, this.factionName) 
+    : super._internal(point, size, terrain, name);
+}
+
 class VisitEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
