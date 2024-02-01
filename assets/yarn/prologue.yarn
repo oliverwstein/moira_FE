@@ -113,3 +113,10 @@ Gandolf: You held out pretty well for being on your own, but it's over. Prepare 
 Midir: So it goes. Lady Aideen...
 <<stop>>
 ===
+
+title: Midir_Death_Quote
+---
+<<local $left = "Gandolf" as String>>
+Midir: Forgive me, my lady.
+<<stop>>
+===

@@ -248,34 +248,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 }
 
-class DialogueEvent extends Event{
-  static List<Event> observers = [];
-  String? bgName;
-  String nodeName;
-  late DialogueMenu menu;
-  DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
-  @override
-  List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered()));
-    return observers;
-  }
-  @override
-  Future<void> execute() async {
-    super.execute();
-    debugPrint("DialogueEvent execution $nodeName $bgName");
-    menu = DialogueMenu(nodeName, bgName);
-    game.stage.menuManager.pushMenu(menu);
-
-  }
-  @override
-  bool checkComplete() {
-    if(checkStarted()) {
-      game.eventQueue.dispatchEvent(this);
-      return menu.dialogue.finished;}
-    return false;
-  } 
-}
-
 class PanEvent extends Event{
   static List<Event> observers = [];
   final Point<int> destination;
