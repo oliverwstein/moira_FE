@@ -413,7 +413,6 @@ class BesiegeEvent extends Event {
     assert(gate.factionName != unit.controller.name);
     if(!gate.fort.isOccupied){
       unit.game.eventQueue.addEventBatch([SeizeEvent(unit, gate)]);
-      gate.cedeTo(unit.controller.name);
     } else {
       debugPrint("BesiegeEvent: ${unit.name} besieges castle ${gate.name}.");
       // This is for the AI; Player units besieging a fort do so via menus, 

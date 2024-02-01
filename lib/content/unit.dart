@@ -533,7 +533,7 @@ class UnitDeathEvent extends Event {
     });
   }
 
-  UnitDeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitDeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "${unit.name}_Death");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

@@ -741,6 +741,17 @@
                             "name":"StartCombat_Gandolf_Midir"}
                         }
                     ]
+                },
+                {
+                    "type": "BesiegeEvent",
+                    "castle": "Jungby",
+                    "triggers":
+                    [
+                        {"UnitDeathEvent":
+                            {
+                            "name":"Midir_Death"}
+                        }
+                    ]
                 }
             ]
         ]
