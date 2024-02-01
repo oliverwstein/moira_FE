@@ -40,10 +40,10 @@ class Player extends Component with HasGameReference<MoiraGame>{
     if(hostilities.contains(unit.faction)) return true;
     switch (factionType) {
       case FactionType.blue:
-        if (game.stage.factionMap[unit.faction]?.factionType == FactionType.red) return true;
+        if (unit.controller.factionType == FactionType.red) return true;
         return false;
       case FactionType.red:
-        if (game.stage.factionMap[unit.faction]?.factionType != FactionType.red) return true;
+        if (unit.controller.factionType != FactionType.red) return true;
         return false;
       case FactionType.green:
         return false;

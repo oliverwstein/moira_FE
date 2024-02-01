@@ -17,6 +17,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   String faction;
   Point<int> tilePosition;
   Tile get tile => game.stage.tileMap[tilePosition]!;
+  Player get controller => game.stage.factionMap[faction]!;
   Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
   late SpriteAnimationComponent sprite;
@@ -353,7 +354,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         for (var point in pointsToCheck) {
           if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
             Tile? tile = game.stage.tileMap[point];
-            if (tile != null && tile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) {
+            if (tile != null && tile.isOccupied && controller.checkHostility(tile.unit!)) {
               targets.add(tile.unit!);
               tile.state = TileState.attack;
               debugPrint("${tile.unit!.name} is a target at ${tile.point}");
@@ -411,8 +412,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void die() {
     dead = true;
-    unit.tile.removeUnit();
-    game.stage.factionMap[faction]!.units.remove(this);
+    tile.removeUnit();
+    controller.units.remove(this);
     removeFromParent();
   }
 }

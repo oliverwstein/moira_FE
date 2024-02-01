@@ -42,7 +42,7 @@ mixin UnitMovement on PositionComponent {
       for (Direction direction in Direction.values) {
         Point <int> nextPoint = currentPoint + getMovement(Movement(direction, 1));
         Tile? nextTile = game.stage.tileMap[Point(nextPoint.x, nextPoint.y)];
-        if (nextTile != null && !(nextTile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(nextTile.unit!))) {
+        if (nextTile != null && !(nextTile.isOccupied && unit.controller.checkHostility(nextTile.unit!))) {
           double cost = game.stage.tileMap[nextTile.point]!.getTerrainCost();
           double nextRemainingMovement = remainingMovement - cost;
           if (nextRemainingMovement > 0) {

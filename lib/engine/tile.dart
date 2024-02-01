@@ -309,6 +309,13 @@ class CastleGate extends Tile {
   // Inherits properties and methods from Tile and adds specific properties for Town.
   CastleGate(Point<int> point, double size, Terrain terrain, String name, this.factionType) 
     : super._internal(point, size, terrain, name);
+  static CastleGate? getNearestCastle(Unit unit, FactionType factionType) {
+    var castleGates = unit.game.stage.children.query<CastleGate>().where((gate) => gate.factionType == factionType);
+    return castleGates.isNotEmpty 
+      ? castleGates.reduce((nearest, gate) => 
+          unit.getPathDistance(gate.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? gate : nearest) 
+      : null;
+  }
   @override
   Future<void> onLoad() async {
     super.onLoad();

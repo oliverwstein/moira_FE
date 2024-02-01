@@ -82,10 +82,10 @@ class CantoEvent extends Event {
     super.execute();
     game.stage.blankAllTiles();
     debugPrint("Canto: unit's remaining movement is: ${unit.remainingMovement}");
-    if (game.stage.factionMap[unit.faction]!.takingTurn && game.stage.activeFaction is! AIPlayer){
+    if (unit.controller.takingTurn && game.stage.activeFaction is! AIPlayer){
       unit.findReachableTiles(unit.remainingMovement);
       game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
-    } else if (game.stage.factionMap[unit.faction]!.takingTurn && game.stage.activeFaction is AIPlayer){
+    } else if (unit.controller.takingTurn && game.stage.activeFaction is AIPlayer){
       var rankedTiles = unit.rankOpenTiles(["Move"]);
       if (rankedTiles.isNotEmpty) {
         var bestTileEvent = rankedTiles.first;

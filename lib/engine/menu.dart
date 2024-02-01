@@ -45,7 +45,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
             Set<Tile> reachableTiles = tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
             tile.unit!.markAttackableTiles(reachableTiles.toList());
             // if the unit is a part of the active faction, add the MoveMenu to the stack.
-            if (game.stage.factionMap[tile.unit!.faction] == game.stage.activeFaction){
+            if (tile.unit!.controller == game.stage.activeFaction){
               pushMenu(MoveMenu(tile.unit!, tile));
             }
             return KeyEventResult.handled;
