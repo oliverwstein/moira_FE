@@ -77,8 +77,7 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
       return Town(point, size, terrain, name);
     } else if (terrain == Terrain.gate) {
         String castleName = name.split("_")[0];
-        FactionType factionType = FactionOrder.fromName(name.split("_")[1]) ?? FactionType.blue;
-        return CastleGate(point, size, terrain, castleName, factionType);}
+        return CastleGate(point, size, terrain, castleName, name.split("_")[1]);}
     else{
       return Tile._internal(point, size, terrain, name);
     }
@@ -304,13 +303,14 @@ class Town extends Tile {
 class CastleGate extends Tile {
   late SpriteComponent flagSprite;
   late final SpriteSheet stateSheet;
-  final FactionType factionType;
+  final String factionName;
+  FactionType get factionType => FactionOrder.fromName(factionName) ?? FactionType.red;
   // Constructor for the Village class. 
   // Inherits properties and methods from Tile and adds specific properties for Town.
-  CastleGate(Point<int> point, double size, Terrain terrain, String name, this.factionType) 
+  CastleGate(Point<int> point, double size, Terrain terrain, String name, this.factionName) 
     : super._internal(point, size, terrain, name);
-  static CastleGate? getNearestCastle(Unit unit, FactionType factionType) {
-    var castleGates = unit.game.stage.children.query<CastleGate>().where((gate) => gate.factionType == factionType);
+  static CastleGate? getNearestCastle(Unit unit, String factionName) {
+    var castleGates = unit.game.stage.children.query<CastleGate>().where((gate) => gate.factionName == factionName);
     return castleGates.isNotEmpty 
       ? castleGates.reduce((nearest, gate) => 
           unit.getPathDistance(gate.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? gate : nearest) 

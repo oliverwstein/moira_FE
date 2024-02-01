@@ -282,5 +282,9 @@ class InvadeOrder extends Order {
 
   @override
   void command(Unit unit){
+    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+    // CastleGate? nearestEnemyCastle = CastleGate.getNearestCastle(unit);
+    //   if(nearestTown == null) {super.command(unit);}
+
   }
 }
