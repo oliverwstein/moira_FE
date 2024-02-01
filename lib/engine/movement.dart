@@ -123,8 +123,11 @@ mixin UnitMovement on PositionComponent {
       openSet.remove(current);
 
       for (var neighbor in _getNeighbors(current)) {
-        double tentativeGScore = gScore[current]! + game.stage.tileMap[neighbor]!.terrain.cost;
-
+        Tile neighborTile = game.stage.tileMap[neighbor]!;
+        double tentativeGScore = gScore[current]! + neighborTile.terrain.cost;
+        if (neighborTile.isOccupied && neighborTile.unit!.controller.checkHostility(unit)){
+          tentativeGScore + 10;
+        }
         if (tentativeGScore < (gScore[neighbor] ?? double.infinity)) {
           cameFrom[neighbor] = current;
           gScore[neighbor] = tentativeGScore;
