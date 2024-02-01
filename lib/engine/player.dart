@@ -286,14 +286,15 @@ class InvadeOrder extends Order {
     CastleGate? nearestCastle = CastleGate.getNearestCastle(unit, targetName);
     debugPrint("${unit.name} ordered to invade ${nearestCastle?.name}");
     if(nearestCastle == null) {
-      // @TODO: If the nearestEnemyCastle is null, 
+      // @TODO: If nearestEnemyCastle is null, 
       // it should really go to the next order in the queue, not the basic order.
       super.command(unit);}
     else {
       List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
       if(openTiles.contains(nearestCastle)){
         unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestCastle.point)]);
-        // @TODO: Then add a Seize or Besiege event depending on whether the fort is occupied.
+        unit.game.eventQueue.addEventBatch([BesiegeEvent(unit, nearestCastle)]);
+        // @TODO: Then add a Besiege event depending on whether the fort is occupied.
       } else {
         Point<int> bestMove = unit.moveTowardsTarget(nearestCastle.point, openTiles);
         unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);

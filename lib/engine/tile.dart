@@ -77,7 +77,8 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
       return Town(point, size, terrain, name);
     } else if (terrain == Terrain.gate) {
         String castleName = name.split("_")[0];
-        return CastleGate(point, size, terrain, castleName, name.split("_")[1]);}
+        String factionName = name.split("_")[1];
+        return CastleGate(point, size, terrain, castleName, factionName);}
     else{
       return Tile._internal(point, size, terrain, name);
     }
@@ -303,16 +304,20 @@ class Town extends Tile {
 class CastleGate extends Tile {
   late SpriteComponent flagSprite;
   late final SpriteSheet stateSheet;
-  final String factionName;
-  FactionType get factionType => FactionOrder.fromName(factionName) ?? FactionType.red;
+  String factionName;
+  FactionType get factionType => game.stage.factionMap[factionName]?.factionType ?? FactionType.red;
+  CastleFort get fort => game.stage.tileMap[Point(point.x, point.y - 2)] as CastleFort;
   CastleGate(Point<int> point, double size, Terrain terrain, String name, this.factionName) 
     : super._internal(point, size, terrain, name);
   static CastleGate? getNearestCastle(Unit unit, String factionName) {
-    var castleGates = unit.game.stage.children.query<CastleGate>().where((gate) => gate.name == factionName);
+    var castleGates = unit.game.stage.children.query<CastleGate>().where((gate) => gate.factionName == factionName);
     return castleGates.isNotEmpty 
       ? castleGates.reduce((nearest, gate) => 
           unit.getPathDistance(gate.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? gate : nearest) 
       : null;
+  }
+  void cedeTo(String newFactionName){
+    factionName = newFactionName;
   }
   @override
   Future<void> onLoad() async {
@@ -381,6 +386,27 @@ class RansackEvent extends Event {
     super.execute();
     town.ransack(); 
     debugPrint("RansackEvent: ${unit.name} ransacks town at ${town.point}.");
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class BesiegeEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final CastleGate gate;
+  BesiegeEvent(this.unit, this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    // gate.ransack(); 
+    debugPrint("BesiegeEvent: ${unit.name} besieges castle ${gate.name}.");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
