@@ -317,6 +317,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       if (town.open) actions.add("Visit");
       if (town.open) actions.add("Ransack");
     }
+    if(game.stage.tileMap[point]! is CastleGate) {
+      CastleGate gate = game.stage.tileMap[point]! as CastleGate;
+      if (gate.factionName != unit.controller.name){
+        if(gate.fort.isOccupied && gate.fort.unit!.controller.checkHostility(unit)){
+          actions.add("Besiege");
+        } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
+          actions.add("Seize");
+        } else if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
+          actions.add("Enter");
+        }
+      }
+    }
     if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
