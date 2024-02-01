@@ -235,7 +235,9 @@ class RansackOrder extends Order {
           unit.game.eventQueue.addEventBatch([RansackEvent(unit, nearestTown)]);
         } 
         else {
-          unit.moveTowardsTarget(nearestTown.point, openTiles);
+          Point<int> bestMove = unit.moveTowardsTarget(nearestTown.point, openTiles);
+          unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
+
         }
       }
     }
@@ -286,7 +288,8 @@ class InvadeOrder extends Order {
         unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestEnemyCastle.point)]);
         // @TODO: Then add a Seize or Besiege event depending on whether the fort is occupied.
       } else {
-        unit.moveTowardsTarget(nearestEnemyCastle.point, openTiles);
+        Point<int> bestMove = unit.moveTowardsTarget(nearestEnemyCastle.point, openTiles);
+        unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
       }
     }
     unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);

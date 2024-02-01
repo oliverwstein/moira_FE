@@ -130,7 +130,7 @@ mixin UnitBehavior on PositionComponent {
     }
   }
 
-  void moveTowardsTarget(Point<int> targetPoint, List<Tile> openTiles) {
+  Point<int> moveTowardsTarget(Point<int> targetPoint, List<Tile> openTiles) {
     Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, targetPoint);
     var closerTiles = {};
     for (Tile tile in openTiles){
@@ -142,6 +142,7 @@ mixin UnitBehavior on PositionComponent {
                               .reduce((curr, next) => curr.value < next.value ? curr : next)
                               .key;
     unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, bestMove)]);
+    return bestMove;
   }
 }
 
