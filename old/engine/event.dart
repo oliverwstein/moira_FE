@@ -357,9 +357,9 @@ class UnitWaitEvent extends Event {
   }
 }
 
-class UnitDeathEvent extends Event {
+class UnitUnitDeathEvent extends Event {
   final Unit unit;
-  UnitDeathEvent(this.unit);
+  UnitUnitDeathEvent(this.unit);
 }
 
 class UnitActionEndEvent extends Event {

@@ -17,7 +17,7 @@ class Announcer extends Observer {
     if (event is UnitCreationEvent && unit == event.unit) {
 
       dev.log('${unit.name} is announced!');
-    } else if (event is UnitDeathEvent && unit == event.unit) {
+    } else if (event is UnitUnitDeathEvent && unit == event.unit) {
       dev.log('${unit.name} is dead!');
     }
   }

@@ -519,21 +519,21 @@ class UnitExhaustEvent extends Event {
   }
 }
 
-class DeathEvent extends Event {
+class UnitDeathEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   static void initialize(EventQueue eventQueue) {
     eventQueue.registerClassObserver<DamageEvent>((damageEvent) {
       if (damageEvent.unit.hp <= 0) {
-        // Trigger DeathEvent
-        var deathEvent = DeathEvent(damageEvent.unit);
+        // Trigger UnitDeathEvent
+        var unitDeathEvent = UnitDeathEvent(damageEvent.unit);
         EventQueue eventQueue = damageEvent.game.eventQueue;
-        eventQueue.addEventBatchToHead([deathEvent]);
+        eventQueue.addEventBatchToHead([unitDeathEvent]);
       }
     });
   }
 
-  DeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitDeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -543,7 +543,7 @@ class DeathEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("DeathEvent: ${unit.name} has died.");
+    debugPrint("UnitDeathEvent: ${unit.name} has died.");
     unit.die();
     completeEvent();
     game.eventQueue.dispatchEvent(this);

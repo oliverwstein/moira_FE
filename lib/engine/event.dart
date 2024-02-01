@@ -34,8 +34,8 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
       return UnitMoveEvent.observers;
     case 'UnitExhaustEvent':
       return UnitExhaustEvent.observers;
-    case 'DeathEvent':
-      return DeathEvent.observers;
+    case 'UnitDeathEvent':
+      return UnitDeathEvent.observers;
     case 'UnitOrderEvent':
       return UnitOrderEvent.observers;
     case 'UnitActionEvent':

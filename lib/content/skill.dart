@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 
@@ -59,12 +56,12 @@ class CantoEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<UnitExhaustEvent>((UnitExhaustEvent) {
+    eventQueue.registerClassObserver<UnitExhaustEvent>((unitExhaustEvent) {
       debugPrint("Canto Check");
-      if (UnitExhaustEvent.unit.hasSkill(Skill.canto) && UnitExhaustEvent.unit.remainingMovement >= .7 && UnitExhaustEvent.manual == false) {
+      if (unitExhaustEvent.unit.hasSkill(Skill.canto) && unitExhaustEvent.unit.remainingMovement >= .7 && unitExhaustEvent.manual == false) {
         debugPrint("Canto Check Succeeds");
-        CantoEvent cantoEvent = CantoEvent(UnitExhaustEvent.unit);
-        EventQueue eventQueue = UnitExhaustEvent.game.eventQueue;
+        CantoEvent cantoEvent = CantoEvent(unitExhaustEvent.unit);
+        EventQueue eventQueue = unitExhaustEvent.game.eventQueue;
         eventQueue.addEventBatchToHead([cantoEvent]);
       }
     });

@@ -6,11 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 
 mixin UnitBehavior on PositionComponent {
-  Point<int> get _tilePosition => (this as Unit).tilePosition;
   MoiraGame get game;
   Unit get unit => (this as Unit);
-
-
 
   List<({List<Event> events, double score})> getMoveEventsAndScores(List<Tile> openTiles) {
   return List.generate(openTiles.length, (index) {

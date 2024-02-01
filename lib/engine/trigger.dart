@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 
 class Trigger extends Component {
@@ -58,8 +57,6 @@ class Trigger extends Component {
     return false;
   });
 
-  Trigger._dummy() : check = ((Event event) => false);
-  
   Trigger._byName(String name) : check = ((Event event) {
     // debugPrint("Check Event by name $name");
     if (event.name != null) {
@@ -74,6 +71,6 @@ class Trigger extends Component {
     }
     return false;
   }) {
-    DamageEvent.observers.add(DeathEvent(unit, trigger: this));
+    DamageEvent.observers.add(UnitDeathEvent(unit, trigger: this));
   }
 }
