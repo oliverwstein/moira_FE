@@ -11,6 +11,7 @@ mixin UnitBehavior on PositionComponent {
   Unit get unit => (this as Unit);
 
 
+
   List<({List<Event> events, double score})> getMoveEventsAndScores(List<Tile> openTiles) {
   return List.generate(openTiles.length, (index) {
     var tile = openTiles[index];
@@ -23,7 +24,7 @@ mixin UnitBehavior on PositionComponent {
   });
 }
 
-List<({List<Event> events, double score})> getCombatEventsAndScores(List<Tile> openTiles) {
+  List<({List<Event> events, double score})> getCombatEventsAndScores(List<Tile> openTiles) {
   return List.generate(openTiles.length, (index) {
     var tile = openTiles[index];
     List<Event> eventList = [];
@@ -40,10 +41,10 @@ List<({List<Event> events, double score})> getCombatEventsAndScores(List<Tile> o
   });
 }
 
-List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
-  List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement);
-  debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
 
+  List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes) {
+  List<Tile> openTiles = getTilesInMoveRange(unit.remainingMovement);
+  // debugPrint("${unit.name} can move to ${openTiles.length} tiles because it has ${unit.movementRange} movement.");
   var rankedTiles = List.generate(openTiles.length, (_) => (events: <Event>[], score: 0.0));
   if (eventTypes.contains("Move")) {
     var moveResults = getMoveEventsAndScores(openTiles);
@@ -62,16 +63,16 @@ List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes
   return rankedTiles;
 }
 
-
   double getTileDefenseScore(Tile tile){
     return tile.getTerrainDefense() + tile.getTerrainAvoid()/10;
   }
+  
   List<Tile> getTilesInMoveRange(double range){
     return unit.findReachableTiles(range, markTiles: false).toList();
   }
 
   ({Unit target, double score})? bestTargetFrom(Tile tile){
-    List<Unit> targets = unit.getTargets(tile.point);
+    List<Unit> targets = unit.getTargetsAt(tile.point);
     Unit? bestTarget;
     double bestCombatScore = 0;
     for(Unit target in targets){
@@ -88,15 +89,15 @@ List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes
 
   double judgeCombatAtDistance(target, distance){
     // behavioral states: brave, neutral, cowardly. 
-    // If the unit is brave, it should consider unit.level + expectedDamageDealt + expectedDamageTaken; it wants a good fight.
-    // If the unit is neutral, it should consider unit.level + expectedDamageDealt - expectedDamageTaken; it wants a fight to its advantage.
-    // If the unit is cowardly, it should consider unit.level + expectedDamageDealt - expectedDamageTaken**2; it wants a fight where it won't get hurt.
+    // If the unit is brave, it should consider unit.level + expectedDamageDealt*2 + expectedDamageTaken; it wants a good fight.
+    // If the unit is neutral, it should consider unit.level + expectedDamageDealt*2 - expectedDamageTaken; it wants a fight to its advantage.
+    // If the unit is cowardly, it should consider unit.level + expectedDamageDealt*2 - expectedDamageTaken**2; it wants a fight where it won't get hurt.
+    // But for now, just have all the units follow the neutral rules.
     double expectedDamageDealt = unit.getBestAttackOnTarget(target, getAttacksOnTarget(target, distance));
     double expectedDamageTaken = target.getBestAttackOnTarget(unit, getAttacksOnTarget(unit, distance));
     if(expectedDamageDealt >= target.hp) expectedDamageTaken = 0;
-    // For now, just have all the units follow the neutral rules.
-    return (unit.level + expectedDamageDealt - expectedDamageTaken);
-
+    double score = unit.level + expectedDamageDealt*2 - expectedDamageTaken;
+    return (score);
   }
 
   List<Attack> getAttacksOnTarget(Unit target, combatDistance){
@@ -121,5 +122,144 @@ List<({List<Event> events, double score})> rankOpenTiles(List<String> eventTypes
       }
     }
     return expectedDamage;
+  }
+  void makeBestAttackAt(Tile tile) {
+    ({double score, Unit target})? target = unit.bestTargetFrom(tile);
+    if(target != null) {
+      unit.game.eventQueue.addEventBatch([StartCombatEvent(unit, target.target)]);
+    }
+  }
+}
+
+class UnitOrderEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final Order order;
+  UnitOrderEvent(this.unit, this.order, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+   
+  }
+}
+
+class UnitActionEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  UnitActionEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+   
+  }
+}
+
+class Order {
+  Order();
+  factory Order.create(String orderType) {
+    switch (orderType) {
+        case 'Ransack':
+            return RansackOrder();
+        case 'Guard':
+            return GuardOrder();
+        default:
+            throw ArgumentError('Invalid order type: $orderType');
+    }
+  }
+  void command(Unit unit) {
+    unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
+    var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
+    if(rankedTiles.firstOrNull != null){
+      for(Event event in rankedTiles.first.events){
+        unit.game.eventQueue.addEventBatch([event]);
+      }
+    }
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+class RansackOrder extends Order {
+  RansackOrder();
+
+  @override
+  void command(Unit unit){
+    unit.remainingMovement = unit.movementRange.toDouble();
+    var tile = unit.tile;
+    if(tile is TownCenter && tile.open) {
+      unit.game.eventQueue.addEventBatch([RansackEvent(unit, tile)]);
+    } else {
+      TownCenter? nearestTown = TownCenter.getNearestTown(unit);
+      if(nearestTown == null) {super.command(unit);}
+      else {
+        List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+        if(openTiles.contains(nearestTown)){
+          unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestTown.point)]);
+          unit.game.eventQueue.addEventBatch([RansackEvent(unit, nearestTown)]);
+        } 
+        else {
+          Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, nearestTown.point);
+          var closerTiles = {};
+          for (Tile tile in openTiles){
+            if (gScores.keys.contains(tile.point)){
+              closerTiles[tile.point] = gScores[tile.point];
+            }
+          }
+          Point<int> bestMove = closerTiles.entries
+                                    .reduce((curr, next) => curr.value < next.value ? curr : next)
+                                    .key;
+          unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, bestMove)]);
+        }
+      }
+    }
+
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+/// Do not move, but attack enemies within range if possible. 
+class GuardOrder extends Order {
+  GuardOrder();
+
+  @override
+  void command(Unit unit){
+    unit.makeBestAttackAt(unit.tile);
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+/// Move to attack any enemy units that come within range, but otherwise do not move. 
+class DefendOrder extends Order {
+  DefendOrder();
+
+  @override
+  void command(Unit unit){
+    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+    var combatResults = unit.getCombatEventsAndScores(openTiles);
+    // Add the best combatResult event list to the queue.
+    unit.game.eventQueue.addEventBatch(combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events);
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+  
+/// Move towards any enemy castle, attacking enemies along the way.
+class InvadeOrder extends Order {
+  InvadeOrder();
+
+  @override
+  void command(Unit unit){
   }
 }

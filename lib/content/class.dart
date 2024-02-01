@@ -7,6 +7,7 @@ class Class extends Component with HasGameReference<MoiraGame>{
   final List<String> skills;
   final List<String> attacks;
   final List<String> proficiencies;
+  final List<String> orders;
   final Map<String, int> baseStats;
   final Map<String, int> growths;
 
@@ -23,12 +24,13 @@ class Class extends Component with HasGameReference<MoiraGame>{
     List<String> skills = List<String>.from(classData['skills'] ?? []);
     List<String> attacks = List<String>.from(classData['attacks'] ?? []);
     List<String> proficiencies = List<String>.from(classData['proficiencies'] ?? []);
+    List<String> orders = List<String>.from(classData['orders'] ?? []);
     Map<String, int> baseStats = Map<String, int>.from(classData['baseStats']);
     Map<String, int> growths = Map<String, int>.from(classData['growths']);
     
     // Return a new Weapon instance
-    return Class._internal(name, description, movementRange, skills, attacks, proficiencies, baseStats, growths);
+    return Class._internal(name, description, movementRange, skills, attacks, proficiencies, orders, baseStats, growths);
   }
   // Internal constructor for creating instances
-  Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.baseStats, this.growths);
+  Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
 }

@@ -16,6 +16,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   double remainingMovement = - 1;
   String faction;
   Point<int> tilePosition;
+  Tile get tile => game.stage.tileMap[tilePosition]!;
   Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
   late SpriteAnimationComponent sprite;
@@ -25,6 +26,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   bool _canAct = true;
   bool dead = false;
   bool get canAct => _canAct;
+  Queue<Order> orders = Queue<Order>();
   final double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
@@ -43,7 +45,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int hp = -1;
   int sta = -1;
         
-  factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings}) {
+  factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings, List<String>? orderStrings}) {
 
     // Extract unit data from the static map in MoiraGame
     var unitsJson = MoiraGame.unitMap['units'] as List;
@@ -60,11 +62,17 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unitData['skills'].addAll(classData.skills);
     unitData['attacks'].addAll(classData.attacks);
     unitData['proficiencies'].addAll(classData.proficiencies);
-
     String faction = factionName;
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = getWeaponTypesFromNames(unitData["proficiencies"].cast<String>());
     Set<Skill> skillSet = getSkillsFromNames(unitData["skills"].cast<String>());
+
+    orderStrings = orderStrings ?? [];
+    orderStrings.addAll(classData.orders);
+    Queue<Order> orders = Queue<Order>();
+    for (String orderString in orderStrings){
+      orders.add(Order.create(orderString));
+    }
 
     // Create items for items
     List<Item> inventory = [];
@@ -100,11 +108,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, inventory, attackMap, proficiencies, skillSet, stats);
+    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
     _postConstruction();
   }
 
@@ -174,7 +182,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
-    } game.stage.tileMap[tilePosition]!.setUnit(this);
+    } unit.tile.setUnit(this);
   }
 
   @override
@@ -213,7 +221,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
                             size: spriteSize,
                             anchor: Anchor.center);
     add(sprite);
-    position = game.stage.tileMap[tilePosition]!.center;
+    position = unit.tile.center;
     anchor = Anchor.center;
   
     // Add to faction:
@@ -224,7 +232,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("Unit created for faction $faction not in factionMap.");
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
-    game.stage.tileMap[tilePosition]?.setUnit(this);
+    unit.tile.setUnit(this);
     debugPrint("Unit $name loaded.");
     _loadCompleter.complete();
   }
@@ -300,13 +308,20 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     return (minCombatRange, maxCombatRange);
   } 
 
-  List<String> getActions(){
+  List<String> getActionsAt(Point<int> point){
     List<String> actions = [];
-    if(unit.getTargets(game.stage.cursor.tilePosition).isNotEmpty) actions.add("Attack");
+    debugPrint("${game.stage.tileMap[point]! is TownCenter}");
+    if(game.stage.tileMap[point]! is TownCenter) {
+      TownCenter town = game.stage.tileMap[point]! as TownCenter;
+      if (town.open) actions.add("Visit");
+      if (town.open) actions.add("Ransack");
+    }
+    if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
   }
+
   void toggleCanAct(bool state) {
     _canAct = state;
     // Define the grayscale paint
@@ -322,7 +337,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
-  List<Unit> getTargets(Point<int> tilePosition) {
+  List<Unit> getTargetsAt(Point<int> tilePosition) {
     List<Unit> targets = [];
     (int, int) combatRange = getCombatRange();
     for (int range = combatRange.$1; range <= combatRange.$2; range++) {
@@ -396,7 +411,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void die() {
     dead = true;
-    game.stage.tileMap[tilePosition]!.removeUnit();
+    unit.tile.removeUnit();
+    game.stage.factionMap[faction]!.units.remove(this);
     removeFromParent();
   }
 }

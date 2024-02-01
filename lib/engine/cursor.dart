@@ -73,7 +73,6 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       }
       position.lerp(targetPosition, 1/4);
     }
-      
   }
 
   Vector2 centerCameraOn(Point<int> newTilePosition) {

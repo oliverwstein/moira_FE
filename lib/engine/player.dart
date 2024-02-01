@@ -27,6 +27,7 @@ class Player extends Component with HasGameReference<MoiraGame>{
   }
 
   void startTurn() {
+    game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   void endTurn(){
     takingTurn = false;
@@ -39,9 +40,6 @@ class Player extends Component with HasGameReference<MoiraGame>{
     if(hostilities.contains(unit.faction)) return true;
     switch (factionType) {
       case FactionType.blue:
-        if (game.stage.factionMap[unit.faction]?.factionType == FactionType.red) return true;
-        return false;
-      case FactionType.yellow:
         if (game.stage.factionMap[unit.faction]?.factionType == FactionType.red) return true;
         return false;
       case FactionType.red:
@@ -64,26 +62,21 @@ class AIPlayer extends Player{
     super.update(dt);
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isNotEmpty){
       Unit unit = unitsToCommand.removeLast();
-      unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
       Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
       game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
-      var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
-      debugPrint("${rankedTiles.firstOrNull}");
-      for(Event event in rankedTiles.first.events){
-        game.eventQueue.addEventBatch([event]);
-      }
-      game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+      if (unit.orders.isNotEmpty) {unit.orders.last.command(unit);}
+      else {Order().command(unit);}
+      
     }
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isEmpty) {
       game.eventQueue.addEventBatch([EndTurnEvent(name)]);
-      }
+    }
   }
 
   @override
   void startTurn() {
     super.startTurn();
     debugPrint("AIPlayer: startTurn for $name");
-    game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
     unitsToCommand = game.stage.activeFaction!.units.toList();
   }
   @override

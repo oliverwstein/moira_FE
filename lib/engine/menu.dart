@@ -31,7 +31,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
+    // debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
     if (isNotEmpty){
       debugPrint("Active menu is: ${_menuStack.last.runtimeType}");
       if(key is RawKeyDownEvent) return _menuStack.last.handleKeyEvent(key, keysPressed);
@@ -223,7 +223,7 @@ class ActionMenu extends Menu {
   Future<void> onLoad() async {
     SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
     unit.sprite.animation = newAnimation;
-    actions = unit.getActions();
+    actions = unit.getActionsAt(game.stage.cursor.tilePosition);
   }
 
   @override
@@ -245,8 +245,20 @@ class ActionMenu extends Menu {
             break;
           case "Attack":
             game.stage.blankAllTiles();
-            List<Unit> targets = unit.getTargets(unit.tilePosition);
+            List<Unit> targets = unit.getTargetsAt(unit.tilePosition);
             game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
+            break;
+          case "Visit":
+            game.stage.blankAllTiles();
+            game.eventQueue.addEventBatch([VisitEvent(unit, unit.tile as TownCenter)]);
+            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.stage.menuManager.clearStack();
+            break;
+          case "Ransack":
+            game.stage.blankAllTiles();
+            game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
+            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.stage.menuManager.clearStack();
             break;
         }
         return KeyEventResult.handled;
@@ -276,6 +288,7 @@ class CombatMenu extends Menu {
   @override 
   Future<void> onLoad() async {
     attacks = unit.attackSet.values.toList();
+    unit.attack = attacks.first;
     // @TODO: attacks should really be generated on a by-target basis. 
     game.stage.cursor.snapToTile(targets.first.tilePosition);
     targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));

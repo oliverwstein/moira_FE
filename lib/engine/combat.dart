@@ -49,8 +49,8 @@ class StartCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    game.add(combat);
     game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
-    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

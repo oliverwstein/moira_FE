@@ -5,7 +5,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 enum TileState {blank, move, attack}
-enum Terrain {forest, path, cliff, sea, stream, fort, gate, rampart, plain}
+enum Terrain {forest, path, cliff, sea, stream, fort, gate, rampart, town, ruin, plain}
 extension TerrainEffects on Terrain {
   double get cost {
     switch (this) {
@@ -30,6 +30,10 @@ extension TerrainEffects on Terrain {
     switch (this) {
       case Terrain.forest:
         return 20;
+      case Terrain.town:
+        return 20;
+      case Terrain.ruin:
+        return 10;
       case Terrain.fort:
         return 30;
       case Terrain.path:
@@ -65,7 +69,23 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   Terrain terrain; // e.g., "grass", "water", "mountain"
   String name; // Defaults to the terrain name if there is no name.
   TileState state = TileState.blank;
-  Tile(this.point, double size, this.terrain, this.name) {
+  // Factory constructor
+  factory Tile(Point<int> point, double size, Terrain terrain, String name) {
+    if (name == "Center" && terrain == Terrain.town) {
+      return TownCenter(point, size, terrain, name);
+    } else if (terrain == Terrain.town) {
+      return Town(point, size, terrain, name);
+    } else if (terrain == Terrain.gate) {
+        String castleName = name.split("_")[0];
+        FactionType factionType = FactionOrder.fromName(name.split("_")[1]) ?? FactionType.blue;
+        return CastleGate(point, size, terrain, castleName, factionType);}
+    else{
+      return Tile._internal(point, size, terrain, name);
+    }
+  }
+
+  // Internal constructor for Tile
+  Tile._internal(this.point, double size, this.terrain, this.name) {
     this.size = Vector2.all(size);
     anchor = Anchor.topLeft;
   }
@@ -158,4 +178,199 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
   }
 }
 
+class TownCenter extends Tile{
+  late SpriteComponent closedSprite;
+  late final SpriteSheet stateSheet;
+  bool open;
+  int loot;
+  // Constructor for the Town class. 
+  // Inherits properties and methods from Tile and adds specific properties for Town.
+  TownCenter(Point<int> point, double size, Terrain terrain, String name, {this.open = true, this.loot = 10}) 
+    : super._internal(point, size, terrain, name);
+
+  static TownCenter? getNearestTown(Unit unit) {
+  var openTowns = unit.game.stage.children.query<TownCenter>().where((town) => town.open && !town.isOccupied);
+  return openTowns.isNotEmpty 
+    ? openTowns.reduce((nearest, town) => 
+        unit.getPathDistance(town.point, unit.tilePosition) < unit.getPathDistance(nearest.point, unit.tilePosition) ? town : nearest) 
+    : null;
+  }
+  void close() {
+    open = false;
+  }
+  @override
+  void render(Canvas canvas){
+    super.render(canvas);
+    if(!open) add(closedSprite);
+
+  }
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    ui.Image statesImages = await game.images.load('states_set.png');
+    stateSheet = SpriteSheet.fromColumnsAndRows(
+      image: statesImages,
+      columns: 3,
+      rows: 4,
+    );
+    closedSprite = SpriteComponent(
+      sprite: stateSheet.getSprite(2, 0), 
+      size: size,
+    );
+    
+    closedSprite.anchor = Anchor.center;
+    closedSprite.position = Vector2(size.x/2, size.y/2);
+    
+  }
+
+  void ransack() {
+    if(loot>=9){
+      (game.stage.tileMap[Point(point.x-1, point.y-1)]! as Town).degrade();
+    }
+    else if(loot>=7){
+      (game.stage.tileMap[Point(point.x, point.y-1)]! as Town).degrade();
+    }
+    else if(loot>=5){
+      (game.stage.tileMap[Point(point.x+1, point.y-1)]! as Town).degrade();
+    }
+    else if(loot>=3){
+      (game.stage.tileMap[Point(point.x-1, point.y)]! as Town).degrade();
+    }
+    else if(loot>=1){
+      (game.stage.tileMap[Point(point.x+1, point.y)]! as Town).degrade();
+    }
+    loot--;
+    if(loot == 0) close();
+  }
+}
+class Town extends Tile {
+  late SpriteComponent ruinSprite;
+  late SpriteComponent plainSprite;
+  late final SpriteSheet stateSheet;
+  late final int col;
+  // Constructor for the Village class. 
+  // Inherits properties and methods from Tile and adds specific properties for Town.
+  Town(Point<int> point, double size, Terrain terrain, String name) 
+    : super._internal(point, size, terrain, name);
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    ui.Image statesImages = await game.images.load('states_set.png');
+    stateSheet = SpriteSheet.fromColumnsAndRows(
+      image: statesImages,
+      columns: 3,
+      rows: 4,
+    );
+    Random rng = Random();
+    col = rng.nextInt(3);
+    ruinSprite = SpriteComponent(
+      sprite: stateSheet.getSprite(0, col), 
+      size: size,
+      anchor: Anchor.center,
+      position: Vector2(size.x/2, size.y/2),
+    );
+    plainSprite = SpriteComponent(
+      sprite: stateSheet.getSprite(1, col), 
+      size: size,
+      anchor: Anchor.center,
+      position: Vector2(size.x/2, size.y/2),
+    );
+  }
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas); // Don't forget to call super.render
+    switch(terrain) {
+      case Terrain.ruin:
+        add(ruinSprite);
+        break;
+      case Terrain.plain:
+        if(ruinSprite.isMounted){
+          remove(ruinSprite);
+        }
+        add(plainSprite);
+        break;
+      default:
+        break;
+    }
+  }
+  
+  void degrade(){
+    if(terrain == Terrain.town){
+      terrain = Terrain.ruin;
+    } else {terrain = Terrain.plain;}
+  }
+}
+
+class CastleGate extends Tile {
+  late SpriteComponent flagSprite;
+  late final SpriteSheet stateSheet;
+  final FactionType factionType;
+  // Constructor for the Village class. 
+  // Inherits properties and methods from Tile and adds specific properties for Town.
+  CastleGate(Point<int> point, double size, Terrain terrain, String name, this.factionType) 
+    : super._internal(point, size, terrain, name);
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    ui.Image statesImages = await game.images.load('states_set.png');
+    stateSheet = SpriteSheet.fromColumnsAndRows(
+      image: statesImages,
+      columns: 3,
+      rows: 4,
+    );
+    flagSprite = SpriteComponent(
+      sprite: stateSheet.getSprite(3, factionType.order), 
+      size: Vector2.all(Stage.tileSize),
+      anchor: Anchor.center,
+      position: Vector2(size.x*1.5, size.y/2),
+    );
+  }
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    flagSprite.sprite = stateSheet.getSprite(3, factionType.order);
+    add(flagSprite);
+  }
+}
+
+class VisitEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final TownCenter town;
+  VisitEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    town.close(); 
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class RansackEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final TownCenter town;
+  RansackEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    town.ransack(); 
+    debugPrint("RansackEvent: ${unit.name} ransacks town at ${town.point}.");
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
 

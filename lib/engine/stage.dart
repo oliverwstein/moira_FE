@@ -71,6 +71,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     getCamera();
     children.register<Unit>();
     children.register<Player>();
+    children.register<TownCenter>();
   }
   void getCamera() {
     debugPrint("Get stage camera");
@@ -133,7 +134,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
       return menuManager.handleKeyEvent(key, keysPressed);
     }
     if (key is RawKeyDownEvent && !cursor.isMoving) {
-      debugPrint("Stage given key ${key.logicalKey.keyLabel} to handle.");
+      // debugPrint("Stage given key ${key.logicalKey.keyLabel} to handle.");
       switch (key.logicalKey) {
         case (LogicalKeyboardKey.keyA || LogicalKeyboardKey.keyB):
           return menuManager.handleKeyEvent(key, keysPressed);

@@ -206,7 +206,8 @@
                     "destination": [
                         32,
                         25
-                    ]
+                    ],
+                    "orders": ["Guard"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -220,7 +221,8 @@
                     "destination": [
                         33,
                         26
-                    ]
+                    ],
+                    "orders": ["Guard"]
                 }
             ],
             [
@@ -492,8 +494,8 @@
                         13
                     ],
                     "destination": [
-                        24,
-                        13
+                        26,
+                        16
                     ]
                 },
                 {
