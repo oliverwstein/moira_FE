@@ -424,11 +424,12 @@ class UnitCreationEvent extends Event{
   final Point<int> tilePosition;
   int? level;
   List<String>? items;
+  List<String>? orders;
   Point<int>? destination;
   late final Unit unit;
   
 
-  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.orders, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   
   @override
   List<Event> getObservers() {
@@ -440,7 +441,7 @@ class UnitCreationEvent extends Event{
   void execute() {
     super.execute();
     debugPrint("UnitCreationEvent: unit $name");
-    unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items);
+    unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items, orderStrings: orders);
     game.stage.add(unit);
     if (destination != null) {
       var moveEvent = UnitMoveEvent(unit, destination!, name: name);
