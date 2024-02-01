@@ -129,6 +129,20 @@ mixin UnitBehavior on PositionComponent {
       unit.game.eventQueue.addEventBatch([StartCombatEvent(unit, target.target)]);
     }
   }
+
+  void moveTowardsTarget(Point<int> targetPoint, List<Tile> openTiles) {
+    Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, targetPoint);
+    var closerTiles = {};
+    for (Tile tile in openTiles){
+      if (gScores.keys.contains(tile.point)){
+        closerTiles[tile.point] = gScores[tile.point];
+      }
+    }
+    Point<int> bestMove = closerTiles.entries
+                              .reduce((curr, next) => curr.value < next.value ? curr : next)
+                              .key;
+    unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, bestMove)]);
+  }
 }
 
 class UnitOrderEvent extends Event {
