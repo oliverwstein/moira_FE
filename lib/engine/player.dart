@@ -188,3 +188,99 @@ class FactionCreationEvent extends Event{
     completeEvent();
   }
 }
+
+class Order {
+  Order();
+  factory Order.create(String orderType) {
+    switch (orderType) {
+        case 'Ransack':
+            return RansackOrder();
+        case 'Guard':
+            return GuardOrder();
+        default:
+            throw ArgumentError('Invalid order type: $orderType');
+    }
+  }
+  void command(Unit unit) {
+    unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
+    var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
+    if(rankedTiles.firstOrNull != null){
+      for(Event event in rankedTiles.first.events){
+        unit.game.eventQueue.addEventBatch([event]);
+      }
+    }
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+class RansackOrder extends Order {
+  RansackOrder();
+
+  @override
+  void command(Unit unit){
+    unit.remainingMovement = unit.movementRange.toDouble();
+    var tile = unit.tile;
+    if(tile is TownCenter && tile.open) {
+      unit.game.eventQueue.addEventBatch([RansackEvent(unit, tile)]);
+    } else {
+      TownCenter? nearestTown = TownCenter.getNearestTown(unit);
+      if(nearestTown == null) {super.command(unit);}
+      else {
+        List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+        if(openTiles.contains(nearestTown)){
+          unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestTown.point)]);
+          unit.game.eventQueue.addEventBatch([RansackEvent(unit, nearestTown)]);
+        } 
+        else {
+          Map<Point<int>, double> gScores = unit.getGScores(unit.tilePosition, nearestTown.point);
+          var closerTiles = {};
+          for (Tile tile in openTiles){
+            if (gScores.keys.contains(tile.point)){
+              closerTiles[tile.point] = gScores[tile.point];
+            }
+          }
+          Point<int> bestMove = closerTiles.entries
+                                    .reduce((curr, next) => curr.value < next.value ? curr : next)
+                                    .key;
+          unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, bestMove)]);
+        }
+      }
+    }
+
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+/// Do not move, but attack enemies within range if possible. 
+class GuardOrder extends Order {
+  GuardOrder();
+
+  @override
+  void command(Unit unit){
+    unit.makeBestAttackAt(unit.tile);
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+
+/// Move to attack any enemy units that come within range, but otherwise do not move. 
+class DefendOrder extends Order {
+  DefendOrder();
+
+  @override
+  void command(Unit unit){
+    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+    var combatResults = unit.getCombatEventsAndScores(openTiles);
+    // Add the best combatResult event list to the queue.
+    unit.game.eventQueue.addEventBatch(combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events);
+    unit.game.eventQueue.addEventBatch([ExhaustUnitEvent(unit)]);
+  }
+}
+  
+/// Move towards any enemy castle, attacking enemies along the way.
+class InvadeOrder extends Order {
+  InvadeOrder();
+
+  @override
+  void command(Unit unit){
+  }
+}
