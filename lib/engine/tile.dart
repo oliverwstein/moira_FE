@@ -74,7 +74,11 @@ class Tile extends PositionComponent with HasGameReference<MoiraGame>{
     if (name == "Center" && terrain == Terrain.town) {
       return TownCenter(point, size, terrain, name);
     } else if (terrain == Terrain.town) {
-      return Town(point, size, terrain, name);}
+      return Town(point, size, terrain, name);
+    } else if (terrain == Terrain.gate) {
+        String castleName = name.split("_")[0];
+        FactionType factionType = FactionOrder.fromName(name.split("_")[1]) ?? FactionType.blue;
+        return CastleGate(point, size, terrain, castleName, factionType);}
     else{
       return Tile._internal(point, size, terrain, name);
     }
@@ -207,7 +211,7 @@ class TownCenter extends Tile{
     stateSheet = SpriteSheet.fromColumnsAndRows(
       image: statesImages,
       columns: 3,
-      rows: 3,
+      rows: 4,
     );
     closedSprite = SpriteComponent(
       sprite: stateSheet.getSprite(2, 0), 
@@ -255,7 +259,7 @@ class Town extends Tile {
     stateSheet = SpriteSheet.fromColumnsAndRows(
       image: statesImages,
       columns: 3,
-      rows: 3,
+      rows: 4,
     );
     Random rng = Random();
     col = rng.nextInt(3);
@@ -294,6 +298,37 @@ class Town extends Tile {
     if(terrain == Terrain.town){
       terrain = Terrain.ruin;
     } else {terrain = Terrain.plain;}
+  }
+}
+
+class CastleGate extends Tile {
+  late SpriteComponent flagSprite;
+  late final SpriteSheet stateSheet;
+  final FactionType factionType;
+  // Constructor for the Village class. 
+  // Inherits properties and methods from Tile and adds specific properties for Town.
+  CastleGate(Point<int> point, double size, Terrain terrain, String name, this.factionType) 
+    : super._internal(point, size, terrain, name);
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    ui.Image statesImages = await game.images.load('states_set.png');
+    stateSheet = SpriteSheet.fromColumnsAndRows(
+      image: statesImages,
+      columns: 3,
+      rows: 4,
+    );
+    flagSprite = SpriteComponent(
+      sprite: stateSheet.getSprite(3, factionType.order), 
+      size: size,
+      anchor: Anchor.center,
+      position: Vector2(3*size.x/2, size.y/2),
+    );
+  }
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    flagSprite.sprite = stateSheet.getSprite(3, factionType.order);
   }
 }
 

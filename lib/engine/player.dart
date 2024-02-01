@@ -42,9 +42,6 @@ class Player extends Component with HasGameReference<MoiraGame>{
       case FactionType.blue:
         if (game.stage.factionMap[unit.faction]?.factionType == FactionType.red) return true;
         return false;
-      case FactionType.yellow:
-        if (game.stage.factionMap[unit.faction]?.factionType == FactionType.red) return true;
-        return false;
       case FactionType.red:
         if (game.stage.factionMap[unit.faction]?.factionType != FactionType.red) return true;
         return false;

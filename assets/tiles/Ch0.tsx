@@ -4034,7 +4034,7 @@
  </tile>
  <tile id="803">
   <properties>
-   <property name="name" value="Chalphy"/>
+   <property name="name" value="Chalphy_blue"/>
    <property name="terrain" value="Gate"/>
   </properties>
  </tile>
@@ -4698,7 +4698,7 @@
  </tile>
  <tile id="934">
   <properties>
-   <property name="name" value="Evans"/>
+   <property name="name" value="Evans_red"/>
    <property name="terrain" value="Gate"/>
   </properties>
  </tile>
@@ -7956,7 +7956,7 @@
  </tile>
  <tile id="1582">
   <properties>
-   <property name="name" value="Jungby"/>
+   <property name="name" value="Jungby_green"/>
    <property name="terrain" value="Gate"/>
   </properties>
  </tile>

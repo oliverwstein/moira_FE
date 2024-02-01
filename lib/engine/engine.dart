@@ -19,18 +19,26 @@ import 'package:flutter/widgets.dart';
 abstract class InputHandler {
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed);
 }
-enum FactionType {blue, red, green, yellow}
+enum FactionType {blue, red, green}
 extension FactionOrder on FactionType {
   int get order {
     switch (this) {
       case FactionType.blue:
         return 0;
-      case FactionType.yellow:
-        return 1;
       case FactionType.red:
         return 2;
       case FactionType.green:
         return 3;
+    }
+  }
+  String get name => toString().split('.').last.replaceFirstMapped(RegExp(r'[a-zA-Z]'), (match) => match.group(0)!.toUpperCase());
+
+  // Static method to get a skill by its name
+  static FactionType? fromName(String name) {
+    try {
+      return FactionType.values.firstWhere((skill) => skill.name.toLowerCase() == name.toLowerCase());
+    } catch (e) {
+      return null; // Return null if no matching skill is found
     }
   }
 }
