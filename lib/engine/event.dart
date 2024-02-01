@@ -85,6 +85,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   @override
   void onLoad() {
     children.register<Event>();
+    children.register<CombatRoundEvent>();
   }
 
   void addEventBatch(List<Event> eventBatch) {
@@ -166,9 +167,10 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             break;
           case 'BesiegeEvent':
             String castleName = eventData['castle'];
+            bool duel = eventData['duel'] ?? false;
             CastleGate? gate = CastleGate.getCastleByName(game, castleName);
             assert(gate != null);
-            event = BesiegeEvent(gate!);
+            event = BesiegeEvent(gate!, duel: duel);
             break;
           default:
             // Add a dummy event.

@@ -491,9 +491,10 @@ class UnitMoveEvent extends Event {
   }
   @override
   bool checkComplete() {
-    if(checkStarted()) {
+    if(checkStarted() && unit.tilePosition == tilePosition) {
       game.eventQueue.dispatchEvent(this);
-      return (unit.tilePosition == tilePosition);}
+      return true;
+    }
     return false;
   } 
 }

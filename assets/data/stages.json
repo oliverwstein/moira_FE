@@ -722,6 +722,7 @@
                 {
                     "type": "BesiegeEvent",
                     "castle": "Jungby",
+                    "duel" : true,
                     "triggers":
                     [
                         {"DialogueEvent":

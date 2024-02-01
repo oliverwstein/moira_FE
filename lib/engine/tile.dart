@@ -398,7 +398,8 @@ class RansackEvent extends Event {
 class BesiegeEvent extends Event {
   static List<Event> observers = [];
   final CastleGate gate;
-  BesiegeEvent(this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  final bool duel;
+  BesiegeEvent(this.gate, {Trigger? trigger, String? name, this.duel = false}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -419,7 +420,8 @@ class BesiegeEvent extends Event {
       // though the event should still be involved.
       // Note: besieging lets the unit use any attack in their attackSet.
       unit.getBestAttackOnTarget(gate.fort.unit!, unit.attackSet.values.toList());
-      unit.game.eventQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!)]);
+      if(duel == false) {unit.game.eventQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!)]);}
+      else {unit.game.eventQueue.addEventBatch([StartDuelEvent(unit, gate.fort.unit!)]);}
     }
     completeEvent();
     game.eventQueue.dispatchEvent(this);
