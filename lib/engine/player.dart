@@ -197,6 +197,8 @@ class Order {
         return RansackOrder();
       case 'Guard':
         return GuardOrder();
+      case 'Defend':
+        return DefendOrder();
       case 'Invade':
         assert(target != null);
         return InvadeOrder(target);
