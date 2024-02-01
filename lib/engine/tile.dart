@@ -443,6 +443,7 @@ class SeizeEvent extends Event {
     assert(gate.factionName != unit.controller.name);
     gate.cedeTo(unit.controller.name);
     debugPrint("SeizeEvent: ${unit.name} seizes castle ${gate.name} for ${unit.controller.name}.");
+    game.eventQueue.add(UnitMoveEvent(unit, gate.fort.point));
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
