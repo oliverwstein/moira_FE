@@ -153,6 +153,7 @@ Gandolf: Enough japes, Aideen. Be quick, or be dead.
 Aideen: ...Heaven preserve me.
 <<stop>>
 ===
+
 title: Gandolf_At_Evans
 ---
 <<local $left = "Gerrard" as String>>
@@ -171,5 +172,13 @@ Gandolf: You can have your fun once Grandbell is ours.
 <<set $left = "Gandolf">>
 Aideen: Animals have come upon us. Oh, my beloved Jungby...
 Gandolf: Quit your mumbling. You'll be Queen of more than Jungby soon enough.
+<<stop>>
+===
+
+title: DiMaggio_Orders_Looting
+---
+<<local $left = "" as String>>
+<<local $right = "DiMaggio" as String>>
+DiMaggio: Alright you idiots, it's time to take Chalphy! And I expect my cut of the loot from those villages!
 <<stop>>
 ===

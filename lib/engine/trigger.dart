@@ -21,11 +21,9 @@ class Trigger extends Component {
         DialogueEvent.observers.add(event);
         return Trigger._byName(name);
       case "PanEvent":
-        Point<int>? destination = Point(triggerData["PanEvent"]["destination"][0], triggerData["PanEvent"]["destination"][1]);
         PanEvent.observers.add(event);
-        String? name = triggerData["PanEvent"]["name"];
-        if (name != null) return Trigger._byName(name);
-        return Trigger._pan(destination);
+        String name = triggerData["PanEvent"]["name"];
+        return Trigger._byName(name);
       case "UnitCreationEvent":
         UnitCreationEvent.observers.add(event);
         String name = triggerData["UnitCreationEvent"]["name"];
@@ -33,6 +31,10 @@ class Trigger extends Component {
       case "UnitMoveEvent":
         UnitMoveEvent.observers.add(event);
         String name = triggerData["UnitMoveEvent"]["name"];
+        return Trigger._byName(name);
+      case "UnitExitEvent":
+        UnitExitEvent.observers.add(event);
+        String name = triggerData["UnitExitEvent"]["name"];
         return Trigger._byName(name);
       default:
         String name = triggerData[triggerData.keys.first]["name"];

@@ -91,7 +91,6 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 
   @override 
   void update(double dt) {
-    // debugPrint("In progress: $name");
     if(!checkTriggered()) return;
     if(!_isStarted) {
       execute();
@@ -206,6 +205,10 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             double speed = eventData['speed'] ?? 2;
             bool chainCamera = eventData['chainCamera'] ?? false;
             event = UnitMoveEvent.named(unitName, destination, speed: speed, chainCamera: chainCamera);
+            break;
+          case 'UnitExitEvent':
+            String unitName = eventData['unitName'];
+            event = UnitExitEvent.named(unitName);
             break;
           case 'DialogueEvent':
             String? bgName = eventData['bgName'];

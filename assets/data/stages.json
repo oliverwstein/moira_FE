@@ -706,7 +706,7 @@
                     [
                         {"UnitMoveEvent":
                             {
-                            "name":"Lex"}
+                            "name":"UnitMoveEvent: Lex_to_Point(42, 3)"}
                         }
                     ]
                 },
@@ -950,9 +950,35 @@
                     ],
                     "triggers":
                     [
-                        {"DialogueEvent":
+                        {"UnitExitEvent":
                             {
-                            "name": "Gandolf_At_Evans"}
+                            "name": "UnitExitEvent: Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "DiMaggio",
+                    "destination": [
+                        32,
+                        23
+                    ],
+                    "triggers":
+                    [
+                        {"PanEvent":
+                            {
+                            "name": "JungbyPan2"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "DiMaggio_Orders_Looting",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: DiMaggio_to_Point(33, 22)"}
                         }
                     ]
                 }

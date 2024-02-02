@@ -582,9 +582,13 @@ class UnitDeathEvent extends Event {
 
 class UnitExitEvent extends Event {
   static List<Event> observers = [];
-  final Unit unit;
+  Unit? unit;
+  final String unitName;
 
-  UnitExitEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "${unit.name}_Death");
+  UnitExitEvent(this.unit, {Trigger? trigger, String? name}) : unitName = unit!.name, super(trigger: trigger, name: "UnitExitEvent: ${unit.name}");
+  UnitExitEvent.named(this.unitName, {this.unit, Trigger? trigger, String? name})
+      : super(trigger: trigger, name: name ?? "UnitExitEvent: $unitName");
+
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -594,8 +598,10 @@ class UnitExitEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("UnitExitEvent: ${unit.name} exits the stage.");
-    unit.exit();
+    unit ??= Unit.getUnitByName(game.stage, unitName);
+    assert(unit != null);
+    unit!.exit();
+    debugPrint("$name");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
