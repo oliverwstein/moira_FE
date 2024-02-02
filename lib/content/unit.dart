@@ -432,7 +432,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
 }
 
-class UnitCircle extends SpriteComponent{
+class UnitCircle extends SpriteComponent with HasVisibility{
   Unit unit;
   UnitCircle(this.unit);
 
@@ -448,6 +448,8 @@ class UnitCircle extends SpriteComponent{
   @override
   void render(Canvas canvas){
     super.render(canvas);
+    if(true)
+      {isVisible = true;} else {isVisible = false;}
   }
 }
 
