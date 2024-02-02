@@ -17,6 +17,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   String faction;
   Point<int> tilePosition;
   Tile get tile => game.stage.tileMap[tilePosition]!;
+  Player get controller => game.stage.factionMap[faction]!;
   Queue<Movement> movementQueue = Queue<Movement>();
   final Map<String, SpriteAnimationComponent> animationMap = {};
   late SpriteAnimationComponent sprite;
@@ -44,6 +45,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int level;
   int hp = -1;
   int sta = -1;
+  static Unit? getUnitByName(Stage stage, String unitName) {
+    return stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
+  }
         
   factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings, List<String>? orderStrings}) {
 
@@ -316,6 +320,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       if (town.open) actions.add("Visit");
       if (town.open) actions.add("Ransack");
     }
+    if(game.stage.tileMap[point]! is CastleGate) {
+      CastleGate gate = game.stage.tileMap[point]! as CastleGate;
+      if (gate.factionName != unit.controller.name){
+        if(gate.fort.isOccupied && gate.fort.unit!.controller.checkHostility(unit)){
+          actions.add("Besiege");
+        } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
+          actions.add("Seize");
+        } else if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
+          actions.add("Enter");
+        }
+      }
+    }
     if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
@@ -353,7 +369,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         for (var point in pointsToCheck) {
           if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
             Tile? tile = game.stage.tileMap[point];
-            if (tile != null && tile.isOccupied && game.stage.factionMap[unit.faction]!.checkHostility(tile.unit!)) {
+            if (tile != null && tile.isOccupied && controller.checkHostility(tile.unit!)) {
               targets.add(tile.unit!);
               tile.state = TileState.attack;
               debugPrint("${tile.unit!.name} is a target at ${tile.point}");
@@ -411,8 +427,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void die() {
     dead = true;
-    unit.tile.removeUnit();
-    game.stage.factionMap[faction]!.units.remove(this);
+    tile.removeUnit();
+    controller.units.remove(this);
     removeFromParent();
   }
 }
@@ -421,13 +437,15 @@ class UnitCreationEvent extends Event{
   final String unitName;
   final String factionName;
   final Point<int> tilePosition;
+
   int? level;
   List<String>? items;
+  List<String>? orders;
   Point<int>? destination;
   late final Unit unit;
   
 
-  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.orders, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   
   @override
   List<Event> getObservers() {
@@ -439,7 +457,7 @@ class UnitCreationEvent extends Event{
   void execute() {
     super.execute();
     debugPrint("UnitCreationEvent: unit $name");
-    unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items);
+    unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items, orderStrings: orders);
     game.stage.add(unit);
     if (destination != null) {
       var moveEvent = UnitMoveEvent(unit, destination!, name: name);
@@ -477,18 +495,19 @@ class UnitMoveEvent extends Event {
   }
   @override
   bool checkComplete() {
-    if(checkStarted()) {
+    if(checkStarted() && unit.tilePosition == tilePosition) {
       game.eventQueue.dispatchEvent(this);
-      return (unit.tilePosition == tilePosition);}
+      return true;
+    }
     return false;
   } 
 }
 
-class ExhaustUnitEvent extends Event {
+class UnitExhaustEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   bool manual;
-  ExhaustUnitEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitExhaustEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -504,21 +523,21 @@ class ExhaustUnitEvent extends Event {
   }
 }
 
-class DeathEvent extends Event {
+class UnitDeathEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   static void initialize(EventQueue eventQueue) {
     eventQueue.registerClassObserver<DamageEvent>((damageEvent) {
       if (damageEvent.unit.hp <= 0) {
-        // Trigger DeathEvent
-        var deathEvent = DeathEvent(damageEvent.unit);
+        // Trigger UnitDeathEvent
+        var unitDeathEvent = UnitDeathEvent(damageEvent.unit);
         EventQueue eventQueue = damageEvent.game.eventQueue;
-        eventQueue.addEventBatchToHead([deathEvent]);
+        eventQueue.addEventBatchToHead([unitDeathEvent]);
       }
     });
   }
 
-  DeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitDeathEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "${unit.name}_Death");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -528,7 +547,7 @@ class DeathEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("DeathEvent: ${unit.name} has died.");
+    debugPrint("UnitDeathEvent: ${unit.name} has died.");
     unit.die();
     completeEvent();
     game.eventQueue.dispatchEvent(this);

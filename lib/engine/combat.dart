@@ -9,7 +9,8 @@ class Combat extends Component with HasGameReference<MoiraGame>{
   Unit attacker;
   Unit defender;
   int damage = 0;
-  Combat(this.attacker, this.defender);
+  bool duel;
+  Combat(this.attacker, this.defender, {this.duel = false});
 
   @override
   void update(dt) {
@@ -35,9 +36,10 @@ class StartCombatEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   final Unit target;
+  final bool duel;
   late final Combat combat;
-  StartCombatEvent(this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name){
-    combat = Combat(unit, target);
+  StartCombatEvent(this.unit, this.target, {Trigger? trigger, String? name, this.duel = false}) : super(trigger: trigger, name: name ?? "StartCombat_${unit.name}_${target.name}"){
+    combat = Combat(unit, target, duel: duel);
   }
   @override
   List<Event> getObservers() {
@@ -49,6 +51,7 @@ class StartCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    if(duel) debugPrint("Duel! $name");
     game.add(combat);
     game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
     completeEvent();
@@ -59,7 +62,21 @@ class StartCombatEvent extends Event {
 class CombatRoundEvent extends Event {
   static List<Event> observers = [];
   final Combat combat;
-  CombatRoundEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  CombatRoundEvent(this.combat, {Trigger? trigger, String? name}) 
+    : super(trigger: trigger, name: name ?? "CombatRound_${combat.attacker.name}_${combat.defender.name}");
+
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
+      if (endCombatEvent.combat.duel && !endCombatEvent.combat.attacker.dead && !endCombatEvent.combat.defender.dead) {
+        CombatRoundEvent newCombatRoundEvent = CombatRoundEvent(endCombatEvent.combat);
+        EventQueue eventQueue = endCombatEvent.game.eventQueue;
+        debugPrint("Add duel round: ${endCombatEvent.combat.attacker.name} against ${endCombatEvent.combat.defender.name}");
+        eventQueue.addEventBatchToHead([newCombatRoundEvent]);
+      } else {
+        endCombatEvent.combat.removeFromParent();
+      }
+    });
+  }
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -73,8 +90,8 @@ class CombatRoundEvent extends Event {
     game.eventQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender)]);
     game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
     combat.addFollowUp();
-    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     completeEvent();
+    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
     game.eventQueue.dispatchEvent(this);
   }
 }
@@ -82,7 +99,7 @@ class CombatRoundEvent extends Event {
 class EndCombatEvent extends Event {
   static List<Event> observers = [];
   final Combat combat;
-  EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "EndCombat_${combat.attacker.name}_${combat.defender.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -93,8 +110,7 @@ class EndCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    combat.removeFromParent();
-    game.eventQueue.addEventBatch([ExhaustUnitEvent(combat.attacker)]);
+    game.eventQueue.addEventBatch([UnitExhaustEvent(combat.attacker)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
@@ -105,7 +121,7 @@ class AttackEvent extends Event {
   final Combat combat;
   final Unit unit;
   final Unit target;
-  AttackEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  AttackEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Attack_${unit.name}_${target.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -144,7 +160,7 @@ class HitEvent extends Event {
   final Unit target;
   final ({int accuracy, int critRate, int damage, int fatigue}) vals;
   
-  HitEvent(this.combat, this.unit, this.target, this.vals, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  HitEvent(this.combat, this.unit, this.target, this.vals, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Hit_${unit.name}_${target.name}");
   
   @override
   List<Event> getObservers() {
@@ -169,7 +185,7 @@ class MissEvent extends Event {
   final Unit unit;
   final Unit target;
   
-  MissEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  MissEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Miss_${unit.name}_${target.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -200,12 +216,11 @@ class CritEvent extends Event {
           EventQueue eventQueue = hitEvent.game.eventQueue;
           eventQueue.addEventBatchToHead([critEvent]);
         }
-        
       }
     });
   }
   
-  CritEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  CritEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Crit_${unit.name}_${target.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -226,7 +241,7 @@ class DamageEvent extends Event {
   static List<Event> observers = [];
   final Combat combat;
   final Unit unit;
-  DamageEvent(this.combat, this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  DamageEvent(this.combat, this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Damage_${unit.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

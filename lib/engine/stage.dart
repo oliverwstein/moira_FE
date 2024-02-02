@@ -72,6 +72,8 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     children.register<Unit>();
     children.register<Player>();
     children.register<TownCenter>();
+    children.register<CastleGate>();
+    children.register<CastleFort>();
   }
   void getCamera() {
     debugPrint("Get stage camera");

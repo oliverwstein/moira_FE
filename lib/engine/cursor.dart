@@ -50,7 +50,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       max(0, min(newTilePosition.x, game.stage.mapTileWidth - 1)),
       max(0, min(newTilePosition.y, game.stage.mapTileHeight - 1))
     );
-     debugPrint("move to $boundedPosition");
+    //  debugPrint("move to $boundedPosition");
     tilePosition = boundedPosition;
     targetPosition = Vector2(tilePosition.x*Stage.tileSize, tilePosition.y*Stage.tileSize);
     

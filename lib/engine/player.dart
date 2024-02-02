@@ -40,10 +40,10 @@ class Player extends Component with HasGameReference<MoiraGame>{
     if(hostilities.contains(unit.faction)) return true;
     switch (factionType) {
       case FactionType.blue:
-        if (game.stage.factionMap[unit.faction]?.factionType == FactionType.red) return true;
+        if (unit.controller.factionType == FactionType.red) return true;
         return false;
       case FactionType.red:
-        if (game.stage.factionMap[unit.faction]?.factionType != FactionType.red) return true;
+        if (unit.controller.factionType != FactionType.red) return true;
         return false;
       case FactionType.green:
         return false;
@@ -186,5 +186,120 @@ class FactionCreationEvent extends Event{
     game.stage.turnOrder[type.order].add(player);
     game.eventQueue.dispatchEvent(this);
     completeEvent();
+  }
+}
+
+class Order {
+  Order();
+  factory Order.create(String orderType) {
+    var inputs = orderType.split("_");
+    switch (inputs[0]) {
+      case 'Ransack':
+        return RansackOrder();
+      case 'Guard':
+        return GuardOrder();
+      case 'Defend':
+        return DefendOrder();
+      case 'Invade':
+        assert(inputs.length == 2);
+        return InvadeOrder(inputs[1]);
+      default:
+        throw ArgumentError('Invalid order type: $orderType');
+    }
+  }
+  void command(Unit unit) {
+    unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
+    var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
+    if(rankedTiles.firstOrNull != null){
+      for(Event event in rankedTiles.first.events){
+        unit.game.eventQueue.addEventBatch([event]);
+      }
+    }
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
+  }
+}
+
+class RansackOrder extends Order {
+  RansackOrder();
+
+  @override
+  void command(Unit unit){
+    debugPrint("${unit.name} ordered to Ransack");
+    unit.remainingMovement = unit.movementRange.toDouble();
+    var tile = unit.tile;
+    if(tile is TownCenter && tile.open) {
+      unit.game.eventQueue.addEventBatch([RansackEvent(unit, tile)]);
+    } else {
+      TownCenter? nearestTown = TownCenter.getNearestTown(unit);
+      if(nearestTown == null) {super.command(unit);}
+      else {
+        List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+        if(openTiles.contains(nearestTown)){
+          unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestTown.point)]);
+          unit.game.eventQueue.addEventBatch([RansackEvent(unit, nearestTown)]);
+        } 
+        else {
+          Point<int> bestMove = unit.moveTowardsTarget(nearestTown.point, openTiles);
+          unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
+
+        }
+      }
+    }
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
+  }
+}
+
+/// Do not move, but attack enemies within range if possible. 
+class GuardOrder extends Order {
+  GuardOrder();
+
+  @override
+  void command(Unit unit){
+    debugPrint("${unit.name} ordered to Guard");
+    unit.makeBestAttackAt(unit.tile);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
+  }
+}
+
+/// Move to attack any enemy units that come within range, but otherwise do not move. 
+class DefendOrder extends Order {
+  DefendOrder();
+
+  @override
+  void command(Unit unit){
+    debugPrint("${unit.name} ordered to Defend");
+    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+    var combatResults = unit.getCombatEventsAndScores(openTiles);
+    // Add the best combatResult event list to the queue.
+    unit.game.eventQueue.addEventBatch(combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
+  }
+}
+  
+/// Move towards any enemy castle, attacking enemies along the way.
+class InvadeOrder extends Order {
+  String targetName;
+  InvadeOrder(this.targetName);
+
+  @override
+  void command(Unit unit){
+    CastleGate? nearestCastle = CastleGate.getNearestCastle(unit, targetName);
+    debugPrint("${unit.name} ordered to invade ${nearestCastle?.name}");
+    if(nearestCastle == null) {
+      // @TODO: If nearestEnemyCastle is null, 
+      // it should really go to the next order in the queue, not the basic order.
+      super.command(unit);}
+    else {
+      List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+      if(openTiles.contains(nearestCastle)){
+        unit.game.eventQueue.addEventBatch([UnitMoveEvent(unit, nearestCastle.point)]);
+        unit.game.eventQueue.addEventBatch([BesiegeEvent(nearestCastle)]);
+        // @TODO: Then add a Besiege event depending on whether the fort is occupied.
+      } else {
+        Point<int> bestMove = unit.moveTowardsTarget(nearestCastle.point, openTiles);
+        unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
+      }
+    }
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }

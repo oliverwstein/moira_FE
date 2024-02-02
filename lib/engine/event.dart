@@ -25,6 +25,65 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   void execute(){
     _isStarted = true;
   }
+  static List getObserversByClassName(String eventClassName){
+    // UPDATE THIS WHENEVER YOU CREATE A NEW EVENT CLASS
+    switch (eventClassName) {
+    case 'UnitCreationEvent':
+      return UnitCreationEvent.observers;
+    case 'UnitMoveEvent':
+      return UnitMoveEvent.observers;
+    case 'UnitExhaustEvent':
+      return UnitExhaustEvent.observers;
+    case 'UnitDeathEvent':
+      return UnitDeathEvent.observers;
+    case 'UnitOrderEvent':
+      return UnitOrderEvent.observers;
+    case 'UnitActionEvent':
+      return UnitActionEvent.observers;
+    case 'StartCombatEvent':
+      return StartCombatEvent.observers;
+    case 'CombatRoundEvent':
+      return CombatRoundEvent.observers;
+    case 'EndCombatEvent':
+      return EndCombatEvent.observers;
+    case 'AttackEvent':
+      return AttackEvent.observers;
+    case 'HitEvent':
+      return HitEvent.observers;
+    case 'MissEvent':
+      return MissEvent.observers;
+    case 'CritEvent':
+      return CritEvent.observers;
+    case 'DamageEvent':
+      return DamageEvent.observers;
+    case 'StartTurnEvent':
+      return StartTurnEvent.observers;
+    case 'TakeTurnEvent':
+      return TakeTurnEvent.observers;
+    case 'EndTurnEvent':
+      return EndTurnEvent.observers;
+    case 'FactionCreationEvent':
+      return FactionCreationEvent.observers;
+    case 'VisitEvent':
+      return VisitEvent.observers;
+    case 'RansackEvent':
+      return RansackEvent.observers;
+    case 'BesiegeEvent':
+      return BesiegeEvent.observers;
+    case 'SeizeEvent':
+      return SeizeEvent.observers;
+    case 'DialogueEvent':
+      return DialogueEvent.observers;
+    case 'PanEvent':
+      return PanEvent.observers;
+    case 'VantageEvent':
+      return VantageEvent.observers;
+    case 'CantoEvent':
+      return CantoEvent.observers;
+    default:
+      return [];
+    }
+  }
 
   List<Event> getObservers();
 
@@ -85,6 +144,7 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   @override
   void onLoad() {
     children.register<Event>();
+    children.register<CombatRoundEvent>();
   }
 
   void addEventBatch(List<Event> eventBatch) {
@@ -131,8 +191,20 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
               destination = Point(eventData['destination'][0], eventData['destination'][1]);
             }
             String? eventName = eventData['name'] ?? name;
-            event = UnitCreationEvent(name, tilePosition, factionName, level:level, items:itemStrings, destination: destination, name: eventName);
+            List<String>? orderStrings;
+            if (eventData['orders'] != null) {
+              orderStrings = List<String>.from(eventData['orders']);
+            }
+            event = UnitCreationEvent(name, tilePosition, factionName, level:level, items:itemStrings, orders: orderStrings, destination: destination, name: eventName);
             break;
+          // case 'UnitMoveEvent':
+          //   // String unitName = eventData['unitName'];
+          //   // Unit? unit = Unit.getUnitByName(game.stage, unitName);
+          //   // assert(unit != null);
+          //   // Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
+          //   // String? eventName = eventData['name'] ?? "${unitName}_moveTo_$destination";
+          //   // event = UnitMoveEvent(unit!, destination, name: eventName);
+          //   break;
           case 'DialogueEvent':
             String? bgName = eventData['bgName'];
             String nodeName = eventData['nodeName'];
@@ -160,6 +232,13 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             String? eventName = eventData['name'] ?? factionName;
             event = FactionCreationEvent(factionName, factionType, human:human, name: eventName);
             break;
+          case 'BesiegeEvent':
+            String castleName = eventData['castle'];
+            bool duel = eventData['duel'] ?? false;
+            CastleGate? gate = CastleGate.getCastleByName(game, castleName);
+            assert(gate != null);
+            event = BesiegeEvent(gate!, duel: duel);
+            break;
           default:
             // Add a dummy event.
             event = DummyEvent();
@@ -175,34 +254,6 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
       }
     }
   }
-}
-
-class DialogueEvent extends Event{
-  static List<Event> observers = [];
-  String? bgName;
-  String nodeName;
-  late DialogueMenu menu;
-  DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
-  @override
-  List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered()));
-    return observers;
-  }
-  @override
-  Future<void> execute() async {
-    super.execute();
-    debugPrint("DialogueEvent execution $nodeName $bgName");
-    menu = DialogueMenu(nodeName, bgName);
-    game.stage.menuManager.pushMenu(menu);
-
-  }
-  @override
-  bool checkComplete() {
-    if(checkStarted()) {
-      game.eventQueue.dispatchEvent(this);
-      return menu.dialogue.finished;}
-    return false;
-  } 
 }
 
 class PanEvent extends Event{

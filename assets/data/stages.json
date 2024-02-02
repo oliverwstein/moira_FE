@@ -41,7 +41,8 @@
                     "destination": [
                         33,
                         25
-                    ]
+                    ],
+                    "orders": ["Defend"]
                     
                 },
                 {
@@ -56,7 +57,8 @@
                     "destination": [
                         32,
                         26
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -70,7 +72,8 @@
                     "destination": [
                         31,
                         25
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -87,7 +90,8 @@
                     "destination": [
                         30,
                         28
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 }
             ],
             [
@@ -103,7 +107,8 @@
                     "destination": [
                         37,
                         26
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -117,7 +122,8 @@
                     "destination": [
                         35,
                         25
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -131,7 +137,8 @@
                     "destination": [
                         35,
                         26
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -145,7 +152,8 @@
                     "destination": [
                         27,
                         27
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 }
             ],
             [
@@ -161,7 +169,8 @@
                     "destination": [
                         36,
                         20
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -175,7 +184,8 @@
                     "destination": [
                         35,
                         19
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -189,7 +199,8 @@
                     "destination": [
                         36,
                         18
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -272,7 +283,8 @@
                     "destination": [
                         41,
                         20
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -286,7 +298,8 @@
                     "destination": [
                         41,
                         23
-                    ]
+                    ],
+                    "orders": ["Defend"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -300,7 +313,8 @@
                     "destination": [
                         46,
                         21
-                    ]
+                    ],
+                    "orders": ["Invade_Chalphy"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -314,7 +328,8 @@
                     "destination": [
                         45,
                         22
-                    ]
+                    ],
+                    "orders": ["Invade_Chalphy"]
                 },
                 {
                     "type": "UnitCreationEvent",
@@ -701,6 +716,52 @@
                                 22
                             ],
                             "name":"JungbyPanT1"}
+                        }
+                    ]
+                }, 
+                {
+                    "type": "BesiegeEvent",
+                    "castle": "Jungby",
+                    "duel" : true,
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name":"Gandolf_Midir_Prefight"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Gandolf_Midir_Fight",
+                    "triggers":
+                    [
+                        {"StartCombatEvent":
+                            {
+                            "name":"StartCombat_Gandolf_Midir"}
+                        }
+                    ]
+                },
+                {
+                    "type": "BesiegeEvent",
+                    "castle": "Jungby",
+                    "triggers":
+                    [
+                        {"UnitDeathEvent":
+                            {
+                            "name":"Midir_Death"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Fall_Of_Jungby",
+                    "bgName": "jungby_interior.png",
+                    "triggers":
+                    [
+                        {"SeizeEvent":
+                            {
+                            "name":"SeizeEvent_Gandolf_Jungby"}
                         }
                     ]
                 }

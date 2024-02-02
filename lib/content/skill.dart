@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 
@@ -59,12 +56,12 @@ class CantoEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<ExhaustUnitEvent>((exhaustUnitEvent) {
+    eventQueue.registerClassObserver<UnitExhaustEvent>((unitExhaustEvent) {
       debugPrint("Canto Check");
-      if (exhaustUnitEvent.unit.hasSkill(Skill.canto) && exhaustUnitEvent.unit.remainingMovement >= .7 && exhaustUnitEvent.manual == false) {
+      if (unitExhaustEvent.unit.hasSkill(Skill.canto) && unitExhaustEvent.unit.remainingMovement >= .7 && unitExhaustEvent.manual == false) {
         debugPrint("Canto Check Succeeds");
-        CantoEvent cantoEvent = CantoEvent(exhaustUnitEvent.unit);
-        EventQueue eventQueue = exhaustUnitEvent.game.eventQueue;
+        CantoEvent cantoEvent = CantoEvent(unitExhaustEvent.unit);
+        EventQueue eventQueue = unitExhaustEvent.game.eventQueue;
         eventQueue.addEventBatchToHead([cantoEvent]);
       }
     });
@@ -82,10 +79,10 @@ class CantoEvent extends Event {
     super.execute();
     game.stage.blankAllTiles();
     debugPrint("Canto: unit's remaining movement is: ${unit.remainingMovement}");
-    if (game.stage.factionMap[unit.faction]!.takingTurn && game.stage.activeFaction is! AIPlayer){
+    if (unit.controller.takingTurn && game.stage.activeFaction is! AIPlayer){
       unit.findReachableTiles(unit.remainingMovement);
       game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
-    } else if (game.stage.factionMap[unit.faction]!.takingTurn && game.stage.activeFaction is AIPlayer){
+    } else if (unit.controller.takingTurn && game.stage.activeFaction is AIPlayer){
       var rankedTiles = unit.rankOpenTiles(["Move"]);
       if (rankedTiles.isNotEmpty) {
         var bestTileEvent = rankedTiles.first;

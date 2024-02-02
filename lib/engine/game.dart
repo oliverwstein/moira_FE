@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
-import 'package:moira/engine/engine.dart';
 class MoiraGame extends FlameGame with KeyboardEvents {
   late Stage stage;
   late TitleCard titleCard;
@@ -102,9 +101,11 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     skillMap = await loadSkillsData();
     classMap = await loadClassesData();
     add(eventQueue);
-    DeathEvent.initialize(eventQueue);
+    CombatRoundEvent.initialize(eventQueue);
+    UnitDeathEvent.initialize(eventQueue);
     CritEvent.initialize(eventQueue);
     CantoEvent.initialize(eventQueue);
+    DialogueEvent.initialize(eventQueue);
 
     
     

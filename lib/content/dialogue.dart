@@ -186,3 +186,44 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
     return _forwardCompleter.future;
   }
 }
+
+class DialogueEvent extends Event{
+  static List<Event> observers = [];
+  String? bgName;
+  String nodeName;
+  late DialogueMenu menu;
+  DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+
+  static void initialize(EventQueue eventQueue) {
+    eventQueue.registerClassObserver<UnitDeathEvent>((deathEvent) {
+      if (deathEvent.game.yarnProject.nodes.keys.contains("${deathEvent.unit.name}_Death_Quote")) {
+        debugPrint("Death Quote found for ${deathEvent.unit.name}");
+        // Trigger UnitDeathEvent
+        var deathQuoteEvent = DialogueEvent("${deathEvent.unit.name}_Death_Quote");
+        EventQueue eventQueue = deathEvent.game.eventQueue;
+        eventQueue.addEventBatchToHead([deathQuoteEvent]);
+      }
+    });
+  }
+
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("DialogueEvent execution $nodeName $bgName");
+    menu = DialogueMenu(nodeName, bgName);
+    game.stage.menuManager.pushMenu(menu);
+
+  }
+  @override
+  bool checkComplete() {
+    if(checkStarted()) {
+      game.eventQueue.dispatchEvent(this);
+      return menu.dialogue.finished;}
+    return false;
+  } 
+}

@@ -45,7 +45,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
             Set<Tile> reachableTiles = tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
             tile.unit!.markAttackableTiles(reachableTiles.toList());
             // if the unit is a part of the active faction, add the MoveMenu to the stack.
-            if (game.stage.factionMap[tile.unit!.faction] == game.stage.activeFaction){
+            if (tile.unit!.controller == game.stage.activeFaction){
               pushMenu(MoveMenu(tile.unit!, tile));
             }
             return KeyEventResult.handled;
@@ -233,33 +233,36 @@ class ActionMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         debugPrint("${actions[selectedIndex]} Chosen");
+        game.stage.blankAllTiles();
         switch (actions[selectedIndex]){
           case "Wait":
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: true)]);
+            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);
             game.stage.menuManager.clearStack();
             break;
           case "Items":
-            game.stage.blankAllTiles();
             debugPrint("${actions[selectedIndex]} Chosen");
             game.stage.menuManager.pushMenu(InventoryMenu(unit));
             break;
           case "Attack":
-            game.stage.blankAllTiles();
             List<Unit> targets = unit.getTargetsAt(unit.tilePosition);
             game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
             break;
           case "Visit":
-            game.stage.blankAllTiles();
             game.eventQueue.addEventBatch([VisitEvent(unit, unit.tile as TownCenter)]);
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
             break;
           case "Ransack":
-            game.stage.blankAllTiles();
             game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
-            game.eventQueue.addEventBatch([ExhaustUnitEvent(unit, manual: false)]);
+            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
             game.stage.menuManager.clearStack();
             break;
+          case "Seize":
+            game.eventQueue.addEventBatch([SeizeEvent(unit, unit.tile as CastleGate)]);
+          case "Besiege":
+            // Create a variant of the CombatMenu called BesiegeMenu. 
+            //For now, just trigger a besiege event.
+            game.eventQueue.addEventBatch([BesiegeEvent(unit.tile as CastleGate)]);
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
