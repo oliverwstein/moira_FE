@@ -8,7 +8,7 @@ import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 import 'package:flutter/material.dart';
 
-class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior{
+class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior {
   final Completer<void> _loadCompleter = Completer<void>();
   final String name;
   final String className;
@@ -227,6 +227,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
                             size: spriteSize,
                             anchor: Anchor.center);
     add(sprite);
+    add(UnitCircle(this));
+    children.register<UnitCircle>();
     position = unit.tile.center;
     anchor = Anchor.center;
   
@@ -439,6 +441,21 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     removeFromParent();
   }
 }
+
+class UnitCircle extends SpriteComponent {
+  Unit unit;
+  UnitCircle(this.unit);
+
+  @override
+  onLoad(){
+    ui.Image circle = unit.game.images.fromCache("unit_circle.png");
+    sprite = Sprite(circle); 
+    anchor = Anchor.center;
+    size = Vector2.all(Stage.tileSize);
+    paint; 
+  }
+}
+
 class UnitCreationEvent extends Event{
   static List<Event> observers = [];
   final String unitName;

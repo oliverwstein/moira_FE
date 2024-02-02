@@ -31,6 +31,18 @@ extension FactionOrder on FactionType {
         return 2;
     }
   }
+  Color get factionColor {
+    switch (this) {
+      case FactionType.blue:
+        return Color.fromARGB(128, 0, 0, 255); // RGB for blue
+      case FactionType.red:
+        return Color.fromARGB(128, 255, 0, 0); // RGB for red
+      case FactionType.green:
+        return Color.fromARGB(128, 0, 255, 0); // RGB for green
+      default:
+        return Color.fromARGB(128, 255, 255, 255); // Default case, should never be reached
+    }
+  }
   String get name => toString().split('.').last.replaceFirstMapped(RegExp(r'[a-zA-Z]'), (match) => match.group(0)!.toUpperCase());
 
   // Static method to get a skill by its name
