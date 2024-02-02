@@ -40,7 +40,7 @@ extension FactionOrder on FactionType {
       case FactionType.green:
         return Color.fromARGB(128, 0, 255, 0); // RGB for green
       default:
-        return Color.fromARGB(128, 255, 255, 255); // Default case, should never be reached
+        return Color.fromARGB(128, 255, 255, 255);
     }
   }
   String get name => toString().split('.').last.replaceFirstMapped(RegExp(r'[a-zA-Z]'), (match) => match.group(0)!.toUpperCase());

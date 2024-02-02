@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
+import 'package:flame/rendering.dart';
 import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 import 'package:flutter/material.dart';
@@ -344,17 +345,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void toggleCanAct(bool state) {
     _canAct = state;
-    // Define the grayscale paint
-    final grayscalePaint = Paint()
-      ..colorFilter = const ColorFilter.matrix([
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0,      0,      0,      1, 0,
-      ]);
-
-    // Apply or remove the grayscale effect based on canAct
-    sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
   List<Unit> getTargetsAt(Point<int> tilePosition) {
@@ -442,17 +432,22 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
 }
 
-class UnitCircle extends SpriteComponent {
+class UnitCircle extends SpriteComponent{
   Unit unit;
   UnitCircle(this.unit);
 
   @override
-  onLoad(){
+  void onLoad(){
     ui.Image circle = unit.game.images.fromCache("unit_circle.png");
     sprite = Sprite(circle); 
     anchor = Anchor.center;
     size = Vector2.all(Stage.tileSize);
-    paint; 
+    paint = Paint()..colorFilter = ColorFilter.mode(unit.controller.factionType.factionColor.withOpacity(.5), BlendMode.srcATop);
+  }
+
+  @override
+  void render(Canvas canvas){
+    super.render(canvas);
   }
 }
 
