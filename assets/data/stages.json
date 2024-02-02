@@ -752,6 +752,18 @@
                             "name":"Midir_Death"}
                         }
                     ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Fall_Of_Jungby",
+                    "bgName": "jungby_interior.png",
+                    "triggers":
+                    [
+                        {"SeizeEvent":
+                            {
+                            "name":"SeizeEvent_Gandolf_Jungby"}
+                        }
+                    ]
                 }
             ]
         ]

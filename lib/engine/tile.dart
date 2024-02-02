@@ -430,7 +430,7 @@ class SeizeEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   final CastleGate gate;
-  SeizeEvent(this.unit, this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  SeizeEvent(this.unit, this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "SeizeEvent_${unit.name}_${gate.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

@@ -8,6 +8,8 @@
 <<character Azel>>
 <<character Lex>>
 <<character Gandolf>>
+<<character DiMaggio>>
+<<character Gerrard>>
 title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
@@ -119,5 +121,22 @@ title: Midir_Death_Quote
 <<local $left = "" as String>>
 <<local $right = "Midir" as String>>
 Midir: Forgive me, my lady.
+<<stop>>
+===
+
+title: Fall_Of_Jungby
+---
+<<local $left = "Aideen" as String>>
+<<local $right = "" as String>>
+Aideen: Midir, no!
+<<set $right = "Gandolf">>
+Gandolf: Ah, my lady Aideen, I feared we had missed you. You have an important appointment!
+Aideen: What?
+Gandolf: DiMaggio, you and Gerrard will take care of things here while the lady and I are away.
+<<set $left = "DiMaggio">>
+DiMaggio: You're leavin', boss?
+Gandolf: Not for long. I'll be back soon with Kinbois and the boys for the march on Belhalla.
+Gandolf: As they've so kindly left the place open for us. Get comfy, boys, this land is ours!
+DiMaggio: With pleasure, sir!
 <<stop>>
 ===
