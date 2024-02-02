@@ -483,14 +483,15 @@ class UnitMoveEvent extends Event {
   Unit? unit;
   final String unitName;
   double speed;
+  bool chainCamera;
 
   // Constructor for directly passing the Unit
-  UnitMoveEvent(this.unit, this.destination, {Trigger? trigger, String? name, this.speed = 2})
+  UnitMoveEvent(this.unit, this.destination, {Trigger? trigger, String? name, this.speed = 2, this.chainCamera = false})
       : unitName = unit!.name, // Set unitName from the Unit
         super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unit.name}_to_$destination");
 
   // Constructor for when only unitName is known at construction
-  UnitMoveEvent.named(this.unitName, this.destination, {this.unit, Trigger? trigger, String? name, this.speed = 2})
+  UnitMoveEvent.named(this.unitName, this.destination, {this.unit, Trigger? trigger, String? name, this.speed = 2, this.chainCamera = false})
       : super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unitName}_to_$destination");
   @override
   List<Event> getObservers() {
@@ -506,10 +507,14 @@ class UnitMoveEvent extends Event {
     debugPrint("$name");
     unit!.speed = speed;
     unit!.moveTo(destination);
+    
   }
   @override
   bool checkComplete() {
-    if(checkStarted() && !unit!.isMoving) {
+    if(chainCamera){
+      game.stage.cursor.centerCameraOn(unit!.tilePosition, 100);
+    }
+    if(checkStarted() && !unit!.isMoving && unit!.movementQueue.isEmpty) {
       game.eventQueue.dispatchEvent(this);
       unit!.speed = 2;
       return true;

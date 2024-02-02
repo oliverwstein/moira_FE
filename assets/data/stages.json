@@ -821,7 +821,7 @@
                     [
                         {"UnitMoveEvent":
                             {
-                            "name":"UnitMoveEvent: Gandolf_to_Point(27, 26)"}
+                            "name":"UnitMoveEvent: Aideen_to_Point(28, 26)"}
                         }
                     ]
                 },
@@ -832,6 +832,7 @@
                         10,
                         15
                     ],
+                    "chainCamera": true,
                     "triggers":
                     [
                         {"DialogueEvent":
@@ -845,20 +846,6 @@
                     "unitName": "Aideen",
                     "destination": [
                         11,
-                        15
-                    ],
-                    "triggers":
-                    [
-                        {"DialogueEvent":
-                            {
-                            "name": "Come_On_Aideen"}
-                        }
-                    ]
-                },
-                {
-                    "type": "PanEvent",
-                    "destination": [
-                        10,
                         15
                     ],
                     "triggers":

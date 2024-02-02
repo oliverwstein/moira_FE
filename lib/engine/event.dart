@@ -202,7 +202,8 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             String unitName = eventData['unitName'];
             Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
             double speed = eventData['speed'] ?? 2;
-            event = UnitMoveEvent.named(unitName, destination, speed: speed);
+            bool chainCamera = eventData['chainCamera'] ?? false;
+            event = UnitMoveEvent.named(unitName, destination, speed: speed, chainCamera: chainCamera);
             break;
           case 'DialogueEvent':
             String? bgName = eventData['bgName'];
