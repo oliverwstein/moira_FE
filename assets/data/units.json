@@ -236,6 +236,40 @@
         "proficiencies": ["Bow"]
     },
     {
+        "name": "Aideen",
+        "faction": "green",
+        "class": "Priest",
+        "level": 3,
+        "baseStats": {
+            "hp": 28,
+            "sta": 20,
+            "str": 0,
+            "def": 1,
+            "dex": 8,
+            "spe": 9,
+            "mag": 8,
+            "res": 12,
+            "wis": 12,
+            "lck": 11
+        },
+        "growths": {
+            "hp": 60,
+            "sta": 70,
+            "str": 30,
+            "def": 30,
+            "dex": 35,
+            "spe": 40,
+            "mag": 5,
+            "res": 5,
+            "wis": 20,
+            "lck": 10
+        },
+        "skills": [],
+        "items": [],
+        "attacks": [],
+        "proficiencies": ["Staff"]
+    },
+    {
     "name": "Brigand",
     "faction": "red",
     "class": "Brigand",

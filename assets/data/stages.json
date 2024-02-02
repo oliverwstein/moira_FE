@@ -767,7 +767,22 @@
                 },
                 {
                     "type": "UnitMoveEvent",
-                    "unitName": "Fall_Of_Jungby",
+                    "unitName": "Gandolf",
+                    "destination": [
+                        27,
+                        26
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Fall_Of_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Gandolf",
                     "destination": [
                         27,
                         26

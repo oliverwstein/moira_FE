@@ -46,7 +46,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int hp = -1;
   int sta = -1;
   static Unit? getUnitByName(Stage stage, String unitName) {
-    return stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
+    debugPrint("getUnitByName: unit $unitName");
+    Unit? unit = stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
+    return unit;
   }
         
   factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings, List<String>? orderStrings}) {
