@@ -140,3 +140,16 @@ Gandolf: As they've so kindly left the place open for us. Get comfy, boys, this 
 DiMaggio: With pleasure, sir!
 <<stop>>
 ===
+
+title: Come_On_Aideen
+---
+<<local $left = "Gandolf" as String>>
+<<local $right = "Aideen" as String>>
+Gandolf: My fine lady, at this pace we will be late for the wedding.
+Aideen: What wedding?
+Gandolf: Why, mine! So I trust you understand my haste.
+Aideen: You're engaged?
+Gandolf: Enough japes, Aideen. Be quick, or be dead.
+Aideen: ...
+<<stop>>
+===
