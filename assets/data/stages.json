@@ -764,6 +764,21 @@
                             "name":"SeizeEvent_Gandolf_Jungby"}
                         }
                     ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Fall_Of_Jungby",
+                    "destination": [
+                        27,
+                        26
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Fall_Of_Jungby"}
+                        }
+                    ]
                 }
             ]
         ]

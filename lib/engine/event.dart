@@ -197,6 +197,11 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             }
             event = UnitCreationEvent(name, tilePosition, factionName, level:level, items:itemStrings, orders: orderStrings, destination: destination, name: eventName);
             break;
+          case 'UnitMoveEvent':
+            String unitName = eventData['unitName'];
+            Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
+            event = UnitMoveEvent.named(unitName, destination);
+            break;
           case 'DialogueEvent':
             String? bgName = eventData['bgName'];
             String nodeName = eventData['nodeName'];
