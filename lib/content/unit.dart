@@ -477,10 +477,18 @@ class UnitCreationEvent extends Event{
 
 class UnitMoveEvent extends Event {
   static List<Event> observers = [];
-  final Point<int> tilePosition;
-  final Unit unit;
-  UnitMoveEvent(this.unit, this.tilePosition, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  final Point<int> destination;
+  Unit? unit;
+  final String unitName;
 
+  // Constructor for directly passing the Unit
+  UnitMoveEvent(this.unit, this.destination, {Trigger? trigger, String? name})
+      : unitName = unit!.name, // Set unitName from the Unit
+        super(trigger: trigger, name: name);
+
+  // Constructor for when only unitName is known at construction
+  UnitMoveEvent.named(this.unitName, this.destination, {this.unit, Trigger? trigger, String? name})
+      : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -490,12 +498,14 @@ class UnitMoveEvent extends Event {
   @override
   void execute() {
     super.execute();
-    debugPrint("UnitMoveEvent: Move unit ${unit.name}");
-    unit.moveTo(tilePosition);
+    unit ??= Unit.getUnitByName(game.stage, unitName);
+    assert(unit != null);
+    debugPrint("UnitMoveEvent: Move unit ${unit!.name}");
+    unit!.moveTo(destination);
   }
   @override
   bool checkComplete() {
-    if(checkStarted() && unit.tilePosition == tilePosition) {
+    if(checkStarted() && unit!.tilePosition == destination) {
       game.eventQueue.dispatchEvent(this);
       return true;
     }
