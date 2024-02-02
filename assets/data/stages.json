@@ -782,9 +782,16 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Gandolf",
+                    "name": "Aideen",
+                    "unitName": "Aideen",
+                    "faction": "Jungby",
+                    "level": -1,
+                    "tilePosition": [
+                        32,
+                        24
+                    ],
                     "destination": [
-                        27,
+                        30,
                         26
                     ],
                     "triggers":
@@ -792,6 +799,17 @@
                         {"DialogueEvent":
                             {
                             "name": "Fall_Of_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Come_On_Aideen",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Gandolf_to_Point(27, 26)"}
                         }
                     ]
                 }

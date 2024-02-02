@@ -462,7 +462,7 @@ class UnitCreationEvent extends Event{
     unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items, orderStrings: orders);
     game.stage.add(unit);
     if (destination != null) {
-      var moveEvent = UnitMoveEvent(unit, destination!, name: name);
+      var moveEvent = UnitMoveEvent(unit, destination!);
       game.eventQueue.add(moveEvent);
     } else {
       destination = tilePosition;
@@ -486,11 +486,11 @@ class UnitMoveEvent extends Event {
   // Constructor for directly passing the Unit
   UnitMoveEvent(this.unit, this.destination, {Trigger? trigger, String? name})
       : unitName = unit!.name, // Set unitName from the Unit
-        super(trigger: trigger, name: name);
+        super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unit.name}_to_$destination");
 
   // Constructor for when only unitName is known at construction
   UnitMoveEvent.named(this.unitName, this.destination, {this.unit, Trigger? trigger, String? name})
-      : super(trigger: trigger, name: name);
+      : super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unitName}_to_$destination");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -502,7 +502,7 @@ class UnitMoveEvent extends Event {
     super.execute();
     unit ??= Unit.getUnitByName(game.stage, unitName);
     assert(unit != null);
-    debugPrint("UnitMoveEvent: Move unit ${unit!.name}");
+    debugPrint("$name");
     unit!.moveTo(destination);
   }
   @override
