@@ -189,7 +189,7 @@ class FactionCreationEvent extends Event{
   }
 }
 
-class Order {
+class Order extends Component {
   Order();
   factory Order.create(String orderType) {
     var inputs = orderType.split("_");
