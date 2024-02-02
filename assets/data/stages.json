@@ -473,6 +473,28 @@
                 },
                 {
                     "type": "UnitCreationEvent",
+                    "unitName": "Barbarian",
+                    "faction": "Evans",
+                    "level": 1,
+                    "tilePosition": [
+                        10,
+                        14
+                    ],
+                    "orders": ["Defend"]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Gerrard",
+                    "faction": "Evans",
+                    "level": 10,
+                    "tilePosition": [
+                        4,
+                        13
+                    ],
+                    "orders": ["Defend"]
+                },
+                {
+                    "type": "UnitCreationEvent",
                     "unitName": "Brigand",
                     "faction": "Evans",
                     "level": 1,

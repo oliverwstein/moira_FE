@@ -314,6 +314,17 @@
     "proficiencies": []
     },
     {
+    "name": "Gerrard",
+    "faction": "red",
+    "class": "Fighter",
+    "baseStats": {},
+    "growths": {},
+    "skills": [],
+    "items": ["Axe", "Hand Axe"],
+    "attacks": [],
+    "proficiencies": []
+    },
+    {
     "name": "Gandolf",
     "faction": "red",
     "class": "Warrior",
