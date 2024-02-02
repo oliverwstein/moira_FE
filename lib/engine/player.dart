@@ -62,7 +62,7 @@ class AIPlayer extends Player{
     super.update(dt);
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isNotEmpty){
       Unit unit = unitsToCommand.removeLast();
-      Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
+      Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
       game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
       if (unit.orders.isNotEmpty) {unit.orders.last.command(unit);}
       else {Order().command(unit);}

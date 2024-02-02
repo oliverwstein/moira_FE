@@ -790,15 +790,27 @@
                         32,
                         24
                     ],
-                    "destination": [
-                        30,
-                        26
-                    ],
                     "triggers":
                     [
                         {"DialogueEvent":
                             {
                             "name": "Fall_Of_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Aideen",
+                    "destination": [
+                        28,
+                        26
+                    ],
+                    "speed": 1.0,
+                    "triggers":
+                    [
+                        {"UnitCreationEvent":
+                            {
+                            "name": "Aideen"}
                         }
                     ]
                 },
@@ -810,6 +822,50 @@
                         {"UnitMoveEvent":
                             {
                             "name":"UnitMoveEvent: Gandolf_to_Point(27, 26)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Gandolf",
+                    "destination": [
+                        10,
+                        15
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Come_On_Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Aideen",
+                    "destination": [
+                        11,
+                        15
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Come_On_Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "PanEvent",
+                    "destination": [
+                        10,
+                        15
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Come_On_Aideen"}
                         }
                     ]
                 }

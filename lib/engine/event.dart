@@ -89,6 +89,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
 
   @override 
   void update(double dt) {
+    // debugPrint("In progress: $name");
     if(!checkTriggered()) return;
     if(!_isStarted) {
       execute();
@@ -200,7 +201,8 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
           case 'UnitMoveEvent':
             String unitName = eventData['unitName'];
             Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
-            event = UnitMoveEvent.named(unitName, destination);
+            double speed = eventData['speed'] ?? 2;
+            event = UnitMoveEvent.named(unitName, destination, speed: speed);
             break;
           case 'DialogueEvent':
             String? bgName = eventData['bgName'];
@@ -211,7 +213,8 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
           case 'PanEvent':
             Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
             String? eventName = eventData['name'];
-            event = PanEvent(destination, name: eventName);
+            double speed = eventData['speed'] ?? 300;
+            event = PanEvent(destination, name: eventName, speed: speed);
             break;
           case 'StartTurnEvent':
             String factionName = eventData['factionName'];
@@ -253,11 +256,12 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
   }
 }
 
-class PanEvent extends Event{
+class PanEvent extends Event {
   static List<Event> observers = [];
   final Point<int> destination;
   late final Vector2 destinationPosition;
-  PanEvent(this.destination, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  double speed;
+  PanEvent(this.destination, {Trigger? trigger, String? name, this.speed = 300}) : super(trigger: trigger, name: name);
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -268,7 +272,7 @@ class PanEvent extends Event{
     super.execute();
     debugPrint("PanEvent: Pan to $destination");
     game.stage.cursor.snapToTile(destination);
-    destinationPosition = game.stage.cursor.centerCameraOn(destination);
+    destinationPosition = game.stage.cursor.centerCameraOn(destination, speed);
   }
   @override
   bool checkComplete() {

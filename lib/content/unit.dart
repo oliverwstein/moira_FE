@@ -28,7 +28,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   bool dead = false;
   bool get canAct => _canAct;
   Queue<Order> orders = Queue<Order>();
-  final double speed = 2; // Speed of cursor movement in pixels per second
+  double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
   Attack? attack;
@@ -482,14 +482,15 @@ class UnitMoveEvent extends Event {
   final Point<int> destination;
   Unit? unit;
   final String unitName;
+  double speed;
 
   // Constructor for directly passing the Unit
-  UnitMoveEvent(this.unit, this.destination, {Trigger? trigger, String? name})
+  UnitMoveEvent(this.unit, this.destination, {Trigger? trigger, String? name, this.speed = 2})
       : unitName = unit!.name, // Set unitName from the Unit
         super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unit.name}_to_$destination");
 
   // Constructor for when only unitName is known at construction
-  UnitMoveEvent.named(this.unitName, this.destination, {this.unit, Trigger? trigger, String? name})
+  UnitMoveEvent.named(this.unitName, this.destination, {this.unit, Trigger? trigger, String? name, this.speed = 2})
       : super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unitName}_to_$destination");
   @override
   List<Event> getObservers() {
@@ -503,12 +504,14 @@ class UnitMoveEvent extends Event {
     unit ??= Unit.getUnitByName(game.stage, unitName);
     assert(unit != null);
     debugPrint("$name");
+    unit!.speed = speed;
     unit!.moveTo(destination);
   }
   @override
   bool checkComplete() {
-    if(checkStarted() && unit!.tilePosition == destination) {
+    if(checkStarted() && !unit!.isMoving) {
       game.eventQueue.dispatchEvent(this);
+      unit!.speed = 2;
       return true;
     }
     return false;
