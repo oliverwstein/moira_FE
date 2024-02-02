@@ -433,6 +433,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     controller.units.remove(this);
     removeFromParent();
   }
+  void exit() {
+    tile.removeUnit();
+    controller.units.remove(this);
+    removeFromParent();
+  }
 }
 class UnitCreationEvent extends Event{
   static List<Event> observers = [];
@@ -517,6 +522,7 @@ class UnitMoveEvent extends Event {
     if(checkStarted() && !unit!.isMoving && unit!.movementQueue.isEmpty) {
       game.eventQueue.dispatchEvent(this);
       unit!.speed = 2;
+      game.stage.cursor.snapToTile(unit!.tilePosition);
       return true;
     }
     return false;
@@ -569,6 +575,27 @@ class UnitDeathEvent extends Event {
     super.execute();
     debugPrint("UnitDeathEvent: ${unit.name} has died.");
     unit.die();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class UnitExitEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+
+  UnitExitEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "${unit.name}_Death");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("UnitExitEvent: ${unit.name} exits the stage.");
+    unit.exit();
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

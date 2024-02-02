@@ -851,7 +851,7 @@
                     "type": "UnitMoveEvent",
                     "unitName": "Gandolf",
                     "destination": [
-                        10,
+                        4,
                         15
                     ],
                     "chainCamera": true,
@@ -867,7 +867,7 @@
                     "type": "UnitMoveEvent",
                     "unitName": "Aideen",
                     "destination": [
-                        11,
+                        5,
                         15
                     ],
                     "triggers":
@@ -875,6 +875,84 @@
                         {"DialogueEvent":
                             {
                             "name": "Come_On_Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Gandolf_At_Evans",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Aideen_to_Point(5, 15)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Gandolf",
+                    "destination": [
+                        9,
+                        30
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Gandolf_At_Evans"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Aideen",
+                    "destination": [
+                        9,
+                        30
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Gandolf_At_Evans"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitExitEvent",
+                    "unitName": "Aideen",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Aideen_to_Point(9, 30)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitExitEvent",
+                    "unitName": "Gandolf",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Gandolf_to_Point(9, 30)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "PanEvent",
+                    "name": "JungbyPan2",
+                    "destination": [
+                        33,
+                        22
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Gandolf_At_Evans"}
                         }
                     ]
                 }
