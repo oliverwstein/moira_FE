@@ -8,7 +8,13 @@ import 'package:flame/rendering.dart';
 import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 import 'package:flutter/material.dart';
-
+final grayscalePaint = Paint()
+      ..colorFilter = const ColorFilter.matrix([
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0,      0,      0,      1, 0,
+      ]);
 class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior {
   final Completer<void> _loadCompleter = Completer<void>();
   final String name;
@@ -161,7 +167,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   void update(double dt) {
     super.update(dt);
-    // tilePosition = getTilePositionFromPosition();
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
@@ -189,7 +194,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
-    } unit.tile.setUnit(this);
+    } 
+    unit.tile.setUnit(this);
+    if(game.stage.freeCursor){sprite.paint = canAct ? Paint() : grayscalePaint;}
   }
 
   @override
@@ -227,8 +234,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
                             animation: unitSheet.createAnimation(row: 4, stepTime: stepTime*2),
                             size: spriteSize,
                             anchor: Anchor.center);
-    add(sprite);
     add(UnitCircle(this));
+    add(sprite);
+    sprite.priority = 5;
     children.register<UnitCircle>();
     position = unit.tile.center;
     anchor = Anchor.center;
@@ -345,6 +353,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void toggleCanAct(bool state) {
     _canAct = state;
+    // // Apply or remove the grayscale effect based on canAct
+    // sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
   List<Unit> getTargetsAt(Point<int> tilePosition) {
@@ -442,7 +452,7 @@ class UnitCircle extends SpriteComponent with HasVisibility{
     sprite = Sprite(circle); 
     anchor = Anchor.center;
     size = Vector2.all(Stage.tileSize*1.25);
-    paint = Paint()..colorFilter = ColorFilter.mode(unit.controller.factionType.factionColor.withOpacity(.5), BlendMode.srcATop);
+    paint = Paint()..colorFilter = ColorFilter.mode(unit.controller.factionType.factionColor.withOpacity(.75), BlendMode.srcATop);
   }
 
   @override
@@ -452,8 +462,7 @@ class UnitCircle extends SpriteComponent with HasVisibility{
   @override
   void update(double dt) {
     super.update(dt);
-    if(unit.game.stage.activeFaction is Player && unit.canAct && !unit.game.eventQueue.processing){
-      isVisible = true;} else {isVisible = false;}
+    if(unit.game.stage.freeCursor && unit.canAct){isVisible = true;} else {isVisible = false;}
     
     }
 }

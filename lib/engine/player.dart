@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
-class Player extends Component with HasGameReference<MoiraGame>{
+abstract class Player extends Component with HasGameReference<MoiraGame>{
   bool takingTurn = false;
   String name;
   FactionType factionType;
@@ -54,7 +54,17 @@ class Player extends Component with HasGameReference<MoiraGame>{
   }
 }
 
-class AIPlayer extends Player{
+class HumanPlayer extends Player {
+  HumanPlayer(super.name, super.factionType);
+
+  @override
+  void takeTurn(){
+    super.takeTurn();
+  }
+  
+}
+
+class AIPlayer extends Player {
   List<Unit> unitsToCommand = [];
   AIPlayer(String name, FactionType factionType) : super(name, factionType);
   @override
@@ -173,7 +183,7 @@ class FactionCreationEvent extends Event{
     debugPrint("FactionCreationEvent execution $name");
     Player player;
     if(human){
-      player = Player(factionName, type);
+      player = HumanPlayer(factionName, type);
       game.stage.add(player);
       game.stage.factionMap[factionName] = player;
     } else {
