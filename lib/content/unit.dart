@@ -441,16 +441,21 @@ class UnitCircle extends SpriteComponent with HasVisibility{
     ui.Image circle = unit.game.images.fromCache("unit_circle.png");
     sprite = Sprite(circle); 
     anchor = Anchor.center;
-    size = Vector2.all(Stage.tileSize);
+    size = Vector2.all(Stage.tileSize*1.25);
     paint = Paint()..colorFilter = ColorFilter.mode(unit.controller.factionType.factionColor.withOpacity(.5), BlendMode.srcATop);
   }
 
   @override
   void render(Canvas canvas){
     super.render(canvas);
-    if(true)
-      {isVisible = true;} else {isVisible = false;}
   }
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if(unit.game.stage.activeFaction is Player && unit.canAct && !unit.game.eventQueue.processing){
+      isVisible = true;} else {isVisible = false;}
+    
+    }
 }
 
 class UnitCreationEvent extends Event{

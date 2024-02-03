@@ -66,7 +66,8 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
   @override
   void update(double dt) {
     super.update(dt);
-    if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue && game.eventQueue.currentBatch().isEmpty){isVisible = true;} else {isVisible = false;}
+    if(game.world == game.stage && game.stage.activeFaction is Player && game.stage.activeFaction!.takingTurn && !game.eventQueue.processing){
+      isVisible = true;} else {isVisible = false;}
     if(position != targetPosition) {
       if(!game.stage.menuManager.isNotEmpty){
         game.camera.moveTo(centerCameraOn(tilePosition, speed), speed: 300);
