@@ -62,8 +62,6 @@ class AIPlayer extends Player{
     super.update(dt);
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isNotEmpty){
       Unit unit = unitsToCommand.removeLast();
-      Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
-      game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
       if (unit.orders.isNotEmpty) {unit.orders.last.command(unit);}
       else {Order().command(unit);}
       
@@ -211,6 +209,8 @@ class Order extends Component {
     unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
     var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
     if(rankedTiles.firstOrNull != null){
+      Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
       for(Event event in rankedTiles.first.events){
         unit.game.eventQueue.addEventBatch([event]);
       }
@@ -224,6 +224,8 @@ class RansackOrder extends Order {
 
   @override
   void command(Unit unit){
+    Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
     debugPrint("${unit.name} ordered to Ransack");
     unit.remainingMovement = unit.movementRange.toDouble();
     var tile = unit.tile;
@@ -271,7 +273,13 @@ class DefendOrder extends Order {
     List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
     var combatResults = unit.getCombatEventsAndScores(openTiles);
     // Add the best combatResult event list to the queue.
-    unit.game.eventQueue.addEventBatch(combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events);
+    var events = combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events;
+    if(events.isNotEmpty){
+      Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
+    }
+    unit.game.eventQueue.addEventBatch(events);
+
     unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }
@@ -283,6 +291,8 @@ class InvadeOrder extends Order {
 
   @override
   void command(Unit unit){
+    Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
     CastleGate? nearestCastle = CastleGate.getNearestCastle(unit, targetName);
     debugPrint("${unit.name} ordered to invade ${nearestCastle?.name}");
     if(nearestCastle == null) {
