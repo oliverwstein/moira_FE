@@ -353,9 +353,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
 
   void toggleCanAct(bool state) {
+    debugPrint("Toggle canAct to $state");
     _canAct = state;
-    // // Apply or remove the grayscale effect based on canAct
-    // sprite.paint = canAct ? Paint() : grayscalePaint;
+    debugPrint("_canAct == $_canAct");
+    // Apply or remove the grayscale effect based on canAct
+    sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
   List<Unit> getTargetsAt(Point<int> tilePosition) {
@@ -583,7 +585,7 @@ class UnitExhaustEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   bool manual;
-  UnitExhaustEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitExhaustEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: "UnitExhaustEvent: $name");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -592,6 +594,7 @@ class UnitExhaustEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
+    debugPrint("$name");
     unit.wait();
     completeEvent();
     game.eventQueue.dispatchEvent(this);

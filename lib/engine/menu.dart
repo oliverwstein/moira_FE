@@ -183,6 +183,7 @@ class CantoMenu extends Menu {
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
           game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
+          game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);         
           game.stage.blankAllTiles();
           game.stage.menuManager.clearStack();
         }
@@ -190,6 +191,7 @@ class CantoMenu extends Menu {
       case LogicalKeyboardKey.keyB:
         game.stage.blankAllTiles();
         game.stage.menuManager.clearStack();
+        game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowLeft:
         direction = Point(direction.x - 1, direction.y);
