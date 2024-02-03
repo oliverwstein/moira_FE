@@ -419,7 +419,7 @@ class BesiegeEvent extends Event {
       // though the event should still be involved.
       // Note: besieging lets the unit use any attack in their attackSet.
       unit.getBestAttackOnTarget(gate.fort.unit!, unit.attackSet.values.toList());
-      game.combatQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!, duel: duel)]);
+      game.eventQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!, duel: duel)]);
     }
     completeEvent();
     game.eventQueue.dispatchEvent(this);

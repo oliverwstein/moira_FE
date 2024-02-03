@@ -307,7 +307,7 @@ class CombatMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Make the attack
-        game.combatQueue.addEventBatch([StartCombatEvent(unit, targets[selectedTargetIndex])]);
+        game.eventQueue.addEventBatch([StartCombatEvent(unit, targets[selectedTargetIndex])]);
         game.stage.cursor.snapToTile(unit.tilePosition);
         game.stage.menuManager.clearStack();
         game.combatQueue.addEventBatch([UnitExhaustEvent(unit)]);

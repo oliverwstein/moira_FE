@@ -51,6 +51,12 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     // Create and return a new instance
     return Stage._internal(mapTileWidth, mapTileHeight, initialPoint, tmxFile, data);
   }
+
+  @override
+  void update(dt){
+    super.update(dt);
+  }
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();

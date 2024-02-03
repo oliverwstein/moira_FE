@@ -49,13 +49,16 @@ class StartCombatEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    game.remove(game.eventQueue);
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     if(duel) debugPrint("Duel! $name");
     game.add(combat);
     game.combatQueue.addEventBatch([CombatRoundEvent(combat)]);
-    completeEvent();
     game.combatQueue.dispatchEvent(this);
+  }
+
+  @override
+  bool checkComplete(){
+    return (!game.combatQueue.processing && game.combatQueue.eventBatches.isEmpty);
   }
 }
 
@@ -71,8 +74,6 @@ class CombatRoundEvent extends Event {
         CombatRoundEvent newCombatRoundEvent = CombatRoundEvent(endCombatEvent.combat);
         debugPrint("Add duel round: ${endCombatEvent.combat.attacker.name} against ${endCombatEvent.combat.defender.name}");
         queue.addEventBatch([newCombatRoundEvent]);
-      } else {
-        endCombatEvent.combat.removeFromParent();
       }
     });
   }
@@ -110,8 +111,12 @@ class EndCombatEvent extends Event {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     completeEvent();
-    game.add(game.eventQueue);
-    if(combat.duel){game.combatQueue.dispatchEvent(this);} else {game.eventQueue.dispatchEvent(this);}
+    if(combat.duel) {
+      game.combatQueue.dispatchEvent(this);
+    } 
+    else {
+      combat.removeFromParent();
+      game.eventQueue.dispatchEvent(this);}
     
   }
 }
