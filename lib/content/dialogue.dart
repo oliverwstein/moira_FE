@@ -195,11 +195,11 @@ class DialogueEvent extends Event{
   DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
 
   static void initialize(EventQueue queue) {
-    queue.registerClassObserver<UnitDeathEvent>((deathEvent) {
-      if (deathEvent.game.yarnProject.nodes.keys.contains("${deathEvent.unit.name}_Death_Quote")) {
-        debugPrint("Death Quote found for ${deathEvent.unit.name}");
+    queue.registerClassObserver<UnitDeathEvent>((catalystEvent) {
+      if (queue == catalystEvent.game.eventQueue && catalystEvent.game.yarnProject.nodes.keys.contains("${catalystEvent.unit.name}_Death_Quote")) {
+        debugPrint("Death Quote found for ${catalystEvent.unit.name}");
         // Trigger UnitDeathEvent
-        var deathQuoteEvent = DialogueEvent("${deathEvent.unit.name}_Death_Quote");
+        var deathQuoteEvent = DialogueEvent("${catalystEvent.unit.name}_Death_Quote");
         queue.addEventBatchToHead([deathQuoteEvent]);
       }
     });
