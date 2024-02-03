@@ -558,6 +558,27 @@ class UnitMoveEvent extends Event {
   } 
 }
 
+class UnitRefreshEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  UnitRefreshEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "UnitRefreshEvent: ${unit.name}");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("$name");
+    unit.toggleCanAct(true);
+    unit.remainingMovement = unit.movementRange.toDouble();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+   
+  }
+}
+
 class UnitExhaustEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
