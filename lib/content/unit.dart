@@ -4,11 +4,18 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
+import 'package:flame/rendering.dart';
 import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 import 'package:flutter/material.dart';
-
-class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior{
+final grayscalePaint = Paint()
+      ..colorFilter = const ColorFilter.matrix([
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0.2126, 0.7152, 0.0722, 0, 0,
+        0,      0,      0,      1, 0,
+      ]);
+class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior {
   final Completer<void> _loadCompleter = Completer<void>();
   final String name;
   final String className;
@@ -28,7 +35,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   bool dead = false;
   bool get canAct => _canAct;
   Queue<Order> orders = Queue<Order>();
-  final double speed = 2; // Speed of cursor movement in pixels per second
+  double speed = 2; // Speed of cursor movement in pixels per second
 
   // Unit Attributes & Components
   Attack? attack;
@@ -46,7 +53,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int hp = -1;
   int sta = -1;
   static Unit? getUnitByName(Stage stage, String unitName) {
-    return stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
+    debugPrint("getUnitByName: unit $unitName");
+    Unit? unit = stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
+    return unit;
   }
         
   factory Unit.fromJSON(Point<int> tilePosition, String name, String factionName, {int? level, List<String>? itemStrings, List<String>? orderStrings}) {
@@ -158,7 +167,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   void update(double dt) {
     super.update(dt);
-    // tilePosition = getTilePositionFromPosition();
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
@@ -186,7 +194,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
-    } unit.tile.setUnit(this);
+    } 
+    unit.tile.setUnit(this);
+    if(game.stage.freeCursor){sprite.paint = canAct ? Paint() : grayscalePaint;}
   }
 
   @override
@@ -224,7 +234,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
                             animation: unitSheet.createAnimation(row: 4, stepTime: stepTime*2),
                             size: spriteSize,
                             anchor: Anchor.center);
+    add(UnitCircle(this));
     add(sprite);
+    sprite.priority = 5;
+    children.register<UnitCircle>();
     position = unit.tile.center;
     anchor = Anchor.center;
   
@@ -340,17 +353,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void toggleCanAct(bool state) {
     _canAct = state;
-    // Define the grayscale paint
-    final grayscalePaint = Paint()
-      ..colorFilter = const ColorFilter.matrix([
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0.2126, 0.7152, 0.0722, 0, 0,
-        0,      0,      0,      1, 0,
-      ]);
-
-    // Apply or remove the grayscale effect based on canAct
-    sprite.paint = canAct ? Paint() : grayscalePaint;
+    // // Apply or remove the grayscale effect based on canAct
+    // sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
   List<Unit> getTargetsAt(Point<int> tilePosition) {
@@ -431,7 +435,38 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     controller.units.remove(this);
     removeFromParent();
   }
+  void exit() {
+    tile.removeUnit();
+    controller.units.remove(this);
+    removeFromParent();
+  }
 }
+
+class UnitCircle extends SpriteComponent with HasVisibility{
+  Unit unit;
+  UnitCircle(this.unit);
+
+  @override
+  void onLoad(){
+    ui.Image circle = unit.game.images.fromCache("unit_circle.png");
+    sprite = Sprite(circle); 
+    anchor = Anchor.center;
+    size = Vector2.all(Stage.tileSize*1.25);
+    paint = Paint()..colorFilter = ColorFilter.mode(unit.controller.factionType.factionColor.withOpacity(.75), BlendMode.srcATop);
+  }
+
+  @override
+  void render(Canvas canvas){
+    super.render(canvas);
+  }
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if(unit.game.stage.freeCursor && unit.canAct){isVisible = true;} else {isVisible = false;}
+    
+    }
+}
+
 class UnitCreationEvent extends Event{
   static List<Event> observers = [];
   final String unitName;
@@ -460,7 +495,7 @@ class UnitCreationEvent extends Event{
     unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items, orderStrings: orders);
     game.stage.add(unit);
     if (destination != null) {
-      var moveEvent = UnitMoveEvent(unit, destination!, name: name);
+      var moveEvent = UnitMoveEvent(unit, destination!);
       game.eventQueue.add(moveEvent);
     } else {
       destination = tilePosition;
@@ -477,10 +512,20 @@ class UnitCreationEvent extends Event{
 
 class UnitMoveEvent extends Event {
   static List<Event> observers = [];
-  final Point<int> tilePosition;
-  final Unit unit;
-  UnitMoveEvent(this.unit, this.tilePosition, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  final Point<int> destination;
+  Unit? unit;
+  final String unitName;
+  double speed;
+  bool chainCamera;
 
+  // Constructor for directly passing the Unit
+  UnitMoveEvent(this.unit, this.destination, {Trigger? trigger, String? name, this.speed = 2, this.chainCamera = false})
+      : unitName = unit!.name, // Set unitName from the Unit
+        super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unit.name}_to_$destination");
+
+  // Constructor for when only unitName is known at construction
+  UnitMoveEvent.named(this.unitName, this.destination, {this.unit, Trigger? trigger, String? name, this.speed = 2, this.chainCamera = false})
+      : super(trigger: trigger, name: name ?? "UnitMoveEvent: ${unitName}_to_$destination");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -490,13 +535,22 @@ class UnitMoveEvent extends Event {
   @override
   void execute() {
     super.execute();
-    debugPrint("UnitMoveEvent: Move unit ${unit.name}");
-    unit.moveTo(tilePosition);
+    unit ??= Unit.getUnitByName(game.stage, unitName);
+    assert(unit != null);
+    debugPrint("$name");
+    unit!.speed = speed;
+    unit!.moveTo(destination);
+    
   }
   @override
   bool checkComplete() {
-    if(checkStarted() && unit.tilePosition == tilePosition) {
+    if(chainCamera){
+      game.stage.cursor.centerCameraOn(unit!.tilePosition, 100);
+    }
+    if(checkStarted() && !unit!.isMoving && unit!.movementQueue.isEmpty) {
       game.eventQueue.dispatchEvent(this);
+      unit!.speed = 2;
+      game.stage.cursor.snapToTile(unit!.tilePosition);
       return true;
     }
     return false;
@@ -549,6 +603,33 @@ class UnitDeathEvent extends Event {
     super.execute();
     debugPrint("UnitDeathEvent: ${unit.name} has died.");
     unit.die();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class UnitExitEvent extends Event {
+  static List<Event> observers = [];
+  Unit? unit;
+  final String unitName;
+
+  UnitExitEvent(this.unit, {Trigger? trigger, String? name}) : unitName = unit!.name, super(trigger: trigger, name: "UnitExitEvent: ${unit.name}");
+  UnitExitEvent.named(this.unitName, {this.unit, Trigger? trigger, String? name})
+      : super(trigger: trigger, name: name ?? "UnitExitEvent: $unitName");
+
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    unit ??= Unit.getUnitByName(game.stage, unitName);
+    assert(unit != null);
+    unit!.exit();
+    debugPrint("$name");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

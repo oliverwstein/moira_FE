@@ -281,6 +281,37 @@
             "lck": 2
         }
     },
+    "Priest": {
+        "description": "A servant of God.",
+        "movementRange": 6,
+        "skills": [],
+        "attacks": [],
+        "proficiencies": ["Staff", "Book"],
+        "growths": {
+            "hp": 90,
+            "sta": 50,
+            "str": 10,
+            "def": 10,
+            "dex": 35,
+            "spe": 35,
+            "mag": 40,
+            "res": 40,
+            "wis": 20,
+            "lck": 10
+        },
+        "baseStats": {
+            "hp": 35,
+            "sta": 20,
+            "str": 8,
+            "def": 5,
+            "dex": 2,
+            "spe": 7,
+            "mag": 0,
+            "res": 0,
+            "wis": 0,
+            "lck": 2
+        }
+    },
     "Bow Knight": {
         "description": "A mounted archer.",
         "movementRange": 8,

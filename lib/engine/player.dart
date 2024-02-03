@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
-class Player extends Component with HasGameReference<MoiraGame>{
+abstract class Player extends Component with HasGameReference<MoiraGame>{
   bool takingTurn = false;
   String name;
   FactionType factionType;
@@ -54,7 +54,17 @@ class Player extends Component with HasGameReference<MoiraGame>{
   }
 }
 
-class AIPlayer extends Player{
+class HumanPlayer extends Player {
+  HumanPlayer(super.name, super.factionType);
+
+  @override
+  void takeTurn(){
+    super.takeTurn();
+  }
+  
+}
+
+class AIPlayer extends Player {
   List<Unit> unitsToCommand = [];
   AIPlayer(String name, FactionType factionType) : super(name, factionType);
   @override
@@ -62,8 +72,6 @@ class AIPlayer extends Player{
     super.update(dt);
     if(takingTurn && game.eventQueue.processing == false && unitsToCommand.isNotEmpty){
       Unit unit = unitsToCommand.removeLast();
-      Vector2 centeredPosition = game.stage.cursor.centerCameraOn(unit.tilePosition);
-      game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
       if (unit.orders.isNotEmpty) {unit.orders.last.command(unit);}
       else {Order().command(unit);}
       
@@ -175,7 +183,7 @@ class FactionCreationEvent extends Event{
     debugPrint("FactionCreationEvent execution $name");
     Player player;
     if(human){
-      player = Player(factionName, type);
+      player = HumanPlayer(factionName, type);
       game.stage.add(player);
       game.stage.factionMap[factionName] = player;
     } else {
@@ -189,7 +197,7 @@ class FactionCreationEvent extends Event{
   }
 }
 
-class Order {
+class Order extends Component {
   Order();
   factory Order.create(String orderType) {
     var inputs = orderType.split("_");
@@ -211,6 +219,8 @@ class Order {
     unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
     var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
     if(rankedTiles.firstOrNull != null){
+      Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
       for(Event event in rankedTiles.first.events){
         unit.game.eventQueue.addEventBatch([event]);
       }
@@ -224,6 +234,8 @@ class RansackOrder extends Order {
 
   @override
   void command(Unit unit){
+    Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
     debugPrint("${unit.name} ordered to Ransack");
     unit.remainingMovement = unit.movementRange.toDouble();
     var tile = unit.tile;
@@ -271,7 +283,13 @@ class DefendOrder extends Order {
     List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
     var combatResults = unit.getCombatEventsAndScores(openTiles);
     // Add the best combatResult event list to the queue.
-    unit.game.eventQueue.addEventBatch(combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events);
+    var events = combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events;
+    if(events.isNotEmpty){
+      Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
+    }
+    unit.game.eventQueue.addEventBatch(events);
+
     unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }
@@ -283,6 +301,8 @@ class InvadeOrder extends Order {
 
   @override
   void command(Unit unit){
+    Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
     CastleGate? nearestCastle = CastleGate.getNearestCastle(unit, targetName);
     debugPrint("${unit.name} ordered to invade ${nearestCastle?.name}");
     if(nearestCastle == null) {

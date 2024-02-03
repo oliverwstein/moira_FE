@@ -223,7 +223,9 @@ class DialogueEvent extends Event{
   bool checkComplete() {
     if(checkStarted()) {
       game.eventQueue.dispatchEvent(this);
-      return menu.dialogue.finished;}
+      if(menu.dialogue.finished){game.stage.menuManager.clearStack();}
+      return menu.dialogue.finished;
+      }
     return false;
   } 
 }

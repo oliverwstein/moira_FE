@@ -140,3 +140,45 @@ Gandolf: As they've so kindly left the place open for us. Get comfy, boys, this 
 DiMaggio: With pleasure, sir!
 <<stop>>
 ===
+
+title: Come_On_Aideen
+---
+<<local $left = "Gandolf" as String>>
+<<local $right = "Aideen" as String>>
+Gandolf: My fine lady, at this pace we will be late for the wedding.
+Aideen: What wedding?
+Gandolf: Why, mine! So I trust you understand my haste.
+Aideen: You're engaged? To whom?
+Gandolf: Enough japes, Aideen. Be quick, or be dead.
+Aideen: ...Heaven preserve me.
+<<stop>>
+===
+
+title: Gandolf_At_Evans
+---
+<<local $left = "Gerrard" as String>>
+<<local $right = "Gandolf" as String>>
+Gandolf: I've got business to attend to in Marpha, so the castle is in your hands, Gerrard! 
+Gandolf: Stay sharp, and if anyone even comes near that bridge, make 'em regret it.
+Gerrard: Yes sir! But who's the dame?
+Gandolf: Why, don't you recognize her? I told you I was lookin' for a fiancee. She's a worthy one for me, I think.
+<<set $right = "Aideen">>
+Aideen: What?!
+Gerrard: Oh yeah boss, she's a fiesty one. Is she so red under that robe?
+<<set $right = "Gandolf">>
+Gandolf: That's the future Queen of Verdane you're talking about! Show some respect.
+Gandolf: You can have your fun once Grandbell is ours. 
+<<set $right = "Aideen">>
+<<set $left = "Gandolf">>
+Aideen: Animals have come upon us. Oh, my beloved Jungby...
+Gandolf: Quit your mumbling. You'll be Queen of more than Jungby soon enough.
+<<stop>>
+===
+
+title: DiMaggio_Orders_Looting
+---
+<<local $left = "" as String>>
+<<local $right = "DiMaggio" as String>>
+DiMaggio: Alright you idiots, it's time to take Chalphy! And I expect my cut of the loot from those villages!
+<<stop>>
+===

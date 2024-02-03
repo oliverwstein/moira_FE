@@ -473,6 +473,28 @@
                 },
                 {
                     "type": "UnitCreationEvent",
+                    "unitName": "Barbarian",
+                    "faction": "Evans",
+                    "level": 1,
+                    "tilePosition": [
+                        10,
+                        14
+                    ],
+                    "orders": ["Defend"]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Gerrard",
+                    "faction": "Evans",
+                    "level": 10,
+                    "tilePosition": [
+                        4,
+                        13
+                    ],
+                    "orders": ["Defend"]
+                },
+                {
+                    "type": "UnitCreationEvent",
                     "unitName": "Brigand",
                     "faction": "Evans",
                     "level": 1,
@@ -684,7 +706,7 @@
                     [
                         {"UnitMoveEvent":
                             {
-                            "name":"Lex"}
+                            "name":"UnitMoveEvent: Lex_to_Point(42, 3)"}
                         }
                     ]
                 },
@@ -762,6 +784,201 @@
                         {"SeizeEvent":
                             {
                             "name":"SeizeEvent_Gandolf_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Gandolf",
+                    "destination": [
+                        27,
+                        26
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Fall_Of_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "name": "Aideen",
+                    "unitName": "Aideen",
+                    "faction": "Jungby",
+                    "level": -1,
+                    "tilePosition": [
+                        32,
+                        24
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Fall_Of_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Aideen",
+                    "destination": [
+                        28,
+                        26
+                    ],
+                    "speed": 1.0,
+                    "triggers":
+                    [
+                        {"UnitCreationEvent":
+                            {
+                            "name": "Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Come_On_Aideen",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Aideen_to_Point(28, 26)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Gandolf",
+                    "destination": [
+                        4,
+                        15
+                    ],
+                    "chainCamera": true,
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Come_On_Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Aideen",
+                    "destination": [
+                        5,
+                        15
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Come_On_Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Gandolf_At_Evans",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Aideen_to_Point(5, 15)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Gandolf",
+                    "destination": [
+                        9,
+                        30
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Gandolf_At_Evans"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "Aideen",
+                    "destination": [
+                        9,
+                        30
+                    ],
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {
+                            "name": "Gandolf_At_Evans"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitExitEvent",
+                    "unitName": "Aideen",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Aideen_to_Point(9, 30)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitExitEvent",
+                    "unitName": "Gandolf",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: Gandolf_to_Point(9, 30)"}
+                        }
+                    ]
+                },
+                {
+                    "type": "PanEvent",
+                    "name": "JungbyPan2",
+                    "destination": [
+                        33,
+                        22
+                    ],
+                    "triggers":
+                    [
+                        {"UnitExitEvent":
+                            {
+                            "name": "UnitExitEvent: Aideen"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitMoveEvent",
+                    "unitName": "DiMaggio",
+                    "destination": [
+                        32,
+                        23
+                    ],
+                    "triggers":
+                    [
+                        {"PanEvent":
+                            {
+                            "name": "JungbyPan2"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "DiMaggio_Orders_Looting",
+                    "triggers":
+                    [
+                        {"UnitMoveEvent":
+                            {
+                            "name":"UnitMoveEvent: DiMaggio_to_Point(33, 22)"}
                         }
                     ]
                 }

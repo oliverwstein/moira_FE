@@ -66,16 +66,16 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
   @override
   void update(double dt) {
     super.update(dt);
-    if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue && game.eventQueue.currentBatch().isEmpty){isVisible = true;} else {isVisible = false;}
+    if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
     if(position != targetPosition) {
       if(!game.stage.menuManager.isNotEmpty){
-        game.camera.moveTo(centerCameraOn(tilePosition), speed: 300);
+        game.camera.moveTo(centerCameraOn(tilePosition, speed), speed: 300);
       }
       position.lerp(targetPosition, 1/4);
     }
   }
 
-  Vector2 centerCameraOn(Point<int> newTilePosition) {
+  Vector2 centerCameraOn(Point<int> newTilePosition, double speed) {
     Vector2 crudePosition = Vector2(newTilePosition.x*Stage.tileSize, newTilePosition.y*Stage.tileSize);
     Rect playBox = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
     Rect centeredRect = Rect.fromCenter(
@@ -96,7 +96,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
       dy = (playBox.bottom - centeredRect.bottom);
     }
     Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
-    game.camera.moveTo(centeredPosition, speed: 300);
+    game.camera.moveTo(centeredPosition, speed: speed);
     return centeredPosition;
     
     

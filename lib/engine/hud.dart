@@ -47,7 +47,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     super.update(dt);
     // ignore: invalid_use_of_internal_member
     position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
-    if (game.world == game.stage && game.stage.activeFaction?.factionType == FactionType.blue){isVisible = true;} else {isVisible = false;}
+    if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
     menu.text = "(${game.stage.menuManager.last?.runtimeType})";
@@ -95,10 +95,9 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
     super.update(dt);
     size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
     position = Vector2(game.stage.cursor.position.x-Stage.tileSize, game.stage.cursor.position.y - Stage.tileSize*2.2);
-    bool worldCheck = game.world == game.stage;
     bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
-    if (worldCheck && stackCheck && unitCheck){
+    if (game.stage.freeCursor && stackCheck && unitCheck){
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
       name.anchor = Anchor.topCenter;
       name.position = Vector2(size.x/2, 0);

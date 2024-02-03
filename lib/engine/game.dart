@@ -56,6 +56,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
   Future<void> onLoad() async {
     await super.onLoad();
     await images.load('title_card.png');
+    await images.load('unit_circle.png');
     await images.load('portraits_spritesheet.png');
     await images.load('dialogue_box_spritesheet.png');
     await images.load('alphabet_spritesheet.png');

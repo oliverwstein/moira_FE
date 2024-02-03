@@ -33,6 +33,8 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   Stage(this.mapTileWidth, this.mapTileHeight, this.initialPoint, this.mapFileName, this.data);
 
   Stage._internal(this.mapTileWidth, this.mapTileHeight, this.initialPoint, this.mapFileName, this.data);
+  
+  bool get freeCursor => activeFaction is HumanPlayer && activeFaction!.takingTurn && !game.eventQueue.processing;
 
   // Static async method to create an instance from JSON
   static Future<Stage> fromJson(String mapFileName) async {
@@ -135,7 +137,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     if(menuManager.isNotEmpty && key is RawKeyDownEvent){
       return menuManager.handleKeyEvent(key, keysPressed);
     }
-    if (key is RawKeyDownEvent && !cursor.isMoving) {
+    if (key is RawKeyDownEvent && !cursor.isMoving && freeCursor) {
       // debugPrint("Stage given key ${key.logicalKey.keyLabel} to handle.");
       switch (key.logicalKey) {
         case (LogicalKeyboardKey.keyA || LogicalKeyboardKey.keyB):
