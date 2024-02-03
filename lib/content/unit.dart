@@ -251,7 +251,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
     unit.tile.setUnit(this);
-    debugPrint("Unit $name loaded.");
     _loadCompleter.complete();
   }
 
@@ -483,7 +482,7 @@ class UnitCreationEvent extends Event{
   late final Unit unit;
   
 
-  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.orders, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.orders, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: "UnitCreationEvent: $unitName");
   
   @override
   List<Event> getObservers() {
@@ -494,7 +493,6 @@ class UnitCreationEvent extends Event{
   @override
   void execute() {
     super.execute();
-    debugPrint("UnitCreationEvent: unit $name");
     unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items, orderStrings: orders);
     game.stage.add(unit);
     if (destination != null) {
@@ -540,7 +538,6 @@ class UnitMoveEvent extends Event {
     super.execute();
     unit ??= Unit.getUnitByName(game.stage, unitName);
     assert(unit != null);
-    debugPrint("$name");
     unit!.speed = speed;
     unit!.moveTo(destination);
     
@@ -572,7 +569,6 @@ class UnitRefreshEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("$name");
     unit.toggleCanAct(true);
     unit.remainingMovement = unit.movementRange.toDouble();
     completeEvent();
@@ -594,7 +590,6 @@ class UnitExhaustEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("$name");
     unit.wait();
     completeEvent();
     game.eventQueue.dispatchEvent(this);
@@ -653,7 +648,6 @@ class UnitExitEvent extends Event {
     unit ??= Unit.getUnitByName(game.stage, unitName);
     assert(unit != null);
     unit!.exit();
-    debugPrint("$name");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

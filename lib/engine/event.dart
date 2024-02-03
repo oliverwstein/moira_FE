@@ -24,6 +24,7 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
   Event({this.trigger, this.name});
   void execute(){
     _isStarted = true;
+    debugPrint("$name");
   }
   static List getObserversByClassName(String eventClassName){
     // UPDATE THIS WHENEVER YOU CREATE A NEW EVENT CLASS

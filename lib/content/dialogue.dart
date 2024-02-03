@@ -68,7 +68,6 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
     dBoxSprite.add(_nameTextComponent!);
     rightPortrait.flipHorizontally();
     _loadCompleter.complete();
-    debugPrint("Dialogue $nodeName loaded.");
   }
 
   TextBoxComponent getBlankTextComponent(String type){

@@ -358,7 +358,7 @@ class VisitEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   final TownCenter town;
-  VisitEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  VisitEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "VisitEvent: Town @${town.point} ${unit.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

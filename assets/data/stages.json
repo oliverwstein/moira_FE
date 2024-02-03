@@ -651,7 +651,6 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Lex",
                     "unitName": "Lex",
                     "faction": "Sigurd",
                     "level": -1,
@@ -676,7 +675,6 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Azel",
                     "unitName": "Azel",
                     "faction": "Sigurd",
                     "level": -1,
@@ -793,7 +791,6 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "name": "Aideen",
                     "unitName": "Aideen",
                     "faction": "Jungby",
                     "level": -1,
@@ -821,7 +818,7 @@
                     [
                         {"UnitCreationEvent":
                             {
-                            "name": "Aideen"}
+                            "name": "UnitCreationEvent: Aideen"}
                         }
                     ]
                 },
