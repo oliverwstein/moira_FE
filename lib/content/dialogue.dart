@@ -194,14 +194,20 @@ class DialogueEvent extends Event{
   late DialogueMenu menu;
   DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
 
-  static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<UnitDeathEvent>((deathEvent) {
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<UnitDeathEvent>((deathEvent) {
       if (deathEvent.game.yarnProject.nodes.keys.contains("${deathEvent.unit.name}_Death_Quote")) {
         debugPrint("Death Quote found for ${deathEvent.unit.name}");
         // Trigger UnitDeathEvent
         var deathQuoteEvent = DialogueEvent("${deathEvent.unit.name}_Death_Quote");
-        EventQueue eventQueue = deathEvent.game.eventQueue;
-        eventQueue.addEventBatchToHead([deathQuoteEvent]);
+        queue.addEventBatchToHead([deathQuoteEvent]);
+      }
+    });
+    queue.registerClassObserver<StartCombatEvent>((catalystEvent) {
+      if (catalystEvent.game.yarnProject.nodes.keys.contains("${catalystEvent.combat.attacker.name}_${catalystEvent.combat.defender.name}_Combat_Quote")) {
+        debugPrint("Combat Quote found for ${catalystEvent.combat.attacker.name} against ${catalystEvent.combat.defender.name}");
+        var combatQuoteEvent = DialogueEvent("${catalystEvent.combat.attacker.name}_${catalystEvent.combat.defender.name}_Combat_Quote");
+        queue.addEventBatchToHead([combatQuoteEvent]);
       }
     });
   }
@@ -223,9 +229,7 @@ class DialogueEvent extends Event{
   bool checkComplete() {
     if(checkStarted()) {
       game.eventQueue.dispatchEvent(this);
-      if(menu.dialogue.finished){game.stage.menuManager.clearStack();}
-      return menu.dialogue.finished;
-      }
+      return menu.dialogue.finished;}
     return false;
   } 
 }

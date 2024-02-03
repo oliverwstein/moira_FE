@@ -107,7 +107,7 @@ Gandolf: I'll show you how it's done.
 <<stop>>
 ===
 
-title: Gandolf_Midir_Fight
+title: Gandolf_Midir_Combat_Quote
 ---
 <<local $left = "Gandolf" as String>>
 <<local $right = "Midir" as String>>

@@ -14,7 +14,6 @@ class Combat extends Component with HasGameReference<MoiraGame>{
 
   @override
   void update(dt) {
-
   }
 
   static int getCombatDistance(unit, target){
@@ -27,7 +26,7 @@ class Combat extends Component with HasGameReference<MoiraGame>{
     if(followUp == null) {
       return;
     } else {
-      game.eventQueue.addEventBatch([AttackEvent(this, followUp.$1, followUp.$2)]);
+      game.combatQueue.addEventBatch([AttackEvent(this, followUp.$1, followUp.$2)]);
     }
   }
 }
@@ -50,12 +49,13 @@ class StartCombatEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
+    game.remove(game.eventQueue);
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     if(duel) debugPrint("Duel! $name");
     game.add(combat);
-    game.eventQueue.addEventBatch([CombatRoundEvent(combat)]);
+    game.combatQueue.addEventBatch([CombatRoundEvent(combat)]);
     completeEvent();
-    game.eventQueue.dispatchEvent(this);
+    game.combatQueue.dispatchEvent(this);
   }
 }
 
@@ -65,13 +65,12 @@ class CombatRoundEvent extends Event {
   CombatRoundEvent(this.combat, {Trigger? trigger, String? name}) 
     : super(trigger: trigger, name: name ?? "CombatRound_${combat.attacker.name}_${combat.defender.name}");
 
-  static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
-      if (endCombatEvent.combat.duel && !endCombatEvent.combat.attacker.dead && !endCombatEvent.combat.defender.dead) {
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
+      if (endCombatEvent.combat.duel && endCombatEvent.combat.attacker.hp > 0 && endCombatEvent.combat.defender.hp > 0) {
         CombatRoundEvent newCombatRoundEvent = CombatRoundEvent(endCombatEvent.combat);
-        EventQueue eventQueue = endCombatEvent.game.eventQueue;
         debugPrint("Add duel round: ${endCombatEvent.combat.attacker.name} against ${endCombatEvent.combat.defender.name}");
-        eventQueue.addEventBatchToHead([newCombatRoundEvent]);
+        queue.addEventBatch([newCombatRoundEvent]);
       } else {
         endCombatEvent.combat.removeFromParent();
       }
@@ -87,12 +86,12 @@ class CombatRoundEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("CombatRoundEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    game.eventQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender)]);
-    game.eventQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
+    game.combatQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender)]);
+    game.combatQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
     combat.addFollowUp();
     completeEvent();
-    game.eventQueue.addEventBatch([EndCombatEvent(combat)]);
-    game.eventQueue.dispatchEvent(this);
+    game.combatQueue.addEventBatch([EndCombatEvent(combat)]);
+    game.combatQueue.dispatchEvent(this);
   }
 }
 
@@ -110,9 +109,10 @@ class EndCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    game.eventQueue.addEventBatch([UnitExhaustEvent(combat.attacker)]);
     completeEvent();
-    game.eventQueue.dispatchEvent(this);
+    game.add(game.eventQueue);
+    if(combat.duel){game.combatQueue.dispatchEvent(this);} else {game.eventQueue.dispatchEvent(this);}
+    
   }
 }
 
@@ -143,13 +143,13 @@ class AttackEvent extends Event {
     if (vals.accuracy > 0) {
       if (rng.nextInt(100) + 1 <= vals.accuracy) {
         // Attack hits
-        game.eventQueue.addEventBatchToHead([HitEvent(combat, unit, target, vals)]);
+        game.combatQueue.addEventBatchToHead([HitEvent(combat, unit, target, vals)]);
       } else {
-        game.eventQueue.addEventBatchToHead([MissEvent(combat, unit, target)]);
+        game.combatQueue.addEventBatchToHead([MissEvent(combat, unit, target)]);
       }
     }
     completeEvent();
-    game.eventQueue.dispatchEvent(this);
+    game.combatQueue.dispatchEvent(this);
   }
 }
 
@@ -173,8 +173,8 @@ class HitEvent extends Event {
     super.execute();
     debugPrint("HitEvent: ${unit.name} hits ${target.name}");
     combat.damage = vals.damage;
-    game.eventQueue.addEventBatchToHead([DamageEvent(combat, target)]);
-    game.eventQueue.dispatchEvent(this);
+    game.combatQueue.addEventBatchToHead([DamageEvent(combat, target)]);
+    game.combatQueue.dispatchEvent(this);
     completeEvent();
   }
 }
@@ -197,7 +197,7 @@ class MissEvent extends Event {
     super.execute();
     debugPrint("MissEvent: ${unit.name} misses ${target.name}");
     completeEvent();
-    game.eventQueue.dispatchEvent(this);
+    game.combatQueue.dispatchEvent(this);
   }
 }
 
@@ -206,15 +206,14 @@ class CritEvent extends Event {
   final Combat combat;
   final Unit unit;
   final Unit target;
-  static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<HitEvent>((hitEvent) {
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<HitEvent>((hitEvent) {
       debugPrint("Critical hit rate: ${hitEvent.vals.critRate}");
       if (hitEvent.vals.critRate > 0) {
         Random rng = Random();
         if (rng.nextInt(100) + 1 <= hitEvent.vals.critRate) {
           CritEvent critEvent = CritEvent(hitEvent.combat, hitEvent.unit, hitEvent.target);
-          EventQueue eventQueue = hitEvent.game.eventQueue;
-          eventQueue.addEventBatchToHead([critEvent]);
+          queue.addEventBatchToHead([critEvent]);
         }
       }
     });
@@ -233,7 +232,7 @@ class CritEvent extends Event {
     debugPrint("CritEvent: ${unit.name} lands a critical hit on ${target.name}");
     combat.damage *= 3;
     completeEvent();
-    game.eventQueue.dispatchEvent(this);
+    game.combatQueue.dispatchEvent(this);
   }
 }
 
@@ -254,7 +253,7 @@ class DamageEvent extends Event {
     debugPrint("DamageEvent: ${unit.name} takes ${combat.damage} damage.");
     unit.hp = (unit.hp - combat.damage).clamp(0, unit.getStat("hp"));
     debugPrint("DamageEvent: ${unit.name} now has ${unit.hp} hp.");
-    game.eventQueue.dispatchEvent(this);
+    game.combatQueue.dispatchEvent(this);
     completeEvent();
   }
 }

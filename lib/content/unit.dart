@@ -167,6 +167,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   void update(double dt) {
     super.update(dt);
+    // unit.toggleCanAct(true);
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
@@ -580,13 +581,12 @@ class UnitExhaustEvent extends Event {
 class UnitDeathEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
-  static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<DamageEvent>((damageEvent) {
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<DamageEvent>((damageEvent) {
       if (damageEvent.unit.hp <= 0) {
         // Trigger UnitDeathEvent
         var unitDeathEvent = UnitDeathEvent(damageEvent.unit);
-        EventQueue eventQueue = damageEvent.game.eventQueue;
-        eventQueue.addEventBatchToHead([unitDeathEvent]);
+        damageEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
       }
     });
   }
