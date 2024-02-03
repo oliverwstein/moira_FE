@@ -47,7 +47,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     super.update(dt);
     // ignore: invalid_use_of_internal_member
     position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
-    if(game.world == game.stage && game.stage.activeFaction.runtimeType is Player && game.stage.activeFaction!.takingTurn && !game.eventQueue.processing){
+    if(game.world == game.stage && game.stage.activeFaction is Player && game.stage.activeFaction!.takingTurn && !game.eventQueue.processing){
       isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
@@ -96,7 +96,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
     super.update(dt);
     size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
     position = Vector2(game.stage.cursor.position.x-Stage.tileSize, game.stage.cursor.position.y - Stage.tileSize*2.2);
-    bool worldCheck = (game.world == game.stage && game.stage.activeFaction.runtimeType is Player && game.stage.activeFaction!.takingTurn && !game.eventQueue.processing);
+    bool worldCheck = (game.world == game.stage && game.stage.activeFaction is Player && game.stage.activeFaction!.takingTurn && !game.eventQueue.processing);
     bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
     if (worldCheck && stackCheck && unitCheck){
