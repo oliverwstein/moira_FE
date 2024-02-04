@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
+import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 class Class extends Component with HasGameReference<MoiraGame>{
   final String name;
@@ -10,7 +13,7 @@ class Class extends Component with HasGameReference<MoiraGame>{
   final List<String> orders;
   final Map<String, int> baseStats;
   final Map<String, int> growths;
-
+  Map<String, SpriteAnimationComponent> animationMap = {};
   // Factory constructor
   factory Class.fromJson(String name) {
     Map<String, dynamic> classData;
@@ -33,4 +36,36 @@ class Class extends Component with HasGameReference<MoiraGame>{
   }
   // Internal constructor for creating instances
   Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
+
+  @override
+  Future<void> onLoad() async {
+    Image spriteSheetImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
+    SpriteSheet spriteSheet = SpriteSheet.fromColumnsAndRows(
+      image: spriteSheetImage,
+      columns: 4,
+      rows: 5,
+    );
+     Vector2 spriteSize = Vector2(spriteSheetImage.width/4, spriteSheetImage.height/5);
+    double stepTime = .15;
+    animationMap['down'] = SpriteAnimationComponent(
+                            animation: spriteSheet.createAnimation(row: 0, stepTime: stepTime),
+                            size: spriteSize,
+                            anchor: Anchor.center);
+    animationMap['up'] = SpriteAnimationComponent(
+                            animation: spriteSheet.createAnimation(row: 1, stepTime: stepTime),
+                            size: spriteSize,
+                            anchor: Anchor.center);
+    animationMap['right'] = SpriteAnimationComponent(
+                            animation: spriteSheet.createAnimation(row: 2, stepTime: stepTime),
+                            size: spriteSize,
+                            anchor: Anchor.center);
+    animationMap['left'] = SpriteAnimationComponent(
+                            animation: spriteSheet.createAnimation(row: 3, stepTime: stepTime),
+                            size: spriteSize,
+                            anchor: Anchor.center);
+    animationMap['idle'] = SpriteAnimationComponent(
+                            animation: spriteSheet.createAnimation(row: 4, stepTime: stepTime*2),
+                            size: spriteSize,
+                            anchor: Anchor.center);
+  }
 }
