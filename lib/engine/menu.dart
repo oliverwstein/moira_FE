@@ -100,8 +100,8 @@ class MoveMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
+    // unit.sprite.animation = newAnimation;
   }
 
   @override
@@ -113,8 +113,8 @@ class MoveMenu extends Menu {
   @override
   void onRemove() {
     super.onRemove();
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    // unit.sprite.animation = newAnimation;
   }
 
   @override
@@ -164,14 +164,14 @@ class CantoMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
+    // unit.sprite.animation = newAnimation;
   }
   @override
   void onRemove() {
     super.onRemove();
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    // unit.sprite.animation = newAnimation;
   }
 
   @override
@@ -223,8 +223,8 @@ class ActionMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    // unit.sprite.animation = newAnimation;
     actions = unit.getActionsAt(game.stage.cursor.tilePosition);
   }
 
@@ -408,8 +408,8 @@ class InventoryMenu extends Menu {
 
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    // unit.sprite.animation = newAnimation;
     List<String> getInventoryNames() => unit.inventory.map((item) => item.name).toList();
     options = getInventoryNames();
   }
