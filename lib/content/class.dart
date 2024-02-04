@@ -16,6 +16,7 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   final Map<String, int> growths;
   late SpriteSheet spriteSheet;
   late Vector2 spriteSize;
+  Direction? _currentDirection;
   // Factory constructor
   factory Class.fromJson(String name) {
     Map<String, dynamic> classData;
@@ -38,10 +39,11 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   }
   // Internal constructor for creating instances
   Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
-
+  Direction? get direction => _currentDirection;
   set direction(Direction? newDirection) {
+    _currentDirection = newDirection;
     int row;
-    double currentStepTime = .15;
+    double currentStepTime = .1;
     switch (newDirection) {
       case Direction.down:
         row = 0;

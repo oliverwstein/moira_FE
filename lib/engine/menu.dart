@@ -70,8 +70,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
 
 abstract class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
-  void close() {
-    game.stage.menuManager.popMenu();}
+  void close() {game.stage.menuManager.popMenu();}
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     switch (key.logicalKey) {
@@ -100,8 +99,7 @@ class MoveMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    // SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
-    // unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(unit.direction);
   }
 
   @override
@@ -113,8 +111,7 @@ class MoveMenu extends Menu {
   @override
   void onRemove() {
     super.onRemove();
-    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    // unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(null);
   }
 
   @override
@@ -164,14 +161,12 @@ class CantoMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    // SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
-    // unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(unit.direction);
   }
   @override
   void onRemove() {
     super.onRemove();
-    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    // unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(null);
   }
 
   @override

@@ -163,9 +163,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unit.toggleCanAct(false);
     game.stage.blankAllTiles();
   }
-  void setSpriteDirection(){
-    unitClass.direction = direction;
-    if(main?.weapon != null) main?.weapon!.direction = direction;
+  void setSpriteDirection(Direction? direction){
+    if(unitClass.direction != direction) {
+      unitClass.direction = direction;
+      if(main?.weapon != null) main?.weapon!.direction = direction;
+    }
   }
   @override
   void update(double dt) {
@@ -175,7 +177,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       isMoving = true;
       Movement currentMovement = movementQueue.first;
       direction = currentMovement.direction;
-      setSpriteDirection();
+      setSpriteDirection(direction);
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
@@ -190,10 +192,9 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         if (movementQueue.isNotEmpty) {
           Movement currentMovement = movementQueue.first;
           direction = currentMovement.direction;
-          setSpriteDirection();
+          setSpriteDirection(direction);
         } else {//The movement is over.
-          direction = null;
-          setSpriteDirection();
+          setSpriteDirection(null);
         }
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
@@ -208,6 +209,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     add(UnitCircle(this));
     children.register<UnitCircle>();
     add(unitClass);
+    if(main?.weapon != null) add(main!.weapon!);
     position = unit.tile.center;
     anchor = Anchor.center;
   

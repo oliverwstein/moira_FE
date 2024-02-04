@@ -65,7 +65,7 @@
     "skills": [],
     "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": []},
+    "proficiencies": ["Sword"]},
     {
     "name": "Alec",
     "faction": "blue",
@@ -98,7 +98,7 @@
     "skills": [],
     "items": ["Salve", "Sword"],
     "attacks": [],
-    "proficiencies": []},
+    "proficiencies": ["Sword"]},
     {
     "name": "Arden",
     "faction": "blue",
