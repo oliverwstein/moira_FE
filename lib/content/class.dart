@@ -42,7 +42,6 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   set direction(Direction? newDirection) {
     int row;
     double currentStepTime = .15;
-    debugPrint("Set direction to $newDirection");
     switch (newDirection) {
       case Direction.down:
         row = 0;

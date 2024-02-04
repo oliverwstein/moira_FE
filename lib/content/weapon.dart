@@ -72,7 +72,7 @@ class Weapon extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
     // Return a new Weapon instance
     return Weapon._internal(weaponType, might, hit, crit, fatigue, null, specialAttack);
   }
-  set direction(Direction newDirection) {
+  set direction(Direction? newDirection) {
     int row;
     double currentStepTime = .15;
     switch (newDirection) {
@@ -105,8 +105,6 @@ class Weapon extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
       rows: 5,
     );
     spriteSize = Vector2(spriteSheetImage.width/4, spriteSheetImage.height/5);
-    double stepTime = .15;
-    animation = spriteSheet.createAnimation(row: 4, stepTime: stepTime*2);
     size = spriteSize; anchor = Anchor.center;
   }
 }

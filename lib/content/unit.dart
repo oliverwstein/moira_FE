@@ -163,6 +163,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unit.toggleCanAct(false);
     game.stage.blankAllTiles();
   }
+  void setSpriteDirection(){
+    unitClass.direction = direction;
+    if(main?.weapon != null) main?.weapon!.direction = direction;
+  }
   @override
   void update(double dt) {
     super.update(dt);
@@ -171,7 +175,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       isMoving = true;
       Movement currentMovement = movementQueue.first;
       direction = currentMovement.direction;
-      unitClass.direction = direction;
+      setSpriteDirection();
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
@@ -186,10 +190,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         if (movementQueue.isNotEmpty) {
           Movement currentMovement = movementQueue.first;
           direction = currentMovement.direction;
-          unitClass.direction = direction;
+          setSpriteDirection();
         } else {//The movement is over.
           direction = null;
-          unitClass.direction = direction;
+          setSpriteDirection();
         }
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
@@ -238,6 +242,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       switch (item.type) {
         case ItemType.main:
           main = item;
+          if(main?.weapon != null) {add(main!.weapon!);}
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
           }
@@ -262,6 +267,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     switch (type) {
       case ItemType.main:
         // debugPrint("$name unequipped ${main?.name} as $type");
+        if(main?.weapon != null) {remove(main!.weapon!);}
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
