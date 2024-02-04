@@ -171,6 +171,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       isMoving = true;
       Movement currentMovement = movementQueue.first;
       direction = currentMovement.direction;
+      unitClass.direction = direction;
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
@@ -185,8 +186,10 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         if (movementQueue.isNotEmpty) {
           Movement currentMovement = movementQueue.first;
           direction = currentMovement.direction;
+          unitClass.direction = direction;
         } else {//The movement is over.
           direction = null;
+          unitClass.direction = direction;
         }
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);

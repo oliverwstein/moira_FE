@@ -39,9 +39,10 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   // Internal constructor for creating instances
   Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
 
-  set direction(Direction newDirection) {
+  set direction(Direction? newDirection) {
     int row;
     double currentStepTime = .15;
+    debugPrint("Set direction to $newDirection");
     switch (newDirection) {
       case Direction.down:
         row = 0;
@@ -72,8 +73,6 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
       rows: 5,
     );
     spriteSize = Vector2(spriteSheetImage.width/4, spriteSheetImage.height/5);
-    double stepTime = .15;
-    animation = spriteSheet.createAnimation(row: 4, stepTime: stepTime*2);
     size = spriteSize; anchor = Anchor.center;
   }
 }
