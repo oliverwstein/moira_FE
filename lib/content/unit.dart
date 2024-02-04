@@ -203,7 +203,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   Future<void> onLoad() async {
     // Load the unit image and create the animation component
-    ui.Image unitImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
+    ui.Image unitImage = await game.images.load('${className.toLowerCase()}_spritesheet.png');
     unitSheet = SpriteSheet.fromColumnsAndRows(
       image: unitImage,
       columns: 4,

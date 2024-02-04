@@ -6,7 +6,7 @@
             "movementRange": 9,
             "skills": ["Canto"],
             "attacks": ["Trample"],
-            "proficiencies": ["Sword", "Lance"],
+            "proficiencies": ["Sword"],
             "growths": {
                 "hp": 90,
                 "sta": 90,
@@ -32,12 +32,43 @@
                 "lck": 10
             }
         },
-        "Cavalier": {
+        "Duke": {
+            "description": "A Duke.",
+            "movementRange": 9,
+            "skills": ["Canto"],
+            "attacks": ["Trample"],
+            "proficiencies": ["Lance"],
+            "growths": {
+                "hp": 90,
+                "sta": 90,
+                "str": 40,
+                "def": 40,
+                "dex": 40,
+                "spe": 40,
+                "mag": 10,
+                "res": 10,
+                "wis": 30,
+                "lck": 40
+            },
+            "baseStats": {
+                "hp": 40,
+                "sta": 30,
+                "str": 10,
+                "def": 7,
+                "dex": 7,
+                "spe": 7,
+                "mag": 0,
+                "res": 3,
+                "wis": 3,
+                "lck": 10
+            }
+        },
+        "Knight": {
             "description": "A mounted knight sworn to service.",
             "movementRange": 8,
             "skills": ["Canto"],
             "attacks": ["Trample"],
-            "proficiencies": ["Sword", "Lance"],
+            "proficiencies": [],
             "growths": {
                 "hp": 80,
                 "sta": 60,
@@ -68,7 +99,7 @@
             "movementRange": 6,
             "skills": ["Pavise"],
             "attacks": [],
-            "proficiencies": ["Lance"],
+            "proficiencies": [],
             "growths": {
                 "hp": 90,
                 "sta": 80,
@@ -310,37 +341,6 @@
             "res": 0,
             "wis": 0,
             "lck": 2
-        }
-    },
-    "Bow Knight": {
-        "description": "A mounted archer.",
-        "movementRange": 8,
-        "skills": ["Canto"],
-        "attacks": [],
-        "proficiencies": ["Bow"],
-        "growths": {
-            "hp": 80,
-            "sta": 60,
-            "str": 30,
-            "def": 20,
-            "dex": 40,
-            "spe": 40,
-            "mag": 5,
-            "res": 5,
-            "wis": 10,
-            "lck": 10
-        },
-        "baseStats": {
-            "hp": 30,
-            "sta": 25,
-            "str": 7,
-            "def": 6,
-            "dex": 6,
-            "spe": 6,
-            "mag": 0,
-            "res": 1,
-            "wis": 1,
-            "lck": 5
         }
     }
     }
