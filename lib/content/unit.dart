@@ -28,8 +28,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Class unitClass;
   Queue<Movement> movementQueue = Queue<Movement>();
   late final Map<String, dynamic> unitData;
-  SpriteAnimationComponent classSprite = SpriteAnimationComponent();
-  SpriteAnimationComponent weaponSprite = SpriteAnimationComponent();
   bool isMoving = false;
   Direction? direction;
   bool _canAct = true;
@@ -202,6 +200,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Future<void> onLoad() async {
     add(UnitCircle(this));
     children.register<UnitCircle>();
+    add(unitClass);
     position = unit.tile.center;
     anchor = Anchor.center;
   
