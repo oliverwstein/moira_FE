@@ -342,6 +342,37 @@
             "wis": 0,
             "lck": 2
         }
+    },
+    "Troubadour": {
+        "description": "A mounted oasis for the body and soul.",
+        "movementRange": 8,
+        "skills": [],
+        "attacks": [],
+        "proficiencies": ["Staff"],
+        "growths": {
+            "hp": 60,
+            "sta": 50,
+            "str": 30,
+            "def": 20,
+            "dex": 30,
+            "spe": 30,
+            "mag": 10,
+            "res": 20,
+            "wis": 20,
+            "lck": 20
+        },
+        "baseStats": {
+            "hp": 28,
+            "sta": 25,
+            "str": 5,
+            "def": 4,
+            "dex": 11,
+            "spe": 12,
+            "mag": 8,
+            "res": 6,
+            "wis": 8,
+            "lck": 8
+        }
     }
     }
 }
