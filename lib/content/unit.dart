@@ -51,6 +51,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int level;
   int hp = -1;
   int sta = -1;
+  int exp = 0;
   static Unit? getUnitByName(Stage stage, String unitName) {
     debugPrint("getUnitByName: unit $unitName");
     Unit? unit = stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
@@ -172,7 +173,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   void update(double dt) {
     super.update(dt);
-    // unit.toggleCanAct(true);
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
@@ -201,7 +201,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       }
     } 
     unit.tile.setUnit(this);
-    // if(game.stage.freeCursor){sprite.paint = canAct ? Paint() : grayscalePaint;}
+    if(game.stage.freeCursor && unit.controller.takingTurn){unitClass.paint = canAct ? Paint() : grayscalePaint;}
   }
 
   @override

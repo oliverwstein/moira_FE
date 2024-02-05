@@ -32,16 +32,18 @@ abstract class Player extends Component with HasGameReference<MoiraGame>{
 
   void startTurn() {
     unitsToCommand = game.stage.activeFaction!.units.toList();
+    List<Event> refreshEvents = [];
     for(Unit unit in unitsToCommand){
-      game.eventQueue.addEventBatch([UnitRefreshEvent(unit)]);
+      refreshEvents.add(UnitRefreshEvent(unit));
     }
+    game.eventQueue.addEventBatch(refreshEvents);
     game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   void endTurn(){
     takingTurn = false;
-    for(Unit unit in units){
-      unit.toggleCanAct(true);
-    }
+    // for(Unit unit in units){
+    //   unit.toggleCanAct(true);
+    // }
   }
 
   bool checkHostility(Unit unit){
