@@ -969,6 +969,22 @@
                     ]
                 },
                 {
+                    "type": "PanEvent",
+                    "name": "QuanPan",
+                    "destination": [
+                        59,
+                        12
+                    ],
+                    "triggers":
+                    [
+                        {"StartTurnEvent":
+                            {
+                            "factionName": "Sigurd",
+                            "turn": 3}
+                        }
+                    ]
+                },
+                {
                     "type": "UnitCreationEvent",
                     "unitName": "Quan",
                     "faction": "Sigurd",
@@ -983,10 +999,8 @@
                     ],
                     "triggers":
                     [
-                        {"StartTurnEvent":
-                            {
-                            "factionName": "Sigurd",
-                            "turn": 3}
+                        {"PanEvent":
+                            {"name": "QuanPan"}
                         }
                     ]
                 },
@@ -1005,10 +1019,8 @@
                     ],
                     "triggers":
                     [
-                        {"StartTurnEvent":
-                            {
-                            "factionName": "Sigurd",
-                            "turn": 3}
+                        {"PanEvent":
+                            {"name": "QuanPan"}
                         }
                     ]
                 },
@@ -1027,10 +1039,8 @@
                     ],
                     "triggers":
                     [
-                        {"StartTurnEvent":
-                            {
-                            "factionName": "Sigurd",
-                            "turn": 3}
+                        {"PanEvent":
+                            {"name": "QuanPan"}
                         }
                     ]
                 }
