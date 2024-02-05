@@ -397,7 +397,7 @@
                         11
                     ],
                     "destination": [
-                        40,
+                        41,
                         11
                     ]
                 },
@@ -411,7 +411,7 @@
                         10
                     ],
                     "destination": [
-                        35,
+                        36,
                         10
                     ]
                 },
@@ -425,7 +425,7 @@
                         8
                     ],
                     "destination": [
-                        31,
+                        32,
                         8
                     ]
                 },
@@ -439,7 +439,7 @@
                         4
                     ],
                     "destination": [
-                        34,
+                        35,
                         4
                     ]
                 },
@@ -454,7 +454,7 @@
                     ],
                     "destination": [
                         35,
-                        4
+                        5
                     ]
                 },
                 {
@@ -468,7 +468,7 @@
                     ],
                     "destination": [
                         12,
-                        8
+                        9
                     ]
                 },
                 {
@@ -504,7 +504,7 @@
                     ],
                     "destination": [
                         11,
-                        12
+                        11
                     ]
                 },
                 {
@@ -518,7 +518,7 @@
                     ],
                     "destination": [
                         24,
-                        13
+                        12
                     ]
                 },
                 {
@@ -546,7 +546,7 @@
                     ],
                     "destination": [
                         21,
-                        17
+                        18
                     ]
                 },
                 {
@@ -560,7 +560,7 @@
                     ],
                     "destination": [
                         23,
-                        21
+                        20
                     ]
                 }
             ],
@@ -969,6 +969,22 @@
                     ]
                 },
                 {
+                    "type": "PanEvent",
+                    "name": "QuanPan",
+                    "destination": [
+                        59,
+                        12
+                    ],
+                    "triggers":
+                    [
+                        {"StartTurnEvent":
+                            {
+                            "factionName": "Sigurd",
+                            "turn": 3}
+                        }
+                    ]
+                },
+                {
                     "type": "UnitCreationEvent",
                     "unitName": "Quan",
                     "faction": "Sigurd",
@@ -983,10 +999,8 @@
                     ],
                     "triggers":
                     [
-                        {"StartTurnEvent":
-                            {
-                            "factionName": "Sigurd",
-                            "turn": 3}
+                        {"PanEvent":
+                            {"name": "QuanPan"}
                         }
                     ]
                 },
@@ -1005,10 +1019,8 @@
                     ],
                     "triggers":
                     [
-                        {"StartTurnEvent":
-                            {
-                            "factionName": "Sigurd",
-                            "turn": 3}
+                        {"PanEvent":
+                            {"name": "QuanPan"}
                         }
                     ]
                 },
@@ -1027,10 +1039,18 @@
                     ],
                     "triggers":
                     [
-                        {"StartTurnEvent":
-                            {
-                            "factionName": "Sigurd",
-                            "turn": 3}
+                        {"PanEvent":
+                            {"name": "QuanPan"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "QuanArrival",
+                    "triggers":
+                    [
+                        {"PanEvent":
+                            {"name": "QuanPan"}
                         }
                     ]
                 }

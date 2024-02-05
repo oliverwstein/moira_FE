@@ -48,9 +48,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   bool hasSkill(Skill skill) => skillSet.contains(skill);
   Set<WeaponType> proficiencies;
   Map<String, int> stats = {};
+  Map<String, int> growths = {};
   int level;
   int hp = -1;
   int sta = -1;
+  int exp = 0;
   static Unit? getUnitByName(Stage stage, String unitName) {
     debugPrint("getUnitByName: unit $unitName");
     Unit? unit = stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
@@ -67,7 +69,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     );
 
     String className = unitData['class'];
-    int givenLevel = level ?? unitData['level'] ?? 1;
+    int givenLevel = (level == -1 ? unitData['level'] : level) ?? 1;
     Class unitClass = Class.fromJson(className, unitData["faction"]);
 
     int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : unitClass.movementRange;
@@ -114,17 +116,15 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         int levelUps = Iterable.generate(givenLevel - 1, (_) => rng.nextInt(100) < growths[stat]! ? 1 : 0)
                         .fold(0, (acc, curr) => acc + curr); // Autoleveler
         stats[stat] = unitClass.baseStats[stat]! + levelUps;
-
       }
-      
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, unitClass, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats);
+    return Unit._internal(unitData, tilePosition, name, unitClass, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats, growths);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.unitClass, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.unitClass, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats, this.growths){
     _postConstruction();
   }
 
@@ -172,7 +172,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   @override
   void update(double dt) {
     super.update(dt);
-    // unit.toggleCanAct(true);
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
@@ -201,7 +200,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       }
     } 
     unit.tile.setUnit(this);
-    // if(game.stage.freeCursor){sprite.paint = canAct ? Paint() : grayscalePaint;}
+    if(game.stage.freeCursor && unit.controller.takingTurn){unitClass.paint = canAct ? Paint() : grayscalePaint;}
   }
 
   @override
@@ -216,6 +215,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     // Add to faction:
     if(game.stage.factionMap.keys.contains(faction)){
       game.stage.factionMap[faction]!.units.add(this);
+      if(name == faction) {controller.leader = this;}
     }
     else{ 
       debugPrint("Unit created for faction $faction not in factionMap.");
@@ -576,11 +576,16 @@ class UnitDeathEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   static void initialize(EventQueue queue) {
-    queue.registerClassObserver<DamageEvent>((damageEvent) {
-      if (damageEvent.unit.hp <= 0) {
+    queue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
+      if (endCombatEvent.combat.attacker.hp == 0) {
         // Trigger UnitDeathEvent
-        var unitDeathEvent = UnitDeathEvent(damageEvent.unit);
-        damageEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
+        var unitDeathEvent = UnitDeathEvent(endCombatEvent.combat.attacker);
+        endCombatEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
+      }
+      if (endCombatEvent.combat.defender.hp == 0) {
+        // Trigger UnitDeathEvent
+        var unitDeathEvent = UnitDeathEvent(endCombatEvent.combat.defender);
+        endCombatEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
       }
     });
   }
@@ -625,5 +630,73 @@ class UnitExitEvent extends Event {
     unit!.exit();
     completeEvent();
     game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class UnitExpEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  int expGain;
+  bool levelUp = false;
+  UnitExpEvent(this.unit, this.expGain, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "UnitExpEvent: ${unit.name} gains $expGain");
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<EndCombatEvent>((event) {
+      for (Unit unit in [event.combat.attacker, event.combat.defender]){
+        if (unit.controller is HumanPlayer) {
+          int expGain = event.combat.expGain[unit]!;
+          UnitExpEvent expEvent = UnitExpEvent(unit, expGain);
+          queue.addEventBatchToHead([expEvent]);
+        }
+      }
+      
+    });
+  }
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("$name");
+    unit.exp += expGain;
+    if(unit.exp >= 100) {
+      levelUp = true;
+      unit.exp %= 100;
+      game.eventQueue.addEventBatchToHead([UnitLevelUpEvent(unit)]);
+      }
+    debugPrint("UnitExpEvent: ${unit.name} now has ${unit.exp} exp.");
+    game.eventQueue.dispatchEvent(this);
+    completeEvent();
+  }
+}
+
+class UnitLevelUpEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  UnitLevelUpEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "UnitLevelUpEvent: ${unit.name}");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("$name");
+    unit.level += 1;
+    debugPrint("UnitLevelUpEvent: ${unit.name} is now level ${unit.level}");
+    Random rng = Random();
+    for (String stat in unit.stats.keys){
+      int statUp = unit.growths[stat]! ~/ 100 + (rng.nextInt(100) < (unit.growths[stat]! % 100) ? 1 : 0);
+
+      debugPrint("Increase $stat by $statUp");
+      unit.stats[stat] = statUp;
+    }
+    game.eventQueue.dispatchEvent(this);
+    completeEvent();
   }
 }

@@ -4,13 +4,16 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 abstract class Player extends Component with HasGameReference<MoiraGame>{
+  Unit? _leader;
   bool takingTurn = false;
   String name;
   FactionType factionType;
   List<Unit> units = [];
   List<Unit> unitsToCommand = [];
   List<String> hostilities = [];
-  
+
+  Unit? get leader => _leader;
+  set leader(Unit? newLeader) {_leader = newLeader;}
 
   Player(this.name, this.factionType);
 
@@ -29,16 +32,18 @@ abstract class Player extends Component with HasGameReference<MoiraGame>{
 
   void startTurn() {
     unitsToCommand = game.stage.activeFaction!.units.toList();
+    List<Event> refreshEvents = [];
     for(Unit unit in unitsToCommand){
-      game.eventQueue.addEventBatch([UnitRefreshEvent(unit)]);
+      refreshEvents.add(UnitRefreshEvent(unit));
     }
+    game.eventQueue.addEventBatch(refreshEvents);
     game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   void endTurn(){
     takingTurn = false;
-    for(Unit unit in units){
-      unit.toggleCanAct(true);
-    }
+    // for(Unit unit in units){
+    //   unit.toggleCanAct(true);
+    // }
   }
 
   bool checkHostility(Unit unit){
@@ -71,6 +76,9 @@ class HumanPlayer extends Player {
   void startTurn() {
     super.startTurn();
     debugPrint("HumanPlayer: startTurn for $name");
+    if(leader != null){
+      game.eventQueue.addEventBatch([PanEvent(leader!.tilePosition)]);
+    }
   }
   
 }

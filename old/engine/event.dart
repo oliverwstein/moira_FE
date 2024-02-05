@@ -376,9 +376,9 @@ class MakeAttackEvent extends Event {
 
 }
 
-class MakeDamageEvent extends Event {
+class MakeCombatDamageEvent extends Event {
   final Unit unit;
-  MakeDamageEvent(this.unit);
+  MakeCombatDamageEvent(this.unit);
   
 }
 

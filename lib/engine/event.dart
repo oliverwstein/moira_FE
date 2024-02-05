@@ -45,6 +45,8 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
       return UnitOrderEvent.observers;
     case 'UnitActionEvent':
       return UnitActionEvent.observers;
+    case 'UnitExpEvent':
+      return UnitExpEvent.observers;
     case 'StartCombatEvent':
       return StartCombatEvent.observers;
     case 'CombatRoundEvent':
@@ -59,8 +61,8 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
       return MissEvent.observers;
     case 'CritEvent':
       return CritEvent.observers;
-    case 'DamageEvent':
-      return DamageEvent.observers;
+    case 'CombatDamageEvent':
+      return CombatDamageEvent.observers;
     case 'StartTurnEvent':
       return StartTurnEvent.observers;
     case 'TakeTurnEvent':
@@ -131,7 +133,7 @@ class DummyEvent extends Event {
 }
 
 class EventQueue extends Component with HasGameReference<MoiraGame>{
-  final Queue<List<Event>> eventBatches = Queue<List<Event>>();
+  Queue<List<Event>> eventBatches = Queue<List<Event>>();
   bool processing = false;
   final Map<Type, List<dynamic>> _classObservers = {};
 
