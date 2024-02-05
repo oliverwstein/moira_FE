@@ -63,9 +63,9 @@
         "lck": 20
     },
     "skills": [],
-    "items": ["Salve", "Sword"],
+    "items": ["Salve", "Sword", "Lance"],
     "attacks": [],
-    "proficiencies": ["Sword"]},
+    "proficiencies": ["Sword", "Lance"]},
     {
     "name": "Alec",
     "faction": "blue",

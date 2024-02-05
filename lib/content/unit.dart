@@ -166,7 +166,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   void setSpriteDirection(Direction? direction){
     if(unitClass.direction != direction) {
       unitClass.direction = direction;
-      if(main?.weapon != null) main?.weapon!.direction = direction;
+      if(main?.weapon != null && unitClass.name == "Knight") main?.weapon!.direction = direction;
     }
   }
   @override
@@ -209,7 +209,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     add(UnitCircle(this));
     children.register<UnitCircle>();
     add(unitClass);
-    if(main?.weapon != null) add(main!.weapon!);
+    if(main?.weapon != null && unitClass.name == "Knight") add(main!.weapon!);
     position = unit.tile.center;
     anchor = Anchor.center;
   
@@ -244,7 +244,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       switch (item.type) {
         case ItemType.main:
           main = item;
-          if(main?.weapon != null) {add(main!.weapon!);}
+          if(main?.weapon != null && unitClass.name == "Knight") {add(main!.weapon!);}
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
           }
@@ -269,7 +269,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     switch (type) {
       case ItemType.main:
         // debugPrint("$name unequipped ${main?.name} as $type");
-        if(main?.weapon != null) {remove(main!.weapon!);}
+        if(main?.weapon != null && unitClass.name == "Knight") {remove(main!.weapon!);}
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
@@ -329,9 +329,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
 
   void toggleCanAct(bool state) {
-    debugPrint("Toggle canAct to $state");
     _canAct = state;
-    debugPrint("_canAct == $_canAct");
     // Apply or remove the grayscale effect based on canAct
     // sprite.paint = canAct ? Paint() : grayscalePaint;
   }
