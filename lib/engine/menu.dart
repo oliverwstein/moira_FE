@@ -363,14 +363,52 @@ class CombatMenu extends Menu {
 class StaffMenu extends Menu {
   final Unit unit;
   late final List<Unit> targets;
+  late final List<Item> staves;
   int selectedTargetIndex = 0;
-  int selectedActIndex = 0;
+  int selectedStaffIndex = 0;
   StaffMenu(this.unit);
   @override 
   Future<void> onLoad() async {
     targets = unit.getStaffTargetsAt(unit.tilePosition);
+    staves = unit.getStaves();
     game.stage.cursor.snapToTile(targets.first.tilePosition);
-    debugPrint("Staff targets are: ${targets.indexed}");
+  }
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("StaffMenu given key ${key.logicalKey.keyLabel} to handle.");
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        // Use the selected staff on the target.
+        staves[selectedStaffIndex].staff!.execute(targets[selectedTargetIndex]);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        // Cancel
+        close();
+        game.stage.cursor.snapToTile(unit.tilePosition);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp: // Change target
+        selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
+        debugPrint("${targets[selectedTargetIndex].name} Selected");
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
+        debugPrint("Target is ${targets[selectedTargetIndex].name}");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowDown: // Change target
+        selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
+        debugPrint("${targets[selectedTargetIndex].name} Selected");
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
+        debugPrint("Target is ${targets[selectedTargetIndex].name}");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft: // Change attack
+        selectedStaffIndex = (selectedStaffIndex - 1) % staves.length;
+        debugPrint("Selected Staff is ${staves[selectedStaffIndex].name}");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowRight: // Change attack
+        selectedStaffIndex = (selectedStaffIndex + 1) % staves.length;
+        debugPrint("Selected Staff is ${staves[selectedStaffIndex].name}");
+        return KeyEventResult.handled;
+      default:
+        return KeyEventResult.ignored;
+    }
   }
 }
 

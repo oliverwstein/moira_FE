@@ -8,22 +8,28 @@ class Staff extends Component with HasGameReference<MoiraGame>{
   // Event? staffEvent;
   int range;
   Staff(this.range);
-  factory Staff.fromJson(dynamic staffData, Event event) {
-    switch (staffData.keys.first){
+  factory Staff.fromJson(dynamic staffData, String name) {
+    int staffRange = staffData["range"] ?? 1;
+    switch (staffData["effect"]){
       case "Heal":
-        int staffRange = staffData["range"] ?? 1;
         int baseHealing = staffData["base"] ?? 10;
         return Heal(staffRange, baseHealing);
       default:
-        int staffRange = staffData["range"] ?? 1;
         return Staff(staffRange);
     }
   }
-
+  void execute(Unit target){
+    debugPrint("Use staff on ${target.name}");
+  }
 }
 
 class Heal extends Staff {
   int baseHealing;
   Heal(super.range, this.baseHealing);
+  @override
+  execute(Unit target){
+    debugPrint("Execute Heal on ${target.name}");
+    // game.eventQueue.addEventBatch();
+  }
 }
 

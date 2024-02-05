@@ -245,6 +245,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         case ItemType.main:
           main = item;
           if(main?.weapon != null && unitClass.name == "Knight") {add(main!.weapon!);}
+          if(main?.staff != null) {add(main!.staff!);}
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
           }
@@ -362,21 +363,25 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     return targets;
   }
-  List<Staff> getStaffActs() {
-    List<Staff> acts = [];
+  List<Item> getStaves() {
+    List<Item> acts = [];
     for(Item item in inventory){
+      debugPrint("${item.name} has ${item.staff}");
       if(item.staff != null){
-        acts.add(item.staff!);
+        acts.add(item);
       }
     }
     return acts;
   }
   int getStaffRange() {
     int range = 1;
-    for(Staff staff in getStaffActs()){range = max(range, staff.range);}
+    List<Item> staves = getStaves();
+    if(staves.isEmpty) return 0;
+    for(Item staffItem in staves){range = max(range, staffItem.staff!.range);}
     return range;
   }
   List<Unit> getStaffTargetsAt(Point<int> tilePosition) {
+    
     List<Unit> targets = [];
     int staffRange = getStaffRange();
     for (int range = 1; range <= staffRange; range++) {
