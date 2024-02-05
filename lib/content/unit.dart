@@ -52,7 +52,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   int level;
   int hp = -1;
   int sta = -1;
-  int exp = 99;
+  int exp = 0;
   static Unit? getUnitByName(Stage stage, String unitName) {
     debugPrint("getUnitByName: unit $unitName");
     Unit? unit = stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
