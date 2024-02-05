@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -68,15 +69,7 @@ class CombatRoundEvent extends Event {
   CombatRoundEvent(this.combat, {Trigger? trigger, String? name}) 
     : super(trigger: trigger, name: name ?? "CombatRound_${combat.attacker.name}_${combat.defender.name}");
 
-  static void initialize(EventQueue queue) {
-    queue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
-      if (endCombatEvent.combat.duel && endCombatEvent.combat.attacker.hp > 0 && endCombatEvent.combat.defender.hp > 0) {
-        CombatRoundEvent newCombatRoundEvent = CombatRoundEvent(endCombatEvent.combat);
-        debugPrint("Add duel round: ${endCombatEvent.combat.attacker.name} against ${endCombatEvent.combat.defender.name}");
-        queue.addEventBatch([newCombatRoundEvent]);
-      }
-    });
-  }
+  static void initialize(EventQueue queue) {}
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -91,15 +84,23 @@ class CombatRoundEvent extends Event {
     game.combatQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
     combat.addFollowUp();
     completeEvent();
-    game.combatQueue.addEventBatch([EndCombatEvent(combat)]);
     game.combatQueue.dispatchEvent(this);
+    if (combat.attacker.hp == 0 || combat.defender.hp == 0 || !combat.duel) {
+      debugPrint("${game.combatQueue.eventBatches.indexed}");
+      game.combatQueue.eventBatches = Queue<List<Event>>();
+      game.combatQueue.addEventBatch([EndCombatEvent(combat)]);
+      return;
+    } else {
+      debugPrint("Add duel round: ${combat.attacker.name} against ${combat.defender.name}");
+      game.combatQueue.addEventBatch([CombatRoundEvent(combat)]);
+    }
   }
 }
 
 class EndCombatEvent extends Event {
   static List<Event> observers = [];
   final Combat combat;
-  EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "EndCombat_${combat.attacker.name}_${combat.defender.name}");
+  EndCombatEvent(this.combat, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "EndCombatEvent_${combat.attacker.name}_${combat.defender.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -109,14 +110,10 @@ class EndCombatEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("EndCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
+    debugPrint("$name");
     completeEvent();
-    if(combat.duel) {
-      game.combatQueue.dispatchEvent(this);
-    } 
-    else {
-      combat.removeFromParent();
-      game.eventQueue.dispatchEvent(this);}
+    game.combatQueue.dispatchEvent(this);
+    combat.removeFromParent();
     
   }
 }
@@ -136,8 +133,8 @@ class AttackEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    if (combat.attacker.dead || combat.defender.dead) {
-      debugPrint("Combat ended due to death.");
+    if (combat.attacker.hp == 0 || combat.defender.hp == 0) {
+      debugPrint("Combat ended due to fatal damage.");
       completeEvent();
       return;
     }
@@ -178,7 +175,7 @@ class HitEvent extends Event {
     super.execute();
     debugPrint("HitEvent: ${unit.name} hits ${target.name}");
     combat.damage = vals.damage;
-    game.combatQueue.addEventBatchToHead([DamageEvent(combat, target)]);
+    game.combatQueue.addEventBatchToHead([CombatDamageEvent(combat, unit, target)]);
     game.combatQueue.dispatchEvent(this);
     completeEvent();
   }
@@ -241,11 +238,12 @@ class CritEvent extends Event {
   }
 }
 
-class DamageEvent extends Event {
+class CombatDamageEvent extends Event {
   static List<Event> observers = [];
   final Combat combat;
   final Unit unit;
-  DamageEvent(this.combat, this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Damage_${unit.name}");
+  final Unit target;
+  CombatDamageEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Damage_${unit.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -255,9 +253,33 @@ class DamageEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    debugPrint("DamageEvent: ${unit.name} takes ${combat.damage} damage.");
-    unit.hp = (unit.hp - combat.damage).clamp(0, unit.getStat("hp"));
-    debugPrint("DamageEvent: ${unit.name} now has ${unit.hp} hp.");
+    debugPrint("CombatDamageEvent: ${target.name} takes ${combat.damage} damage.");
+    target.hp = (target.hp - combat.damage).clamp(0, target.getStat("hp"));
+    debugPrint("CombatDamageEvent: ${target.name} now has ${target.hp} hp.");
+    game.combatQueue.dispatchEvent(this);
+    completeEvent();
+  }
+}
+
+class CombatExpEvent extends Event {
+  static List<Event> observers = [];
+  final Combat combat;
+  final Unit unit;
+  final Unit target;
+  CombatExpEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Damage_${unit.name}");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+
+    debugPrint("CombatExpEvent: ${unit.name} gains ${combat}.");
+    unit.exp = (unit.hp - combat.damage).clamp(0, unit.getStat("hp"));
+    debugPrint("CombatExpEvent: ${unit.name} now has ${unit.exp} exp.");
     game.combatQueue.dispatchEvent(this);
     completeEvent();
   }

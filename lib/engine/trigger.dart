@@ -68,11 +68,11 @@ class Trigger extends Component {
   });
 
   Trigger.death(Unit unit) : check = ((Event event) {
-    if (event is DamageEvent && unit.hp <= 0) {
+    if (event is CombatDamageEvent && unit.hp <= 0) {
       return true;
     }
     return false;
   }) {
-    DamageEvent.observers.add(UnitDeathEvent(unit, trigger: this));
+    CombatDamageEvent.observers.add(UnitDeathEvent(unit, trigger: this));
   }
 }

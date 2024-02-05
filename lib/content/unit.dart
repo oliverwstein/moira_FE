@@ -577,11 +577,16 @@ class UnitDeathEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   static void initialize(EventQueue queue) {
-    queue.registerClassObserver<DamageEvent>((damageEvent) {
-      if (damageEvent.unit.hp <= 0) {
+    queue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
+      if (endCombatEvent.combat.attacker.hp == 0) {
         // Trigger UnitDeathEvent
-        var unitDeathEvent = UnitDeathEvent(damageEvent.unit);
-        damageEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
+        var unitDeathEvent = UnitDeathEvent(endCombatEvent.combat.attacker);
+        endCombatEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
+      }
+      if (endCombatEvent.combat.defender.hp == 0) {
+        // Trigger UnitDeathEvent
+        var unitDeathEvent = UnitDeathEvent(endCombatEvent.combat.defender);
+        endCombatEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
       }
     });
   }
