@@ -86,8 +86,6 @@ class CombatRoundEvent extends Event {
     completeEvent();
     game.combatQueue.dispatchEvent(this);
     if (combat.attacker.hp == 0 || combat.defender.hp == 0 || !combat.duel) {
-      debugPrint("${game.combatQueue.eventBatches.indexed}");
-      game.combatQueue.eventBatches = Queue<List<Event>>();
       game.combatQueue.addEventBatch([EndCombatEvent(combat)]);
       return;
     } else {
