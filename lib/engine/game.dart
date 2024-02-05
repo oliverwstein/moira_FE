@@ -107,6 +107,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     
     UnitDeathEvent.initialize(eventQueue);
     UnitDeathEvent.initialize(combatQueue);
+    UnitExpEvent.initialize(eventQueue);
     CombatRoundEvent.initialize(combatQueue);
     CritEvent.initialize(combatQueue);
     CantoEvent.initialize(eventQueue);

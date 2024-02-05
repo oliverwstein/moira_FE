@@ -113,7 +113,7 @@ class EndCombatEvent extends Event {
     super.execute();
     debugPrint("$name");
     completeEvent();
-    game.combatQueue.dispatchEvent(this);
+    game.eventQueue.dispatchEvent(this);
     combat.removeFromParent();
     
   }
@@ -259,40 +259,6 @@ class CombatDamageEvent extends Event {
     if(target.hp == 0) {combat.expGain[unit] = (30 + (target.level - unit.level)*2).clamp(2, 100);}
     else {combat.expGain[unit] = (10 + target.level - unit.level).clamp(1, 100);}
     debugPrint("CombatDamageEvent: ${target.name} now has ${target.hp} hp.");
-    game.combatQueue.dispatchEvent(this);
-    completeEvent();
-  }
-}
-
-class CombatExpEvent extends Event {
-  static List<Event> observers = [];
-  final Unit unit;
-  int expGain;
-  CombatExpEvent(this.unit, this.expGain, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "CombatExpEvent: ${unit.name} gains $expGain");
-  static void initialize(EventQueue queue) {
-    queue.registerClassObserver<EndCombatEvent>((event) {
-      for (Unit unit in [event.combat.attacker, event.combat.defender]){
-        if (unit.controller is HumanPlayer) {
-          int expGain = event.combat.expGain[unit]!;
-          CombatExpEvent expEvent = CombatExpEvent(unit, expGain);
-          queue.addEventBatch([expEvent]);
-        }
-      }
-      
-    });
-  }
-  @override
-  List<Event> getObservers() {
-    observers.removeWhere((event) => (event.checkTriggered()));
-    return observers;
-  }
-
-  @override
-  Future<void> execute() async {
-    super.execute();
-    debugPrint("$name");
-    unit.exp += expGain;
-    debugPrint("CombatExpEvent: ${unit.name} now has ${unit.exp} exp.");
     game.combatQueue.dispatchEvent(this);
     completeEvent();
   }

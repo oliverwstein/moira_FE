@@ -633,3 +633,37 @@ class UnitExitEvent extends Event {
     game.eventQueue.dispatchEvent(this);
   }
 }
+
+class UnitExpEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  int expGain;
+  UnitExpEvent(this.unit, this.expGain, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "UnitExpEvent: ${unit.name} gains $expGain");
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<EndCombatEvent>((event) {
+      for (Unit unit in [event.combat.attacker, event.combat.defender]){
+        if (unit.controller is HumanPlayer) {
+          int expGain = event.combat.expGain[unit]!;
+          UnitExpEvent expEvent = UnitExpEvent(unit, expGain);
+          queue.addEventBatchToHead([expEvent]);
+        }
+      }
+      
+    });
+  }
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("$name");
+    unit.exp += expGain;
+    debugPrint("UnitExpEvent: ${unit.name} now has ${unit.exp} exp.");
+    game.eventQueue.dispatchEvent(this);
+    completeEvent();
+  }
+}
