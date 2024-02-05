@@ -8,6 +8,7 @@ abstract class Player extends Component with HasGameReference<MoiraGame>{
   String name;
   FactionType factionType;
   List<Unit> units = [];
+  List<Unit> unitsToCommand = [];
   List<String> hostilities = [];
   
 
@@ -27,6 +28,10 @@ abstract class Player extends Component with HasGameReference<MoiraGame>{
   }
 
   void startTurn() {
+    unitsToCommand = game.stage.activeFaction!.units.toList();
+    for(Unit unit in unitsToCommand){
+      game.eventQueue.addEventBatch([UnitRefreshEvent(unit)]);
+    }
     game.eventQueue.addEventBatch([TakeTurnEvent(name)]);
   }
   void endTurn(){
@@ -61,11 +66,16 @@ class HumanPlayer extends Player {
   void takeTurn(){
     super.takeTurn();
   }
+
+  @override
+  void startTurn() {
+    super.startTurn();
+    debugPrint("HumanPlayer: startTurn for $name");
+  }
   
 }
 
 class AIPlayer extends Player {
-  List<Unit> unitsToCommand = [];
   AIPlayer(String name, FactionType factionType) : super(name, factionType);
   @override
   void update(dt){
@@ -85,7 +95,6 @@ class AIPlayer extends Player {
   void startTurn() {
     super.startTurn();
     debugPrint("AIPlayer: startTurn for $name");
-    unitsToCommand = game.stage.activeFaction!.units.toList();
   }
   @override
   void endTurn() {
@@ -109,7 +118,7 @@ class StartTurnEvent extends Event{
     super.execute();
     debugPrint("StartTurnEvent: Start turn $turn for $factionName");
     game.stage.activeFaction = game.stage.factionMap[factionName];
-    await Future.delayed(const Duration(milliseconds: 1000));
+    // await Future.delayed(const Duration(milliseconds: 1000));
     game.stage.activeFaction!.startTurn();
     completeEvent();
     game.eventQueue.dispatchEvent(this);
@@ -216,7 +225,6 @@ class Order extends Component {
     }
   }
   void command(Unit unit) {
-    unit.remainingMovement = unit.movementRange.toDouble(); // This should be moved to the refresher event at the start of turn eventually.
     var rankedTiles = unit.rankOpenTiles(["Move", "Combat"]);
     if(rankedTiles.firstOrNull != null){
       Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
@@ -237,7 +245,6 @@ class RansackOrder extends Order {
     Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
       unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
     debugPrint("${unit.name} ordered to Ransack");
-    unit.remainingMovement = unit.movementRange.toDouble();
     var tile = unit.tile;
     if(tile is TownCenter && tile.open) {
       unit.game.eventQueue.addEventBatch([RansackEvent(unit, tile)]);

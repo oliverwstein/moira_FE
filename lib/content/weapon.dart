@@ -1,6 +1,10 @@
 // ignore_for_file: constant_identifier_names
 
+import 'dart:ui';
+
 import 'package:flame/components.dart';
+import 'package:flame/sprite.dart';
+import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 
 enum WeaponType {Sword, Axe, Lance, Knife, Staff, Book, Bow}
@@ -22,7 +26,7 @@ Set<WeaponType> getWeaponTypesFromNames(List<String> weaponTypeNames) {
                         .whereType<WeaponType>()
                         .toSet();
 }
-class Weapon extends Component with HasGameReference<MoiraGame>{
+class Weapon extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   late WeaponType weaponType; // The type of the weapon. 
   late int might; // The base power of the weapon. 
   late int hit; // The base accuracy of the weapon. 
@@ -31,8 +35,8 @@ class Weapon extends Component with HasGameReference<MoiraGame>{
   bool magic = false; // Whether the weapon does magical or physical damage.
   late List<CombatEffect>? effects; // The special effects of the weapon. 
   late Attack? specialAttack; // The special attack that can be performed with the weapon, if any. 
-  
-  // Internal constructor for creating instances
+  late SpriteSheet spriteSheet;
+  late Vector2 spriteSize;
   Weapon._internal(this.weaponType, this.might, this.hit, this.crit, this.fatigue, this.effects, this.specialAttack);
 
   // Factory constructor
@@ -67,5 +71,40 @@ class Weapon extends Component with HasGameReference<MoiraGame>{
 
     // Return a new Weapon instance
     return Weapon._internal(weaponType, might, hit, crit, fatigue, null, specialAttack);
+  }
+  set direction(Direction? newDirection) {
+    int row;
+    double currentStepTime = .15;
+    switch (newDirection) {
+      case Direction.down:
+        row = 0;
+        break;
+      case Direction.up:
+        row = 1;
+        break;
+      case Direction.right:
+        row = 2;
+        break;
+      case Direction.left:
+        row = 3;
+        break;
+      default:
+        row = 4;
+        currentStepTime *= 2;
+    }
+    animation = spriteSheet.createAnimation(row: row, stepTime: currentStepTime);
+    size = spriteSize; anchor = Anchor.center;
+  }
+  @override
+  Future<void> onLoad() async {
+    debugPrint(weaponType.name.toLowerCase());
+    Image spriteSheetImage = await game.images.load('${weaponType.name.toLowerCase()}_spritesheet.png');
+    spriteSheet = SpriteSheet.fromColumnsAndRows(
+      image: spriteSheetImage,
+      columns: 4,
+      rows: 5,
+    );
+    spriteSize = Vector2(spriteSheetImage.width/4, spriteSheetImage.height/5);
+    size = spriteSize; anchor = Anchor.center;
   }
 }

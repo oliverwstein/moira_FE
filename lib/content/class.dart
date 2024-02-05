@@ -1,6 +1,13 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'dart:ui';
+
 import 'package:flame/components.dart';
+import 'package:flame/rendering.dart';
+import 'package:flame/sprite.dart';
+import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
-class Class extends Component with HasGameReference<MoiraGame>{
+class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   final String name;
   final String description;
   final int movementRange;
@@ -10,9 +17,12 @@ class Class extends Component with HasGameReference<MoiraGame>{
   final List<String> orders;
   final Map<String, int> baseStats;
   final Map<String, int> growths;
-
+  late SpriteSheet spriteSheet;
+  late Vector2 spriteSize;
+  String factionType;
+  Direction? _currentDirection;
   // Factory constructor
-  factory Class.fromJson(String name) {
+  factory Class.fromJson(String name, String factionType) {
     Map<String, dynamic> classData;
 
     // Check if the class exists in the map and retrieve its data
@@ -29,8 +39,128 @@ class Class extends Component with HasGameReference<MoiraGame>{
     Map<String, int> growths = Map<String, int>.from(classData['growths']);
     
     // Return a new Weapon instance
-    return Class._internal(name, description, movementRange, skills, attacks, proficiencies, orders, baseStats, growths);
+    return Class._internal(name, factionType, description, movementRange, skills, attacks, proficiencies, orders, baseStats, growths);
   }
   // Internal constructor for creating instances
-  Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
+  Class._internal(this.name, this.factionType, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
+  Direction? get direction => _currentDirection;
+  set direction(Direction? newDirection) {
+    _currentDirection = newDirection;
+    int row;
+    double currentStepTime = .1;
+    switch (newDirection) {
+      case Direction.down:
+        row = 0;
+        break;
+      case Direction.up:
+        row = 1;
+        break;
+      case Direction.right:
+        row = 2;
+        break;
+      case Direction.left:
+        row = 3;
+        break;
+      default:
+        row = 4;
+        currentStepTime *= 2;
+    }
+    animation = spriteSheet.createAnimation(row: row, stepTime: currentStepTime);
+    size = spriteSize; anchor = Anchor.center;
+  }
+  @override
+Future<void> onLoad() async {
+  debugPrint(name.toLowerCase());
+
+  // Load the original sprite sheet image
+  Image spriteSheetImage = await game.images.load('class_sprites/${name.toLowerCase()}_spritesheet.png');
+
+  // Apply color transformation based on the faction
+  debugPrint("factionType $factionType, ${FactionOrder.fromName(factionType)}");
+  Image recoloredSpriteImage = await applyFactionColorShift(spriteSheetImage, FactionOrder.fromName(factionType)!);
+
+  // Create the SpriteSheet from the recolored image
+  spriteSheet = SpriteSheet.fromColumnsAndRows(
+    image: recoloredSpriteImage,
+    columns: 4,
+    rows: 5,
+  );
+
+  // Set the sprite size and component size based on the original image dimensions
+  spriteSize = Vector2(spriteSheetImage.width / 4, spriteSheetImage.height / 5);
+  size = spriteSize;
+  anchor = Anchor.center;
 }
+}
+
+Map<int, int> grays = {
+  0xFF292929: 0, // Placeholder for dynamic replacement
+  0xFF494949: 0,
+  0xFF7A7A7A: 0,
+  0xFF8D8D8D: 0,
+  0xFFCECECE: 0,
+};
+
+Map<Color, Map<FactionType, Color>> colorTransformations = {
+  Color(0xFF292929): {
+    FactionType.red: Color(0xFF290808),
+    FactionType.green: Color(0xFF0A2908),
+    FactionType.blue: Color(0xFF040029),
+  },
+  Color(0xFF494949): {
+    FactionType.red: Color.fromARGB(255, 91, 26, 26),
+    FactionType.green: Color.fromARGB(255, 48, 145, 48),
+    FactionType.blue: Color.fromARGB(255, 54, 52, 125),
+  },
+  Color(0xFF7A7A7A): {
+    FactionType.red: Color(0xFF7A1818),
+    FactionType.green: Color(0xFF187A18),
+    FactionType.blue: Color(0xFF233876),
+  },
+  Color(0xFF8D8D8D): {
+    FactionType.red: Color(0xFF8D3838),
+    FactionType.green: Color(0xFF388D38),
+    FactionType.blue: Color(0xFF366087),
+  },
+  Color(0xFFCECECE): {
+    FactionType.red: Color(0xFFCE7C7C),
+    FactionType.green: Color(0xFF7CCE7C),
+    FactionType.blue: Color(0xFF9097CE),
+  },
+};
+
+Future<Image> applyFactionColorShift(Image image, FactionType faction) async {
+  final ByteData? byteData = await image.toByteData(format: ImageByteFormat.rawUnmodified);
+  final buffer = byteData!.buffer.asUint8List();
+
+  for (int i = 0; i < buffer.length; i += 4) {
+    // Convert RGBA to a color value
+    int currentColorValue = (buffer[i+3] << 24) | (buffer[i] << 16) | (buffer[i+1] << 8) | buffer[i+2];
+    Color currentColor = Color(currentColorValue);
+
+    // Check if this color is one of the grays to be replaced
+    if (colorTransformations.containsKey(currentColor)) {
+      Color? newColor = colorTransformations[currentColor]?[faction];
+      if (newColor != null) {
+        buffer[i] = newColor.red;
+        buffer[i + 1] = newColor.green;
+        buffer[i + 2] = newColor.blue;
+        // Alpha remains unchanged
+      }
+    }
+  }
+
+  // Recreate the image from the modified buffer
+  final ImmutableBuffer immutableBuffer = await ImmutableBuffer.fromUint8List(buffer);
+  final ImageDescriptor imageDescriptor = ImageDescriptor.raw(
+    immutableBuffer,
+    width: image.width,
+    height: image.height,
+    pixelFormat: PixelFormat.rgba8888,
+  );
+
+  final Codec codec = await imageDescriptor.instantiateCodec();
+  final FrameInfo frameInfo = await codec.getNextFrame();
+  return frameInfo.image;
+}
+

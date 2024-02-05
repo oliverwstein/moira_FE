@@ -358,7 +358,7 @@ class VisitEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   final TownCenter town;
-  VisitEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  VisitEvent(this.unit, this.town, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "VisitEvent: Town @${town.point} ${unit.name}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -412,14 +412,14 @@ class BesiegeEvent extends Event {
     Unit unit = gate.unit!;
     assert(gate.factionName != unit.controller.name);
     if(!gate.fort.isOccupied){
-      unit.game.eventQueue.addEventBatch([SeizeEvent(unit, gate)]);
+      game.eventQueue.addEventBatch([SeizeEvent(unit, gate)]);
     } else {
       debugPrint("BesiegeEvent: ${unit.name} besieges castle ${gate.name}.");
       // This is for the AI; Player units besieging a fort do so via menus, 
       // though the event should still be involved.
       // Note: besieging lets the unit use any attack in their attackSet.
       unit.getBestAttackOnTarget(gate.fort.unit!, unit.attackSet.values.toList());
-      unit.game.eventQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!, duel: duel)]);
+      game.eventQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!, duel: duel)]);
     }
     completeEvent();
     game.eventQueue.dispatchEvent(this);

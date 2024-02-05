@@ -107,23 +107,6 @@ Gandolf: I'll show you how it's done.
 <<stop>>
 ===
 
-title: Gandolf_Midir_Fight
----
-<<local $left = "Gandolf" as String>>
-<<local $right = "Midir" as String>>
-Gandolf: You held out pretty well for being on your own, but it's over. Prepare to die!
-Midir: So it goes. Lady Aideen...
-<<stop>>
-===
-
-title: Midir_Death_Quote
----
-<<local $left = "" as String>>
-<<local $right = "Midir" as String>>
-Midir: Forgive me, my lady.
-<<stop>>
-===
-
 title: Fall_Of_Jungby
 ---
 <<local $left = "Aideen" as String>>
@@ -180,5 +163,32 @@ title: DiMaggio_Orders_Looting
 <<local $left = "" as String>>
 <<local $right = "DiMaggio" as String>>
 DiMaggio: Alright you idiots, it's time to take Chalphy! And I expect my cut of the loot from those villages!
+<<stop>>
+===
+
+title: Village_Point(48, 7)
+---
+<<local $left = "Gandolf" as String>>
+<<local $right = "Midir" as String>>
+Gandolf: You held out pretty well for being on your own, but it's over. Prepare to die!
+Midir: So it goes. Lady Aideen...
+<<stop>>
+===
+
+
+title: Gandolf_Midir_Combat_Quote
+---
+<<local $left = "Gandolf" as String>>
+<<local $right = "Midir" as String>>
+Gandolf: You held out pretty well for being on your own, but it's over. Prepare to die!
+Midir: So it goes. Lady Aideen...
+<<stop>>
+===
+
+title: Midir_Death_Quote
+---
+<<local $left = "" as String>>
+<<local $right = "Midir" as String>>
+Midir: Forgive me, my lady.
 <<stop>>
 ===

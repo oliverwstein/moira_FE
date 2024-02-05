@@ -60,6 +60,7 @@ class CantoEvent extends Event {
       debugPrint("Canto Check");
       if (unitExhaustEvent.unit.hasSkill(Skill.canto) && unitExhaustEvent.unit.remainingMovement >= .7 && unitExhaustEvent.manual == false) {
         debugPrint("Canto Check Succeeds");
+        unitExhaustEvent.unit.toggleCanAct(true);
         CantoEvent cantoEvent = CantoEvent(unitExhaustEvent.unit);
         EventQueue eventQueue = unitExhaustEvent.game.eventQueue;
         eventQueue.addEventBatchToHead([cantoEvent]);
@@ -80,14 +81,17 @@ class CantoEvent extends Event {
     game.stage.blankAllTiles();
     debugPrint("Canto: unit's remaining movement is: ${unit.remainingMovement}");
     if (unit.controller.takingTurn && game.stage.activeFaction is! AIPlayer){
-      unit.findReachableTiles(unit.remainingMovement);
-      game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
+      if(unit.findReachableTiles(unit.remainingMovement).length > 1){
+        game.stage.menuManager.pushMenu(CantoMenu(unit, game.stage.tileMap[unit.tilePosition]!));
+      } else {game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);}
+      
     } else if (unit.controller.takingTurn && game.stage.activeFaction is AIPlayer){
       var rankedTiles = unit.rankOpenTiles(["Move"]);
-      if (rankedTiles.isNotEmpty) {
+      if (rankedTiles.length > 1) {
         var bestTileEvent = rankedTiles.first;
         game.eventQueue.addEventBatchToHead(bestTileEvent.events);
-      }
+      } 
+      game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);
     }
     
 

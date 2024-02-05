@@ -18,19 +18,18 @@ final grayscalePaint = Paint()
 class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior {
   final Completer<void> _loadCompleter = Completer<void>();
   final String name;
-  final String className;
   int movementRange;
   double remainingMovement = - 1;
   String faction;
   Point<int> tilePosition;
+  
   Tile get tile => game.stage.tileMap[tilePosition]!;
   Player get controller => game.stage.factionMap[faction]!;
+  Class unitClass;
   Queue<Movement> movementQueue = Queue<Movement>();
-  final Map<String, SpriteAnimationComponent> animationMap = {};
-  late SpriteAnimationComponent sprite;
-  late final SpriteSheet unitSheet;
   late final Map<String, dynamic> unitData;
   bool isMoving = false;
+  Direction? direction;
   bool _canAct = true;
   bool dead = false;
   bool get canAct => _canAct;
@@ -69,19 +68,19 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
     String className = unitData['class'];
     int givenLevel = level ?? unitData['level'] ?? 1;
-    Class classData = Class.fromJson(className);
+    Class unitClass = Class.fromJson(className, unitData["faction"]);
 
-    int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : classData.movementRange;
-    unitData['skills'].addAll(classData.skills);
-    unitData['attacks'].addAll(classData.attacks);
-    unitData['proficiencies'].addAll(classData.proficiencies);
+    int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : unitClass.movementRange;
+    unitData['skills'].addAll(unitClass.skills);
+    unitData['attacks'].addAll(unitClass.attacks);
+    unitData['proficiencies'].addAll(unitClass.proficiencies);
     String faction = factionName;
     // Add weapon proficiencies
     Set<WeaponType> proficiencies = getWeaponTypesFromNames(unitData["proficiencies"].cast<String>());
     Set<Skill> skillSet = getSkillsFromNames(unitData["skills"].cast<String>());
 
     orderStrings = orderStrings ?? [];
-    orderStrings.addAll(classData.orders);
+    orderStrings.addAll(unitClass.orders);
     Queue<Order> orders = Queue<Order>();
     for (String orderString in orderStrings){
       orders.add(Order.create(orderString));
@@ -100,32 +99,32 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       attackMap[attackName] = Attack.fromJson(attackName);
     }
 
-    Map<String, int> stats = Map<String, int>.from(classData.baseStats);
-    Map<String, int> growths = Map<String, int>.from(classData.growths);
-    for (String stat in classData.growths.keys){
+    Map<String, int> stats = Map<String, int>.from(unitClass.baseStats);
+    Map<String, int> growths = Map<String, int>.from(unitClass.growths);
+    for (String stat in unitClass.growths.keys){
       if (unitData['growths']?.keys.contains(stat)){
         growths[stat] = unitData['growths'][stat];
       }
     }
     var rng = Random();
-    for (String stat in classData.baseStats.keys){
+    for (String stat in unitClass.baseStats.keys){
       if (unitData['baseStats'].keys.contains(stat)){
         stats[stat] = unitData['baseStats'][stat];
       } else {
         int levelUps = Iterable.generate(givenLevel - 1, (_) => rng.nextInt(100) < growths[stat]! ? 1 : 0)
                         .fold(0, (acc, curr) => acc + curr); // Autoleveler
-        stats[stat] = classData.baseStats[stat]! + levelUps;
+        stats[stat] = unitClass.baseStats[stat]! + levelUps;
 
       }
       
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, className, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats);
+    return Unit._internal(unitData, tilePosition, name, unitClass, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.className, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.unitClass, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
     _postConstruction();
   }
 
@@ -164,14 +163,21 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     unit.toggleCanAct(false);
     game.stage.blankAllTiles();
   }
+  void setSpriteDirection(Direction? direction){
+    if(unitClass.direction != direction) {
+      unitClass.direction = direction;
+      if(main?.weapon != null && unitClass.name == "Knight") main?.weapon!.direction = direction;
+    }
+  }
   @override
   void update(double dt) {
     super.update(dt);
+    // unit.toggleCanAct(true);
     if (movementQueue.isNotEmpty) {
       isMoving = true;
       Movement currentMovement = movementQueue.first;
-      SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
-      sprite.animation = newAnimation;
+      direction = currentMovement.direction;
+      setSpriteDirection(direction);
       Point<int> movement = getMovement(currentMovement);
       Point<int> targetTilePosition = tilePosition + movement;
       double distance = position.distanceTo(game.stage.tileMap[targetTilePosition]!.center);
@@ -185,59 +191,25 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
         if (movementQueue.isNotEmpty) {
           Movement currentMovement = movementQueue.first;
-          SpriteAnimation newAnimation = animationMap[currentMovement.directionString]!.animation!;
-          sprite.animation = newAnimation;
+          direction = currentMovement.direction;
+          setSpriteDirection(direction);
         } else {//The movement is over.
-          SpriteAnimation newAnimation = animationMap["idle"]!.animation!;
-          sprite.animation = newAnimation;
+          setSpriteDirection(null);
         }
       } else {
         position.moveToTarget(game.stage.tileMap[targetTilePosition]!.center, moveStep);
       }
     } 
     unit.tile.setUnit(this);
-    if(game.stage.freeCursor){sprite.paint = canAct ? Paint() : grayscalePaint;}
+    // if(game.stage.freeCursor){sprite.paint = canAct ? Paint() : grayscalePaint;}
   }
 
   @override
   Future<void> onLoad() async {
-    // Load the unit image and create the animation component
-    ui.Image unitImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
-    unitSheet = SpriteSheet.fromColumnsAndRows(
-      image: unitImage,
-      columns: 4,
-      rows: 5,
-    );
-    Vector2 spriteSize = Vector2(unitImage.width/4, unitImage.height/5);
-    double stepTime = .15;
-    animationMap['down'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 0, stepTime: stepTime),
-                            size: spriteSize,
-                            anchor: Anchor.center);
-    animationMap['up'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 1, stepTime: stepTime),
-                            size: spriteSize,
-                            anchor: Anchor.center);
-    animationMap['right'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 2, stepTime: stepTime),
-                            size: spriteSize,
-                            anchor: Anchor.center);
-    animationMap['left'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 3, stepTime: stepTime),
-                            size: spriteSize,
-                            anchor: Anchor.center);
-    animationMap['idle'] = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 4, stepTime: stepTime*2),
-                            size: spriteSize,
-                            anchor: Anchor.center);
-    sprite = SpriteAnimationComponent(
-                            animation: unitSheet.createAnimation(row: 4, stepTime: stepTime*2),
-                            size: spriteSize,
-                            anchor: Anchor.center);
     add(UnitCircle(this));
-    add(sprite);
-    sprite.priority = 5;
     children.register<UnitCircle>();
+    add(unitClass);
+    if(main?.weapon != null && unitClass.name == "Knight") add(main!.weapon!);
     position = unit.tile.center;
     anchor = Anchor.center;
   
@@ -250,8 +222,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       debugPrint("factionMap has keys ${game.stage.factionMap.keys}.");
     }
     unit.tile.setUnit(this);
-    debugPrint("Unit $name loaded.");
     _loadCompleter.complete();
+  }
+  @override
+  void render(Canvas canvas){
+    super.render(canvas);
   }
 
   Future<void> get loadCompleted => _loadCompleter.future;
@@ -269,6 +244,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       switch (item.type) {
         case ItemType.main:
           main = item;
+          if(main?.weapon != null && unitClass.name == "Knight") {add(main!.weapon!);}
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
           }
@@ -293,6 +269,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     switch (type) {
       case ItemType.main:
         // debugPrint("$name unequipped ${main?.name} as $type");
+        if(main?.weapon != null && unitClass.name == "Knight") {remove(main!.weapon!);}
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
         }
@@ -353,7 +330,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void toggleCanAct(bool state) {
     _canAct = state;
-    // // Apply or remove the grayscale effect based on canAct
+    // Apply or remove the grayscale effect based on canAct
     // sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
@@ -480,7 +457,7 @@ class UnitCreationEvent extends Event{
   late final Unit unit;
   
 
-  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.orders, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitCreationEvent(this.unitName, this.tilePosition, this.factionName, {this.level, this.items, this.orders, this.destination, Trigger? trigger, String? name}) : super(trigger: trigger, name: "UnitCreationEvent: $unitName");
   
   @override
   List<Event> getObservers() {
@@ -491,7 +468,6 @@ class UnitCreationEvent extends Event{
   @override
   void execute() {
     super.execute();
-    debugPrint("UnitCreationEvent: unit $name");
     unit = Unit.fromJSON(tilePosition, unitName, factionName, level: level, itemStrings: items, orderStrings: orders);
     game.stage.add(unit);
     if (destination != null) {
@@ -537,7 +513,6 @@ class UnitMoveEvent extends Event {
     super.execute();
     unit ??= Unit.getUnitByName(game.stage, unitName);
     assert(unit != null);
-    debugPrint("$name");
     unit!.speed = speed;
     unit!.moveTo(destination);
     
@@ -557,11 +532,31 @@ class UnitMoveEvent extends Event {
   } 
 }
 
+class UnitRefreshEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  UnitRefreshEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "UnitRefreshEvent: ${unit.name}");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+    unit.toggleCanAct(true);
+    unit.remainingMovement = unit.movementRange.toDouble();
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+   
+  }
+}
+
 class UnitExhaustEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   bool manual;
-  UnitExhaustEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  UnitExhaustEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: "UnitExhaustEvent: $name");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
@@ -580,13 +575,12 @@ class UnitExhaustEvent extends Event {
 class UnitDeathEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
-  static void initialize(EventQueue eventQueue) {
-    eventQueue.registerClassObserver<DamageEvent>((damageEvent) {
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<DamageEvent>((damageEvent) {
       if (damageEvent.unit.hp <= 0) {
         // Trigger UnitDeathEvent
         var unitDeathEvent = UnitDeathEvent(damageEvent.unit);
-        EventQueue eventQueue = damageEvent.game.eventQueue;
-        eventQueue.addEventBatchToHead([unitDeathEvent]);
+        damageEvent.game.eventQueue.addEventBatchToHead([unitDeathEvent]);
       }
     });
   }
@@ -629,7 +623,6 @@ class UnitExitEvent extends Event {
     unit ??= Unit.getUnitByName(game.stage, unitName);
     assert(unit != null);
     unit!.exit();
-    debugPrint("$name");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

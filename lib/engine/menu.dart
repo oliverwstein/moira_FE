@@ -70,8 +70,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
 
 abstract class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
-  void close() {
-    game.stage.menuManager.popMenu();}
+  void close() {game.stage.menuManager.popMenu();}
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     switch (key.logicalKey) {
@@ -100,8 +99,7 @@ class MoveMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(unit.direction);
   }
 
   @override
@@ -113,8 +111,7 @@ class MoveMenu extends Menu {
   @override
   void onRemove() {
     super.onRemove();
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(null);
   }
 
   @override
@@ -164,14 +161,12 @@ class CantoMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["left"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(unit.direction);
   }
   @override
   void onRemove() {
     super.onRemove();
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    unit.setSpriteDirection(null);
   }
 
   @override
@@ -183,6 +178,7 @@ class CantoMenu extends Menu {
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
           // Move the unit to the tile selected by the cursor. 
           game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
+          game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);         
           game.stage.blankAllTiles();
           game.stage.menuManager.clearStack();
         }
@@ -190,6 +186,7 @@ class CantoMenu extends Menu {
       case LogicalKeyboardKey.keyB:
         game.stage.blankAllTiles();
         game.stage.menuManager.clearStack();
+        game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowLeft:
         direction = Point(direction.x - 1, direction.y);
@@ -221,8 +218,8 @@ class ActionMenu extends Menu {
   }
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    // unit.sprite.animation = newAnimation;
     actions = unit.getActionsAt(game.stage.cursor.tilePosition);
   }
 
@@ -310,6 +307,7 @@ class CombatMenu extends Menu {
         game.eventQueue.addEventBatch([StartCombatEvent(unit, targets[selectedTargetIndex])]);
         game.stage.cursor.snapToTile(unit.tilePosition);
         game.stage.menuManager.clearStack();
+        game.combatQueue.addEventBatch([UnitExhaustEvent(unit)]);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         // Cancel
@@ -405,8 +403,8 @@ class InventoryMenu extends Menu {
 
   @override 
   Future<void> onLoad() async {
-    SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    unit.sprite.animation = newAnimation;
+    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
+    // unit.sprite.animation = newAnimation;
     List<String> getInventoryNames() => unit.inventory.map((item) => item.name).toList();
     options = getInventoryNames();
   }
