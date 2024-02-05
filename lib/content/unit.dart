@@ -216,6 +216,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     // Add to faction:
     if(game.stage.factionMap.keys.contains(faction)){
       game.stage.factionMap[faction]!.units.add(this);
+      if(name == faction) {controller.leader = this;}
     }
     else{ 
       debugPrint("Unit created for faction $faction not in factionMap.");

@@ -4,13 +4,16 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 abstract class Player extends Component with HasGameReference<MoiraGame>{
+  Unit? _leader;
   bool takingTurn = false;
   String name;
   FactionType factionType;
   List<Unit> units = [];
   List<Unit> unitsToCommand = [];
   List<String> hostilities = [];
-  
+
+  Unit? get leader => _leader;
+  set leader(Unit? newLeader) {_leader = newLeader;}
 
   Player(this.name, this.factionType);
 
@@ -71,6 +74,9 @@ class HumanPlayer extends Player {
   void startTurn() {
     super.startTurn();
     debugPrint("HumanPlayer: startTurn for $name");
+    if(leader != null){
+      game.eventQueue.addEventBatch([PanEvent(leader!.tilePosition)]);
+    }
   }
   
 }
