@@ -7,6 +7,7 @@ class Item extends Component with HasGameReference<MoiraGame>{
   Equip? equipCond;
   Use? use;
   Weapon? weapon;
+  Staff? staff;
   List<Effect>? effects;
   
   // Factory constructor
