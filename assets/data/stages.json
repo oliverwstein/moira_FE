@@ -967,6 +967,72 @@
                             "name":"UnitMoveEvent: DiMaggio_to_Point(33, 22)"}
                         }
                     ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Quan",
+                    "faction": "Sigurd",
+                    "level": -1,
+                    "tilePosition": [
+                        61,
+                        14
+                    ],
+                    "destination": [
+                        58,
+                        15
+                    ],
+                    "triggers":
+                    [
+                        {"StartTurnEvent":
+                            {
+                            "factionName": "Sigurd",
+                            "turn": 3}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Finn",
+                    "faction": "Sigurd",
+                    "level": -1,
+                    "tilePosition": [
+                        61,
+                        13
+                    ],
+                    "destination": [
+                        59,
+                        15
+                    ],
+                    "triggers":
+                    [
+                        {"StartTurnEvent":
+                            {
+                            "factionName": "Sigurd",
+                            "turn": 3}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Ethlyn",
+                    "faction": "Sigurd",
+                    "level": -1,
+                    "tilePosition": [
+                        61,
+                        12
+                    ],
+                    "destination": [
+                        60,
+                        15
+                    ],
+                    "triggers":
+                    [
+                        {"StartTurnEvent":
+                            {
+                            "factionName": "Sigurd",
+                            "turn": 3}
+                        }
+                    ]
                 }
             ]
         ]

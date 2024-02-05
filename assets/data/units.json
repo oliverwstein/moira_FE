@@ -202,6 +202,108 @@
     "proficiencies": ["Staff", "Book"]
     },
     {
+    "name": "Quan",
+    "faction": "blue",
+    "class": "Duke",
+    "level": 4,
+    "baseStats": {
+        "hp": 34,
+        "sta": 30,
+        "str": 16,
+        "def": 10,
+        "dex": 10,
+        "spe": 10,
+        "mag": 1,
+        "res": 3,
+        "wis": 3,
+        "lck": 5
+    },
+    "growths": {
+        "hp": 110,
+        "sta": 90,
+        "str": 50,
+        "def": 50,
+        "dex": 30,
+        "spe": 40,
+        "mag": 5,
+        "res": 5,
+        "wis": 10,
+        "lck": 15
+    },
+    "skills": [],
+    "items": ["Lance"],
+    "attacks": [],
+    "proficiencies": ["Lance"]
+    },
+    {
+    "name": "Finn",
+    "faction": "blue",
+    "class": "Knight",
+    "level": 1,
+    "baseStats": {
+        "hp": 32,
+        "sta": 28,
+        "str": 9,
+        "def": 7,
+        "dex": 8,
+        "spe": 10,
+        "mag": 0,
+        "res": 1,
+        "wis": 1,
+        "lck": 8
+    },
+    "growths": {
+        "hp": 70,
+        "sta": 80,
+        "str": 30,
+        "def": 30,
+        "dex": 40,
+        "spe": 40,
+        "mag": 5,
+        "res": 5,
+        "wis": 10,
+        "lck": 50
+    },
+    "skills": [],
+    "items": ["Lance"],
+    "attacks": [],
+    "proficiencies": ["Lance"]
+    },
+    {
+    "name": "Ethlyn",
+    "faction": "blue",
+    "class": "Troubadour",
+    "level": 1,
+    "baseStats": {
+        "hp": 28,
+        "sta": 25,
+        "str": 5,
+        "def": 4,
+        "dex": 11,
+        "spe": 12,
+        "mag": 8,
+        "res": 6,
+        "wis": 8,
+        "lck": 8
+    },
+    "growths": {
+        "hp": 60,
+        "sta": 60,
+        "str": 30,
+        "def": 20,
+        "dex": 30,
+        "spe": 30,
+        "mag": 5,
+        "res": 15,
+        "wis": 20,
+        "lck": 20
+    },
+    "skills": [],
+    "items": ["Sword"],
+    "attacks": [],
+    "proficiencies": ["Sword", "Staff"]
+    },
+    {
     "name": "Midir",
     "faction": "green",
     "class": "Knight",
