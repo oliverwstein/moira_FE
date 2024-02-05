@@ -1043,6 +1043,16 @@
                             {"name": "QuanPan"}
                         }
                     ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "QuanArrival",
+                    "triggers":
+                    [
+                        {"PanEvent":
+                            {"name": "QuanPan"}
+                        }
+                    ]
                 }
             ]
         ]

@@ -10,6 +10,9 @@
 <<character Gandolf>>
 <<character DiMaggio>>
 <<character Gerrard>>
+<<character Quan>>
+<<character Ethlyn>>
+<<character Finn>>
 title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
@@ -166,12 +169,25 @@ DiMaggio: Alright you idiots, it's time to take Chalphy! And I expect my cut of 
 <<stop>>
 ===
 
+title: QuanArrival
+---
+<<local $left = "Quan" as String>>
+<<local $right = "Ethlyn" as String>>
+Quan: Looks like we're not too late. I hope Sigurd is alright.
+Ethlyn: Oh, I'm sure he is, but he might need some healing. I'm sorry to drag you into this, Quan.
+Ethlyn: I know I'm no longer a Chalphy, but I can't sit back and do nothing.
+Quan: Nonsense, my love. He is still your brother - now he's just my brother-in-law as well.
+Quan: And we were brothers in arms before that. Besides, I can hardy let my wife fight alone!
+Ethlyn: Bless you, my sweet lord.
+<<set $right = "Finn">>
+Finn: Forgive me my lord, but we really ought to hurry.
+<<stop>>
+===
+
 title: Village_Point(48, 7)
 ---
-<<local $left = "Gandolf" as String>>
-<<local $right = "Midir" as String>>
-Gandolf: You held out pretty well for being on your own, but it's over. Prepare to die!
-Midir: So it goes. Lady Aideen...
+<<local $left = "" as String>>
+<<local $right = "" as String>>
 <<stop>>
 ===
 
