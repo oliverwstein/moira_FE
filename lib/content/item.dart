@@ -7,6 +7,7 @@ class Item extends Component with HasGameReference<MoiraGame>{
   Equip? equipCond;
   Use? use;
   Weapon? weapon;
+  Staff? staff;
   List<Effect>? effects;
   
   // Factory constructor
@@ -21,18 +22,20 @@ class Item extends Component with HasGameReference<MoiraGame>{
       // Extract the properties from itemData
       String description = itemData['description'] ?? 'No description provided';
       ItemType type = ItemType.values.firstWhere((e) => e.toString() == 'ItemType.${itemData['type']}', orElse: () => ItemType.basic);
-      
+      Weapon? weapon;
       if (itemData.containsKey("weapon")) {
-        Weapon weapon = Weapon.fromJson(itemData['weapon']);
-        return Item._internal(name, description, type, weapon);
-      } else {
-        return Item._internal(name, description, type, null);
+        weapon = Weapon.fromJson(itemData['weapon']);
       }
+      Staff? staff;
+      if (itemData.containsKey("staff")) {
+        staff = Staff.fromJson(itemData['staff'], name);
+      }
+      return Item._internal(name, description, type, weapon, staff);
     }
   }
 
   // Internal constructor for creating instances from factory constructor
-  Item._internal(this.name, this.description, this.type, this.weapon) {
+  Item._internal(this.name, this.description, this.type, this.weapon, this.staff) {
     equipCond = Equip(this);
   }
 

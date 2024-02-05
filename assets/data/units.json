@@ -299,7 +299,7 @@
         "lck": 20
     },
     "skills": [],
-    "items": ["Sword"],
+    "items": ["Sword", "Salve Staff"],
     "attacks": [],
     "proficiencies": ["Sword", "Staff"]
     },

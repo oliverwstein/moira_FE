@@ -237,8 +237,10 @@ class ActionMenu extends Menu {
             game.stage.menuManager.clearStack();
             break;
           case "Items":
-            debugPrint("${actions[selectedIndex]} Chosen");
             game.stage.menuManager.pushMenu(InventoryMenu(unit));
+            break;
+          case "Staff":
+            game.stage.menuManager.pushMenu(StaffMenu(unit));
             break;
           case "Attack":
             List<Unit> targets = unit.getTargetsAt(unit.tilePosition);
@@ -351,6 +353,60 @@ class CombatMenu extends Menu {
         var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
         debugPrint("Unit attack numbers are $unitAttackNumbers");
         debugPrint("Target attack numbers are $targetAttackNumbers");
+        return KeyEventResult.handled;
+      default:
+        return KeyEventResult.ignored;
+    }
+  }
+}
+
+class StaffMenu extends Menu {
+  final Unit unit;
+  late final List<Unit> targets;
+  late final List<Item> staves;
+  int selectedTargetIndex = 0;
+  int selectedStaffIndex = 0;
+  StaffMenu(this.unit);
+  @override 
+  Future<void> onLoad() async {
+    targets = unit.getStaffTargetsAt(unit.tilePosition);
+    staves = unit.getStaves();
+    game.stage.cursor.snapToTile(targets.first.tilePosition);
+  }
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("StaffMenu given key ${key.logicalKey.keyLabel} to handle.");
+    switch (key.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        // Use the selected staff on the target.
+        unit.equip(staves[selectedStaffIndex]);
+        staves[selectedStaffIndex].staff!.execute(targets[selectedTargetIndex]);
+        game.stage.menuManager.clearStack();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        // Cancel
+        close();
+        game.stage.cursor.snapToTile(unit.tilePosition);
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp: // Change target
+        selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
+        debugPrint("${targets[selectedTargetIndex].name} Selected");
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
+        debugPrint("Target is ${targets[selectedTargetIndex].name}");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowDown: // Change target
+        selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
+        debugPrint("${targets[selectedTargetIndex].name} Selected");
+        game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
+        debugPrint("Target is ${targets[selectedTargetIndex].name}");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowLeft: // Change attack
+        selectedStaffIndex = (selectedStaffIndex - 1) % staves.length;
+        debugPrint("Selected Staff is ${staves[selectedStaffIndex].name}");
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowRight: // Change attack
+        selectedStaffIndex = (selectedStaffIndex + 1) % staves.length;
+        debugPrint("Selected Staff is ${staves[selectedStaffIndex].name}");
         return KeyEventResult.handled;
       default:
         return KeyEventResult.ignored;
