@@ -157,36 +157,36 @@
             }
         },
         "Brigand": {
-        "description": "The plague of every era.",
-        "movementRange": 6,
-        "skills": [],
-        "attacks": [],
-        "proficiencies": ["Axe"],
-        "orders": ["Ransack"],
-        "growths": {
-            "hp": 90,
-            "sta": 50,
-            "str": 50,
-            "def": 10,
-            "dex": 35,
-            "spe": 35,
-            "mag": 5,
-            "res": 5,
-            "wis": 10,
-            "lck": 10
-        },
-        "baseStats": {
-            "hp": 35,
-            "sta": 20,
-            "str": 8,
-            "def": 5,
-            "dex": 2,
-            "spe": 7,
-            "mag": 0,
-            "res": 0,
-            "wis": 0,
-            "lck": 2
-        }
+            "description": "The plague of every era.",
+            "movementRange": 6,
+            "skills": [],
+            "attacks": [],
+            "proficiencies": ["Axe"],
+            "orders": ["Ransack"],
+            "growths": {
+                "hp": 90,
+                "sta": 50,
+                "str": 50,
+                "def": 10,
+                "dex": 35,
+                "spe": 35,
+                "mag": 5,
+                "res": 5,
+                "wis": 10,
+                "lck": 10
+            },
+            "baseStats": {
+                "hp": 35,
+                "sta": 20,
+                "str": 8,
+                "def": 5,
+                "dex": 2,
+                "spe": 7,
+                "mag": 0,
+                "res": 0,
+                "wis": 0,
+                "lck": 2
+            }
     },
     "Fighter": {
         "description": "A tough brawler.",
@@ -346,7 +346,7 @@
     "Troubadour": {
         "description": "A mounted oasis for the body and soul.",
         "movementRange": 8,
-        "skills": [],
+        "skills": ["Canto"],
         "attacks": [],
         "proficiencies": ["Staff"],
         "growths": {

@@ -379,7 +379,9 @@ class StaffMenu extends Menu {
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Use the selected staff on the target.
+        unit.equip(staves[selectedStaffIndex]);
         staves[selectedStaffIndex].staff!.execute(targets[selectedTargetIndex]);
+        game.stage.menuManager.clearStack();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         // Cancel

@@ -37,6 +37,7 @@ class Heal extends Staff {
     int healing = baseHealing + wielder.getStat("wis");
     game.eventQueue.addEventBatch([UnitHealEvent(target, healing)]);
     game.eventQueue.addEventBatch([UnitExpEvent(wielder, expGain)]);
+    game.eventQueue.addEventBatch([UnitExhaustEvent(wielder)]);
   }
 }
 
