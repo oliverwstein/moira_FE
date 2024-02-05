@@ -417,6 +417,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     controller.units.remove(this);
     removeFromParent();
   }
+
+  List<Staff> getStaffActs() {
+    List<Staff> acts = [];
+    for(Item item in inventory){
+      if(item.staff != null){
+        acts.add(item.staff!);
+      }
+    }
+    return acts;
+  }
 }
 
 class UnitCircle extends SpriteComponent with HasVisibility{

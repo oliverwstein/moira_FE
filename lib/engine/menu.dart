@@ -358,6 +358,25 @@ class CombatMenu extends Menu {
   }
 }
 
+class StaffMenu extends Menu {
+  final Unit unit;
+  final List<Unit> targets;
+  late List<Staff> acts;
+  int selectedTargetIndex = 0;
+  int selectedActIndex = 0;
+  StaffMenu(this.unit, this.targets);
+  @override 
+  Future<void> onLoad() async {
+    acts = unit.getStaffActs();
+    game.stage.cursor.snapToTile(targets.first.tilePosition);
+    targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
+    var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
+    var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
+    debugPrint("Unit attack numbers are $unitAttackNumbers");
+    debugPrint("Target attack numbers are $targetAttackNumbers");
+  }
+}
+
 class StageMenu extends Menu {
   final List<String> options = ["Save Game", "End Turn"];
   int selectedIndex = 0;
