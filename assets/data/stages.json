@@ -879,8 +879,8 @@
                     "type": "UnitMoveEvent",
                     "unitName": "Gandolf",
                     "destination": [
-                        9,
-                        30
+                        6,
+                        23
                     ],
                     "triggers":
                     [
@@ -894,8 +894,8 @@
                     "type": "UnitMoveEvent",
                     "unitName": "Aideen",
                     "destination": [
-                        9,
-                        30
+                        6,
+                        23
                     ],
                     "triggers":
                     [
@@ -912,7 +912,7 @@
                     [
                         {"UnitMoveEvent":
                             {
-                            "name":"UnitMoveEvent: Aideen_to_Point(9, 30)"}
+                            "name":"UnitMoveEvent: Aideen_to_Point(6, 23)"}
                         }
                     ]
                 },
@@ -923,7 +923,7 @@
                     [
                         {"UnitMoveEvent":
                             {
-                            "name":"UnitMoveEvent: Gandolf_to_Point(9, 30)"}
+                            "name":"UnitMoveEvent: Gandolf_to_Point(6, 23)"}
                         }
                     ]
                 },
