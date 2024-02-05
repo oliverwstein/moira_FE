@@ -5,14 +5,6 @@ import 'package:flame/rendering.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
-final swapRedBluePaint = Paint()
-  ..colorFilter = const ColorFilter.matrix([
-    // R  G  B  A  Const
-    0, 0, 1, 0, 0, // Red output (from blue input)
-    0, 1, 0, 0, 0, // Green output (unchanged)
-    1, 0, 0, 0, 0, // Blue output (from red input)
-    0, 0, 0, 1, 0, // Alpha output (unchanged)
-  ]);
 class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   final String name;
   final String description;
@@ -76,7 +68,7 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   @override
   Future<void> onLoad() async {
     debugPrint(name.toLowerCase());
-    Image spriteSheetImage = await game.images.load('${name.toLowerCase()}_spritesheet.png');
+    Image spriteSheetImage = await game.images.load('class_sprites/${name.toLowerCase()}_spritesheet.png');
     spriteSheet = SpriteSheet.fromColumnsAndRows(
       image: spriteSheetImage,
       columns: 4,
