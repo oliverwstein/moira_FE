@@ -360,20 +360,15 @@ class CombatMenu extends Menu {
 
 class StaffMenu extends Menu {
   final Unit unit;
-  final List<Unit> targets;
-  late List<Staff> acts;
+  late final List<Unit> targets;
   int selectedTargetIndex = 0;
   int selectedActIndex = 0;
-  StaffMenu(this.unit, this.targets);
+  StaffMenu(this.unit);
   @override 
   Future<void> onLoad() async {
-    acts = unit.getStaffActs();
+    targets = unit.getStaffTargetsAt(unit.tilePosition);
     game.stage.cursor.snapToTile(targets.first.tilePosition);
-    targets[selectedTargetIndex].attack = targets[selectedTargetIndex].getAttack(Combat.getCombatDistance(unit, targets[selectedTargetIndex]));
-    var unitAttackNumbers = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
-    var targetAttackNumbers = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
-    debugPrint("Unit attack numbers are $unitAttackNumbers");
-    debugPrint("Target attack numbers are $targetAttackNumbers");
+    debugPrint("Staff targets are: ${targets.indexed}");
   }
 }
 

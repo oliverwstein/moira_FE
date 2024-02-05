@@ -300,7 +300,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       maxCombatRange = max(maxCombatRange, attackSet[attackName]!.range.$2);
     }
     return (minCombatRange, maxCombatRange);
-  } 
+  }
 
   List<String> getActionsAt(Point<int> point){
     List<String> actions = [];
@@ -353,6 +353,46 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
             if (tile != null && tile.isOccupied && controller.checkHostility(tile.unit!)) {
               targets.add(tile.unit!);
               tile.state = TileState.attack;
+              debugPrint("${tile.unit!.name} is a target at ${tile.point}");
+            }
+          }
+        }
+      }
+    }
+    return targets;
+  }
+  List<Staff> getStaffActs() {
+    List<Staff> acts = [];
+    for(Item item in inventory){
+      if(item.staff != null){
+        acts.add(item.staff!);
+      }
+    }
+    return acts;
+  }
+  int getStaffRange() {
+    int range = 1;
+    for(Staff staff in getStaffActs()){range = max(range, staff.range);}
+    return range;
+  }
+  List<Unit> getStaffTargetsAt(Point<int> tilePosition) {
+    List<Unit> targets = [];
+    int staffRange = getStaffRange();
+    for (int range = 1; range <= staffRange; range++) {
+      for (int dx = 0; dx <= range; dx++) {
+        int dy = range - dx;
+        List<Point<int>> pointsToCheck = [
+          Point(tilePosition.x + dx, tilePosition.y + dy),
+          Point(tilePosition.x - dx, tilePosition.y + dy),
+          Point(tilePosition.x + dx, tilePosition.y - dy),
+          Point(tilePosition.x - dx, tilePosition.y - dy)
+        ];
+
+        for (var point in pointsToCheck) {
+          if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
+            Tile? tile = game.stage.tileMap[point];
+            if (tile != null && tile.isOccupied && !controller.checkHostility(tile.unit!)) {
+              targets.add(tile.unit!);
               debugPrint("${tile.unit!.name} is a target at ${tile.point}");
             }
           }
@@ -416,16 +456,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     tile.removeUnit();
     controller.units.remove(this);
     removeFromParent();
-  }
-
-  List<Staff> getStaffActs() {
-    List<Staff> acts = [];
-    for(Item item in inventory){
-      if(item.staff != null){
-        acts.add(item.staff!);
-      }
-    }
-    return acts;
   }
 }
 
