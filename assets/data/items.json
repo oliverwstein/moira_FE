@@ -40,15 +40,15 @@
         {
             "description": "Wearer gains 5 Dexterity.",
             "type": "treasure"
-        }
-    },
+        },
     "Salve Staff":
-    {
+        {
         "description": "Restores health to an adjacent target.",
         "staff": {
             "effect": "Heal",
             "base": 10
         },
         "type": "main"
+        }
     }
 }

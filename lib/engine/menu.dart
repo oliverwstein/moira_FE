@@ -237,8 +237,10 @@ class ActionMenu extends Menu {
             game.stage.menuManager.clearStack();
             break;
           case "Items":
-            debugPrint("${actions[selectedIndex]} Chosen");
             game.stage.menuManager.pushMenu(InventoryMenu(unit));
+            break;
+          case "Staff":
+            game.stage.menuManager.pushMenu(StaffMenu(unit));
             break;
           case "Attack":
             List<Unit> targets = unit.getTargetsAt(unit.tilePosition);

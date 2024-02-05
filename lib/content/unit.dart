@@ -323,6 +323,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       }
     }
     if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
+    if(unit.getStaffTargetsAt(point).isNotEmpty) actions.add("Staff");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
@@ -391,7 +392,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         for (var point in pointsToCheck) {
           if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
             Tile? tile = game.stage.tileMap[point];
-            if (tile != null && tile.isOccupied && !controller.checkHostility(tile.unit!)) {
+            if (tile != null && tile.isOccupied && !controller.checkHostility(tile.unit!) && !targets.contains(tile.unit!)) {
               targets.add(tile.unit!);
               debugPrint("${tile.unit!.name} is a target at ${tile.point}");
             }
