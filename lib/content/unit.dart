@@ -68,7 +68,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
     String className = unitData['class'];
     int givenLevel = level ?? unitData['level'] ?? 1;
-    Class unitClass = Class.fromJson(className);
+    Class unitClass = Class.fromJson(className, unitData["faction"]);
 
     int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : unitClass.movementRange;
     unitData['skills'].addAll(unitClass.skills);

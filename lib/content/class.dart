@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:ui';
 
 import 'package:flame/components.dart';
@@ -17,9 +19,10 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   final Map<String, int> growths;
   late SpriteSheet spriteSheet;
   late Vector2 spriteSize;
+  String factionType;
   Direction? _currentDirection;
   // Factory constructor
-  factory Class.fromJson(String name) {
+  factory Class.fromJson(String name, String factionType) {
     Map<String, dynamic> classData;
 
     // Check if the class exists in the map and retrieve its data
@@ -36,10 +39,10 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
     Map<String, int> growths = Map<String, int>.from(classData['growths']);
     
     // Return a new Weapon instance
-    return Class._internal(name, description, movementRange, skills, attacks, proficiencies, orders, baseStats, growths);
+    return Class._internal(name, factionType, description, movementRange, skills, attacks, proficiencies, orders, baseStats, growths);
   }
   // Internal constructor for creating instances
-  Class._internal(this.name, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
+  Class._internal(this.name, this.factionType, this.description, this.movementRange, this.skills, this.attacks, this.proficiencies, this.orders, this.baseStats, this.growths);
   Direction? get direction => _currentDirection;
   set direction(Direction? newDirection) {
     _currentDirection = newDirection;
@@ -66,18 +69,28 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
     size = spriteSize; anchor = Anchor.center;
   }
   @override
-  Future<void> onLoad() async {
-    debugPrint(name.toLowerCase());
-    Image spriteSheetImage = await game.images.load('class_sprites/${name.toLowerCase()}_spritesheet.png');
-    Image recoloredSpriteImage = await replaceShades(spriteSheetImage, redShades);
-    spriteSheet = SpriteSheet.fromColumnsAndRows(
-      image: recoloredSpriteImage,
-      columns: 4,
-      rows: 5,
-    );
-    spriteSize = Vector2(spriteSheetImage.width/4, spriteSheetImage.height/5);
-    size = spriteSize; anchor = Anchor.center;
-  }
+Future<void> onLoad() async {
+  debugPrint(name.toLowerCase());
+
+  // Load the original sprite sheet image
+  Image spriteSheetImage = await game.images.load('class_sprites/${name.toLowerCase()}_spritesheet.png');
+
+  // Apply color transformation based on the faction
+  debugPrint("factionType $factionType, ${FactionOrder.fromName(factionType)}");
+  Image recoloredSpriteImage = await applyFactionColorShift(spriteSheetImage, FactionOrder.fromName(factionType)!);
+
+  // Create the SpriteSheet from the recolored image
+  spriteSheet = SpriteSheet.fromColumnsAndRows(
+    image: recoloredSpriteImage,
+    columns: 4,
+    rows: 5,
+  );
+
+  // Set the sprite size and component size based on the original image dimensions
+  spriteSize = Vector2(spriteSheetImage.width / 4, spriteSheetImage.height / 5);
+  size = spriteSize;
+  anchor = Anchor.center;
+}
 }
 
 Map<int, int> grays = {
@@ -88,51 +101,56 @@ Map<int, int> grays = {
   0xFFCECECE: 0,
 };
 
-// Replacement shades for red
-Map<int, int> redShades = {
-  0xFF292929: 0xFF290808,
-  0xFF494949: 0xFF490F0F,
-  0xFF7A7A7A: 0xFF7A1818,
-  0xFF8D8D8D: 0xFF8D3838,
-  0xFFCECECE: 0xFFCE7C7C,
+Map<Color, Map<FactionType, Color>> colorTransformations = {
+  Color(0xFF292929): {
+    FactionType.red: Color(0xFF290808),
+    FactionType.green: Color(0xFF0A2908),
+    FactionType.blue: Color(0xFF040029),
+  },
+  Color(0xFF494949): {
+    FactionType.red: Color.fromARGB(255, 91, 26, 26),
+    FactionType.green: Color.fromARGB(255, 48, 145, 48),
+    FactionType.blue: Color.fromARGB(255, 54, 52, 125),
+  },
+  Color(0xFF7A7A7A): {
+    FactionType.red: Color(0xFF7A1818),
+    FactionType.green: Color(0xFF187A18),
+    FactionType.blue: Color(0xFF233876),
+  },
+  Color(0xFF8D8D8D): {
+    FactionType.red: Color(0xFF8D3838),
+    FactionType.green: Color(0xFF388D38),
+    FactionType.blue: Color(0xFF366087),
+  },
+  Color(0xFFCECECE): {
+    FactionType.red: Color(0xFFCE7C7C),
+    FactionType.green: Color(0xFF7CCE7C),
+    FactionType.blue: Color(0xFF9097CE),
+  },
 };
 
-// Replacement shades for blue
-Map<int, int> blueShades = {
-  0xFF292929: 0xFF040029,
-  0xFF494949: 0xFF1B1649,
-  0xFF7A7A7A: 0xFF233876,
-  0xFF8D8D8D: 0xFF366087,
-  0xFFCECECE: 0xFF9097CE,
-};
-
-Map<int, int> greenShades = {
-  0xFF292929: 0xFF0A2908,
-  0xFF494949: 0xFF0F490F,
-  0xFF7A7A7A: 0xFF187A18,
-  0xFF8D8D8D: 0xFF388D38,
-  0xFFCECECE: 0xFF7CCE7C,
-};
-
-Future<Image> replaceShades(Image image, Map<int, int> replacementShades) async {
+Future<Image> applyFactionColorShift(Image image, FactionType faction) async {
   final ByteData? byteData = await image.toByteData(format: ImageByteFormat.rawUnmodified);
   final buffer = byteData!.buffer.asUint8List();
 
   for (int i = 0; i < buffer.length; i += 4) {
-    // Extract the current pixel color (in ARGB format)
-    int currentColor = (buffer[i+3] << 24) | (buffer[i] << 16) | (buffer[i+1] << 8) | buffer[i+2];
+    // Convert RGBA to a color value
+    int currentColorValue = (buffer[i+3] << 24) | (buffer[i] << 16) | (buffer[i+1] << 8) | buffer[i+2];
+    Color currentColor = Color(currentColorValue);
 
-    // Check if the current color is one of the grays to replace
-    if (replacementShades.containsKey(currentColor)) {
-      // Replace with the corresponding color
-      int newColor = replacementShades[currentColor]!;
-      buffer[i] = (newColor >> 16) & 0xFF; // Red component
-      buffer[i + 1] = (newColor >> 8) & 0xFF; // Green component
-      buffer[i + 2] = newColor & 0xFF; // Blue component
-      // Alpha remains unchanged
+    // Check if this color is one of the grays to be replaced
+    if (colorTransformations.containsKey(currentColor)) {
+      Color? newColor = colorTransformations[currentColor]?[faction];
+      if (newColor != null) {
+        buffer[i] = newColor.red;
+        buffer[i + 1] = newColor.green;
+        buffer[i + 2] = newColor.blue;
+        // Alpha remains unchanged
+      }
     }
   }
 
+  // Recreate the image from the modified buffer
   final ImmutableBuffer immutableBuffer = await ImmutableBuffer.fromUint8List(buffer);
   final ImageDescriptor imageDescriptor = ImageDescriptor.raw(
     immutableBuffer,

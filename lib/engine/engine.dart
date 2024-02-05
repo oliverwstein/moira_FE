@@ -48,9 +48,9 @@ extension FactionOrder on FactionType {
   // Static method to get a skill by its name
   static FactionType? fromName(String name) {
     try {
-      return FactionType.values.firstWhere((skill) => skill.name.toLowerCase() == name.toLowerCase());
+      return FactionType.values.firstWhere((factionType) => factionType.name.toLowerCase() == name.toLowerCase());
     } catch (e) {
-      return null; // Return null if no matching skill is found
+      return null; // Return null if no matching faction is found
     }
   }
 }
