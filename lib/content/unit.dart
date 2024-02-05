@@ -48,10 +48,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   bool hasSkill(Skill skill) => skillSet.contains(skill);
   Set<WeaponType> proficiencies;
   Map<String, int> stats = {};
+  Map<String, int> growths = {};
   int level;
   int hp = -1;
   int sta = -1;
-  int exp = 0;
+  int exp = 99;
   static Unit? getUnitByName(Stage stage, String unitName) {
     debugPrint("getUnitByName: unit $unitName");
     Unit? unit = stage.children.query<Unit>().where((unit) => unit.name == unitName).firstOrNull;
@@ -68,7 +69,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     );
 
     String className = unitData['class'];
-    int givenLevel = level ?? unitData['level'] ?? 1;
+    int givenLevel = (level == -1 ? unitData['level'] : level) ?? 1;
     Class unitClass = Class.fromJson(className, unitData["faction"]);
 
     int movementRange = unitData.keys.contains('movementRange') ? unitData['movementRange'] : unitClass.movementRange;
@@ -115,17 +116,15 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         int levelUps = Iterable.generate(givenLevel - 1, (_) => rng.nextInt(100) < growths[stat]! ? 1 : 0)
                         .fold(0, (acc, curr) => acc + curr); // Autoleveler
         stats[stat] = unitClass.baseStats[stat]! + levelUps;
-
       }
-      
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, unitClass, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats);
+    return Unit._internal(unitData, tilePosition, name, unitClass, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats, growths);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.unitClass, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.unitClass, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats, this.growths){
     _postConstruction();
   }
 
@@ -638,6 +637,7 @@ class UnitExpEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   int expGain;
+  bool levelUp = false;
   UnitExpEvent(this.unit, this.expGain, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "UnitExpEvent: ${unit.name} gains $expGain");
   static void initialize(EventQueue queue) {
     queue.registerClassObserver<EndCombatEvent>((event) {
@@ -662,7 +662,40 @@ class UnitExpEvent extends Event {
     super.execute();
     debugPrint("$name");
     unit.exp += expGain;
+    if(unit.exp >= 100) {
+      levelUp = true;
+      unit.exp %= 100;
+      game.eventQueue.addEventBatchToHead([UnitLevelUpEvent(unit)]);
+      }
     debugPrint("UnitExpEvent: ${unit.name} now has ${unit.exp} exp.");
+    game.eventQueue.dispatchEvent(this);
+    completeEvent();
+  }
+}
+
+class UnitLevelUpEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  UnitLevelUpEvent(this.unit, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "UnitLevelUpEvent: ${unit.name}");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    debugPrint("$name");
+    unit.level += 1;
+    debugPrint("UnitLevelUpEvent: ${unit.name} is now level ${unit.level}");
+    Random rng = Random();
+    for (String stat in unit.stats.keys){
+      int statUp = unit.growths[stat]! ~/ 100 + (rng.nextInt(100) < (unit.growths[stat]! % 100) ? 1 : 0);
+
+      debugPrint("Increase $stat by $statUp");
+      unit.stats[stat] = statUp;
+    }
     game.eventQueue.dispatchEvent(this);
     completeEvent();
   }
