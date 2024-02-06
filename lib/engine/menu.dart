@@ -255,7 +255,7 @@ class UnitActionMenu extends SelectionMenu {
                 game.stage.menuManager.clearStack();
                 break;
               case "Items":
-                game.stage.menuManager.pushMenu(InventoryMenu(unit));
+                game.stage.menuManager.pushMenu(InventoryMenu(game.stage.cursor.tilePosition, unit));
                 break;
               case "Staff":
                 game.stage.menuManager.pushMenu(StaffMenu(unit));
@@ -568,25 +568,27 @@ class SelectionMenu extends Menu {
   }
 }
 
-class InventoryMenu extends Menu {
+class InventoryMenu extends SelectionMenu {
   final Unit unit;
-  late final List<String> options;
-  int selectedIndex = 0;
-  InventoryMenu(this.unit);
+  static List<String> getInventoryNames(Unit unit) => unit.inventory.map((item) => item.name).toList();
+  InventoryMenu(Point<int> tilePosition, this.unit)
+      : super(tilePosition, getInventoryNames(unit));
 
   @override 
-  Future<void> onLoad() async {
-    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    // unit.sprite.animation = newAnimation;
-    List<String> getInventoryNames() => unit.inventory.map((item) => item.name).toList();
-    options = getInventoryNames();
+  void close() {
+    super.close();
+    if(game.stage.menuManager._menuStack.lastOrNull != null){
+      game.stage.menuManager._menuStack.last.close();
+    }
+    
   }
-
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    switch (key.logicalKey) {
-      case LogicalKeyboardKey.keyA:
-        debugPrint("${options[selectedIndex]} Chosen");
+    debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
+    // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
+      switch (key.logicalKey) {
+        case LogicalKeyboardKey.keyA:
+            debugPrint("${actions[selectedIndex]} Chosen");
         if(unit.inventory[selectedIndex].use != null){
           // If the item has a use, prompt if they want to use it.
         } 
@@ -598,15 +600,14 @@ class InventoryMenu extends Menu {
         close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowUp:
-        selectedIndex = (selectedIndex - 1) % options.length;
-        debugPrint("${options[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex - 1) % actions.length;
+        debugPrint("${actions[selectedIndex]} Selected");
       case LogicalKeyboardKey.arrowDown:
-        selectedIndex = (selectedIndex + 1) % options.length;
-        debugPrint("${options[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex + 1) % actions.length;
+        debugPrint("${actions[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
   }
-
 }
 
 class DialogueMenu extends Menu {
