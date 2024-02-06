@@ -20,6 +20,7 @@ class Staff extends Component with HasGameReference<MoiraGame>{
         return Staff(staffRange);
     }
   }
+  bool canUseOn(Unit target) => true;
   void execute(Unit target){
     debugPrint("Use staff on ${target.name}. They feel funny.");
   }
@@ -30,6 +31,8 @@ class Heal extends Staff {
   int staminaCost;
   int expGain;
   Heal(super.range, this.baseHealing, this.staminaCost, this.expGain);
+  @override
+  bool canUseOn(Unit target) => target.hp < target.getStat("hp");
   @override
   execute(Unit target){
     debugPrint("Execute Heal on ${target.name}");

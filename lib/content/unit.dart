@@ -383,28 +383,30 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   List<Unit> getStaffTargetsAt(Point<int> tilePosition) {
     
     List<Unit> targets = [];
-    int staffRange = getStaffRange();
-    for (int range = 1; range <= staffRange; range++) {
-      for (int dx = 0; dx <= range; dx++) {
-        int dy = range - dx;
-        List<Point<int>> pointsToCheck = [
-          Point(tilePosition.x + dx, tilePosition.y + dy),
-          Point(tilePosition.x - dx, tilePosition.y + dy),
-          Point(tilePosition.x + dx, tilePosition.y - dy),
-          Point(tilePosition.x - dx, tilePosition.y - dy)
-        ];
+    for(Item staffItem in getStaves()){
+      for (int range = 1; range <= staffItem.staff!.range; range++) {
+        for (int dx = 0; dx <= range; dx++) {
+          int dy = range - dx;
+          List<Point<int>> pointsToCheck = [
+            Point(tilePosition.x + dx, tilePosition.y + dy),
+            Point(tilePosition.x - dx, tilePosition.y + dy),
+            Point(tilePosition.x + dx, tilePosition.y - dy),
+            Point(tilePosition.x - dx, tilePosition.y - dy)
+          ];
 
-        for (var point in pointsToCheck) {
-          if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
-            Tile? tile = game.stage.tileMap[point];
-            if (tile != null && tile.isOccupied && !controller.checkHostility(tile.unit!) && !targets.contains(tile.unit!)) {
-              targets.add(tile.unit!);
-              debugPrint("${tile.unit!.name} is a target at ${tile.point}");
+          for (var point in pointsToCheck) {
+            if (point.x >= 0 && point.x < game.stage.mapTileWidth && point.y >= 0 && point.y < game.stage.mapTileHeight) {
+              Tile? tile = game.stage.tileMap[point];
+              if (tile != null && tile.isOccupied && !controller.checkHostility(tile.unit!) && !targets.contains(tile.unit!) && staffItem.staff!.canUseOn(tile.unit!)) {
+                targets.add(tile.unit!);
+                debugPrint("${tile.unit!.name} is a target at ${tile.point}");
+              }
             }
           }
         }
       }
     }
+    
     return targets;
   }
   ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Unit target, Attack? attack){
