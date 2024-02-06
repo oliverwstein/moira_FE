@@ -300,23 +300,16 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   List<String> getActionsAt(Point<int> point){
     if(!canAct) {return [];}
     List<String> actions = [];
-    if(sta > 0){
-      debugPrint("${game.stage.tileMap[point]! is TownCenter}");
-      if(game.stage.tileMap[point]! is TownCenter) {
+    switch (game.stage.tileMap[point]!) {
+      case TownCenter():
         TownCenter town = game.stage.tileMap[point]! as TownCenter;
         if (town.open) actions.add("Visit");
         if (town.open) actions.add("Ransack");
-      }
-      if(game.stage.tileMap[point]! is CastleFort) {
-        CastleFort fort = game.stage.tileMap[point]! as CastleFort;
-        if (!fort.gate.isOccupied) actions.add("Depart");
-        if (fort.gate.isOccupied && fort.gate.unit!.controller.checkHostility(unit)) actions.add("Sortie");
-      }
-      if(game.stage.tileMap[point]! is CastleGate) {
+      case CastleGate():
         CastleGate gate = game.stage.tileMap[point]! as CastleGate;
         if (gate.factionName != unit.controller.name){
           if(gate.fort.isOccupied && gate.fort.unit!.controller.checkHostility(unit)){
-            actions.add("Besiege");
+            if (sta > 0) actions.add("Besiege");
           } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
             actions.add("Seize");
           }
@@ -327,10 +320,17 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
             // actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
           }
         }
-      }
+      case CastleFort():
+          CastleFort fort = game.stage.tileMap[point]! as CastleFort;
+          if (!fort.gate.isOccupied) actions.add("Depart");
+          if (fort.gate.isOccupied && fort.gate.unit!.controller.checkHostility(unit)) {
+            if (sta > 0) actions.add("Sortie");}
+    }
+    if(sta > 0){
       if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
       if(unit.getStaffTargetsAt(point).isNotEmpty) actions.add("Staff");
     }
+    debugPrint("${game.stage.tileMap[point]! is TownCenter}");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
