@@ -56,6 +56,8 @@ class StartCombatEvent extends Event {
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
     if(duel) debugPrint("Duel! $name");
     game.add(combat);
+    combat.defender.getBestAttackOnTarget(combat.attacker, 
+                                          combat.defender.getAttacksOnTarget(combat.attacker, Combat.getCombatDistance(combat.attacker, combat.defender)));
     game.combatQueue.addEventBatch([CombatRoundEvent(combat)]);
     game.combatQueue.dispatchEvent(this);
   }
@@ -142,6 +144,7 @@ class AttackEvent extends Event {
     debugPrint("AttackEvent: ${unit.name} against ${target.name}");
     combat.damage = 0;
     Random rng = Random();
+
     var vals = unit.attackCalc(target, unit.attack);
     if (vals.accuracy > 0) {
       if (rng.nextInt(100) + 1 <= vals.accuracy) {
