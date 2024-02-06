@@ -350,6 +350,7 @@ class CastleGate extends Tile {
 }
 
 class CastleFort extends Tile {
+  CastleGate get gate => game.stage.tileMap[Point(point.x, point.y + 2)] as CastleGate;
   CastleFort(Point<int> point, double size, Terrain terrain, String name) 
     : super._internal(point, size, terrain, name);
 }
@@ -444,6 +445,50 @@ class SeizeEvent extends Event {
     gate.cedeTo(unit.controller.name);
     debugPrint("SeizeEvent: ${unit.name} seizes castle ${gate.name} for ${unit.controller.name}.");
     // game.eventQueue.add(UnitMoveEvent(unit, gate.fort.point));
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class GuardCastleEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final CastleGate gate;
+  GuardCastleEvent(this.unit, this.gate, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "GuardCastleEvent: ${unit.name} guards ${gate.name} for ${unit.controller.name}");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    assert(gate.factionName == unit.controller.name);
+    debugPrint("GuardCastleEvent: ${unit.name} guards ${gate.name} for ${unit.controller.name}.");
+    game.eventQueue.add(UnitMoveEvent(unit, gate.fort.point));
+    completeEvent();
+    game.eventQueue.dispatchEvent(this);
+  }
+}
+
+class DepartCastleEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final CastleFort fort;
+  DepartCastleEvent(this.unit, this.fort, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "DepartCastleEvent: ${unit.name} leaves ${fort.gate.name}");
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+
+  @override
+  Future<void> execute() async {
+    super.execute();
+    assert(fort.gate.factionName == unit.controller.name);
+    debugPrint("name");
+    game.eventQueue.add(UnitMoveEvent(unit, fort.gate.point));
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
