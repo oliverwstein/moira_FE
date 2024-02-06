@@ -34,7 +34,7 @@ extension FactionOrder on FactionType {
   Color get factionColor {
     switch (this) {
       case FactionType.blue:
-        return Color.fromARGB(255, 0, 0, 255); // RGB for blue
+        return const Color.fromARGB(255, 0, 0, 255); // RGB for blue
       case FactionType.red:
         return const Color.fromARGB(255, 255, 0, 0); // RGB for red
       case FactionType.green:

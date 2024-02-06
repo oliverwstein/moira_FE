@@ -53,11 +53,6 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
   }
 
   @override
-  void update(dt){
-    super.update(dt);
-  }
-
-  @override
   Future<void> onLoad() async {
     await super.onLoad();
     FlameAudio.bgm.stop();

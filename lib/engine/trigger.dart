@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flame/components.dart';
 import 'package:moira/content/content.dart';
 
@@ -47,14 +45,6 @@ class Trigger extends Component {
     // debugPrint("Check StartTurnEvent");
     if (event is StartTurnEvent) {
       return event.factionName == factionName && event.turn == turn;
-    }
-    return false;
-  });
-
-  Trigger._pan(Point<int> destination) : check = ((Event event) {
-    // debugPrint("Check PanEvent");
-    if (event is PanEvent) {
-      return event.destination == destination;
     }
     return false;
   });

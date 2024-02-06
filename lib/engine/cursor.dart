@@ -1,11 +1,9 @@
-// ignore_for_file: unnecessary_overrides
 import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
-import 'package:flutter/material.dart';
 import 'package:moira/engine/engine.dart';
 
 class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {

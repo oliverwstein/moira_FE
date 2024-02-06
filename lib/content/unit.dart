@@ -4,8 +4,6 @@ import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
-import 'package:flame/rendering.dart';
-import 'package:flame/sprite.dart';
 import 'package:moira/content/content.dart';
 import 'package:flutter/material.dart';
 final grayscalePaint = Paint()
@@ -223,10 +221,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     unit.tile.setUnit(this);
     _loadCompleter.complete();
-  }
-  @override
-  void render(Canvas canvas){
-    super.render(canvas);
   }
 
   Future<void> get loadCompleted => _loadCompleter.future;
@@ -486,11 +480,6 @@ class UnitCircle extends SpriteComponent with HasVisibility{
     anchor = Anchor.center;
     size = Vector2.all(Stage.tileSize*1.25);
     paint = Paint()..colorFilter = ColorFilter.mode(unit.controller.factionType.factionColor.withOpacity(.75), BlendMode.srcATop);
-  }
-
-  @override
-  void render(Canvas canvas){
-    super.render(canvas);
   }
   @override
   void update(double dt) {
