@@ -55,7 +55,7 @@ extension TerrainEffects on Terrain {
         return 0;
     }
   }
-  int get healingPercent {
+  int get recoveryPercent {
     switch (this) {
       case Terrain.fort:
         return 20;

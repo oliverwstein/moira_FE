@@ -593,7 +593,12 @@ class UnitRefreshEvent extends Event {
     super.execute();
     unit.toggleCanAct(true);
     unit.remainingMovement = unit.movementRange.toDouble();
-    unit.sta = (unit.sta + (unit.getStat("sta") ~/ 10)).clamp(unit.getStat("sta") ~/ 10, unit.getStat("sta"));
+    unit.sta = (unit.sta + (unit.getStat("sta") ~/ 10)).clamp(0, unit.getStat("sta"));
+    int recoveryPercent = unit.tile.terrain.recoveryPercent;
+    if(recoveryPercent > 0) {
+      unit.sta = (unit.sta + (unit.getStat("sta")*recoveryPercent ~/ 100)).clamp(0, unit.getStat("sta"));
+      game.eventQueue.addEventBatchToHead([UnitHealEvent(unit, unit.getStat("hp")*recoveryPercent ~/ 100)]);
+    }
     completeEvent();
     game.eventQueue.dispatchEvent(this);
    
