@@ -45,8 +45,12 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
             Set<Tile> reachableTiles = tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
             tile.unit!.markAttackableTiles(reachableTiles.toList());
             // if the unit is a part of the active faction, add the MoveMenu to the stack.
-            if (tile.unit!.controller == game.stage.activeFaction){
-              pushMenu(MoveMenu(tile.unit!, tile));
+            if (tile.unit!.controller == game.stage.activeFaction && tile.unit!.canAct){
+              if(reachableTiles.length > 1) {pushMenu(MoveMenu(tile.unit!, tile));}
+              else {
+                game.stage.blankAllTiles();
+                game.stage.menuManager.pushMenu(ActionMenu(tile.unit!));
+              }
             }
             return KeyEventResult.handled;
           } else {
@@ -172,7 +176,7 @@ class CantoMenu extends Menu {
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     Point<int> direction = const Point(0, 0);
-    debugPrint("MoveMenu given key ${key.logicalKey.keyLabel} to handle.");
+    debugPrint("CantoMenu given key ${key.logicalKey.keyLabel} to handle.");
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         if(game.stage.tileMap[game.stage.cursor.tilePosition]!.state == TileState.move){
@@ -214,12 +218,13 @@ class ActionMenu extends Menu {
   @override 
   void close() {
     super.close();
-    game.stage.menuManager._menuStack.last.close();
+    if(game.stage.menuManager._menuStack.lastOrNull != null){
+      game.stage.menuManager._menuStack.last.close();
+    }
+    
   }
   @override 
   Future<void> onLoad() async {
-    // SpriteAnimation newAnimation = unit.animationMap["idle"]!.animation!;
-    // unit.sprite.animation = newAnimation;
     actions = unit.getActionsAt(game.stage.cursor.tilePosition);
   }
 
@@ -262,6 +267,13 @@ class ActionMenu extends Menu {
             // Create a variant of the CombatMenu called BesiegeMenu. 
             //For now, just trigger a besiege event.
             game.eventQueue.addEventBatch([BesiegeEvent(unit.tile as CastleGate)]);
+          case "Depart":
+            game.eventQueue.addEventBatch([DepartCastleEvent(unit, unit.tile as CastleFort)]);
+            game.stage.menuManager.clearStack();
+          case "Guard":
+            game.eventQueue.addEventBatch([GuardCastleEvent(unit, unit.tile as CastleGate)]);
+            game.stage.menuManager.pushMenu(ActionMenu(unit));
+
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:

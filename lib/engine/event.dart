@@ -81,6 +81,10 @@ abstract class Event extends Component with HasGameReference<MoiraGame>{
       return BesiegeEvent.observers;
     case 'SeizeEvent':
       return SeizeEvent.observers;
+    case 'GuardCastleEvent':
+      return GuardCastleEvent.observers;
+    case 'DepartCastleEvent':
+      return DepartCastleEvent.observers;
     case 'DialogueEvent':
       return DialogueEvent.observers;
     case 'PanEvent':

@@ -304,12 +304,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   }
 
   List<String> getActionsAt(Point<int> point){
+    if(!canAct) {return [];}
     List<String> actions = [];
     debugPrint("${game.stage.tileMap[point]! is TownCenter}");
     if(game.stage.tileMap[point]! is TownCenter) {
       TownCenter town = game.stage.tileMap[point]! as TownCenter;
       if (town.open) actions.add("Visit");
       if (town.open) actions.add("Ransack");
+    }
+    if(game.stage.tileMap[point]! is CastleFort) {
+      CastleFort fort = game.stage.tileMap[point]! as CastleFort;
+      if (!fort.gate.isOccupied) actions.add("Depart");
+      if (fort.gate.isOccupied && fort.gate.unit!.controller.checkHostility(unit)) actions.add("Sortie");
     }
     if(game.stage.tileMap[point]! is CastleGate) {
       CastleGate gate = game.stage.tileMap[point]! as CastleGate;
@@ -318,8 +324,12 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           actions.add("Besiege");
         } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
           actions.add("Seize");
-        } else if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
-          actions.add("Enter");
+        }
+      } 
+      else {
+        if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
+          actions.add("Guard"); // Guard the CastleFort
+          // actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
         }
       }
     }
@@ -332,8 +342,6 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
 
   void toggleCanAct(bool state) {
     _canAct = state;
-    // Apply or remove the grayscale effect based on canAct
-    // sprite.paint = canAct ? Paint() : grayscalePaint;
   }
 
   List<Unit> getTargetsAt(Point<int> tilePosition) {
