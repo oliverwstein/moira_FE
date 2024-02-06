@@ -90,6 +90,7 @@ Future<void> onLoad() async {
   spriteSize = Vector2(spriteSheetImage.width / 4, spriteSheetImage.height / 5);
   size = spriteSize;
   anchor = Anchor.center;
+  direction = null;
 }
 }
 
