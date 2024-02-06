@@ -71,7 +71,7 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
         Vector2 shift = getCursorEdgeOffset();
         if(shift.length != 0) game.camera.moveBy(shift, speed: 10*shift.length.abs());
       }
-      position.lerp(targetPosition, 1/4);
+      position.lerp(targetPosition, 1/8);
     }
   }
 
@@ -103,18 +103,33 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
   Vector2 getCursorEdgeOffset() {
     Rect playBox = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
     Rect centeredRect = game.camera.visibleWorldRect;
+
     // Set distance to check from edge
     double edgeDistance = Stage.tileSize * 2;
-    // Calculate distances
+
+    // Calculate potential dx and dy
     double dx = _calculateOffset(position.x, centeredRect.left, centeredRect.right, playBox.left, playBox.right, edgeDistance);
     double dy = _calculateOffset(position.y, centeredRect.top, centeredRect.bottom, playBox.top, playBox.bottom, edgeDistance);
-    return Vector2(dx, dy);
-  }
 
-  double _calculateOffset(double pos, double rectStart, double rectEnd, double boxStart, double boxEnd, double edgeDistance) {
+    // Clamp dx and dy to ensure centeredRect does not go outside playBox
+    double clampedDx = _clampOffset(dx, centeredRect.left, centeredRect.right, playBox.left, playBox.right);
+    double clampedDy = _clampOffset(dy, centeredRect.top, centeredRect.bottom, playBox.top, playBox.bottom);
+
+    return Vector2(clampedDx, clampedDy);
+}
+
+double _calculateOffset(double pos, double rectStart, double rectEnd, double boxStart, double boxEnd, double edgeDistance) {
     double distStart = (pos - rectStart < edgeDistance && boxStart < rectStart) ? edgeDistance - (pos - rectStart) : 0;
     double distEnd = (rectEnd - pos < edgeDistance && boxEnd > rectEnd) ? edgeDistance - (rectEnd - pos) : 0;
     return distEnd - distStart;
-  }
+}
+
+double _clampOffset(double offset, double rectStart, double rectEnd, double boxStart, double boxEnd) {
+    if (offset > 0) { // Moving right or down
+        return min(offset, boxEnd - rectEnd);
+    } else { // Moving left or up
+        return max(offset, boxStart - rectStart);
+    }
+}
 
 }
