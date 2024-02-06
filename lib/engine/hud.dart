@@ -7,7 +7,7 @@ import 'package:moira/content/content.dart';
 class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent point;
   late final TextComponent terrain;
-  late final TextComponent menu;
+  late final TextComponent effect;
 
   Hud();
   
@@ -17,29 +17,33 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     // ignore: invalid_use_of_internal_member
     position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
     anchor = Anchor.topLeft;
-    size = Vector2(Stage.tileSize*3, Stage.tileSize*3);
+    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
+    double scaler = 24/Stage.tileSize;
     priority = 25;
     point = TextComponent(
         text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
-        position: Vector2(size.x / 2, size.y * (1 / 4)),
+        position: Vector2(size.x / 2, size.y * (1 / 5)),
+        scale: Vector2.all(1/scaler),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     terrain = TextComponent(
         text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
         position: Vector2(size.x / 2, size.y * (2 / 4)),
+        scale: Vector2.all(1/scaler),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
-    menu = TextComponent(
-        text: '',
-        position: Vector2(size.x / 2, size.y * (3 / 4)),
+    effect = TextComponent(
+        text: 'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}',
+        position: Vector2(size.x / 2, size.y * (4 / 5)),
+        scale: Vector2.all(1/scaler),
         anchor: Anchor.center,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(point);
       add(terrain);
-      add(menu);
+      add(effect);
   }
 
   @override
@@ -50,7 +54,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
     point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
     terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
-    menu.text = "(${game.stage.menuManager.last?.runtimeType})";
+    effect.text = 'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}';
   }
 
   @override

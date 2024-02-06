@@ -46,11 +46,19 @@ extension TerrainEffects on Terrain {
   int get defense {
     switch (this) {
       case Terrain.fort:
-        return 2;
+        return 0;
       case Terrain.forest:
-        return 1;
+        return 0;
       case Terrain.path:
-        return -1;
+        return 0;
+      default:
+        return 0;
+    }
+  }
+  int get healing {
+    switch (this) {
+      case Terrain.fort:
+        return 20;
       default:
         return 0;
     }
