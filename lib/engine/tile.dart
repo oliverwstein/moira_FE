@@ -5,7 +5,7 @@ import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 enum TileState {blank, move, attack}
-enum Terrain {forest, path, cliff, sea, stream, fort, gate, rampart, town, ruin, plain}
+enum Terrain {forest, path, cliff, sea, stream, fort, gate, rampart, town, chapel, ruin, plain}
 extension TerrainEffects on Terrain {
   double get cost {
     switch (this) {
@@ -55,10 +55,12 @@ extension TerrainEffects on Terrain {
         return 0;
     }
   }
-  int get healing {
+  int get healingPercent {
     switch (this) {
       case Terrain.fort:
         return 20;
+      case Terrain.chapel:
+        return 100;
       default:
         return 0;
     }
