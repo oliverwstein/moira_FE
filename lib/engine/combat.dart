@@ -58,6 +58,7 @@ class StartCombatEvent extends Event {
     game.add(combat);
     combat.defender.getBestAttackOnTarget(combat.attacker, 
                                           combat.defender.getAttacksOnTarget(combat.attacker, Combat.getCombatDistance(combat.attacker, combat.defender)));
+    if(duel) {combat.defender.getBestAttackOnTarget(combat.attacker, combat.defender.attackSet.values.toList());}
     game.combatQueue.addEventBatch([CombatRoundEvent(combat)]);
     game.combatQueue.dispatchEvent(this);
   }
