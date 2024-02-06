@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/material.dart';
 import 'package:moira/engine/engine.dart';
 
 class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
@@ -67,7 +68,8 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
     if(position != targetPosition) {
       if(!game.stage.menuManager.isNotEmpty){
-        game.camera.moveTo(centerCameraOn(tilePosition, speed), speed: 300);
+        Vector2 shift = getCursorEdgeOffset();
+        if(shift.length != 0) game.camera.moveBy(shift, speed: 10*shift.length.abs());
       }
       position.lerp(targetPosition, 1/4);
     }
@@ -97,4 +99,22 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     game.camera.moveTo(centeredPosition, speed: speed);
     return centeredPosition;
   }
+
+  Vector2 getCursorEdgeOffset() {
+    Rect playBox = Rect.fromPoints(const Offset(0, 0), game.stage.playAreaSize.toOffset());
+    Rect centeredRect = game.camera.visibleWorldRect;
+    // Set distance to check from edge
+    double edgeDistance = Stage.tileSize * 2;
+    // Calculate distances
+    double dx = _calculateOffset(position.x, centeredRect.left, centeredRect.right, playBox.left, playBox.right, edgeDistance);
+    double dy = _calculateOffset(position.y, centeredRect.top, centeredRect.bottom, playBox.top, playBox.bottom, edgeDistance);
+    return Vector2(dx, dy);
+  }
+
+  double _calculateOffset(double pos, double rectStart, double rectEnd, double boxStart, double boxEnd, double edgeDistance) {
+    double distStart = (pos - rectStart < edgeDistance && boxStart < rectStart) ? edgeDistance - (pos - rectStart) : 0;
+    double distEnd = (rectEnd - pos < edgeDistance && boxEnd > rectEnd) ? edgeDistance - (rectEnd - pos) : 0;
+    return distEnd - distStart;
+  }
+
 }
