@@ -247,9 +247,9 @@ class UnitActionMenu extends SelectionMenu {
     // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
-            debugPrint("${actions[selectedIndex]} Chosen");
+            debugPrint("${options[selectedIndex]} Chosen");
             game.stage.blankAllTiles();
-            switch (actions[selectedIndex]){
+            switch (options[selectedIndex]){
               case "Wait":
                 game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);
                 game.stage.menuManager.clearStack();
@@ -287,7 +287,7 @@ class UnitActionMenu extends SelectionMenu {
                 CastleGate gate = unit.tile as CastleGate;
                 game.eventQueue.addEventBatch([GuardCastleEvent(unit, gate)]);
                 game.stage.menuManager.pushMenu(UnitActionMenu(gate.fort.point, unit));
-          } switch (actions[selectedIndex]){
+          } switch (options[selectedIndex]){
               case "End":
                 // End the turn, then close.
                 game.eventQueue.addEventBatch([EndTurnEvent(game.stage.activeFaction!.name)]);
@@ -304,11 +304,11 @@ class UnitActionMenu extends SelectionMenu {
         close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowUp:
-        selectedIndex = (selectedIndex - 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
       case LogicalKeyboardKey.arrowDown:
-        selectedIndex = (selectedIndex + 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
   }
@@ -331,9 +331,9 @@ class StageMenu extends SelectionMenu {
     // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
-            debugPrint("${actions[selectedIndex]} Chosen");
+            debugPrint("${options[selectedIndex]} Chosen");
             game.stage.blankAllTiles();
-            switch (actions[selectedIndex]){
+            switch (options[selectedIndex]){
               case "End":
                 // End the turn, then close.
                 game.eventQueue.addEventBatch([EndTurnEvent(game.stage.activeFaction!.name)]);
@@ -350,11 +350,11 @@ class StageMenu extends SelectionMenu {
         close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowUp:
-        selectedIndex = (selectedIndex - 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
       case LogicalKeyboardKey.arrowDown:
-        selectedIndex = (selectedIndex + 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
   }
@@ -497,10 +497,10 @@ class StaffMenu extends Menu {
 
 class SelectionMenu extends Menu {
   final Point<int> tilePosition;
-  late final List<String> actions;
+  late final List<String> options;
   int selectedIndex = 0;
   late final SpriteFontRenderer fontRenderer;
-  SelectionMenu(this.tilePosition, this.actions);
+  SelectionMenu(this.tilePosition, this.options);
 
   @override 
   void close() {
@@ -513,7 +513,7 @@ class SelectionMenu extends Menu {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    size = Vector2(Stage.tileSize * 3, actions.length * Stage.tileSize * 0.75 + Stage.tileSize * 0.25); // Dynamic size based on actions
+    size = Vector2(Stage.tileSize * 3, options.length * Stage.tileSize * 0.75 + Stage.tileSize * 0.25); // Dynamic size based on options
     anchor = Anchor.center;
     fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     
@@ -526,27 +526,30 @@ class SelectionMenu extends Menu {
   @override
   void render(Canvas canvas) {
       super.render(canvas);
-      final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
-      final highlightPaint = Paint()..color = Color.fromARGB(141, 203, 16, 203); // Color for highlighting selected action
-      canvas.drawRect(size.toRect(), backgroundPaint);
-      // Calculate the height of each action entry for positioning and highlighting
-      double actionHeight = Stage.tileSize * 0.75;
-      // Render each action using the SpriteFontRenderer
-      for (int i = 0; i < actions.length; i++) {
-          double yPos = i * actionHeight; // Adjust yPos as needed for spacing
-          // Highlight the background of the selected action
-          if (i == selectedIndex) {
-              Rect highlightRect = Rect.fromLTWH(0, yPos + Stage.tileSize * 0.1, size.x, actionHeight + Stage.tileSize * 0.10);
-              canvas.drawRect(highlightRect, highlightPaint);
-          }
-          // Use the fontRenderer to draw the text
-          fontRenderer.render(
-              canvas,
-              actions[i],
-              Vector2(Stage.tileSize * 0.25, yPos), // Adjust text position within the highlighted area
-              anchor: Anchor.topLeft,
-          );
+      if(game.stage.menuManager._menuStack.last == this){
+        final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
+        final highlightPaint = Paint()..color = Color.fromARGB(141, 203, 16, 203); // Color for highlighting selected action
+        canvas.drawRect(size.toRect(), backgroundPaint);
+        // Calculate the height of each action entry for positioning and highlighting
+        double actionHeight = Stage.tileSize * 0.75;
+        // Render each action using the SpriteFontRenderer
+        for (int i = 0; i < options.length; i++) {
+            double yPos = i * actionHeight; // Adjust yPos as needed for spacing
+            // Highlight the background of the selected action
+            if (i == selectedIndex) {
+                Rect highlightRect = Rect.fromLTWH(0, yPos + Stage.tileSize * 0.1, size.x, actionHeight + Stage.tileSize * 0.10);
+                canvas.drawRect(highlightRect, highlightPaint);
+            }
+            // Use the fontRenderer to draw the text
+            fontRenderer.render(
+                canvas,
+                options[i],
+                Vector2(Stage.tileSize * 0.25, yPos), // Adjust text position within the highlighted area
+                anchor: Anchor.topLeft,
+            );
+        }
       }
+      
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -554,15 +557,15 @@ class SelectionMenu extends Menu {
     // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
-          debugPrint("${actions[selectedIndex]} Chosen");
+          debugPrint("${options[selectedIndex]} Chosen");
       case LogicalKeyboardKey.keyB:
         close();
       case LogicalKeyboardKey.arrowUp:
-        selectedIndex = (selectedIndex - 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
       case LogicalKeyboardKey.arrowDown:
-        selectedIndex = (selectedIndex + 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
   }
@@ -588,7 +591,7 @@ class InventoryMenu extends SelectionMenu {
     // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
-            debugPrint("${actions[selectedIndex]} Chosen");
+            debugPrint("${options[selectedIndex]} Chosen");
         if(unit.inventory[selectedIndex].use != null){
           // If the item has a use, prompt if they want to use it.
         } 
@@ -600,11 +603,11 @@ class InventoryMenu extends SelectionMenu {
         close();
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowUp:
-        selectedIndex = (selectedIndex - 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
       case LogicalKeyboardKey.arrowDown:
-        selectedIndex = (selectedIndex + 1) % actions.length;
-        debugPrint("${actions[selectedIndex]} Selected");
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
   }
