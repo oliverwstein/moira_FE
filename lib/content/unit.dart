@@ -324,10 +324,12 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           actions.add("Besiege");
         } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
           actions.add("Seize");
-        } else if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
-          actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
-        } else if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
+        }
+      } 
+      else {
+        if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
           actions.add("Guard"); // Guard the CastleFort
+          actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
         }
       }
     }
