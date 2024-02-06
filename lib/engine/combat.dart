@@ -54,11 +54,10 @@ class StartCombatEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("StartCombatEvent: ${combat.attacker.name} against ${combat.defender.name}");
-    if(duel) debugPrint("Duel! $name");
     game.add(combat);
-    combat.defender.getBestAttackOnTarget(combat.attacker, 
-                                          combat.defender.getAttacksOnTarget(combat.attacker, Combat.getCombatDistance(combat.attacker, combat.defender)));
-    if(duel) {combat.defender.getBestAttackOnTarget(combat.attacker, combat.defender.attackSet.values.toList());}
+    if(duel) {
+      debugPrint("Duel! $name");
+      combat.defender.getBestAttackOnTarget(combat.attacker, combat.defender.attackSet.values.toList());}
     game.combatQueue.addEventBatch([CombatRoundEvent(combat)]);
     game.combatQueue.dispatchEvent(this);
   }
