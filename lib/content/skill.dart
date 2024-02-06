@@ -57,9 +57,8 @@ class CantoEvent extends Event {
   final Unit unit;
   static void initialize(EventQueue eventQueue) {
     eventQueue.registerClassObserver<UnitExhaustEvent>((unitExhaustEvent) {
-      debugPrint("Canto Check");
       if (unitExhaustEvent.unit.hasSkill(Skill.canto) && unitExhaustEvent.unit.remainingMovement >= .7 && unitExhaustEvent.manual == false) {
-        debugPrint("Canto Check Succeeds");
+        debugPrint("Canto Activates");
         unitExhaustEvent.unit.toggleCanAct(true);
         CantoEvent cantoEvent = CantoEvent(unitExhaustEvent.unit);
         EventQueue eventQueue = unitExhaustEvent.game.eventQueue;

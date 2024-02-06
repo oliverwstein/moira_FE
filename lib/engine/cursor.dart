@@ -96,7 +96,5 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     Vector2 centeredPosition = crudePosition + Vector2(dx, dy);
     game.camera.moveTo(centeredPosition, speed: speed);
     return centeredPosition;
-    
-    
   }
 }

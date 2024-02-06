@@ -117,6 +117,11 @@ class MoveMenu extends Menu {
     super.onRemove();
     unit.setSpriteDirection(null);
   }
+  @override
+  void update(dt){
+    Cursor cursor = game.stage.cursor;
+    game.camera.moveTo(cursor.centerCameraOn(cursor.tilePosition, 300), speed: 300);
+  }
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -171,6 +176,11 @@ class CantoMenu extends Menu {
   void onRemove() {
     super.onRemove();
     unit.setSpriteDirection(null);
+  }
+  @override
+  void update(dt){
+    Cursor cursor = game.stage.cursor;
+    game.camera.moveTo(cursor.centerCameraOn(cursor.tilePosition, 300), speed: 300);
   }
 
   @override
