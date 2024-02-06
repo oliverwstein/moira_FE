@@ -140,6 +140,11 @@ class AttackEvent extends Event {
       completeEvent();
       return;
     }
+    if(combat.attacker.sta <= 0){
+      debugPrint("${combat.attacker} too fatigued to strike.");
+      completeEvent();
+      return;
+    }
     debugPrint("AttackEvent: ${unit.name} against ${target.name}");
     combat.damage = 0;
     Random rng = Random();
