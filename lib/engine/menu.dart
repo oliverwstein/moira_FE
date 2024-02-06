@@ -40,7 +40,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
           Tile tile = game.stage.tileMap[game.stage.cursor.tilePosition]!;
-          if(tile.isOccupied && tile.unit!.canAct) {
+          if(tile.isOccupied) {
             game.stage.blankAllTiles();
             Set<Tile> reachableTiles = tile.unit!.findReachableTiles(tile.unit!.movementRange.toDouble());
             tile.unit!.markAttackableTiles(reachableTiles.toList());
