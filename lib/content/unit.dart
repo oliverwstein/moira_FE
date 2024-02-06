@@ -300,35 +300,37 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   List<String> getActionsAt(Point<int> point){
     if(!canAct) {return [];}
     List<String> actions = [];
-    debugPrint("${game.stage.tileMap[point]! is TownCenter}");
-    if(game.stage.tileMap[point]! is TownCenter) {
-      TownCenter town = game.stage.tileMap[point]! as TownCenter;
-      if (town.open) actions.add("Visit");
-      if (town.open) actions.add("Ransack");
-    }
-    if(game.stage.tileMap[point]! is CastleFort) {
-      CastleFort fort = game.stage.tileMap[point]! as CastleFort;
-      if (!fort.gate.isOccupied) actions.add("Depart");
-      if (fort.gate.isOccupied && fort.gate.unit!.controller.checkHostility(unit)) actions.add("Sortie");
-    }
-    if(game.stage.tileMap[point]! is CastleGate) {
-      CastleGate gate = game.stage.tileMap[point]! as CastleGate;
-      if (gate.factionName != unit.controller.name){
-        if(gate.fort.isOccupied && gate.fort.unit!.controller.checkHostility(unit)){
-          actions.add("Besiege");
-        } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
-          actions.add("Seize");
-        }
-      } 
-      else {
-        if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
-          actions.add("Guard"); // Guard the CastleFort
-          // actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
+    if(sta > 0){
+      debugPrint("${game.stage.tileMap[point]! is TownCenter}");
+      if(game.stage.tileMap[point]! is TownCenter) {
+        TownCenter town = game.stage.tileMap[point]! as TownCenter;
+        if (town.open) actions.add("Visit");
+        if (town.open) actions.add("Ransack");
+      }
+      if(game.stage.tileMap[point]! is CastleFort) {
+        CastleFort fort = game.stage.tileMap[point]! as CastleFort;
+        if (!fort.gate.isOccupied) actions.add("Depart");
+        if (fort.gate.isOccupied && fort.gate.unit!.controller.checkHostility(unit)) actions.add("Sortie");
+      }
+      if(game.stage.tileMap[point]! is CastleGate) {
+        CastleGate gate = game.stage.tileMap[point]! as CastleGate;
+        if (gate.factionName != unit.controller.name){
+          if(gate.fort.isOccupied && gate.fort.unit!.controller.checkHostility(unit)){
+            actions.add("Besiege");
+          } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
+            actions.add("Seize");
+          }
+        } 
+        else {
+          if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
+            actions.add("Guard"); // Guard the CastleFort
+            // actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
+          }
         }
       }
+      if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
+      if(unit.getStaffTargetsAt(point).isNotEmpty) actions.add("Staff");
     }
-    if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
-    if(unit.getStaffTargetsAt(point).isNotEmpty) actions.add("Staff");
     if(unit.inventory.isNotEmpty) actions.add("Items");
     actions.add("Wait");
     return actions;
@@ -591,6 +593,7 @@ class UnitRefreshEvent extends Event {
     super.execute();
     unit.toggleCanAct(true);
     unit.remainingMovement = unit.movementRange.toDouble();
+    unit.sta = (unit.sta + (unit.getStat("sta") ~/ 10)).clamp(unit.getStat("sta") ~/ 10, unit.getStat("sta"));
     completeEvent();
     game.eventQueue.dispatchEvent(this);
    

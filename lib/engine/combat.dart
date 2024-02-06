@@ -153,6 +153,7 @@ class AttackEvent extends Event {
         game.combatQueue.addEventBatchToHead([MissEvent(combat, unit, target)]);
       }
     }
+    unit.sta = (unit.sta - vals.fatigue).clamp(0, unit.getStat("sta"));
     completeEvent();
     game.combatQueue.dispatchEvent(this);
   }
