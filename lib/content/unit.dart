@@ -329,7 +329,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       else {
         if(!gate.fort.isOccupied && gate.factionName == unit.controller.name){
           actions.add("Guard"); // Guard the CastleFort
-          actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
+          // actions.add("Enter"); // Go into the Castle (@TODO: Implement Castle interior)
         }
       }
     }
