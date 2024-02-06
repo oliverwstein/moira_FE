@@ -57,13 +57,15 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
               if(reachableTiles.length > 1) {pushMenu(MoveMenu(tile.unit!, tile));}
               else {
                 game.stage.blankAllTiles();
-                game.stage.menuManager.pushMenu(ActionMenu(tile.unit!, tile.point));
+                List<String> actions = tile.unit!.getActionsAt(tile.point);
+                game.stage.menuManager.pushMenu(ActionMenu(tile.point, actions));
               }
             }
             return KeyEventResult.handled;
           } else {
-            // add the StageMenu to the stack.
-            pushMenu(StageMenu());
+            // add the basic action menu to the stack.
+            List<String> actions = ["End", "Save"];
+            pushMenu(ActionMenu(tile.point, actions));
             return KeyEventResult.handled;
           }
         case LogicalKeyboardKey.keyB:
@@ -141,7 +143,8 @@ class MoveMenu extends Menu {
           // Move the unit to the tile selected by the cursor. 
           game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
           game.stage.blankAllTiles();
-          game.stage.menuManager.pushMenu(ActionMenu(unit, game.stage.cursor.tilePosition));
+          List<String> actions = unit.getActionsAt(game.stage.cursor.tilePosition);
+          game.stage.menuManager.pushMenu(ActionMenu(game.stage.cursor.tilePosition, actions));
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
@@ -228,14 +231,12 @@ class CantoMenu extends Menu {
 }
 
 class ActionMenu extends Menu {
-  final Unit unit;
+  Unit? unit;
   final Point<int> tilePosition;
   late final List<String> actions;
   int selectedIndex = 0;
   late final SpriteFontRenderer fontRenderer;
-  ActionMenu(this.unit, this.tilePosition){
-    actions = unit.getActionsAt(tilePosition);
-  }
+  ActionMenu(this.tilePosition, this.actions);
 
   @override 
   void close() {
@@ -246,11 +247,13 @@ class ActionMenu extends Menu {
     
   }
   @override
-  void onLoad() {
+  Future<void> onLoad() async {
     super.onLoad();
     size = Vector2(Stage.tileSize * 3, actions.length * Stage.tileSize * 0.75 + Stage.tileSize * 0.25); // Dynamic size based on actions
     anchor = Anchor.center;
+    unit = game.stage.tileMap[tilePosition]!.unit;
     fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
+    
   }
 
   @override
@@ -282,55 +285,67 @@ class ActionMenu extends Menu {
           );
       }
   }
-
-
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
-    if(unit.isMoving) return KeyEventResult.ignored;
-    switch (key.logicalKey) {
-      case LogicalKeyboardKey.keyA:
-        debugPrint("${actions[selectedIndex]} Chosen");
-        game.stage.blankAllTiles();
-        switch (actions[selectedIndex]){
-          case "Wait":
-            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: true)]);
-            game.stage.menuManager.clearStack();
-            break;
-          case "Items":
-            game.stage.menuManager.pushMenu(InventoryMenu(unit));
-            break;
-          case "Staff":
-            game.stage.menuManager.pushMenu(StaffMenu(unit));
-            break;
-          case "Attack":
-            List<Unit> targets = unit.getTargetsAt(unit.tilePosition);
-            game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
-            break;
-          case "Visit":
-            game.eventQueue.addEventBatch([VisitEvent(unit, unit.tile as TownCenter)]);
-            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
-            game.stage.menuManager.clearStack();
-            break;
-          case "Ransack":
-            game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
-            game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
-            game.stage.menuManager.clearStack();
-            break;
-          case "Seize":
-            game.eventQueue.addEventBatch([SeizeEvent(unit, unit.tile as CastleGate)]);
-          case "Besiege":
-            // Create a variant of the CombatMenu called BesiegeMenu. 
-            //For now, just trigger a besiege event.
-            game.eventQueue.addEventBatch([BesiegeEvent(unit.tile as CastleGate)]);
-          case "Depart":
-            game.eventQueue.addEventBatch([DepartCastleEvent(unit, unit.tile as CastleFort)]);
-            game.stage.menuManager.clearStack();
-          case "Guard":
-            game.eventQueue.addEventBatch([GuardCastleEvent(unit, unit.tile as CastleGate)]);
-            game.stage.menuManager.pushMenu(ActionMenu(unit, game.stage.cursor.tilePosition));
-
-        }
+    // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
+      switch (key.logicalKey) {
+        case LogicalKeyboardKey.keyA:
+          if(unit != null) {
+            Unit selectedUnit = unit!;
+            debugPrint("${actions[selectedIndex]} Chosen");
+            game.stage.blankAllTiles();
+            switch (actions[selectedIndex]){
+              case "Wait":
+                game.eventQueue.addEventBatch([UnitExhaustEvent(selectedUnit, manual: true)]);
+                game.stage.menuManager.clearStack();
+                break;
+              case "Items":
+                game.stage.menuManager.pushMenu(InventoryMenu(selectedUnit));
+                break;
+              case "Staff":
+                game.stage.menuManager.pushMenu(StaffMenu(selectedUnit));
+                break;
+              case "Attack":
+                List<Unit> targets = selectedUnit.getTargetsAt(selectedUnit.tilePosition);
+                game.stage.menuManager.pushMenu(CombatMenu(selectedUnit, targets));
+                break;
+              case "Visit":
+                game.eventQueue.addEventBatch([VisitEvent(selectedUnit, selectedUnit.tile as TownCenter)]);
+                game.eventQueue.addEventBatch([UnitExhaustEvent(selectedUnit, manual: false)]);
+                game.stage.menuManager.clearStack();
+                break;
+              case "Ransack":
+                game.eventQueue.addEventBatch([RansackEvent(selectedUnit, selectedUnit.tile as TownCenter)]);
+                game.eventQueue.addEventBatch([UnitExhaustEvent(selectedUnit, manual: false)]);
+                game.stage.menuManager.clearStack();
+                break;
+              case "Seize":
+                game.eventQueue.addEventBatch([SeizeEvent(selectedUnit, selectedUnit.tile as CastleGate)]);
+              case "Besiege":
+                // Create a variant of the CombatMenu called BesiegeMenu. 
+                //For now, just trigger a besiege event.
+                game.eventQueue.addEventBatch([BesiegeEvent(selectedUnit.tile as CastleGate)]);
+              case "Depart":
+                game.eventQueue.addEventBatch([DepartCastleEvent(selectedUnit, selectedUnit.tile as CastleFort)]);
+                game.stage.menuManager.clearStack();
+              case "Guard":
+                game.eventQueue.addEventBatch([GuardCastleEvent(selectedUnit, selectedUnit.tile as CastleGate)]);
+                List<String> actions = selectedUnit.getActionsAt(game.stage.cursor.tilePosition);
+                game.stage.menuManager.pushMenu(ActionMenu(game.stage.cursor.tilePosition, actions));
+            }
+          } switch (actions[selectedIndex]){
+              case "End":
+                // End the turn, then close.
+                game.eventQueue.addEventBatch([EndTurnEvent(game.stage.activeFaction!.name)]);
+                // Note: it is not faster to create and execute the event manually.
+                close();
+                break;
+              case "Save":
+                // @TODO add saving?
+                close();
+                break;
+            }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();
@@ -344,7 +359,6 @@ class ActionMenu extends Menu {
     }
     return KeyEventResult.handled;
   }
-
 }
 
 class CombatMenu extends Menu {
@@ -479,43 +493,6 @@ class StaffMenu extends Menu {
       default:
         return KeyEventResult.ignored;
     }
-  }
-}
-
-class StageMenu extends Menu {
-  final List<String> options = ["Save Game", "End Turn"];
-  int selectedIndex = 0;
-  StageMenu();
-  @override
-  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint("StageMenu given key ${key.logicalKey.keyLabel} to handle.");
-    switch (key.logicalKey) {
-      case LogicalKeyboardKey.keyA:
-        debugPrint("${options[selectedIndex]} Chosen");
-        switch (options[selectedIndex]){
-          case "End Turn":
-            // End the turn, then close.
-            game.eventQueue.addEventBatch([EndTurnEvent(game.stage.activeFaction!.name)]);
-            // Note: it is not faster to create and execute the event manually.
-            close();
-            break;
-          case "Save Game":
-            // @TODO add saving?
-            close();
-            break;
-        }
-        return KeyEventResult.handled;
-      case LogicalKeyboardKey.keyB:
-        close();
-        return KeyEventResult.handled;
-      case LogicalKeyboardKey.arrowUp:
-        selectedIndex = (selectedIndex - 1) % options.length;
-        debugPrint("${options[selectedIndex]} Selected");
-      case LogicalKeyboardKey.arrowDown:
-        selectedIndex = (selectedIndex + 1) % options.length;
-        debugPrint("${options[selectedIndex]} Selected");
-    }
-    return KeyEventResult.handled;
   }
 }
 
