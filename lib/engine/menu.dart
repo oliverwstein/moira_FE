@@ -1,16 +1,24 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/extensions.dart';
+import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jenny/jenny.dart';
 import 'package:moira/content/content.dart';
 
-class MenuManager extends Component with HasGameReference<MoiraGame> implements InputHandler {
+class MenuManager extends PositionComponent with HasGameReference<MoiraGame> implements InputHandler {
   final List<Menu> _menuStack = [];
 
   bool get isNotEmpty => _menuStack.isNotEmpty;
   Menu? get last => _menuStack.lastOrNull;
+
+  @override
+  void onLoad() {
+    super.onLoad();
+    anchor = Anchor.center;
+  }
 
   void pushMenu(Menu menu) {
     add(menu);
@@ -49,7 +57,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
               if(reachableTiles.length > 1) {pushMenu(MoveMenu(tile.unit!, tile));}
               else {
                 game.stage.blankAllTiles();
-                game.stage.menuManager.pushMenu(ActionMenu(tile.unit!));
+                game.stage.menuManager.pushMenu(ActionMenu(tile.unit!, tile.point));
               }
             }
             return KeyEventResult.handled;
@@ -72,7 +80,7 @@ class MenuManager extends Component with HasGameReference<MoiraGame> implements 
   }
 }
 
-abstract class Menu extends Component with HasGameReference<MoiraGame> implements InputHandler {
+abstract class Menu extends PositionComponent with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
   void close() {game.stage.menuManager.popMenu();}
   @override
@@ -120,7 +128,7 @@ class MoveMenu extends Menu {
   @override
   void update(dt){
     Cursor cursor = game.stage.cursor;
-    game.camera.moveTo(cursor.centerCameraOn(cursor.tilePosition, 300), speed: 300);
+    game.camera.moveBy(cursor.getCursorEdgeOffset(), speed: 300);
   }
 
   @override
@@ -133,7 +141,7 @@ class MoveMenu extends Menu {
           // Move the unit to the tile selected by the cursor. 
           game.eventQueue.addEventBatch([UnitMoveEvent(unit, game.stage.cursor.tilePosition)]);
           game.stage.blankAllTiles();
-          game.stage.menuManager.pushMenu(ActionMenu(unit));
+          game.stage.menuManager.pushMenu(ActionMenu(unit, game.stage.cursor.tilePosition));
         }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
@@ -180,7 +188,7 @@ class CantoMenu extends Menu {
   @override
   void update(dt){
     Cursor cursor = game.stage.cursor;
-    game.camera.moveTo(cursor.centerCameraOn(cursor.tilePosition, 300), speed: 300);
+    game.camera.moveBy(cursor.getCursorEdgeOffset(), speed: 300);
   }
 
   @override
@@ -221,9 +229,13 @@ class CantoMenu extends Menu {
 
 class ActionMenu extends Menu {
   final Unit unit;
+  final Point<int> tilePosition;
   late final List<String> actions;
   int selectedIndex = 0;
-  ActionMenu(this.unit);
+  late final SpriteFontRenderer fontRenderer;
+  ActionMenu(this.unit, this.tilePosition){
+    actions = unit.getActionsAt(tilePosition);
+  }
 
   @override 
   void close() {
@@ -233,10 +245,44 @@ class ActionMenu extends Menu {
     }
     
   }
-  @override 
-  Future<void> onLoad() async {
-    actions = unit.getActionsAt(game.stage.cursor.tilePosition);
+  @override
+  void onLoad() {
+    super.onLoad();
+    size = Vector2(Stage.tileSize * 3, actions.length * Stage.tileSize * 0.75 + Stage.tileSize * 0.25); // Dynamic size based on actions
+    anchor = Anchor.center;
+    fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
   }
+
+  @override
+  void update(dt){
+    position = Vector2(game.stage.cursor.position.x + Stage.tileSize*3, game.stage.cursor.position.y - Stage.tileSize*1);
+  }
+  @override
+  void render(Canvas canvas) {
+      super.render(canvas);
+      final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
+      final highlightPaint = Paint()..color = Color.fromARGB(141, 203, 16, 203); // Color for highlighting selected action
+      canvas.drawRect(size.toRect(), backgroundPaint);
+      // Calculate the height of each action entry for positioning and highlighting
+      double actionHeight = Stage.tileSize * 0.75;
+      // Render each action using the SpriteFontRenderer
+      for (int i = 0; i < actions.length; i++) {
+          double yPos = i * actionHeight; // Adjust yPos as needed for spacing
+          // Highlight the background of the selected action
+          if (i == selectedIndex) {
+              Rect highlightRect = Rect.fromLTWH(0, yPos + Stage.tileSize * 0.1, size.x, actionHeight + Stage.tileSize * 0.10);
+              canvas.drawRect(highlightRect, highlightPaint);
+          }
+          // Use the fontRenderer to draw the text
+          fontRenderer.render(
+              canvas,
+              actions[i],
+              Vector2(Stage.tileSize * 0.25, yPos), // Adjust text position within the highlighted area
+              anchor: Anchor.topLeft,
+          );
+      }
+  }
+
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -282,7 +328,7 @@ class ActionMenu extends Menu {
             game.stage.menuManager.clearStack();
           case "Guard":
             game.eventQueue.addEventBatch([GuardCastleEvent(unit, unit.tile as CastleGate)]);
-            game.stage.menuManager.pushMenu(ActionMenu(unit));
+            game.stage.menuManager.pushMenu(ActionMenu(unit, game.stage.cursor.tilePosition));
 
         }
         return KeyEventResult.handled;
