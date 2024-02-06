@@ -65,6 +65,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
 class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent name;
   late final TextComponent hp;
+  late final TextComponent sta;
   late final Unit? unit;
 
   UnitHud();
@@ -74,7 +75,7 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
     super.onLoad();
     size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
     anchor = Anchor.topLeft;
-    double scaler = 20/Stage.tileSize;
+    double scaler = 24/Stage.tileSize;
     name = TextComponent(
         text: game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name,
         scale: Vector2.all(1/scaler),
@@ -82,13 +83,20 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
     hp = TextComponent(
-        text: "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("hp")}",
+        text: "HP:${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("hp")}",
+        scale: Vector2.all(1/scaler),
+        anchor: Anchor.topCenter,
+        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
+      );
+    sta = TextComponent(
+        text: "STA:${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.sta}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("sta")}",
         scale: Vector2.all(1/scaler),
         anchor: Anchor.topCenter,
         textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
       );
       add(name);
       add(hp);
+      add(sta);
   }
   @override
   void update(double dt) {
@@ -101,9 +109,12 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
       name.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.name}";
       name.anchor = Anchor.topCenter;
       name.position = Vector2(size.x/2, 0);
-      hp.text = "${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("hp")}";
+      hp.text = "HP:${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.hp}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("hp")}";
       hp.anchor = Anchor.topCenter;
-      hp.position = Vector2(size.x/2, size.y/2);
+      hp.position = Vector2(size.x/2, size.y/3);
+      sta.text = "STA:${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.sta}/${game.stage.tileMap[game.stage.cursor.tilePosition]!.unit?.getStat("sta")}";
+      sta.anchor = Anchor.topCenter;
+      sta.position = Vector2(size.x/2, 2*size.y/3);
       isVisible = true;
     } else {isVisible = false;}
     
