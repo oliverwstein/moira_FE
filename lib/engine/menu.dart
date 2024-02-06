@@ -497,139 +497,49 @@ class CombatMenu extends Menu {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if(game.stage.menuManager._menuStack.last == this){
+    if (game.stage.menuManager._menuStack.last == this) {
       final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
       canvas.drawRect(size.toRect(), backgroundPaint);
-      double lineHeight = Stage.tileSize*.6;
-      // Render the unit's name
-      fontRenderer.render(
-              canvas,
-              "${unit.name}",
-              Vector2(Stage.tileSize * 0.25, 0),
-              anchor: Anchor.topLeft,
-          );
-      fontRenderer.render(
-              canvas,
-              "${unit.main?.name}",
-              Vector2(size.x-Stage.tileSize * 0.25, 0),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              unit.attack?.name ?? "",
-              Vector2(size.x-Stage.tileSize * 0.25, lineHeight),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              "HP",
-              Vector2(size.x/2, lineHeight*2),
-              anchor: Anchor.topCenter,
-          );
-      fontRenderer.render(
-              canvas,
-              "${targets[selectedTargetIndex].hp}",
-              Vector2(size.x/4, lineHeight*2),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              "${unit.hp}",
-              Vector2(3*size.x/4, lineHeight*2),
-              anchor: Anchor.topLeft,
-          );
-      fontRenderer.render(
-              canvas,
-              "STA",
-              Vector2(size.x/2, lineHeight*3),
-              anchor: Anchor.topCenter,
-          );
-      fontRenderer.render(
-              canvas,
-              "${targets[selectedTargetIndex].sta}-${defenderVals.fatigue}",
-              Vector2(size.x/4, lineHeight*3),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              "${unit.sta}-${attackerVals.fatigue}",
-              Vector2(3*size.x/4, lineHeight*3),
-              anchor: Anchor.topLeft,
-          );
-      fontRenderer.render(
-              canvas,
-              "Damage",
-              Vector2(size.x/2, lineHeight*4),
-              anchor: Anchor.topCenter,
-          );
-      fontRenderer.render(
-              canvas,
-              "${defenderVals.damage}",
-              Vector2(size.x/4, lineHeight*4),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              "${attackerVals.damage}",
-              Vector2(3*size.x/4, lineHeight*4),
-              anchor: Anchor.topLeft,
-          );
-      fontRenderer.render(
-              canvas,
-              "Hit %",
-              Vector2(size.x/2, lineHeight*5),
-              anchor: Anchor.topCenter,
-          );
-      fontRenderer.render(
-              canvas,
-              "${defenderVals.accuracy}",
-              Vector2(size.x/4, lineHeight*5),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              "${attackerVals.accuracy}",
-              Vector2(3*size.x/4, lineHeight*5),
-              anchor: Anchor.topLeft,
-          );
-      fontRenderer.render(
-              canvas,
-              "Crit %",
-              Vector2(size.x/2, lineHeight*6),
-              anchor: Anchor.topCenter,
-          );
-      fontRenderer.render(
-              canvas,
-              "${defenderVals.critRate}",
-              Vector2(size.x/4, lineHeight*6),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              "${attackerVals.critRate}",
-              Vector2(3*size.x/4, lineHeight*6),
-              anchor: Anchor.topLeft,
-          );
-      fontRenderer.render(
-              canvas,
-              "${targets[selectedTargetIndex].name}",
-              Vector2(Stage.tileSize * 0.25, lineHeight*7),
-              anchor: Anchor.topLeft,
-          );
-      fontRenderer.render(
-              canvas,
-              "${targets[selectedTargetIndex].main?.name}",
-              Vector2(size.x-Stage.tileSize * 0.25, lineHeight*7),
-              anchor: Anchor.topRight,
-          );
-      fontRenderer.render(
-              canvas,
-              targets[selectedTargetIndex].attack?.name ?? "",
-              Vector2(size.x-Stage.tileSize * 0.25, lineHeight*8),
-              anchor: Anchor.topRight,
-          );
+      double lineHeight = Stage.tileSize * .6;
+      double leftColumnX = size.x / 4;
+      double rightColumnX = size.x - leftColumnX;
+      double centerColumnX = size.x / 2;
+
+      List<(String, double, double, Anchor)> renderTexts = [
+        ("${unit.name}", Stage.tileSize*.25, 0, Anchor.topLeft),
+        ("${unit.main?.name}", size.x - Stage.tileSize*.25, 0, Anchor.topRight),
+        (unit.attack?.name ?? "", rightColumnX, lineHeight, Anchor.topRight),
+        ("HP", centerColumnX, lineHeight * 2, Anchor.topCenter),
+        ("${targets[selectedTargetIndex].hp}", leftColumnX, lineHeight * 2, Anchor.topRight),
+        ("${unit.hp}", rightColumnX, lineHeight * 2, Anchor.topLeft),
+        ("STA", centerColumnX, lineHeight * 3, Anchor.topCenter),
+        ("${targets[selectedTargetIndex].sta}-${defenderVals.fatigue}", leftColumnX, lineHeight * 3, Anchor.topRight),
+        ("${unit.sta}-${attackerVals.fatigue}", rightColumnX, lineHeight * 3, Anchor.topLeft),
+        ("Damage", centerColumnX, lineHeight * 4, Anchor.topCenter),
+        ("${defenderVals.damage}", leftColumnX, lineHeight * 4, Anchor.topRight),
+        ("${attackerVals.damage}", rightColumnX, lineHeight * 4, Anchor.topLeft),
+        ("Hit %", centerColumnX, lineHeight * 5, Anchor.topCenter),
+        ("${defenderVals.accuracy}", leftColumnX, lineHeight * 5, Anchor.topRight),
+        ("${attackerVals.accuracy}", rightColumnX, lineHeight * 5, Anchor.topLeft),
+        ("Crit %", centerColumnX, lineHeight * 6, Anchor.topCenter),
+        ("${defenderVals.critRate}", leftColumnX, lineHeight * 6, Anchor.topRight),
+        ("${attackerVals.critRate}", rightColumnX, lineHeight * 6, Anchor.topLeft),
+        ("${targets[selectedTargetIndex].name}", Stage.tileSize*.25, lineHeight * 7, Anchor.topLeft),
+        ("${targets[selectedTargetIndex].main?.name}", size.x - Stage.tileSize*.25, lineHeight * 7, Anchor.topRight),
+        (targets[selectedTargetIndex].attack?.name ?? "", size.x - Stage.tileSize*.25, lineHeight * 8, Anchor.topRight),
+      ];
+
+      for (var textInfo in renderTexts) {
+        fontRenderer.render(
+          canvas,
+          textInfo.$1,
+          Vector2(textInfo.$2, textInfo.$3),
+          anchor: textInfo.$4,
+        );
+      }
     }
   }
+
 
   @override 
   Future<void> onLoad() async {
