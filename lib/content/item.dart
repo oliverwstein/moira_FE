@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
 class Effect extends Component {}
 class Use extends Component {}
