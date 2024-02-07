@@ -303,7 +303,7 @@ class SelectionMenu extends Menu {
   }
 }
 
-class UnitActionMenu extends SelectionMenu {
+class UnitActionMenu extends SelectionMenu with HasVisibility {
   final Unit unit;
 
   UnitActionMenu(Point<int> tilePosition, this.unit)
@@ -315,12 +315,17 @@ class UnitActionMenu extends SelectionMenu {
     if(game.stage.menuManager._menuStack.lastOrNull != null){
       game.stage.menuManager._menuStack.last.close();
     }
-    
+  }
+
+  @override
+  void update(dt){
+    super.update(dt);
+    if(unit.tilePosition != game.stage.cursor.tilePosition) {isVisible = false;} else {isVisible = true;}
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
-    // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
+    if(!isVisible) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
             debugPrint("${options[selectedIndex]} Chosen");
@@ -478,7 +483,7 @@ class StageMenu extends SelectionMenu {
   }
 }
 
-class CombatMenu extends Menu {
+class CombatMenu extends Menu{
   final Unit unit;
   final List<Unit> targets;
   late List<Attack> attacks;
@@ -545,7 +550,6 @@ class CombatMenu extends Menu {
     }
   }
 
-
   @override 
   Future<void> onLoad() async {
     size = Vector2(Stage.tileSize * 4, Stage.tileSize * 6);
@@ -563,6 +567,7 @@ class CombatMenu extends Menu {
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     debugPrint("CombatMenu given key ${key.logicalKey.keyLabel} to handle.");
+    if(unit.isMoving) return KeyEventResult.handled;
     switch (key.logicalKey) {
       case LogicalKeyboardKey.keyA:
         // Make the attack
@@ -614,12 +619,60 @@ class StaffMenu extends Menu {
   late final List<Item> staves;
   int selectedTargetIndex = 0;
   int selectedStaffIndex = 0;
+  late final SpriteFontRenderer fontRenderer;
   StaffMenu(this.unit);
   @override 
   Future<void> onLoad() async {
+    size = Vector2(Stage.tileSize * 2, Stage.tileSize * 3);
+    anchor = Anchor.center;
+    fontRenderer = SpriteFontRenderer.fromFont(game.hudFont, scale: .5);
     targets = unit.getStaffTargetsAt(unit.tilePosition);
     staves = unit.getStaves();
     game.stage.cursor.snapToTile(targets.first.tilePosition);
+  }
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    if (game.stage.menuManager._menuStack.last == this) {
+      final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
+      canvas.drawRect(size.toRect(), backgroundPaint);
+      double lineHeight = Stage.tileSize * .6;
+      double leftColumnX = size.x / 4;
+      double rightColumnX = size.x - leftColumnX;
+      double centerColumnX = size.x / 2;
+      List<(String, double, double, Anchor)> renderTexts = [
+        // ("${unit.name}", Stage.tileSize*.25, 0, Anchor.topLeft),
+        // ("${unit.main?.name}", size.x - Stage.tileSize*.25, 0, Anchor.topRight),
+        // (unit.attack?.name ?? "", size.x - Stage.tileSize*.25, lineHeight, Anchor.topRight),
+        // ("HP", centerColumnX, lineHeight * 2, Anchor.topCenter),
+        // ("${targets[selectedTargetIndex].hp}", leftColumnX, lineHeight * 2, Anchor.topRight),
+        // ("${unit.hp}", rightColumnX, lineHeight * 2, Anchor.topLeft),
+        // ("STA", centerColumnX, lineHeight * 3, Anchor.topCenter),
+        // ("${targets[selectedTargetIndex].sta}-${defenderVals.fatigue}", leftColumnX, lineHeight * 3, Anchor.topRight),
+        // ("${unit.sta}-${attackerVals.fatigue}", rightColumnX, lineHeight * 3, Anchor.topLeft),
+        // ("Damage", centerColumnX, lineHeight * 4, Anchor.topCenter),
+        // ("${defenderVals.damage}", leftColumnX, lineHeight * 4, Anchor.topRight),
+        // ("${attackerVals.damage}", rightColumnX, lineHeight * 4, Anchor.topLeft),
+        // ("Hit %", centerColumnX, lineHeight * 5, Anchor.topCenter),
+        // ("${defenderVals.accuracy}", leftColumnX, lineHeight * 5, Anchor.topRight),
+        // ("${attackerVals.accuracy}", rightColumnX, lineHeight * 5, Anchor.topLeft),
+        // ("Crit %", centerColumnX, lineHeight * 6, Anchor.topCenter),
+        // ("${defenderVals.critRate}", leftColumnX, lineHeight * 6, Anchor.topRight),
+        // ("${attackerVals.critRate}", rightColumnX, lineHeight * 6, Anchor.topLeft),
+        // ("${targets[selectedTargetIndex].name}", Stage.tileSize*.25, lineHeight * 7, Anchor.topLeft),
+        // ("${targets[selectedTargetIndex].main?.name}", size.x - Stage.tileSize*.25, lineHeight * 7, Anchor.topRight),
+        // (targets[selectedTargetIndex].attack?.name ?? "", size.x - Stage.tileSize*.25, lineHeight * 8, Anchor.topRight),
+      ];
+
+      for (var textInfo in renderTexts) {
+        fontRenderer.render(
+          canvas,
+          textInfo.$1,
+          Vector2(textInfo.$2, textInfo.$3),
+          anchor: textInfo.$4,
+        );
+      }
+    }
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
