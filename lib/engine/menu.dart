@@ -234,14 +234,6 @@ class SelectionMenu extends Menu {
   late final SpriteFontRenderer fontRenderer;
   SelectionMenu(this.tilePosition, this.options);
 
-  @override 
-  void close() {
-    super.close();
-    if(game.stage.menuManager._menuStack.lastOrNull != null){
-      game.stage.menuManager._menuStack.last.close();
-    }
-    
-  }
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -309,14 +301,6 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
   UnitActionMenu(Point<int> tilePosition, this.unit)
       : super(tilePosition, unit.getActionsAt(tilePosition));
 
-  @override 
-  void close() {
-    super.close();
-    if(game.stage.menuManager._menuStack.lastOrNull != null){
-      game.stage.menuManager._menuStack.last.close();
-    }
-  }
-
   @override
   void update(dt){
     super.update(dt);
@@ -324,7 +308,7 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
+    debugPrint("UnitActionMenu given key ${key.logicalKey.keyLabel} to handle.");
     if(!isVisible) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
@@ -401,17 +385,9 @@ class InventoryMenu extends SelectionMenu {
   InventoryMenu(Point<int> tilePosition, this.unit)
       : super(tilePosition, getInventoryNames(unit));
 
-  @override 
-  void close() {
-    super.close();
-    if(game.stage.menuManager._menuStack.lastOrNull != null){
-      game.stage.menuManager._menuStack.last.close();
-    }
-    
-  }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
+    debugPrint("InventoryMenu given key ${key.logicalKey.keyLabel} to handle.");
     // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
@@ -440,14 +416,7 @@ class InventoryMenu extends SelectionMenu {
 class StageMenu extends SelectionMenu {
   StageMenu(Point<int> tilePosition)
       : super(tilePosition, ["End", "Save"]);
-  @override 
-  void close() {
-    super.close();
-    if(game.stage.menuManager._menuStack.lastOrNull != null){
-      game.stage.menuManager._menuStack.last.close();
-    }
-    
-  }
+      
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
