@@ -236,6 +236,24 @@ Villager: It's called the Speed Ring. Slip her on for a little boost in speed. G
 <<stop>>
 ===
 
+title: Talk_Azel_Sigurd
+---
+<<local $left = "Azel" as String>>
+<<local $right = "Sigurd" as String>>
+Azel: Lord Sigurd! I'm glad you're uninjured.
+Sigurd: Azel? What are you doing so far from Velthomer?
+Azel: Lex and I came to help you. We couldn't let you fight alone!
+Sigurd: But Azel, does your brother approve of this? Does he know you're risking your life?
+Azel: Well, I doubt he'd approve, but he's off in Belhalla with the Royal Guard. Actually, he ordered me not to leave the capital.
+Sigurd: I'm not surprised. What would I tell him if you died here?
+Azel: I shouldn't say this, but...I don't know if he'd care. I've never lived up to his expectations.
+Azel: Perhaps I can change that if I drape myself in glory, eh?
+Sigurd: Just as long as you don't drape yourself in a black shroud. I'm glad you came, Azel. Thank you.
+Azel: My pleasure, sir! It's an honor to fight by your side.
+<<set $right = "">>
+Azel: He's just the man everyone says he is! I wish Arvis was as kind...
+<<stop>>
+===
 
 title: Gandolf_Midir_Combat_Quote
 ---
