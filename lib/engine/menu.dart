@@ -82,7 +82,10 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
 
 abstract class Menu extends PositionComponent with HasGameReference<MoiraGame> implements InputHandler {
   void open() {}
-  void close() {game.stage.menuManager.popMenu();}
+  void close() {
+    game.stage.menuManager.popMenu();
+    if(game.stage.menuManager._menuStack.lastOrNull is MoveMenu){
+      game.stage.menuManager._menuStack.last.close();}}
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     switch (key.logicalKey) {
@@ -416,7 +419,7 @@ class InventoryMenu extends SelectionMenu {
 class StageMenu extends SelectionMenu {
   StageMenu(Point<int> tilePosition)
       : super(tilePosition, ["End", "Save"]);
-      
+
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
