@@ -1,5 +1,8 @@
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 import 'package:moira/content/content.dart';
+class Effect extends Component {}
+class Use extends Component {}
 class Item extends Component with HasGameReference<MoiraGame>{
   final String name;
   String description;
@@ -54,5 +57,28 @@ class Equip extends Component {
   }
 }
 
-class Effect extends Component {}
-class Use extends Component {}
+class AddItemEvent extends Event {
+  static List<Event> observers = [];
+  final Unit unit;
+  final Item item;
+  AddItemEvent(this.unit, this.item, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "AddItemEvent:${unit.name}_${item.name}");
+
+  static void initialize(EventQueue queue) {
+  }
+
+  @override
+  List<Event> getObservers() {
+    observers.removeWhere((event) => (event.checkTriggered()));
+    return observers;
+  }
+  @override
+  Future<void> execute() async {
+    super.execute();
+  }
+  @override
+  bool checkComplete() {
+    if(checkStarted()) {
+      game.eventQueue.dispatchEvent(this);}
+    return false;
+  } 
+}
