@@ -556,14 +556,16 @@ class CombatMenu extends Menu{
       case LogicalKeyboardKey.arrowUp: // Change target
         selectedTargetIndex = (selectedTargetIndex - 1) % targets.length;
         game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
-        targets[selectedTargetIndex].getBestAttackOnTarget(unit, targets[selectedTargetIndex].getAttacksOnTarget(unit, Combat.getCombatDistance(unit, targets[selectedTargetIndex])));
+        targets[selectedTargetIndex].getBestAttackOnTarget(unit, 
+          targets[selectedTargetIndex].getAttacksOnTarget(unit, Combat.getCombatDistance(unit, targets[selectedTargetIndex])));
         attackerVals = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
         defenderVals = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowDown: // Change target
         selectedTargetIndex = (selectedTargetIndex + 1) % targets.length;
         game.stage.cursor.snapToTile(targets[selectedTargetIndex].tilePosition);
-        targets[selectedTargetIndex].getBestAttackOnTarget(unit, targets[selectedTargetIndex].getAttacksOnTarget(unit, Combat.getCombatDistance(unit, targets[selectedTargetIndex])));
+        targets[selectedTargetIndex].getBestAttackOnTarget(unit, 
+          targets[selectedTargetIndex].getAttacksOnTarget(unit, Combat.getCombatDistance(unit, targets[selectedTargetIndex])));
         attackerVals = unit.attackCalc(targets[selectedTargetIndex], unit.attack);
         defenderVals = targets[selectedTargetIndex].attackCalc(unit, targets[selectedTargetIndex].attack);
         return KeyEventResult.handled;
