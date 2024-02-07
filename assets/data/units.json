@@ -30,6 +30,7 @@
         "lck": 40
     },
     "skills": [],
+    "money": 5000,
     "items": ["Salve", "Salve", "Sword", "Lance", "Axe"],
     "attacks": [],
     "proficiencies": []},
@@ -63,6 +64,7 @@
         "lck": 20
     },
     "skills": [],
+    "money": 2000,
     "items": ["Salve", "Sword", "Lance"],
     "attacks": [],
     "proficiencies": ["Sword", "Lance"]},
@@ -96,6 +98,7 @@
         "lck": 40
     },
     "skills": [],
+    "money": 2000,
     "items": ["Salve", "Sword"],
     "attacks": [],
     "proficiencies": ["Sword"]},
@@ -129,6 +132,7 @@
         "lck": 30
     },
     "skills": [],
+    "money": 2000,
     "items": ["Salve", "Sword"],
     "attacks": [],
     "proficiencies": ["Sword"]
@@ -163,6 +167,7 @@
         "lck": 20
     },
     "skills": [],
+    "money": 5000,
     "items": ["Axe"],
     "attacks": [],
     "proficiencies": ["Axe"]
@@ -198,6 +203,7 @@
     },
     "skills": [],
     "items": [],
+    "money": 5000,
     "attacks": ["Fire"],
     "proficiencies": ["Staff", "Book"]
     },
@@ -231,6 +237,7 @@
         "lck": 15
     },
     "skills": [],
+    "money": 5000,
     "items": ["Lance"],
     "attacks": [],
     "proficiencies": ["Lance"]
@@ -265,6 +272,7 @@
         "lck": 50
     },
     "skills": [],
+    "money": 1500,
     "items": ["Lance"],
     "attacks": [],
     "proficiencies": ["Lance"]
@@ -299,6 +307,7 @@
         "lck": 20
     },
     "skills": [],
+    "money": 4000,
     "items": ["Sword", "Salve Staff"],
     "attacks": [],
     "proficiencies": ["Sword", "Staff"]
@@ -333,6 +342,7 @@
         "lck": 10
     },
     "skills": [],
+    "money": 2000,
     "items": ["Bow"],
     "attacks": [],
     "proficiencies": ["Bow"]
@@ -367,6 +377,7 @@
         "lck": 10
     },
     "skills": [],
+    "money": 5000,
     "items": [],
     "attacks": [],
     "proficiencies": ["Staff"]
@@ -412,6 +423,7 @@
     "growths": {},
     "skills": [],
     "items": ["Axe"],
+    "money": 2000,
     "attacks": [],
     "proficiencies": []
     },
@@ -422,6 +434,7 @@
     "baseStats": {},
     "growths": {},
     "skills": [],
+    "money": 2000,
     "items": ["Axe", "Hand Axe"],
     "attacks": [],
     "proficiencies": []
@@ -433,6 +446,7 @@
     "baseStats": {},
     "growths": {},
     "skills": [],
+    "money": 2000,
     "items": ["Hand Axe", "Skill Ring"],
     "attacks": [],
     "proficiencies": []

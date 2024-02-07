@@ -13,6 +13,7 @@
 <<character Quan>>
 <<character Ethlyn>>
 <<character Finn>>
+<<character Villager>>
 title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
@@ -184,10 +185,52 @@ Finn: Forgive me my lord, but we really ought to hurry.
 <<stop>>
 ===
 
-title: Village_Point(48, 7)
+title: Town_(48,7)_Visit
 ---
-<<local $left = "" as String>>
+<<local $villager = "Villager" as String>>
+<<local $left = "Villager" as String>>
 <<local $right = "" as String>>
+Villager: You've come for us! Our village is saved! Here's a small sum of money we all pooled together. 
+Villager: Use it how you see fit. Please help out the other villages if you can. They're sure to appreciate it.
+<<stop>>
+===
+
+title: Town_(39,2)_Visit
+---
+<<local $villager = "OldVillager" as String>>
+<<local $left = "Villager" as String>>
+<<local $right = "" as String>>
+Villager: Bless you, sir. I am glad to see such fine swords are left in Jungby to protect us from these axe-wielding thugs.
+Villager: You have surely delivered us from evil, so please, take some of the alms we have saved.
+Villager: If you find yourself wounded, any chapel around would be happy to mend you. 
+<<stop>>
+===
+
+title: Town_(19,2)_Visit
+---
+<<local $left = "Villager" as String>>
+<<local $right = "" as String>>
+Villager: The ruling family of this area has produced master swordsmen for generations. It's no surprise as the Chalphys are all descended from Baldo, the God of Light. 
+Villager: If we just had Lord Vylon's Holy Tyrfing, those barbarians wouldn't have a prayer!
+<<stop>>
+===
+
+title: Town_(21,15)_Visit
+---
+<<local $left = "Villager" as String>>
+<<local $right = "" as String>>
+Villager: Jungby's ruling family of master archers are descended from Ulir, the God of Archery. Duke Ring had himself twin daughters and a son. 
+Villager: However, Lady Adean's twin was abducted by pirates as a youngster. The son, Sir Andrei, joined his father on the campaign to Isaac. 
+Villager: You didn't hear it from me, but there seems to be quite a bit of friction between the two.
+<<stop>>
+===
+
+title: Town_(27,30)_Visit
+---
+<<local $left = "Villager" as String>>
+<<local $right = "" as String>>
+Villager: You came to save us!? I thought we were doomed! I've got a ring for you in appreciation. 
+Villager: It's called the Speed Ring. Slip her on for a little boost in speed. Go ahead... put her on! Your enemy'll have a tough time hitting you now!
 <<stop>>
 ===
 
