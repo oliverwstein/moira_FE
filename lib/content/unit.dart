@@ -39,6 +39,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Item? main;
   Item? treasure;
   Item? gear;
+  int money = 0;
   List<Item> inventory = [];
   Map<String, Attack> attackSet = {};
   List<Effect> effectSet = [];
@@ -85,7 +86,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     for (String orderString in orderStrings){
       orders.add(Order.create(orderString));
     }
-
+    int money = unitData["money"] ?? 1000;
     // Create items for items
     List<Item> inventory = [];
     itemStrings = itemStrings ?? [];
@@ -118,11 +119,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     
     // Return a new Unit instance
-    return Unit._internal(unitData, tilePosition, name, unitClass, givenLevel, movementRange, faction, orders, inventory, attackMap, proficiencies, skillSet, stats, growths);
+    return Unit._internal(unitData, tilePosition, name, unitClass, givenLevel, movementRange, faction, orders, money, inventory, attackMap, proficiencies, skillSet, stats, growths);
   }
 
    // Private constructor for creating instances
-  Unit._internal(this.unitData, this.tilePosition, this.name, this.unitClass, this.level, this.movementRange, this.faction, this.orders, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats, this.growths){
+  Unit._internal(this.unitData, this.tilePosition, this.name, this.unitClass, this.level, this.movementRange, this.faction, this.orders, this.money, this.inventory, this.attackSet, this.proficiencies, this.skillSet, this.stats, this.growths){
     _postConstruction();
   }
 

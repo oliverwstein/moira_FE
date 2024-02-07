@@ -209,6 +209,13 @@ class DialogueEvent extends Event{
         queue.addEventBatchToHead([combatQuoteEvent]);
       }
     });
+    queue.registerClassObserver<VisitEvent>((catalystEvent) {
+      if (catalystEvent.game.yarnProject.nodes.keys.contains("Town_(${catalystEvent.town.point.x},${catalystEvent.town.point.y})_Visit")) {
+        debugPrint("Visit Conversation found for Town ${catalystEvent.town.point}");
+        var dialogueEvent = DialogueEvent("Town_(${catalystEvent.town.point.x},${catalystEvent.town.point.y})_Visit");
+        queue.addEventBatchToHead([dialogueEvent]);
+      }
+    });
   }
 
   @override
