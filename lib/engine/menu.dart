@@ -504,11 +504,10 @@ class CombatMenu extends Menu {
       double leftColumnX = size.x / 4;
       double rightColumnX = size.x - leftColumnX;
       double centerColumnX = size.x / 2;
-
       List<(String, double, double, Anchor)> renderTexts = [
         ("${unit.name}", Stage.tileSize*.25, 0, Anchor.topLeft),
         ("${unit.main?.name}", size.x - Stage.tileSize*.25, 0, Anchor.topRight),
-        (unit.attack?.name ?? "", rightColumnX, lineHeight, Anchor.topRight),
+        (unit.attack?.name ?? "", size.x - Stage.tileSize*.25, lineHeight, Anchor.topRight),
         ("HP", centerColumnX, lineHeight * 2, Anchor.topCenter),
         ("${targets[selectedTargetIndex].hp}", leftColumnX, lineHeight * 2, Anchor.topRight),
         ("${unit.hp}", rightColumnX, lineHeight * 2, Anchor.topLeft),
@@ -528,6 +527,12 @@ class CombatMenu extends Menu {
         ("${targets[selectedTargetIndex].main?.name}", size.x - Stage.tileSize*.25, lineHeight * 7, Anchor.topRight),
         (targets[selectedTargetIndex].attack?.name ?? "", size.x - Stage.tileSize*.25, lineHeight * 8, Anchor.topRight),
       ];
+      if(Combat.addFollowUp(unit, targets[selectedTargetIndex])?.$1 == unit){
+        renderTexts.add(("(x2)", size.x, lineHeight, Anchor.topLeft));
+      }
+      else if(Combat.addFollowUp(unit, targets[selectedTargetIndex])?.$1 == targets[selectedTargetIndex]){
+        renderTexts.add(("x2", size.x, lineHeight*8, Anchor.topLeft));
+      }
 
       for (var textInfo in renderTexts) {
         fontRenderer.render(
