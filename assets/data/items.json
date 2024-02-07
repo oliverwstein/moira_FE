@@ -41,6 +41,11 @@
             "description": "Wearer gains 5 Dexterity.",
             "type": "treasure"
         },
+    "Speed Ring":
+        {
+            "description": "Wearer gains 5 Speed.",
+            "type": "treasure"
+        },
     "Salve Staff":
         {
         "description": "Restores health to an adjacent target.",

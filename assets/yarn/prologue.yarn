@@ -196,6 +196,7 @@ Villager: Use it how you see fit. Please help out the other villages if you can.
 ===
 
 title: Town_(39,2)_Visit
+AddItemEvent:item.Salve
 ---
 <<local $villager = "OldVillager" as String>>
 <<local $left = "Villager" as String>>
@@ -226,6 +227,7 @@ Villager: You didn't hear it from me, but there seems to be quite a bit of frict
 ===
 
 title: Town_(27,30)_Visit
+AddItemEvent:item.Speed_Ring
 ---
 <<local $left = "Villager" as String>>
 <<local $right = "" as String>>

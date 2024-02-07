@@ -62,6 +62,10 @@ class AddItemEvent extends Event {
   final Unit unit;
   final Item item;
   AddItemEvent(this.unit, this.item, {Trigger? trigger, String? name}) : super(trigger: trigger, name: "AddItemEvent:${unit.name}_${item.name}");
+  AddItemEvent.byName(MoiraGame game, String unitName, String itemName, {Trigger? trigger, String? name})
+   : unit = Unit.getUnitByName(game.stage, unitName)!,
+     item = Item.fromJson(itemName), 
+     super(trigger: trigger, name: "AddItemEvent:${unitName}_$itemName");
 
   static void initialize(EventQueue queue) {
   }
@@ -74,11 +78,8 @@ class AddItemEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
+    unit.inventory.add(item);
+    game.eventQueue.dispatchEvent(this);
+    checkComplete();
   }
-  @override
-  bool checkComplete() {
-    if(checkStarted()) {
-      game.eventQueue.dispatchEvent(this);}
-    return false;
-  } 
 }

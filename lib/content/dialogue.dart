@@ -21,6 +21,7 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   late final SpriteSheet dBoxSheet;
   late final SpriteAnimationComponent dBoxSprite;
   late Vector2 aspectBox;
+  Map<String, String> tags = {};
   int speakerSide = 0;
   late SpriteComponent leftPortrait = SpriteComponent();
   late SpriteComponent rightPortrait = SpriteComponent();
@@ -36,6 +37,8 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   }
   @override
   Future<void> onLoad() async {
+    tags = game.yarnProject.nodes[nodeName]!.tags;
+    debugPrint("tags: ${tags.entries}");
     aspectBox = Vector2(Stage.tileSize*game.stage.tilesInRow, Stage.tileSize*game.stage.tilesInColumn);
     position = game.camera.viewfinder.position;
     size = aspectBox;
@@ -212,6 +215,23 @@ class DialogueEvent extends Event{
     queue.registerClassObserver<VisitEvent>((catalystEvent) {
       if (catalystEvent.game.yarnProject.nodes.keys.contains("Town_(${catalystEvent.town.point.x},${catalystEvent.town.point.y})_Visit")) {
         debugPrint("Visit Conversation found for Town ${catalystEvent.town.point}");
+        Node node = catalystEvent.game.yarnProject.nodes["Town_(${catalystEvent.town.point.x},${catalystEvent.town.point.y})_Visit"]!;
+        debugPrint("Dialogue Tags are: ${node.tags.entries}");
+        for(var tag in node.tags.entries){
+          debugPrint("Tag: ${tag.key}, ${tag.value}");
+          Map<String, String> eventData = {"type": tag.key};
+          switch (tag.key) {
+            case "AddItemEvent":
+              eventData[tag.value.split(".")[0]] = tag.value.split(".")[1];
+              eventData["unit"] = catalystEvent.unit.name;
+              Event event = catalystEvent.game.eventQueue.loadEventfromJson(eventData);
+              catalystEvent.game.eventQueue.addEventBatchToHead([event]);
+              break;
+            default:
+          }
+          
+          
+        }
         var dialogueEvent = DialogueEvent("Town_(${catalystEvent.town.point.x},${catalystEvent.town.point.y})_Visit");
         queue.addEventBatchToHead([dialogueEvent]);
       }
