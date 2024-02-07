@@ -222,7 +222,7 @@ class DialogueEvent extends Event{
           Map<String, String> eventData = {"type": tag.key};
           switch (tag.key) {
             case "AddItemEvent":
-              eventData[tag.value.split(".")[0]] = tag.value.split(".")[1];
+              eventData[tag.value.split(".")[0]] = tag.value.split(".")[1].replaceAll("_", " ");
               eventData["unit"] = catalystEvent.unit.name;
               Event event = catalystEvent.game.eventQueue.loadEventfromJson(eventData);
               catalystEvent.game.eventQueue.addEventBatchToHead([event]);
