@@ -381,6 +381,7 @@ class VisitEvent extends Event {
     super.execute();
     town.close();
     unit.money += town.loot*500;
+    debugPrint("${unit.name} gains ${town.loot*500}");
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

@@ -206,7 +206,7 @@
                     "type": "UnitCreationEvent",
                     "unitName": "Gandolf",
                     "faction": "Evans",
-                    "level": 20,
+                    "level": -1,
                     "items": [
                         "Hand Axe"
                     ],
