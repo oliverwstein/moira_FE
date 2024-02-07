@@ -185,6 +185,14 @@ Finn: Forgive me my lord, but we really ought to hurry.
 <<stop>>
 ===
 
+title: ArvisArrival
+---
+<<local $left = "" as String>>
+<<local $right = "Arvis" as String>>
+Arvis: What a mess! His Majesty won't be pleased. I should have thought you could take care of a few savages, Sigurd...
+<<stop>>
+===
+
 title: Town_(48,7)_Visit
 ---
 <<local $villager = "Villager" as String>>
@@ -268,6 +276,42 @@ Sigurd: I see. Well, all the same, I appreciate your aid.
 Lex: I'll do what I can. Those barbarians need to learn some manners, after all.
 <<stop>>
 ===
+
+title: Talk_Ethlyn_Sigurd
+---
+<<local $left = "Ethlyn" as String>>
+<<local $right = "Sigurd" as String>>
+Ethlyn: Sigurd, you're alive!
+Sigurd: Good to see you too, Ethlyn.
+Ethlyn: I was so worried when I heard of Verdane's invasion. 
+Sigurd: Did you really think a pack of Verdanese brutes could threaten me?
+Ethlyn: You and what army, Sigurd? Especially with Father being away, I knew I had to come.
+Sigurd: I can't fault your judgment. Mother's heart beats in your chest. 
+Sigurd: When you married Quan, you seemed so demure! But you're still the same as ever. Poor Quan!
+Ethlyn: I wouldn't need to nag you if you had more sense! I don't need to nag Quan!
+Sigurd: You've got me there. And I'm lucky to have you here. Thank you.
+Ethlyn: Oh, Sigurd...
+<<stop>>
+===
+
+title: Talk_Quan_Sigurd
+---
+<<local $left = "Quan" as String>>
+<<local $right = "Sigurd" as String>>
+Quan: Sigurd, are you alright?
+Sigurd: Quan, you're a sight for sore eyes!
+Quan: Well, we heard about your skirmish with Verdane and couldn't stay away.
+Sigurd: What of Leinster? Don't you need to be guarding the border with Thracia?
+Quan: We do. That's why I only brought Finn. My father is commanding the Lance Ritter at present.
+Sigurd: I see. Sorry to drag you into all this, Quan.
+Quan: Nonsense! I don't forget my oaths.
+Sigurd: Huh?
+Quan: At the academy in Belhalla with Eldigan! When we vowed to aid each other in times of need?
+Sigurd: Ah, yes, of course. I haven't forgotten.
+Quan: Well then, let's get down to business.
+<<stop>>
+===
+
 
 title: Gandolf_Midir_Combat_Quote
 ---
