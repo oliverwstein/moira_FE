@@ -4,7 +4,8 @@ import 'package:moira/content/content.dart';
 class Staff extends Component with HasGameReference<MoiraGame>{
   // Event? staffEvent;
   int range;
-  Staff(this.range);
+  int staminaCost;
+  Staff(this.range, {this.staminaCost = 1});
   factory Staff.fromJson(dynamic staffData, String name) {
     int staffRange = staffData["range"] ?? 1;
     int staminaCost = staffData["staminaCost"] ?? 1;
@@ -21,24 +22,35 @@ class Staff extends Component with HasGameReference<MoiraGame>{
   void execute(Unit target){
     debugPrint("Use staff on ${target.name}. They feel funny.");
   }
+  String effectString(Unit target){
+    return "They feel funny.";
+  }
 }
 
 class Heal extends Staff {
   int baseHealing;
-  int staminaCost;
   int expGain;
-  Heal(super.range, this.baseHealing, this.staminaCost, this.expGain);
+  Heal(super.range, this.baseHealing, this.expGain, int staminaCost) : super(staminaCost: staminaCost);
   @override
   bool canUseOn(Unit target) => target.hp < target.getStat("hp");
+
+  int healingCalc(Unit target){
+    Unit wielder = parent as Unit;
+    return baseHealing + wielder.getStat("wis");
+  }
   @override
   execute(Unit target){
     debugPrint("Execute Heal on ${target.name}");
     Unit wielder = parent as Unit;
-    int healing = baseHealing + wielder.getStat("wis");
+    int healing = healingCalc(target);
     wielder.sta = (wielder.sta - staminaCost).clamp(0, wielder.getStat("sta"));
     game.eventQueue.addEventBatch([UnitHealEvent(target, healing)]);
     game.eventQueue.addEventBatch([UnitExpEvent(wielder, expGain)]);
     game.eventQueue.addEventBatch([UnitExhaustEvent(wielder)]);
+  }
+  @override
+  String effectString(Unit target){
+    return "HP:${target.hp}/${target.getStat("hp")} to ${(target.hp+healingCalc(target)).clamp(0, target.getStat("hp"))}";
   }
 }
 

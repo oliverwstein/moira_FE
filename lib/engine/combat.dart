@@ -23,13 +23,13 @@ class Combat extends Component with HasGameReference<MoiraGame>{
     return (unit.tilePosition.x - target.tilePosition.x).abs() + (unit.tilePosition.y - target.tilePosition.y).abs();
   }
 
-  void addFollowUp() {
+  static (Unit, Unit)? addFollowUp(Unit attacker, Unit defender) {
     (Unit, Unit)? followUp = (attacker.getStat("spe") >= defender.getStat("spe") + 4) ? (attacker, defender) :
                   (defender.getStat("spe") >= attacker.getStat("spe") + 4) ? (defender, attacker) : null;
     if(followUp == null) {
-      return;
+      return null;
     } else {
-      game.combatQueue.addEventBatch([AttackEvent(this, followUp.$1, followUp.$2)]);
+      return (followUp.$1, followUp.$2);
     }
   }
 }
@@ -86,7 +86,8 @@ class CombatRoundEvent extends Event {
     debugPrint("CombatRoundEvent: ${combat.attacker.name} against ${combat.defender.name}");
     game.combatQueue.addEventBatch([AttackEvent(combat, combat.attacker, combat.defender)]);
     game.combatQueue.addEventBatch([AttackEvent(combat, combat.defender, combat.attacker)]);
-    combat.addFollowUp();
+    (Unit, Unit)? followUp = Combat.addFollowUp(combat.attacker, combat.defender);
+    if (followUp != null) {game.combatQueue.addEventBatch([AttackEvent(combat, followUp.$1, followUp.$2)]);}
     completeEvent();
     game.combatQueue.dispatchEvent(this);
     if (combat.attacker.hp == 0 || combat.defender.hp == 0 || !combat.duel) {
