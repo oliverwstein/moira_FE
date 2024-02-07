@@ -255,6 +255,20 @@ Azel: He's just the man everyone says he is! I wish Arvis was as kind...
 <<stop>>
 ===
 
+title: Talk_Lex_Sigurd
+---
+<<local $left = "Lex" as String>>
+<<local $right = "Sigurd" as String>>
+Lex: How do you do, sir?
+Sigurd: Lex! To what do I owe the honor?
+Lex: To whom, more like. Arvis' kid brother dragged me here. 
+Sigurd: Azel? That would explain it, I'm glad. But does Lord Langobalt know?
+Lex: Of course not! You know how he feels about your father. But he won't mind the house of Velthomer owing me a favor. 
+Sigurd: I see. Well, all the same, I appreciate your aid.
+Lex: I'll do what I can. Those barbarians need to learn some manners, after all.
+<<stop>>
+===
+
 title: Gandolf_Midir_Combat_Quote
 ---
 <<local $left = "Gandolf" as String>>
