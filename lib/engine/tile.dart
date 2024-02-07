@@ -379,7 +379,8 @@ class VisitEvent extends Event {
   @override
   Future<void> execute() async {
     super.execute();
-    town.close(); 
+    town.close();
+    unit.money += town.loot*500;
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
@@ -401,6 +402,7 @@ class RansackEvent extends Event {
     super.execute();
     town.ransack(); 
     debugPrint("RansackEvent: ${unit.name} ransacks town at ${town.point}.");
+    unit.money += 250;
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }
