@@ -10,6 +10,7 @@ class Item extends Component with HasGameReference<MoiraGame>{
   Use? use;
   Weapon? weapon;
   Staff? staff;
+  int weight = 0;
   List<Effect>? effects;
   
   // Factory constructor
@@ -32,12 +33,13 @@ class Item extends Component with HasGameReference<MoiraGame>{
       if (itemData.containsKey("staff")) {
         staff = Staff.fromJson(itemData['staff'], name);
       }
-      return Item._internal(name, description, type, weapon, staff);
+      int weight = itemData['weight'] ?? 0;
+      return Item._internal(name, description, type, weight, weapon, staff);
     }
   }
 
   // Internal constructor for creating instances from factory constructor
-  Item._internal(this.name, this.description, this.type, this.weapon, this.staff) {
+  Item._internal(this.name, this.description, this.type, this.weight, this.weapon, this.staff) {
     equipCond = Equip(this);
   }
 

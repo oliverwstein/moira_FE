@@ -24,8 +24,8 @@ class Combat extends Component with HasGameReference<MoiraGame>{
   }
 
   static (Unit, Unit)? addFollowUp(Unit attacker, Unit defender) {
-    (Unit, Unit)? followUp = (attacker.getStat("spe") >= defender.getStat("spe") + 4) ? (attacker, defender) :
-                  (defender.getStat("spe") >= attacker.getStat("spe") + 4) ? (defender, attacker) : null;
+    (Unit, Unit)? followUp = (attacker.getStat("AttackSpeed") >= defender.getStat("AttackSpeed") + 4) ? (attacker, defender) :
+                  (defender.getStat("AttackSpeed") >= attacker.getStat("AttackSpeed") + 4) ? (defender, attacker) : null;
     if(followUp == null) {
       return null;
     } else {
