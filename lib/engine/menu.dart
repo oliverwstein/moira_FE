@@ -284,7 +284,6 @@ class SelectionMenu extends Menu {
       game.stage.cursor.position.x + Stage.tileSize * 3,
       game.stage.cursor.position.y - Stage.tileSize,
     );
-
     // Use the static method from Menu to clamp the position
     position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
   }
@@ -543,7 +542,7 @@ class TalkMenu extends SelectionMenu {
   }
 }
 
-class CombatMenu extends Menu{
+class CombatMenu extends Menu {
   final Unit unit;
   final List<Unit> targets;
   late List<Attack> attacks;
@@ -556,7 +555,10 @@ class CombatMenu extends Menu{
 
   @override
   void update(dt){
-    position = Vector2(game.stage.cursor.position.x + Stage.tileSize*3, game.stage.cursor.position.y - Stage.tileSize*1);
+    Vector2 desiredPosition = Vector2(
+      game.stage.cursor.position.x + Stage.tileSize*3,
+      game.stage.cursor.position.y - Stage.tileSize*1);
+    position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
   }
 
   @override
@@ -694,7 +696,10 @@ class StaffMenu extends Menu {
   }
   @override
   void update(dt){
-    position = Vector2(unit.position.x + Stage.tileSize*3, unit.position.y - Stage.tileSize*1);
+    Vector2 desiredPosition = Vector2(
+      unit.position.x + Stage.tileSize*3,
+      unit.position.y - Stage.tileSize*1);
+    position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
   }
   @override
   void render(Canvas canvas) {
