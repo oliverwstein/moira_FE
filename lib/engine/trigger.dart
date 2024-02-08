@@ -8,7 +8,7 @@ class Trigger extends Component {
   factory Trigger.fromJson(dynamic triggerData, Event event) {
     switch (triggerData.keys.first) {
       case "StartTurnEvent":
-        int turn = triggerData["StartTurnEvent"]["turn"];
+        int turn = triggerData["StartTurnEvent"]["turn"] ?? -1;
         String factionName = triggerData["StartTurnEvent"]["factionName"];
         StartTurnEvent.observers.add(event);
         String? name = triggerData["StartTurnEvent"]["name"];
@@ -44,7 +44,7 @@ class Trigger extends Component {
   Trigger._startTurn(int turn, String factionName) : check = ((Event event) {
     // debugPrint("Check StartTurnEvent");
     if (event is StartTurnEvent) {
-      return event.factionName == factionName && event.turn == turn;
+      return event.factionName == factionName && (event.turn == turn || turn == -1);
     }
     return false;
   });

@@ -1077,8 +1077,9 @@
                     ],
                     "triggers":
                     [
-                        {"SeizeEvent":
-                            {"name":"SeizeEventSigurd_Jungby"}
+                        {"StartTurnEvent":
+                            {"faction":"Velthomer"}
+                            
                         }
                     ]
                 }
