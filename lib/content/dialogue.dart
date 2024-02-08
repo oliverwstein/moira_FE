@@ -115,6 +115,12 @@ class Dialogue extends PositionComponent with HasGameReference<MoiraGame>, Dialo
   Future<void> onDialogueFinish() async {
     super.onDialogueFinish();
     finished = true;
+    game.yarnProject.nodes.remove(nodeName);
+    game.stage.menuManager.last!.close();
+    if(game.stage.menuManager.last is UnitActionMenu){
+      (game.stage.menuManager.last as UnitActionMenu).committed = true;
+      (game.stage.menuManager.last as UnitActionMenu).options.remove("Talk");
+    }
     removeFromParent();
   }
   @override
