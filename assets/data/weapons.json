@@ -64,6 +64,12 @@
                 "might": 0,
                 "hit": 0,
                 "specialAttack": "Valflame"
+            },
+        "Foci":
+            {
+                "weaponType" : "Staff",
+                "might": 3,
+                "hit": 25
             }
         }
  }

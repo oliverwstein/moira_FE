@@ -79,6 +79,13 @@
         },
         "type": "main",
         "weight": 6
+        },
+    "Wand":
+        {
+        "description": "Restores health to an adjacent target.",
+        "weapon": "Foci",
+        "type": "main",
+        "weight": 3
         }
     }
 }
