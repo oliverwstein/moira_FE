@@ -31,6 +31,12 @@
             "description": "A bow.",
             "type": "main"
         },
+    "Valflame":
+        {
+            "weapon": "Valflame",
+            "description": "The ultimate tome of fire magic.",
+            "type": "main"
+        },
     "Salve":
         {
             "description": "Restores 10 health on use.",
@@ -44,6 +50,11 @@
     "Speed Ring":
         {
             "description": "Wearer gains 5 Speed.",
+            "type": "treasure"
+        },
+    "Recover Ring":
+        {
+            "description": "Wearer is fully healed at the start of each turn.",
             "type": "treasure"
         },
     "Salve Staff":

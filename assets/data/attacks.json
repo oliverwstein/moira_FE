@@ -97,7 +97,7 @@
                 "range": [1, 2],
                 "effects": []
             },
-            "Fire":
+        "Fire":
             {
                 "description" : "Fuego.",
                 "scaling" : [0.0, 0.0, 0.9, 0.2],
@@ -105,6 +105,18 @@
                 "might": 5,
                 "hit": 90,
                 "fatigue": 1,
+                "magic": true,
+                "range": [1, 2],
+                "effects": []
+            },
+        "Valflame":
+            {
+                "description" : "The flames of a holy dragon.",
+                "scaling" : [0.0, 0.0, 0.9, 0.2],
+                "weaponType" : ["Staff", "Book"],
+                "might": 30,
+                "hit": 80,
+                "fatigue": 5,
                 "magic": true,
                 "range": [1, 2],
                 "effects": []

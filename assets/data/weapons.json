@@ -41,12 +41,19 @@
                 "hit": 5,
                 "specialAttack": "Throw"
             },
-            "Bow":
+        "Bow":
             {
                 "weaponType" : "Bow",
                 "might": 10,
                 "hit": 10,
                 "specialAttack": "Shoot"
+            },
+        "Valflame":
+            {
+                "weaponType" : "Book",
+                "might": 0,
+                "hit": 0,
+                "specialAttack": "Valflame"
             }
         }
  }
