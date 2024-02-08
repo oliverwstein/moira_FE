@@ -49,7 +49,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     // Information to display in the HUD
     List<String> texts = [
       '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
-      '${game.stage.tileMap[game.stage.cursor.tilePosition]!.name}',
+      (game.stage.tileMap[game.stage.cursor.tilePosition]!.name),
       'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}',
     ];
 
