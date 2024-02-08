@@ -72,6 +72,13 @@ class HumanPlayer extends Player {
       game.eventQueue.addEventBatch([PanEvent(leader!.tilePosition)]);
     }
   }
+  @override
+  void update(dt){
+    super.update(dt);
+    if(takingTurn && game.eventQueue.processing == false && !game.stage.menuManager.isNotEmpty && unitsAllMoved()) {
+      game.eventQueue.addEventBatch([EndTurnEvent(name)]);
+    }
+  }
   
 }
 
