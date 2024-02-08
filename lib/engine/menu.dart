@@ -339,6 +339,9 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
                 game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
                 game.stage.menuManager.clearStack();
                 break;
+              case "Talk":
+                game.stage.menuManager.pushMenu(TalkMenu(game.stage.cursor.tilePosition, unit));
+                break;
               case "Ransack":
                 game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
                 game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
@@ -442,6 +445,52 @@ class StageMenu extends SelectionMenu {
                 close();
                 break;
             }
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        close();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp:
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+      case LogicalKeyboardKey.arrowDown:
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+    }
+    return KeyEventResult.handled;
+  }
+}
+
+class TalkMenu extends SelectionMenu {
+  final Unit unit;
+  static List<String> getTalkOptions(Unit unit, Point<int> point) {
+    List<String> options = [];
+    List<Tile?> adjacentTiles = [
+      unit.game.stage.tileMap[Point(point.x+1, point.y)],
+      unit.game.stage.tileMap[Point(point.x-1, point.y)],
+      unit.game.stage.tileMap[Point(point.x, point.y+1)],
+      unit.game.stage.tileMap[Point(point.x, point.y-1)],
+      ];
+    for (Tile? tile in adjacentTiles){
+      if(tile != null){
+        if(tile.unit != null && unit.game.yarnProject.nodes.keys.contains("Talk_${unit.name}_${tile.unit!.name}")){
+          options.add(tile.unit!.name);
+        }
+      }
+    }
+    return options;
+  }
+  TalkMenu(Point<int> tilePosition, this.unit)
+      : super(tilePosition, getTalkOptions(unit, tilePosition));
+
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("TalkMenu given key ${key.logicalKey.keyLabel} to handle.");
+      switch (key.logicalKey) {
+        case LogicalKeyboardKey.keyA:
+          debugPrint("${options[selectedIndex]} Chosen");
+          DialogueMenu menu = DialogueMenu("Talk_${unit.name}_${options[selectedIndex]}", null);
+          game.stage.menuManager.pushMenu(menu);
+
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();
@@ -695,7 +744,7 @@ class DialogueMenu extends Menu {
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    if(dialogue.finished){close();}
+    if(dialogue.finished){game.stage.menuManager.clearStack();}
     return dialogue.handleKeyEvent(key, keysPressed);
   }
 
