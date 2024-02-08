@@ -4,67 +4,66 @@ import 'package:flame/text.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 
-class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
-  late final TextComponent point;
-  late final TextComponent terrain;
-  late final TextComponent effect;
+class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
+  late final SpriteFontRenderer fontRenderer;
 
   Hud();
-  
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    // ignore: invalid_use_of_internal_member
-    position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
+    fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     anchor = Anchor.topLeft;
-    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
-    double scaler = 24/Stage.tileSize;
+    size = Vector2(Stage.tileSize * 3.5, Stage.tileSize * 2.5);
     priority = 25;
-    point = TextComponent(
-        text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
-        position: Vector2(size.x / 2, size.y * (1 / 5)),
-        scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
-      );
-    terrain = TextComponent(
-        text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
-        position: Vector2(size.x / 2, size.y * (2 / 4)),
-        scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
-      );
-    effect = TextComponent(
-        text: 'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}',
-        position: Vector2(size.x / 2, size.y * (4 / 5)),
-        scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
-      );
-      add(point);
-      add(terrain);
-      add(effect);
   }
-
   @override
   void update(double dt) {
     super.update(dt);
-    // ignore: invalid_use_of_internal_member
-    position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
-    if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
-    point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
-    terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
-    effect.text = 'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}';
+    adjustHudPosition();
+    isVisible = game.stage.freeCursor;
+  }
+
+  void adjustHudPosition() {
+    Rect visibleWorldRect = game.camera.viewfinder.visibleWorldRect;
+    double midwayY = visibleWorldRect.top + (visibleWorldRect.height / 2);
+    Vector2 cursorPosition = game.stage.cursor.position;
+
+    if (cursorPosition.y > midwayY) {
+      // Cursor is in the lower half, move HUD to the top-left
+      position = Vector2(visibleWorldRect.left + Stage.tileSize*.5, visibleWorldRect.top + Stage.tileSize*.5);
+    } else {
+      // Cursor is in the upper half, move HUD to the bottom-left
+      position = Vector2(visibleWorldRect.left + Stage.tileSize*.5, visibleWorldRect.bottom - size.y - Stage.tileSize*.5);
+    }
   }
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    // Draw the HUD box
-    final paint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
-    canvas.drawRect(size.toRect(), paint);
+    final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
+    canvas.drawRect(size.toRect(), backgroundPaint);
+
+    // Information to display in the HUD
+    List<String> texts = [
+      '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
+      '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
+      'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}',
+    ];
+
+    double yPos = 0; // Start at the top of the HUD
+    for (String text in texts) {
+      fontRenderer.render(
+        canvas,
+        text,
+        Vector2(size.x / 2, yPos),
+        anchor: Anchor.topCenter,
+      );
+      yPos += Stage.tileSize * 0.75; // Move down for the next text
+    }
   }
 }
+
 
 class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent name;

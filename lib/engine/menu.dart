@@ -318,8 +318,6 @@ class SelectionMenu extends Menu {
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
-    // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
           debugPrint("${options[selectedIndex]} Chosen");
