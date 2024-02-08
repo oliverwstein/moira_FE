@@ -15,6 +15,7 @@
 <<character Finn>>
 <<character Villager>>
 <<character Arvis>>
+<<character Filat>>
 title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
@@ -163,6 +164,50 @@ Gandolf: Quit your mumbling. You'll be Queen of more than Jungby soon enough.
 <<stop>>
 ===
 
+title: Sigurd_Seizes_Jungby
+---
+<<local $left = "Sigurd" as String>>
+<<local $right = "Oifey" as String>>
+Oifey: Sir, we've found a wounded knight on the ground over here!
+Sigurd: That's Midir! He's alive?
+<<set $right = "Midir">>
+Sigurd: Hold on!
+Midir: Si-Sir Sigurd?
+Sigurd: Be well, Midir. You're in safe hands now. But where is Lady Aideen?
+Midir: I don't know. Gandolf took her...
+Sigurd: Is that so? Well, don't worry, I'll get her back. Take some time to heal.
+Midir: No, Sigurd, I must join you. I swore I would defend her with my life. 
+<<stop>>
+===
+
+title: Gerrard_Deploys
+---
+<<local $left = "" as String>>
+<<local $right = "Gerrard" as String>>
+Gerrard: Damn it, DiMaggio, you couldn't take on a handful of knights? Gandolf will be furious.
+Gerrard: Well boys, looks like we have a job to do!
+<<stop>>
+===
+
+
+title: Sigurd_Seizes_Evans
+---
+<<local $left = "Sigurd" as String>>
+<<local $right = "Oifey" as String>>
+Oifey: Sir, we've searched the entire castle, but there's no sign of Lady Aideen.
+Sigurd: No! Where could she be?
+Oifey: Verdane must have carried her off before we arrived. I hope she's alright.
+Sigurd: Barbarians! I'll hunt them to the ends of the earth if I have to. 
+Oifey: Yes, sir! There's also a messenger for you from His Majesty in Belhalla.
+<<set $right = "Filat">>
+Filat: Sir Sigurd, His Majesty is most pleased with your efforts in liberating Jungby.
+Filat: He has decided to ordain you a Holy Knight of Grannvale.
+Sigurd: What an honor! I hardly deserve it, but I shall not fail His Majesty.
+Filat: So we trust, Sir Sigurd. It is vital that you defend these castles while Grannvale is occupied with Isaach.
+Filat: You will be compensated, of course. Please be vigilant in the campaign ahead.
+<<stop>>
+===
+
 title: DiMaggio_Orders_Looting
 ---
 <<local $left = "" as String>>
@@ -253,7 +298,7 @@ AddItemEvent:item.Regal_Sword
 Arvis: Sir Sigurd, I see you are well.
 Sigurd: Lord Arvis? What are you doing here?
 Arvis: His Majesty was worried and sent me to investigate matters. He also asked me to give you this blade.
-Sigurd: My god, it's beautiful! What an honor. Lord Arvis, please express my sincerest gratitude to His Majesty.
+Sigurd: By Baldo, it's beautiful! What an honor. Lord Arvis, please express my sincerest gratitude to His Majesty.
 Arvis: I shall deliver your words precisely. But what is this I hear of my brother joining your banner?
 Sigurd: Well, he joined the fight, but I didn't ask him to come behind your back. 
 Sigurd: I just couldn't turn him away. Do you mind if he stays with us a bit longer?
