@@ -238,7 +238,7 @@
     },
     "skills": [],
     "money": 5000,
-    "items": ["Lance"],
+    "items": ["Lance", "Javelin"],
     "attacks": [],
     "proficiencies": ["Lance"]
     },

@@ -5,7 +5,7 @@
             {
                 "weaponType" : "Sword",
                 "might": 5,
-                "hit": 15,
+                "hit": 30,
                 "crit": 5,
                 "fatigue": 1,
                 "effects": [],
@@ -15,7 +15,7 @@
             {
                 "weaponType" : "Sword",
                 "might": 14,
-                "hit": 15,
+                "hit": 30,
                 "crit": 5,
                 "fatigue": 2,
                 "effects": [],
@@ -25,7 +25,7 @@
             {
                 "weaponType" : "Axe",
                 "might": 9,
-                "hit": 10,
+                "hit": 25,
                 "fatigue": 1,
                 "effects": [],
                 "specialAttack": "Smash"
@@ -34,7 +34,7 @@
             {
                 "weaponType" : "Lance",
                 "might": 7,
-                "hit": 20,
+                "hit": 35,
                 "fatigue": 2,
                 "effects": [],
                 "specialAttack": "Stab"
@@ -47,8 +47,15 @@
         "Hand Axe":
             {
                 "weaponType" : "Axe",
-                "might": 8,
+                "might": 7,
                 "hit": 5,
+                "specialAttack": "Throw"
+            },
+        "Javelin":
+            {
+                "weaponType" : "Axe",
+                "might": 5,
+                "hit": 25,
                 "specialAttack": "Throw"
             },
         "Bow":
