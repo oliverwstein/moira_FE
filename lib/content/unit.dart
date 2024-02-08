@@ -208,6 +208,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   Future<void> onLoad() async {
     add(UnitCircle(this));
     children.register<UnitCircle>();
+    children.register<Item>();
     add(unitClass);
     if(main?.weapon != null && unitClass.name == "Knight") add(main!.weapon!);
     position = unit.tile.center;

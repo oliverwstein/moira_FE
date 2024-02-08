@@ -433,17 +433,21 @@ class InventoryMenu extends SelectionMenu {
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     debugPrint("InventoryMenu given key ${key.logicalKey.keyLabel} to handle.");
-    // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
-            debugPrint("${options[selectedIndex]} Chosen");
-        if(unit.inventory[selectedIndex].use != null){
-          // If the item has a use, prompt if they want to use it.
-        } 
-        if (unit.inventory[selectedIndex].type != ItemType.basic) {
-          unit.equip(unit.inventory[selectedIndex]);
-        }
-        return KeyEventResult.handled;
+          debugPrint("${options[selectedIndex]} Chosen");
+          if(unit.inventory[selectedIndex].use != null){
+            // If the item has a use, prompt if they want to use it.
+          } 
+          if (unit.inventory[selectedIndex].type != ItemType.basic) {
+            if([unit.main?.name, unit.gear?.name, unit.treasure?.name].contains(options[selectedIndex])){
+              unit.unequip(unit.inventory[selectedIndex].type);
+            } else {
+              unit.equip(unit.inventory[selectedIndex]);
+            }
+            
+          }
+          return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();
         return KeyEventResult.handled;
@@ -455,6 +459,22 @@ class InventoryMenu extends SelectionMenu {
         debugPrint("${options[selectedIndex]} Selected");
     }
     return KeyEventResult.handled;
+  }
+  @override
+  void render(Canvas canvas) {
+      super.render(canvas);
+      double actionHeight = Stage.tileSize * 0.75;
+      for (int i = 0; i < options.length; i++) {
+        double yPos = i * actionHeight;
+        if(unit.main?.name == options[i] ||unit.gear?.name == options[i]||unit.treasure?.name == options[i]){
+          fontRenderer.render(
+            canvas,
+            "- ",
+            Vector2(0, yPos),
+            anchor: Anchor.topLeft,
+        );
+        }
+      }
   }
 }
 
