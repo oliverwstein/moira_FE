@@ -490,7 +490,6 @@ class TalkMenu extends SelectionMenu {
           debugPrint("${options[selectedIndex]} Chosen");
           DialogueMenu menu = DialogueMenu("Talk_${unit.name}_${options[selectedIndex]}", null);
           game.stage.menuManager.pushMenu(menu);
-
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();
@@ -744,7 +743,11 @@ class DialogueMenu extends Menu {
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    if(dialogue.finished){game.stage.menuManager.clearStack();}
+    if(dialogue.finished){
+      game.stage.menuManager.clearStack();
+      if(game.stage.tileMap[game.stage.cursor]!.unit!.controller.takingTurn){
+        game.eventQueue.addEventBatch([UnitExhaustEvent(game.stage.tileMap[game.stage.cursor]!.unit!, manual: false)]);
+      }}
     return dialogue.handleKeyEvent(key, keysPressed);
   }
 

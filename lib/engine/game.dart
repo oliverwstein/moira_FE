@@ -86,7 +86,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     dialogueFont = SpriteFont(source: images.fromCache("alphabet_spritesheet.png"), size: 16, ascent: 16, glyphs: glyphList);
     hudFont = SpriteFont(source: images.fromCache("alphabet_spritesheet.png"), size: 16, ascent: 16, glyphs: glyphList);
     SpriteSheet portraitSheet = SpriteSheet(image: images.fromCache("portraits_spritesheet.png"), srcSize: Vector2(48, 64));
-    List<String> portraitNames = ["", "Villager", "Gerrard", "DiMaggio", "Lex", "Azel", "Gandolf", "Aideen", "Midir", "Arden", "Noish", "Alec", "Sigurd", "Oifey", "Quan", "Ethlyn", "Finn"];
+    List<String> portraitNames = ["", "Villager", "Gerrard", "DiMaggio", "Lex", "Azel", "Gandolf", "Aideen", "Midir", "Arden", "Noish", "Alec", "Sigurd", "Oifey", "Quan", "Ethlyn", "Finn", "Arvis"];
     for(var i = 0; i < portraitNames.length; i++){
       portraitMap[portraitNames[i]] = portraitSheet.getSpriteById(i);
     }
