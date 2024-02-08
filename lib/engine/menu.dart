@@ -250,9 +250,43 @@ class SelectionMenu extends Menu {
   }
 
   @override
-  void update(dt){
-    position = Vector2(game.stage.cursor.position.x + Stage.tileSize*3, game.stage.cursor.position.y - Stage.tileSize*1);
+  void update(double dt) {
+    super.update(dt);
+    // Calculate the desired position based on the cursor
+    Vector2 desiredPosition = Vector2(
+      game.stage.cursor.position.x + Stage.tileSize * 3,
+      game.stage.cursor.position.y - Stage.tileSize * 1,
+    );
+
+    // Clamp the desired position to ensure the menu stays within the VisibleWorldRect
+    position = clampPositionToVisibleWorld(desiredPosition);
   }
+
+  Vector2 clampPositionToVisibleWorld(Vector2 desiredPosition) {
+    Rect menuRect = Rect.fromLTWH(
+      desiredPosition.x,
+      desiredPosition.y,
+      size.x,
+      size.y,
+    );
+
+    Rect visibleWorldRect = game.camera.visibleWorldRect;
+    
+    // Adjust the x position if the menu goes beyond the visible world bounds
+    double clampedX = max(
+      visibleWorldRect.left,
+      min(menuRect.right, visibleWorldRect.right) - size.x,
+    );
+
+    // Adjust the y position if the menu goes beyond the visible world bounds
+    double clampedY = max(
+      visibleWorldRect.top,
+      min(menuRect.bottom, visibleWorldRect.bottom) - size.y,
+    );
+
+    return Vector2(clampedX, clampedY);
+  }
+
   @override
   void render(Canvas canvas) {
       super.render(canvas);
@@ -280,7 +314,6 @@ class SelectionMenu extends Menu {
             );
         }
       }
-      
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
