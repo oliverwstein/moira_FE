@@ -23,6 +23,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
   }
 
   void adjustHudPosition() {
+    // ignore: invalid_use_of_internal_member
     Rect visibleWorldRect = game.camera.viewfinder.visibleWorldRect;
     Vector2 cursorPosition = game.stage.cursor.position;
 
