@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_string_interpolations
+
 import 'dart:math';
 
 import 'package:flame/components.dart';
@@ -40,6 +42,7 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     // debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
+    if(key.logicalKey == LogicalKeyboardKey.escape){clearStack();}
     if (isNotEmpty){
       debugPrint("Active menu is: ${_menuStack.last.runtimeType}");
       if(key is RawKeyDownEvent) return _menuStack.last.handleKeyEvent(key, keysPressed);
@@ -232,7 +235,7 @@ class CantoMenu extends Menu {
 
 class SelectionMenu extends Menu {
   final Point<int> tilePosition;
-  late final List<String> options;
+  late List<String> options;
   int selectedIndex = 0;
   late final SpriteFontRenderer fontRenderer;
   SelectionMenu(this.tilePosition, this.options);
@@ -254,6 +257,7 @@ class SelectionMenu extends Menu {
   void render(Canvas canvas) {
       super.render(canvas);
       if(game.stage.menuManager._menuStack.last == this){
+        size = Vector2(Stage.tileSize * 3, options.length * Stage.tileSize * 0.75 + Stage.tileSize * 0.25); // Dynamic size based on options
         final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
         final highlightPaint = Paint()..color = const Color.fromARGB(141, 203, 16, 203); // Color for highlighting selected action
         canvas.drawRect(size.toRect(), backgroundPaint);
@@ -300,6 +304,7 @@ class SelectionMenu extends Menu {
 
 class UnitActionMenu extends SelectionMenu with HasVisibility {
   final Unit unit;
+  bool committed = false;
 
   UnitActionMenu(Point<int> tilePosition, this.unit)
       : super(tilePosition, unit.getActionsAt(tilePosition));
@@ -308,6 +313,7 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
   void update(dt){
     super.update(dt);
     if(unit.tilePosition != game.stage.cursor.tilePosition) {isVisible = false;} else {isVisible = true;}
+
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -336,6 +342,9 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
                 game.eventQueue.addEventBatch([VisitEvent(unit, unit.tile as TownCenter)]);
                 game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
                 game.stage.menuManager.clearStack();
+                break;
+              case "Talk":
+                game.stage.menuManager.pushMenu(TalkMenu(game.stage.cursor.tilePosition, unit));
                 break;
               case "Ransack":
                 game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
@@ -369,7 +378,10 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
             }
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
-        close();
+        if(committed){
+          game.stage.menuManager.clearStack();
+          game.eventQueue.addEventBatchToHead([UnitExhaustEvent(unit, manual: false)]);}
+        else{close();}
         return KeyEventResult.handled;
       case LogicalKeyboardKey.arrowUp:
         selectedIndex = (selectedIndex - 1) % options.length;
@@ -440,6 +452,52 @@ class StageMenu extends SelectionMenu {
                 close();
                 break;
             }
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.keyB:
+        close();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp:
+        selectedIndex = (selectedIndex - 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+      case LogicalKeyboardKey.arrowDown:
+        selectedIndex = (selectedIndex + 1) % options.length;
+        debugPrint("${options[selectedIndex]} Selected");
+    }
+    return KeyEventResult.handled;
+  }
+}
+
+class TalkMenu extends SelectionMenu {
+  final Unit unit;
+  static List<String> getTalkOptions(Unit unit, Point<int> point) {
+    List<String> options = [];
+    List<Tile?> adjacentTiles = [
+      unit.game.stage.tileMap[Point(point.x+1, point.y)],
+      unit.game.stage.tileMap[Point(point.x-1, point.y)],
+      unit.game.stage.tileMap[Point(point.x, point.y+1)],
+      unit.game.stage.tileMap[Point(point.x, point.y-1)],
+      ];
+    for (Tile? tile in adjacentTiles){
+      if(tile != null){
+        if(tile.unit != null && unit.game.yarnProject.nodes.keys.contains("Talk_${unit.name}_${tile.unit!.name}")){
+          options.add(tile.unit!.name);
+        }
+      }
+    }
+    return options;
+  }
+  TalkMenu(Point<int> tilePosition, this.unit)
+      : super(tilePosition, getTalkOptions(unit, tilePosition));
+
+  @override
+  KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
+    debugPrint("TalkMenu given key ${key.logicalKey.keyLabel} to handle.");
+      switch (key.logicalKey) {
+        case LogicalKeyboardKey.keyA:
+          debugPrint("${options[selectedIndex]} Chosen");
+          DialogueMenu menu = DialogueMenu("Talk_${unit.name}_${options[selectedIndex]}", null);
+          close();
+          game.stage.menuManager.pushMenu(menu);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();
@@ -693,8 +751,7 @@ class DialogueMenu extends Menu {
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    if(dialogue.finished){close();}
-    return dialogue.handleKeyEvent(key, keysPressed);
+    KeyEventResult result = dialogue.handleKeyEvent(key, keysPressed);
+    return result;
   }
-
 }

@@ -182,12 +182,8 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
     }
   }
 
-
-  void loadEventsFromJson(dynamic jsonData) {
-    for (List<dynamic> eventBatch in jsonData) {
-      List<Event> batch = [];
-      for (Map eventData in eventBatch){
-        Event event;
+  Event loadEventfromJson(dynamic eventData){
+    Event event;
         switch (eventData['type']) {
           case 'UnitCreationEvent':
             String name = eventData['unitName'];
@@ -225,6 +221,11 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
             String nodeName = eventData['nodeName'];
             String? eventName = eventData['name'] ?? nodeName;
             event = DialogueEvent(nodeName, bgName: bgName, name: eventName);
+            break;
+          case 'AddItemEvent':
+            String itemName = eventData['item'];
+            String unitName = eventData['unit'];
+            event = AddItemEvent.byName(game, unitName, itemName);
             break;
           case 'PanEvent':
             Point<int> destination = Point(eventData['destination'][0], eventData['destination'][1]);
@@ -264,7 +265,15 @@ class EventQueue extends Component with HasGameReference<MoiraGame>{
         if (triggerList.isNotEmpty) {
           eventTrigger = Trigger.fromJson(triggerList.first, event);
           event.trigger = eventTrigger;
-          }
+        }
+    return event;
+  }
+
+  void loadEventsFromJson(dynamic jsonData) {
+    for (List<dynamic> eventBatch in jsonData) {
+      List<Event> batch = [];
+      for (Map eventData in eventBatch){
+        Event event = loadEventfromJson(eventData);
         batch.add(event);
         addEventBatch(batch);
       }

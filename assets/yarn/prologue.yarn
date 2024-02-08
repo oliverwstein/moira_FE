@@ -14,6 +14,7 @@
 <<character Ethlyn>>
 <<character Finn>>
 <<character Villager>>
+<<character Arvis>>
 title: Opening_Jungby
 ---
 <<local $left = "Midir" as String>>
@@ -185,6 +186,14 @@ Finn: Forgive me my lord, but we really ought to hurry.
 <<stop>>
 ===
 
+title: ArvisArrival
+---
+<<local $left = "" as String>>
+<<local $right = "Arvis" as String>>
+Arvis: What a mess! His Majesty won't be pleased. I should have thought you could take care of a few savages, Sigurd...
+<<stop>>
+===
+
 title: Town_(48,7)_Visit
 ---
 <<local $villager = "Villager" as String>>
@@ -196,6 +205,7 @@ Villager: Use it how you see fit. Please help out the other villages if you can.
 ===
 
 title: Town_(39,2)_Visit
+AddItemEvent:item.Salve
 ---
 <<local $villager = "OldVillager" as String>>
 <<local $left = "Villager" as String>>
@@ -226,11 +236,99 @@ Villager: You didn't hear it from me, but there seems to be quite a bit of frict
 ===
 
 title: Town_(27,30)_Visit
+AddItemEvent:item.Speed_Ring
 ---
 <<local $left = "Villager" as String>>
 <<local $right = "" as String>>
 Villager: You came to save us!? I thought we were doomed! I've got a ring for you in appreciation. 
 Villager: It's called the Speed Ring. Slip her on for a little boost in speed. Go ahead... put her on! Your enemy'll have a tough time hitting you now!
+<<stop>>
+===
+
+title: Talk_Arvis_Sigurd
+---
+<<local $left = "Arvis" as String>>
+<<local $right = "Sigurd" as String>>
+Arvis: Sir Sigurd, I see you are well.
+Sigurd: Lord Arvis? What are you doing here?
+Arvis: His Majesty was worried and sent me to investigate matters. He also asked me to give you this.
+Sigurd: My god, it's beautiful! What an honor. Lord Arvis, please express my sincerest gratitude to His Majesty.
+Arvis: I shall deliver your words precisely. But what is this I hear of my brother joining your banner?
+Sigurd: Well, he joined the fight, but I didn't ask him to come behind your back. 
+Sigurd: I just couldn't turn him away. Do you mind if he stays with us a bit longer?
+Arvis: Azel is responsible for his own decisions. I ask only that you guard his life well.
+Arvis: Half-brother he may be, but he is all the brother I have, even if he hates me.
+Arvis: I leave him with you in good faith. Perhaps he'll listen to you.
+Sigurd: I will guard him with my life, Lord Arvis. And I'll speak to him afterwards and see if I can get him to return home.
+Arvis: I appreciate that, Sir Sigurd. Now, His Majesty needs me in Belhalla, so I must take my leave. 
+<<stop>>
+===
+
+title: Talk_Azel_Sigurd
+---
+<<local $left = "Azel" as String>>
+<<local $right = "Sigurd" as String>>
+Azel: Lord Sigurd! I'm glad you're uninjured.
+Sigurd: Azel? What are you doing so far from Velthomer?
+Azel: Lex and I came to help you. We couldn't let you fight alone!
+Sigurd: But Azel, does your brother approve of this? Does he know you're risking your life?
+Azel: Well, I doubt he'd approve, but he's off in Belhalla with the Royal Guard. Actually, he ordered me not to leave the capital.
+Sigurd: I'm not surprised. What would I tell him if you died here?
+Azel: I shouldn't say this, but...I don't know if he'd care. I've never lived up to his expectations.
+Azel: Perhaps I can change that if I drape myself in glory, eh?
+Sigurd: Just as long as you don't drape yourself in a black shroud. I'm glad you came, Azel. Thank you.
+Azel: My pleasure, sir! It's an honor to fight by your side.
+<<set $right = "">>
+Azel: He's just the man everyone says he is! I wish Arvis was as kind...
+<<stop>>
+===
+
+title: Talk_Lex_Sigurd
+---
+<<local $left = "Lex" as String>>
+<<local $right = "Sigurd" as String>>
+Lex: How do you do, sir?
+Sigurd: Lex! To what do I owe the honor?
+Lex: To whom, more like. Arvis' kid brother dragged me here. 
+Sigurd: Azel? That would explain it, I'm glad. But does Lord Langobalt know?
+Lex: Of course not! You know how he feels about your father. But he won't mind the house of Velthomer owing me a favor. 
+Sigurd: I see. Well, all the same, I appreciate your aid.
+Lex: I'll do what I can. Those barbarians need to learn some manners, after all.
+<<stop>>
+===
+
+title: Talk_Ethlyn_Sigurd
+---
+<<local $left = "Ethlyn" as String>>
+<<local $right = "Sigurd" as String>>
+Ethlyn: Sigurd, you're alive!
+Sigurd: Good to see you too, Ethlyn.
+Ethlyn: I was so worried when I heard of Verdane's invasion. 
+Sigurd: Did you really think a pack of Verdanese brutes could threaten me?
+Ethlyn: You and what army, Sigurd? Especially with Father being away, I knew I had to come.
+Sigurd: I can't fault your judgment. Mother's heart beats in your chest. 
+Sigurd: When you married Quan, you seemed so demure! But you're still the same as ever. Poor Quan!
+Ethlyn: I wouldn't need to nag you if you had more sense! I don't need to nag Quan!
+Sigurd: You've got me there. And I'm lucky to have you here. Thank you.
+Ethlyn: Oh, Sigurd...
+<<stop>>
+===
+
+title: Talk_Quan_Sigurd
+---
+<<local $left = "Quan" as String>>
+<<local $right = "Sigurd" as String>>
+Quan: Sigurd, are you alright?
+Sigurd: Quan, you're a sight for sore eyes!
+Quan: Well, we heard about your skirmish with Verdane and couldn't stay away.
+Sigurd: What of Leinster? Don't you need to be guarding the border with Thracia?
+Quan: We do. That's why I only brought Finn. My father is commanding the Lance Ritter at present.
+Sigurd: I see. Sorry to drag you into all this, Quan.
+Quan: Nonsense! I don't forget my oaths.
+Sigurd: Huh?
+Quan: At the academy in Belhalla with Eldigan! When we vowed to aid each other in times of need?
+Sigurd: Ah, yes, of course. I haven't forgotten.
+Quan: Well then, let's get down to business.
 <<stop>>
 ===
 

@@ -1053,6 +1053,34 @@
                             {"name": "QuanPan"}
                         }
                     ]
+                },
+                {
+                    "type": "FactionCreationEvent",
+                    "factionType": "green",
+                    "factionName": "Velthomer",
+                    "human": false,
+                    "triggers":
+                    [
+                        {"SeizeEvent":
+                            {"name":"SeizeEventSigurd_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "UnitCreationEvent",
+                    "unitName": "Arvis",
+                    "faction": "Velthomer",
+                    "level": -1,
+                    "tilePosition": [
+                        31,
+                        3
+                    ],
+                    "triggers":
+                    [
+                        {"SeizeEvent":
+                            {"name":"SeizeEventSigurd_Jungby"}
+                        }
+                    ]
                 }
             ]
         ]

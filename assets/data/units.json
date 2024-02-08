@@ -462,6 +462,30 @@
     "items": ["Hand Axe", "Skill Ring"],
     "attacks": [],
     "proficiencies": []
+    },
+    {
+    "name": "Arvis",
+    "faction": "green",
+    "class": "Sage",
+    "level": 25,
+    "baseStats": {
+        "hp": 60,
+        "sta": 55,
+        "str": 15,
+        "def": 8,
+        "dex": 27,
+        "spe": 30,
+        "mag": 30,
+        "res": 22,
+        "wis": 18,
+        "lck": 0
+        },
+    "growths": {},
+    "skills": ["Adept", "Nihil"],
+    "money": 2000,
+    "items": ["Valflame", "Recover Ring"],
+    "attacks": ["Fire"],
+    "proficiencies": ["Book", "Staff"]
     }
 ]
 }
