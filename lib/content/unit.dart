@@ -305,7 +305,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       case TownCenter():
         TownCenter town = game.stage.tileMap[point]! as TownCenter;
         if (town.open) actions.add("Visit");
-        if (town.open) actions.add("Ransack");
+        if (town.open && unit.controller.factionType == FactionType.red) actions.add("Ransack");
       case CastleGate():
         CastleGate gate = game.stage.tileMap[point]! as CastleGate;
         if (gate.factionName != unit.controller.name){
@@ -612,6 +612,12 @@ class UnitExhaustEvent extends Event {
   final Unit unit;
   bool manual;
   UnitExhaustEvent(this.unit, {this.manual = false, Trigger? trigger, String? name}) : super(trigger: trigger, name: "UnitExhaustEvent: $name");
+  static void initialize(EventQueue queue) {
+    queue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
+        UnitExhaustEvent unitExhaustEvent = UnitExhaustEvent(endCombatEvent.combat.attacker);
+        endCombatEvent.game.eventQueue.addEventBatchToHead([unitExhaustEvent]);
+    });
+  }
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));

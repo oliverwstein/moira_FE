@@ -339,17 +339,12 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
                 game.stage.menuManager.pushMenu(CombatMenu(unit, targets));
                 break;
               case "Visit":
-                game.eventQueue.addEventBatch([VisitEvent(unit, unit.tile as TownCenter)]);
-                game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
-                game.stage.menuManager.clearStack();
+                game.eventQueue.addEventBatchToHead([VisitEvent(unit, unit.tile as TownCenter)]);
+                committed = true;
+                options.remove("Visit");
                 break;
               case "Talk":
                 game.stage.menuManager.pushMenu(TalkMenu(game.stage.cursor.tilePosition, unit));
-                break;
-              case "Ransack":
-                game.eventQueue.addEventBatch([RansackEvent(unit, unit.tile as TownCenter)]);
-                game.eventQueue.addEventBatch([UnitExhaustEvent(unit, manual: false)]);
-                game.stage.menuManager.clearStack();
                 break;
               case "Seize":
                 game.eventQueue.addEventBatch([SeizeEvent(unit, unit.tile as CastleGate)]);
@@ -604,7 +599,6 @@ class CombatMenu extends Menu{
         game.eventQueue.addEventBatch([StartCombatEvent(unit, targets[selectedTargetIndex])]);
         game.stage.cursor.snapToTile(unit.tilePosition);
         game.stage.menuManager.clearStack();
-        game.combatQueue.addEventBatch([UnitExhaustEvent(unit)]);
         return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         // Cancel

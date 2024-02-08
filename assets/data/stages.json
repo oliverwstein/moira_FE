@@ -785,7 +785,7 @@
                     [
                         {"DialogueEvent":
                             {
-                            "name": "Fall_Of_Jungby"}
+                            "name": "Gandolf_Seizes_Jungby"}
                         }
                     ]
                 },
@@ -802,7 +802,7 @@
                     [
                         {"DialogueEvent":
                             {
-                            "name": "Fall_Of_Jungby"}
+                            "name": "Gandolf_Seizes_Jungby"}
                         }
                     ]
                 },
@@ -1078,7 +1078,7 @@
                     "triggers":
                     [
                         {"StartTurnEvent":
-                            {"faction":"Velthomer"}
+                            {"factionName":"Velthomer"}
                             
                         }
                     ]

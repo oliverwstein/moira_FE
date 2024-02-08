@@ -79,6 +79,6 @@ class AddItemEvent extends Event {
     super.execute();
     unit.inventory.add(item);
     game.eventQueue.dispatchEvent(this);
-    checkComplete();
+    completeEvent();
   }
 }
