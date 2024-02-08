@@ -328,6 +328,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
             if (sta > 0) actions.add("Sortie");}
     }
     if(sta > 0){
+      if(TalkMenu.getTalkOptions(unit, point).isNotEmpty) actions.add("Talk");
       if(unit.getTargetsAt(point).isNotEmpty) actions.add("Attack");
       if(unit.getStaffTargetsAt(point).isNotEmpty) actions.add("Staff");
     }
