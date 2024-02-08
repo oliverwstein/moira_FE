@@ -90,8 +90,7 @@ abstract class Menu extends PositionComponent with HasGameReference<MoiraGame> i
     if(game.stage.menuManager._menuStack.lastOrNull is MoveMenu){
       game.stage.menuManager._menuStack.last.close();}}
   
-  static Vector2 clampPositionToVisibleWorld(
-      MoiraGame game, Vector2 desiredPosition, Vector2 menuSize) {
+  static Vector2 clampPositionToVisibleWorld(MoiraGame game, Vector2 desiredPosition, Vector2 menuSize) {
     Rect menuRect = Rect.fromLTWH(
       desiredPosition.x,
       desiredPosition.y,
@@ -101,20 +100,24 @@ abstract class Menu extends PositionComponent with HasGameReference<MoiraGame> i
 
     Rect visibleWorldRect = game.camera.visibleWorldRect;
 
+    // Define the offset from the edge
+    double offset = Stage.tileSize * 0.5;
+
     // Adjust the x position if the menu goes beyond the visible world bounds
     double clampedX = max(
-      visibleWorldRect.left,
-      min(menuRect.right, visibleWorldRect.right) - menuSize.x,
+      visibleWorldRect.left + offset,
+      min(menuRect.right, visibleWorldRect.right - offset) - menuSize.x,
     );
 
     // Adjust the y position if the menu goes beyond the visible world bounds
     double clampedY = max(
-      visibleWorldRect.top,
-      min(menuRect.bottom, visibleWorldRect.bottom) - menuSize.y,
+      visibleWorldRect.top + offset,
+      min(menuRect.bottom, visibleWorldRect.bottom - offset) - menuSize.y,
     );
 
     return Vector2(clampedX, clampedY);
   }
+
 
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -613,7 +616,7 @@ class CombatMenu extends Menu {
   @override 
   Future<void> onLoad() async {
     size = Vector2(Stage.tileSize * 4, Stage.tileSize * 6);
-    anchor = Anchor.center;
+    anchor = Anchor.topLeft;
     fontRenderer = SpriteFontRenderer.fromFont(game.hudFont, scale: .5);
     attacks = unit.attackSet.values.toList();
     unit.attack = attacks.first;

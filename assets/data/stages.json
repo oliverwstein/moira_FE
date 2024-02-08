@@ -239,7 +239,7 @@
             [
                 {
                     "type": "DialogueEvent",
-                    "bgName": "jungby_interior.png",
+                    "bgName": "jungby.png",
                     "nodeName": "Opening_Jungby"
                 },
                 {

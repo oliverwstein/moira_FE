@@ -66,8 +66,8 @@ class Weapon extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
     int hit = weaponData['hit'] ?? 0;
     int crit = weaponData['crit'] ?? 0;
     int fatigue = weaponData['fatigue'] ?? 0;
-    // List<CombatEffect> effects = weaponData['effects'] ?? []; // Replace with actual type if you have a specific Effect class
-    Attack specialAttack = Attack.fromJson(weaponData['specialAttack']); // Replace with actual type
+    Attack? specialAttack;
+    if (weaponData['specialAttack'] != null) specialAttack = Attack.fromJson(weaponData['specialAttack']); 
 
     // Return a new Weapon instance
     return Weapon._internal(weaponType, might, hit, crit, fatigue, null, specialAttack);
