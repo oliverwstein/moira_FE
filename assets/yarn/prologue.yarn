@@ -113,7 +113,7 @@ Gandolf: I'll show you how it's done.
 <<stop>>
 ===
 
-title: Fall_Of_Jungby
+title: Gandolf_Seizes_Jungby
 ---
 <<local $left = "Aideen" as String>>
 <<local $right = "" as String>>

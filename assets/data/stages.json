@@ -764,7 +764,7 @@
                 },
                 {
                     "type": "DialogueEvent",
-                    "nodeName": "Fall_Of_Jungby",
+                    "nodeName": "Gandolf_Seizes_Jungby",
                     "bgName": "jungby_interior.png",
                     "triggers":
                     [
@@ -1080,6 +1080,30 @@
                         {"StartTurnEvent":
                             {"faction":"Velthomer"}
                             
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Sigurd_Seizes_Jungby",
+                    "bgName": "jungby_interior.png",
+                    "triggers":
+                    [
+                        {"SeizeEvent":
+                            {
+                            "name":"SeizeEvent_Sigurd_Jungby"}
+                        }
+                    ]
+                },
+                {
+                    "type": "DialogueEvent",
+                    "nodeName": "Sigurd_Seizes_Evans",
+                    "bgName": "jungby_interior.png",
+                    "triggers":
+                    [
+                        {"SeizeEvent":
+                            {
+                            "name":"SeizeEvent_Sigurd_Evans"}
                         }
                     ]
                 }
