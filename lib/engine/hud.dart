@@ -6,9 +6,7 @@ import 'package:moira/content/content.dart';
 
 class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
   late final SpriteFontRenderer fontRenderer;
-
   Hud();
-
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -26,17 +24,20 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
 
   void adjustHudPosition() {
     Rect visibleWorldRect = game.camera.viewfinder.visibleWorldRect;
-    double midwayY = visibleWorldRect.top + (visibleWorldRect.height / 2);
     Vector2 cursorPosition = game.stage.cursor.position;
 
-    if (cursorPosition.y > midwayY) {
-      // Cursor is in the lower half, move HUD to the top-left
-      position = Vector2(visibleWorldRect.left + Stage.tileSize*.5, visibleWorldRect.top + Stage.tileSize*.5);
-    } else {
-      // Cursor is in the upper half, move HUD to the bottom-left
-      position = Vector2(visibleWorldRect.left + Stage.tileSize*.5, visibleWorldRect.bottom - size.y - Stage.tileSize*.5);
-    }
-  }
+    // Calculate the midway points of the visible world rectangle
+    double midwayX = visibleWorldRect.left + (visibleWorldRect.width / 2);
+    double midwayY = visibleWorldRect.top + (visibleWorldRect.height / 2);
+
+    // Determine the HUD's position based on the cursor's quadrant
+    x = (cursorPosition.x > midwayX) ? 
+               visibleWorldRect.left + Stage.tileSize * 0.5 : 
+               visibleWorldRect.right - size.x - Stage.tileSize * 0.5;
+    y = (cursorPosition.y > midwayY) ? 
+               visibleWorldRect.top + Stage.tileSize * 0.5 : 
+               visibleWorldRect.bottom - size.y - Stage.tileSize * 0.5;
+}
 
   @override
   void render(Canvas canvas) {
