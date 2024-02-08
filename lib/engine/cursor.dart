@@ -115,20 +115,20 @@ class Cursor extends PositionComponent with HasGameReference<MoiraGame>, HasVisi
     double clampedDy = _clampOffset(dy, centeredRect.top, centeredRect.bottom, playBox.top, playBox.bottom);
 
     return Vector2(clampedDx, clampedDy);
-}
+  }
 
-double _calculateOffset(double pos, double rectStart, double rectEnd, double boxStart, double boxEnd, double edgeDistance) {
-    double distStart = (pos - rectStart < edgeDistance && boxStart < rectStart) ? edgeDistance - (pos - rectStart) : 0;
-    double distEnd = (rectEnd - pos < edgeDistance && boxEnd > rectEnd) ? edgeDistance - (rectEnd - pos) : 0;
-    return distEnd - distStart;
-}
+  double _calculateOffset(double pos, double rectStart, double rectEnd, double boxStart, double boxEnd, double edgeDistance) {
+      double distStart = (pos - rectStart < edgeDistance && boxStart < rectStart) ? edgeDistance - (pos - rectStart) : 0;
+      double distEnd = (rectEnd - pos < edgeDistance && boxEnd > rectEnd) ? edgeDistance - (rectEnd - pos) : 0;
+      return distEnd - distStart;
+  }
 
-double _clampOffset(double offset, double rectStart, double rectEnd, double boxStart, double boxEnd) {
-    if (offset > 0) { // Moving right or down
-        return min(offset, boxEnd - rectEnd);
-    } else { // Moving left or up
-        return max(offset, boxStart - rectStart);
-    }
-}
+  double _clampOffset(double offset, double rectStart, double rectEnd, double boxStart, double boxEnd) {
+      if (offset > 0) { // Moving right or down
+          return min(offset, boxEnd - rectEnd);
+      } else { // Moving left or up
+          return max(offset, boxStart - rectStart);
+      }
+  }
 
 }

@@ -4,67 +4,67 @@ import 'package:flame/text.dart';
 import 'package:flutter/widgets.dart';
 import 'package:moira/content/content.dart';
 
-class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
-  late final TextComponent point;
-  late final TextComponent terrain;
-  late final TextComponent effect;
-
+class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
+  late final SpriteFontRenderer fontRenderer;
   Hud();
-  
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    // ignore: invalid_use_of_internal_member
-    position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
+    fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     anchor = Anchor.topLeft;
-    size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
-    double scaler = 24/Stage.tileSize;
+    size = Vector2(Stage.tileSize * 3.5, Stage.tileSize * 2.5);
     priority = 25;
-    point = TextComponent(
-        text: '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
-        position: Vector2(size.x / 2, size.y * (1 / 5)),
-        scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
-      );
-    terrain = TextComponent(
-        text: '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
-        position: Vector2(size.x / 2, size.y * (2 / 4)),
-        scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
-      );
-    effect = TextComponent(
-        text: 'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}',
-        position: Vector2(size.x / 2, size.y * (4 / 5)),
-        scale: Vector2.all(1/scaler),
-        anchor: Anchor.center,
-        textRenderer: SpriteFontRenderer.fromFont(game.hudFont),
-      );
-      add(point);
-      add(terrain);
-      add(effect);
   }
-
   @override
   void update(double dt) {
     super.update(dt);
-    // ignore: invalid_use_of_internal_member
-    position = game.camera.viewfinder.visibleWorldRect.topLeft.toVector2();
-    if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
-    point.text = '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})';
-    terrain.text = game.stage.tileMap[game.stage.cursor.tilePosition]!.name;
-    effect.text = 'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}';
+    adjustHudPosition();
+    isVisible = game.stage.freeCursor;
   }
+
+  void adjustHudPosition() {
+    Rect visibleWorldRect = game.camera.viewfinder.visibleWorldRect;
+    Vector2 cursorPosition = game.stage.cursor.position;
+
+    // Calculate the midway points of the visible world rectangle
+    double midwayX = visibleWorldRect.left + (visibleWorldRect.width / 2);
+    double midwayY = visibleWorldRect.top + (visibleWorldRect.height / 2);
+
+    // Determine the HUD's position based on the cursor's quadrant
+    x = (cursorPosition.x > midwayX) ? 
+               visibleWorldRect.left + Stage.tileSize * 0.5 : 
+               visibleWorldRect.right - size.x - Stage.tileSize * 0.5;
+    y = (cursorPosition.y > midwayY) ? 
+               visibleWorldRect.top + Stage.tileSize * 0.5 : 
+               visibleWorldRect.bottom - size.y - Stage.tileSize * 0.5;
+}
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    // Draw the HUD box
-    final paint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
-    canvas.drawRect(size.toRect(), paint);
+    final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white
+    canvas.drawRect(size.toRect(), backgroundPaint);
+
+    // Information to display in the HUD
+    List<String> texts = [
+      '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
+      '(${game.stage.tileMap[game.stage.cursor.tilePosition]!.name})',
+      'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}',
+    ];
+
+    double yPos = 0; // Start at the top of the HUD
+    for (String text in texts) {
+      fontRenderer.render(
+        canvas,
+        text,
+        Vector2(size.x / 2, yPos),
+        anchor: Anchor.topCenter,
+      );
+      yPos += Stage.tileSize * 0.75; // Move down for the next text
+    }
   }
 }
+
 
 class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility{
   late final TextComponent name;
@@ -106,7 +106,12 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   void update(double dt) {
     super.update(dt);
     size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
-    position = Vector2(game.stage.cursor.position.x-Stage.tileSize, game.stage.cursor.position.y - Stage.tileSize*2.2);
+    Vector2 desiredPosition = Vector2(
+      game.stage.cursor.position.x-Stage.tileSize,
+      game.stage.cursor.position.y - Stage.tileSize*2.2
+    );
+    // Use the static method from Menu to clamp the position
+    position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
     bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
     if (game.stage.freeCursor && stackCheck && unitCheck){

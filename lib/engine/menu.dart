@@ -89,6 +89,33 @@ abstract class Menu extends PositionComponent with HasGameReference<MoiraGame> i
     game.stage.menuManager.popMenu();
     if(game.stage.menuManager._menuStack.lastOrNull is MoveMenu){
       game.stage.menuManager._menuStack.last.close();}}
+  
+  static Vector2 clampPositionToVisibleWorld(
+      MoiraGame game, Vector2 desiredPosition, Vector2 menuSize) {
+    Rect menuRect = Rect.fromLTWH(
+      desiredPosition.x,
+      desiredPosition.y,
+      menuSize.x,
+      menuSize.y,
+    );
+
+    Rect visibleWorldRect = game.camera.visibleWorldRect;
+
+    // Adjust the x position if the menu goes beyond the visible world bounds
+    double clampedX = max(
+      visibleWorldRect.left,
+      min(menuRect.right, visibleWorldRect.right) - menuSize.x,
+    );
+
+    // Adjust the y position if the menu goes beyond the visible world bounds
+    double clampedY = max(
+      visibleWorldRect.top,
+      min(menuRect.bottom, visibleWorldRect.bottom) - menuSize.y,
+    );
+
+    return Vector2(clampedX, clampedY);
+  }
+
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
     switch (key.logicalKey) {
@@ -250,9 +277,17 @@ class SelectionMenu extends Menu {
   }
 
   @override
-  void update(dt){
-    position = Vector2(game.stage.cursor.position.x + Stage.tileSize*3, game.stage.cursor.position.y - Stage.tileSize*1);
+  void update(double dt) {
+    super.update(dt);
+    // Calculate the desired position based on the cursor or other criteria
+    Vector2 desiredPosition = Vector2(
+      game.stage.cursor.position.x + Stage.tileSize * 3,
+      game.stage.cursor.position.y - Stage.tileSize,
+    );
+    // Use the static method from Menu to clamp the position
+    position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
   }
+
   @override
   void render(Canvas canvas) {
       super.render(canvas);
@@ -280,12 +315,9 @@ class SelectionMenu extends Menu {
             );
         }
       }
-      
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint("ActionMenu given key ${key.logicalKey.keyLabel} to handle.");
-    // if(unit != null) || unit!.isMoving) return KeyEventResult.ignored;
       switch (key.logicalKey) {
         case LogicalKeyboardKey.keyA:
           debugPrint("${options[selectedIndex]} Chosen");
@@ -508,7 +540,7 @@ class TalkMenu extends SelectionMenu {
   }
 }
 
-class CombatMenu extends Menu{
+class CombatMenu extends Menu {
   final Unit unit;
   final List<Unit> targets;
   late List<Attack> attacks;
@@ -521,7 +553,10 @@ class CombatMenu extends Menu{
 
   @override
   void update(dt){
-    position = Vector2(game.stage.cursor.position.x + Stage.tileSize*3, game.stage.cursor.position.y - Stage.tileSize*1);
+    Vector2 desiredPosition = Vector2(
+      game.stage.cursor.position.x + Stage.tileSize*3,
+      game.stage.cursor.position.y - Stage.tileSize*1);
+    position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
   }
 
   @override
@@ -659,7 +694,10 @@ class StaffMenu extends Menu {
   }
   @override
   void update(dt){
-    position = Vector2(unit.position.x + Stage.tileSize*3, unit.position.y - Stage.tileSize*1);
+    Vector2 desiredPosition = Vector2(
+      unit.position.x + Stage.tileSize*3,
+      unit.position.y - Stage.tileSize*1);
+    position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
   }
   @override
   void render(Canvas canvas) {
