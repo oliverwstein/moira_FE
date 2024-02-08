@@ -106,7 +106,12 @@ class UnitHud extends PositionComponent with HasGameReference<MoiraGame>, HasVis
   void update(double dt) {
     super.update(dt);
     size = Vector2(Stage.tileSize*3, Stage.tileSize*2);
-    position = Vector2(game.stage.cursor.position.x-Stage.tileSize, game.stage.cursor.position.y - Stage.tileSize*2.2);
+    Vector2 desiredPosition = Vector2(
+      game.stage.cursor.position.x-Stage.tileSize,
+      game.stage.cursor.position.y - Stage.tileSize*2.2
+    );
+    // Use the static method from Menu to clamp the position
+    position = Menu.clampPositionToVisibleWorld(game, desiredPosition, size);
     bool stackCheck = !game.stage.menuManager.isNotEmpty;
     bool unitCheck = game.stage.tileMap[game.stage.cursor.tilePosition]!.isOccupied;
     if (game.stage.freeCursor && stackCheck && unitCheck){
