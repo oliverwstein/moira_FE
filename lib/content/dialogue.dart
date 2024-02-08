@@ -200,7 +200,7 @@ class DialogueEvent extends Event{
   String? bgName;
   String nodeName;
   late DialogueMenu menu;
-  DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: name);
+  DialogueEvent(this.nodeName, {this.bgName, Trigger? trigger, String? name}) : super(trigger: trigger, name: nodeName);
 
   static void initialize(EventQueue queue) {
     queue.registerClassObserver<UnitDeathEvent>((catalystEvent) {
@@ -216,6 +216,14 @@ class DialogueEvent extends Event{
         debugPrint("Combat Quote found for ${catalystEvent.combat.attacker.name} against ${catalystEvent.combat.defender.name}");
         var combatQuoteEvent = DialogueEvent("${catalystEvent.combat.attacker.name}_${catalystEvent.combat.defender.name}_Combat_Quote");
         queue.addEventBatchToHead([combatQuoteEvent]);
+      }
+    });
+    queue.registerClassObserver<SeizeEvent>((catalystEvent) {
+      if (catalystEvent.game.yarnProject.nodes.keys.contains("${catalystEvent.unit.name}_Seizes_${catalystEvent.gate.name}")) {
+        debugPrint("Seize Quote found for ${catalystEvent.unit.name} against ${catalystEvent.gate.name}");
+        DialogueEvent dialogueEvent = DialogueEvent("${catalystEvent.unit.name}_Seizes_${catalystEvent.gate.name}", bgName: "${catalystEvent.gate.name.toLowerCase()}.png");
+        debugPrint("dialogueEvent, ${dialogueEvent.name}, ${dialogueEvent.nodeName}");
+        queue.addEventBatchToHead([dialogueEvent]);
       }
     });
     queue.registerClassObserver<VisitEvent>((catalystEvent) {

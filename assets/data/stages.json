@@ -763,18 +763,6 @@
                     ]
                 },
                 {
-                    "type": "DialogueEvent",
-                    "nodeName": "Gandolf_Seizes_Jungby",
-                    "bgName": "jungby_interior.png",
-                    "triggers":
-                    [
-                        {"SeizeEvent":
-                            {
-                            "name":"SeizeEvent_Gandolf_Jungby"}
-                        }
-                    ]
-                },
-                {
                     "type": "UnitMoveEvent",
                     "unitName": "Gandolf",
                     "destination": [
@@ -1062,7 +1050,7 @@
                     "triggers":
                     [
                         {"SeizeEvent":
-                            {"name":"SeizeEventSigurd_Jungby"}
+                            {"name":"SeizeEvent_Sigurd_Jungby"}
                         }
                     ]
                 },
@@ -1080,30 +1068,6 @@
                         {"StartTurnEvent":
                             {"factionName":"Velthomer"}
                             
-                        }
-                    ]
-                },
-                {
-                    "type": "DialogueEvent",
-                    "nodeName": "Sigurd_Seizes_Jungby",
-                    "bgName": "jungby_interior.png",
-                    "triggers":
-                    [
-                        {"SeizeEvent":
-                            {
-                            "name":"SeizeEvent_Sigurd_Jungby"}
-                        }
-                    ]
-                },
-                {
-                    "type": "DialogueEvent",
-                    "nodeName": "Sigurd_Seizes_Evans",
-                    "bgName": "jungby_interior.png",
-                    "triggers":
-                    [
-                        {"SeizeEvent":
-                            {
-                            "name":"SeizeEvent_Sigurd_Evans"}
                         }
                     ]
                 }
