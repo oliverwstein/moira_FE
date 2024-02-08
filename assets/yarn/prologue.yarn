@@ -245,13 +245,14 @@ Villager: It's called the Speed Ring. Slip her on for a little boost in speed. G
 <<stop>>
 ===
 
-title: Talk_Arvis_Sigurd
+title: Talk_Sigurd_Arvis
+AddItemEvent:item.Regal_Sword
 ---
 <<local $left = "Arvis" as String>>
 <<local $right = "Sigurd" as String>>
 Arvis: Sir Sigurd, I see you are well.
 Sigurd: Lord Arvis? What are you doing here?
-Arvis: His Majesty was worried and sent me to investigate matters. He also asked me to give you this.
+Arvis: His Majesty was worried and sent me to investigate matters. He also asked me to give you this blade.
 Sigurd: My god, it's beautiful! What an honor. Lord Arvis, please express my sincerest gratitude to His Majesty.
 Arvis: I shall deliver your words precisely. But what is this I hear of my brother joining your banner?
 Sigurd: Well, he joined the fight, but I didn't ask him to come behind your back. 

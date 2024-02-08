@@ -7,6 +7,12 @@
             "description": "A sword.",
             "type": "main"
         },
+    "Regal Sword":
+        {
+            "weapon": "Regal Sword",
+            "description": "A sword of extraordinary craftsmanship.",
+            "type": "main"
+        },
     "Lance":
         {
             "weapon": "Lance",

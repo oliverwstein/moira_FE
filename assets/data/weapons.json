@@ -11,6 +11,16 @@
                 "effects": [],
                 "specialAttack": "Slash"
             },
+        "Regal Sword":
+            {
+                "weaponType" : "Sword",
+                "might": 14,
+                "hit": 15,
+                "crit": 5,
+                "fatigue": 2,
+                "effects": [],
+                "specialAttack": "Slash"
+            },
         "Axe":
             {
                 "weaponType" : "Axe",
