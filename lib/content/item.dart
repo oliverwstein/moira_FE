@@ -42,7 +42,6 @@ class Item extends Component with HasGameReference<MoiraGame>{
   Item._internal(this.name, this.description, this.type, this.weight, this.weapon, this.staff) {
     equipCond = Equip(this);
   }
-
 }
 
 class Equip extends Component {

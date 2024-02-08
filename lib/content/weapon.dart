@@ -95,6 +95,7 @@ class Weapon extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
     animation = spriteSheet.createAnimation(row: row, stepTime: currentStepTime);
     size = spriteSize; anchor = Anchor.center;
   }
+
   @override
   Future<void> onLoad() async {
     debugPrint(weaponType.name.toLowerCase());
@@ -105,6 +106,7 @@ class Weapon extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
       rows: 5,
     );
     spriteSize = Vector2(spriteSheetImage.width/4, spriteSheetImage.height/5);
+    animation = spriteSheet.createAnimation(row: 4, stepTime: .3);
     size = spriteSize; anchor = Anchor.center;
   }
 }

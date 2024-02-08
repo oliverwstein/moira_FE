@@ -274,7 +274,7 @@ class SelectionMenu extends Menu {
   Future<void> onLoad() async {
     super.onLoad();
     size = Vector2(Stage.tileSize * 3, options.length * Stage.tileSize * 0.75 + Stage.tileSize * 0.25); // Dynamic size based on options
-    anchor = Anchor.center;
+    anchor = Anchor.topLeft;
     fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     
   }
@@ -284,7 +284,7 @@ class SelectionMenu extends Menu {
     super.update(dt);
     // Calculate the desired position based on the cursor or other criteria
     Vector2 desiredPosition = Vector2(
-      game.stage.cursor.position.x + Stage.tileSize * 3,
+      game.stage.cursor.position.x + Stage.tileSize * 2,
       game.stage.cursor.position.y - Stage.tileSize,
     );
     // Use the static method from Menu to clamp the position
@@ -596,10 +596,10 @@ class CombatMenu extends Menu {
         (targets[selectedTargetIndex].attack?.name ?? "", size.x - Stage.tileSize*.25, lineHeight * 8, Anchor.topRight),
       ];
       if(Combat.addFollowUp(unit, targets[selectedTargetIndex])?.$1 == unit){
-        renderTexts.add(("(x2)", size.x, lineHeight, Anchor.topLeft));
+        renderTexts.add(("(x2)", size.x, lineHeight, Anchor.center));
       }
       else if(Combat.addFollowUp(unit, targets[selectedTargetIndex])?.$1 == targets[selectedTargetIndex]){
-        renderTexts.add(("x2", size.x, lineHeight*8, Anchor.topLeft));
+        renderTexts.add(("x2", size.x, lineHeight*8, Anchor.center));
       }
 
       for (var textInfo in renderTexts) {

@@ -93,7 +93,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     itemStrings = itemStrings ?? [];
 
     for(String itemName in itemStrings.isEmpty ? unitData['items'] : itemStrings){
-      inventory.add(Item.fromJson(itemName));
+      Item item = Item.fromJson(itemName);
+      inventory.add(item);
     }
 
     Map<String, Attack> attackMap = {};
@@ -240,7 +241,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
       switch (item.type) {
         case ItemType.main:
           main = item;
-          if(main?.weapon != null && unitClass.name == "Knight") {add(main!.weapon!);}
+          if(main?.weapon != null && unitClass.name == "Knight") {
+            add(main!.weapon!);}
           if(main?.staff != null) {add(main!.staff!);}
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
