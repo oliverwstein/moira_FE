@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
@@ -57,12 +58,15 @@ class HealthBar extends Bar {
 class ExpBar extends Bar {
   final Unit unit;
   late final SpriteFontRenderer fontRenderer;
+  late TextEntry expText;
   ExpBar(this.unit) : super(unit.exp, 100);
 
   @override
   void onLoad() {
+    fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
+    expText = TextEntry("$val", 0, 0, Anchor.topLeft);
     _bar = RectangleComponent(
-      size: Vector2(Stage.tileSize*3, Stage.tileSize/6), 
+      size: Vector2(Stage.tileSize*3*val/100, Stage.tileSize/6), 
       position: Vector2(Stage.tileSize*.1, Stage.tileSize/12),
       paint: Paint()..color = const Color.fromARGB(255, 208, 178, 7),
       anchor: Anchor.bottomLeft,
@@ -72,28 +76,31 @@ class ExpBar extends Bar {
       paint: Paint()..color = const Color.fromARGB(255, 52, 52, 52),
       anchor: Anchor.center,
     );
-    TextEntry("$val", 0, 0, Anchor.topLeft);
     anchor = Anchor.center;
-    add(_bar);
+    _backBar.add(_bar);
+    add(_backBar);
+    position = game.camera.visibleWorldRect.center.toVector2();
   }
 
   @override
   render(Canvas canvas){
+    super.render(canvas);
     fontRenderer.render(
       canvas,
-      "$val",
-      Vector2(0, size.y/2),
-      anchor: Anchor.center,
+      expText.text,
+      Vector2(expText.offsetX, expText.offsetY),
+      anchor: expText.anchor,
     );
   }
   @override
   void update(double dt) {
     debugPrint("$val, ${unit.exp}, ${_bar.size.x/Stage.tileSize}");
     if(val != unit.exp){
+      expText.text = val.toString();
       val = (val + 1) % maxVal;
+      _bar.size.x = Stage.tileSize*3*val/100;
       if(val == 0) {_bar.size.x = 0;}
     }
-    super.update(dt);
   }
   
 }

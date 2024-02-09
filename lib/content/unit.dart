@@ -729,13 +729,17 @@ class UnitExpEvent extends Event {
     observers.removeWhere((event) => (event.checkTriggered()));
     return observers;
   }
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    expBar = ExpBar(unit);
+    unit.add(expBar);
+  }
 
   @override
   Future<void> execute() async {
     super.execute();
     debugPrint("$name");
-    expBar = ExpBar(unit);
-    game.camera.add(expBar);
     unit.exp += expGain;
     if(unit.exp >= 100) {
       levelUp = true;
@@ -748,8 +752,8 @@ class UnitExpEvent extends Event {
 
   @override
   bool checkComplete(){
-    if (expBar.val == unit.exp) {
-      game.camera.remove(expBar);
+    if (checkStarted() && expBar.val == unit.exp) {
+      unit.remove(expBar);
       return true;}
     else {return false;}
   }
