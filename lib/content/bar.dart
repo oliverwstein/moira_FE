@@ -64,7 +64,7 @@ class ExpBar extends Bar {
   @override
   void onLoad() {
     fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
-    expText = TextEntry("$val", 0, 0, Anchor.topLeft);
+    expText = TextEntry("$val", 0, 0, Anchor.topRight);
     _bar = RectangleComponent(
       size: Vector2(Stage.tileSize*3*val/100, Stage.tileSize/6), 
       position: Vector2(Stage.tileSize*.1, Stage.tileSize/12),
@@ -88,7 +88,7 @@ class ExpBar extends Bar {
     fontRenderer.render(
       canvas,
       expText.text,
-      Vector2(expText.offsetX, expText.offsetY),
+      Vector2(x-_backBar.size.x/1.5, expText.offsetY),
       anchor: expText.anchor,
     );
   }
@@ -98,7 +98,7 @@ class ExpBar extends Bar {
     if(val != unit.exp){
       expText.text = val.toString();
       val = (val + 1) % maxVal;
-      _bar.size.x = Stage.tileSize*3*val/100;
+      _bar.size.x = Stage.tileSize*3*val/(100);
       if(val == 0) {_bar.size.x = 0;}
     }
   }
