@@ -735,7 +735,7 @@ class UnitExpEvent extends Event {
     super.execute();
     debugPrint("$name");
     expBar = ExpBar(unit);
-    unit.add(expBar);
+    game.camera.add(expBar);
     unit.exp += expGain;
     if(unit.exp >= 100) {
       levelUp = true;
@@ -749,7 +749,7 @@ class UnitExpEvent extends Event {
   @override
   bool checkComplete(){
     if (expBar.val == unit.exp) {
-      unit.remove(expBar);
+      game.camera.remove(expBar);
       return true;}
     else {return false;}
   }

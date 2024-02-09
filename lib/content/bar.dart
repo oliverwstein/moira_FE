@@ -36,8 +36,7 @@ class Bar extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
 
   @override
   update(dt){
-    if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
-    _bar.size.lerp(Vector2((val / maxVal) * Stage.tileSize, _bar.size.y), dt);
+    _bar.size.lerp(Vector2((val / maxVal) * Stage.tileSize, _bar.size.y), dt*3);
   }
 }
 
@@ -47,6 +46,7 @@ class HealthBar extends Bar {
 
   @override
   void update(double dt) {
+    if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
     val = unit.hp;
     maxVal = unit.getStat("hp");
     _bar.paint.color = val > (maxVal * .5) ? Colors.green : Colors.red;
@@ -73,7 +73,7 @@ class ExpBar extends Bar {
       anchor: Anchor.center,
     );
     TextEntry("$val", 0, 0, Anchor.topLeft);
-    anchor = Anchor.bottomLeft;
+    anchor = Anchor.center;
     add(_bar);
   }
 
