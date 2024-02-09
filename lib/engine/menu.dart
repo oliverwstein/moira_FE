@@ -25,14 +25,14 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
   void pushMenu(Menu menu) {
     add(menu);
     _menuStack.add(menu);
-    debugPrint("push ${_menuStack.lastOrNull} to _menuStack");
+    debugPrint("push $last to _menuStack");
     menu.open();
   }
 
   void popMenu() {
-    debugPrint("pop ${_menuStack.lastOrNull} from _menuStack");
+    debugPrint("pop $last from _menuStack");
     remove(_menuStack.removeLast());
-    debugPrint("top of _menuStack is now: ${_menuStack.lastOrNull}");
+    debugPrint("top of _menuStack is now: $last");
   }
 
   void clearStack(){
@@ -44,8 +44,8 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
     // debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
     if(key.logicalKey == LogicalKeyboardKey.escape){clearStack();}
     if (isNotEmpty){
-      debugPrint("Active menu is: ${_menuStack.last.runtimeType}");
-      if(key is RawKeyDownEvent) return _menuStack.last.handleKeyEvent(key, keysPressed);
+      // debugPrint("Active menu is: ${last.runtimeType}");
+      if(key is RawKeyDownEvent) return last!.handleKeyEvent(key, keysPressed);
       return KeyEventResult.handled;
     } else {
       switch (key.logicalKey) {
@@ -70,8 +70,7 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
             return KeyEventResult.handled;
           }
         case LogicalKeyboardKey.keyB:
-          
-          if (_menuStack.isEmpty){
+          if (!isNotEmpty){
             game.stage.blankAllTiles();
           }
           return KeyEventResult.handled;
@@ -87,8 +86,8 @@ abstract class Menu extends PositionComponent with HasGameReference<MoiraGame> i
   void open() {}
   void close() {
     game.stage.menuManager.popMenu();
-    if(game.stage.menuManager._menuStack.lastOrNull is MoveMenu){
-      game.stage.menuManager._menuStack.last.close();}}
+    if(game.stage.menuManager.last is MoveMenu){
+      game.stage.menuManager.last?.close();}}
   
   static Vector2 clampPositionToVisibleWorld(MoiraGame game, Vector2 desiredPosition, Vector2 menuSize) {
     Rect menuRect = Rect.fromLTWH(
@@ -294,7 +293,7 @@ class SelectionMenu extends Menu {
   @override
   void render(Canvas canvas) {
       super.render(canvas);
-      if(game.stage.menuManager._menuStack.last == this){
+      if(game.stage.menuManager.last == this){
         size = Vector2(Stage.tileSize * 3, options.length * Stage.tileSize * 0.75 + Stage.tileSize * 0.25); // Dynamic size based on options
         final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
         final highlightPaint = Paint()..color = const Color.fromARGB(141, 203, 16, 203); // Color for highlighting selected action
@@ -348,7 +347,6 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
   void update(dt){
     super.update(dt);
     if(unit.tilePosition != game.stage.cursor.tilePosition) {isVisible = false;} else {isVisible = true;}
-
   }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
@@ -585,7 +583,7 @@ class CombatMenu extends Menu {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if (game.stage.menuManager._menuStack.last == this) {
+    if (game.stage.menuManager.last == this) {
       final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
       canvas.drawRect(size.toRect(), backgroundPaint);
       double lineHeight = Stage.tileSize * .6;
@@ -725,7 +723,7 @@ class StaffMenu extends Menu {
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if (game.stage.menuManager._menuStack.last == this) {
+    if (game.stage.menuManager.last == this) {
       final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
       canvas.drawRect(size.toRect(), backgroundPaint);
       double lineHeight = Stage.tileSize * .6;

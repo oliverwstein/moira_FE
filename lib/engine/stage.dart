@@ -65,12 +65,12 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     cursor.priority = 10;
     add(cursor);
     hud = Hud();
+    hud.priority = 20;
     unitHud = UnitHud();
     unitHud.priority = 20;
     game.eventQueue.loadEventsFromJson(data['events']);
     menuManager = MenuManager();
-    menuManager.priority = 20;
-    add(menuManager);
+    menuManager.priority = 30;
     getCamera();
     children.register<Unit>();
     children.register<Player>();
@@ -87,6 +87,7 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
     game.camera.viewfinder.anchor = Anchor.center;
     game.stage.add(hud);
     game.stage.add(unitHud);
+    add(menuManager);
     
   }
 
@@ -143,6 +144,12 @@ class Stage extends World with HasGameReference<MoiraGame> implements InputHandl
       switch (key.logicalKey) {
         case (LogicalKeyboardKey.keyA || LogicalKeyboardKey.keyB):
           return menuManager.handleKeyEvent(key, keysPressed);
+        case LogicalKeyboardKey.keyX:
+          Tile tile = game.stage.tileMap[game.stage.cursor.tilePosition]!;
+          if(tile.isOccupied) {
+            game.stage.menuManager.pushMenu(UnitInfoMenu(tile.unit!));
+            }
+          return KeyEventResult.handled;
         default:
           Point<int> direction = const Point(0, 0);
           // Check each arrow key independently
