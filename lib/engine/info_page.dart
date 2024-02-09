@@ -54,11 +54,13 @@ class UnitInfoMenu extends Menu {
           TextEntry("Speed:", Stage.tileSize*.25, lineHeight*3, Anchor.topLeft),
           TextEntry("${unit.getStat("spe")}", Stage.tileSize*6, lineHeight*3, Anchor.topRight),
           TextEntry("Will:", Stage.tileSize*.25, lineHeight*4, Anchor.topLeft),
-          TextEntry("${unit.getStat("wil")}", Stage.tileSize*6, lineHeight*4, Anchor.topRight),
-          TextEntry("Wisdom:", Stage.tileSize*.25, lineHeight*5, Anchor.topLeft),
-          TextEntry("${unit.getStat("wis")}", Stage.tileSize*6, lineHeight*5, Anchor.topRight),
-          TextEntry("Luck:", Stage.tileSize*.25, lineHeight*6, Anchor.topLeft),
-          TextEntry("${unit.getStat("lck")}", Stage.tileSize*6, lineHeight*6, Anchor.topRight),
+          // TextEntry("${unit.getStat("wil")}", Stage.tileSize*6, lineHeight*4, Anchor.topRight),
+          TextEntry("Faith:", Stage.tileSize*.25, lineHeight*5, Anchor.topLeft),
+          TextEntry("${unit.getStat("fai")}", Stage.tileSize*6, lineHeight*5, Anchor.topRight),
+          TextEntry("Wisdom:", Stage.tileSize*.25, lineHeight*6, Anchor.topLeft),
+          TextEntry("${unit.getStat("wis")}", Stage.tileSize*6, lineHeight*6, Anchor.topRight),
+          TextEntry("Luck:", Stage.tileSize*.25, lineHeight*7, Anchor.topLeft),
+          TextEntry("${unit.getStat("lck")}", Stage.tileSize*6, lineHeight*7, Anchor.topRight),
         ];
         renderTextEntries(canvas, Vector2(0, 0), bio, fontRenderer, lineHeight);
         renderTextEntries(canvas, Vector2(0, Stage.tileSize*3), vitals, fontRenderer, lineHeight);
