@@ -8,3 +8,4 @@ export 'skill.dart';
 export 'unit.dart';
 export 'weapon.dart';
 export 'staff.dart';
+export 'healthbar.dart';

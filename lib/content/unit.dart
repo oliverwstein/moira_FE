@@ -13,7 +13,7 @@ final grayscalePaint = Paint()
         0.2126, 0.7152, 0.0722, 0, 0,
         0,      0,      0,      1, 0,
       ]);
-class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior {
+class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovement, UnitBehavior{
   final Completer<void> _loadCompleter = Completer<void>();
   final String name;
   int movementRange;
@@ -148,6 +148,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     }
     hp = getStat('hp');
     sta = getStat('sta');
+    add(HealthBar(this));
     remainingMovement = movementRange.toDouble();
   }
   
