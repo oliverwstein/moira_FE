@@ -781,6 +781,7 @@ class UnitLevelUpEvent extends Event {
 
       debugPrint("Increase $stat by $statUp");
       unit.stats[stat] = unit.stats[stat]! + statUp;
+      // await Future.delayed(const Duration(seconds: 1));
     }
     game.eventQueue.dispatchEvent(this);
     completeEvent();
