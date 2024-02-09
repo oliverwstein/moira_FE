@@ -7,21 +7,21 @@ environment:
   sdk: '>=3.2.0 <4.0.0'
 
 dependencies:
-  flame: any
-  flame_oxygen: any
-  flame_audio: any
+  flame: ^1.13.1
+  flame_oxygen: ^0.1.9+6
+  flame_audio: ^2.1.6
   flutter:
     sdk: flutter
-  flutter_animate: any
+  flutter_animate: ^4.3.0
   google_fonts: any
-  flame_tiled: any
+  flame_tiled: ^1.18.2
   async: any
   jenny: ^1.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: any
+  flutter_lints: ^2.0.3
 
 flutter:
   assets:
