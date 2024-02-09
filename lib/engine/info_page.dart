@@ -32,7 +32,6 @@ class UnitInfoMenu extends Menu {
       if(game.stage.menuManager.last == this){
         size = game.camera.visibleWorldRect.toVector2();
         final backgroundPaint = Paint()..color = const Color(0xAAFFFFFF); // Semi-transparent white for the background
-        final highlightPaint = Paint()..color = const Color.fromARGB(141, 203, 16, 203); // Color for highlighting selected action
         canvas.drawRect(size.toRect(), backgroundPaint);
         double lineHeight = Stage.tileSize * 0.75;
         List<TextEntry> bio = [
@@ -66,6 +65,9 @@ class UnitInfoMenu extends Menu {
         renderTextEntries(canvas, Vector2(0, 0), bio, fontRenderer, lineHeight);
         renderTextEntries(canvas, Vector2(0, Stage.tileSize*3), vitals, fontRenderer, lineHeight);
         renderTextEntries(canvas, Vector2(0, Stage.tileSize*5), stats, fontRenderer, lineHeight);
+        if(game.portraitMap.keys.contains(unit.name)){
+          add(SpriteComponent(sprite:game.portraitMap[unit.name]!, position: Vector2(Stage.tileSize*5, 0)));
+        }
       }
   }
 }
