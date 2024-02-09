@@ -426,7 +426,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
     return targets;
   }
   ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Unit target, Attack? attack){
-    Vector4 combatStats = Vector4(getStat('str').toDouble(), getStat('dex').toDouble(), getStat('mag').toDouble(), getStat('wis').toDouble());
+    Vector4 combatStats = Vector4(getStat('str').toDouble(), getStat('dex').toDouble(), getStat("wil").toDouble(), getStat('wis').toDouble());
     
     if(attack == null) {return (damage: 0, accuracy: 0, critRate: 0, fatigue: 0);}
     else {
@@ -448,8 +448,8 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         crit += main!.weapon!.crit;
         fatigue += main!.weapon!.fatigue;
         }
-      int damage = (might - ((atk.magic ? 1 : 0)*target.getStat('res') + (1-(atk.magic ? 1 : 0))*target.getStat('def')) - game.stage.tileMap[target.tilePosition]!.getTerrainDefense()).toInt().clamp(0, 100);
-      int accuracy = (hit - target.getStat('lck') - ((atk.magic ? 1 : 0)*target.getStat('wis') + (1-(atk.magic ? 1 : 0))*target.getStat('dex')) - game.stage.tileMap[target.tilePosition]!.getTerrainAvoid()).toInt().clamp(1, 99);
+      int damage = (might - ((atk.magic ? 1 : 0)*target.getStat('fai') + (1-(atk.magic ? 1 : 0))*target.getStat('def')) - game.stage.tileMap[target.tilePosition]!.getTerrainDefense()).toInt().clamp(0, 100);
+      int accuracy = (hit - target.getStat('lck') - ((atk.magic ? 1 : 0)*target.getStat('fai') + (1-(atk.magic ? 1 : 0))*target.getStat('dex')) - game.stage.tileMap[target.tilePosition]!.getTerrainAvoid()).toInt().clamp(1, 99);
       int critRate = (crit - target.getStat('lck')).toInt().clamp(0, 100);
       return (damage: damage, accuracy: accuracy, critRate: critRate, fatigue: fatigue);
     }

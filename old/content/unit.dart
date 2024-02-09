@@ -301,8 +301,8 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
   }
 
   ({int accuracy, int critRate, int damage, int fatigue}) attackCalc(Attack attack, target){
-    assert(stats['str'] != null && stats['dex'] != null && stats["mag"] != null && stats['wis'] != null);
-    Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats["mag"]!.toDouble(), stats['wis']!.toDouble());
+    assert(stats['str'] != null && stats['dex'] != null && stats["wil"] != null && stats['wis'] != null);
+    Vector4 combatStats = Vector4(stats['str']!.toDouble(), stats['dex']!.toDouble(), stats["wil"]!.toDouble(), stats['wis']!.toDouble());
     int might = (attack.might + (attack.scaling.dot(combatStats))).toInt();
     int hit = attack.hit + stats['lck']!;
     int crit = attack.crit + stats['lck']!;
@@ -320,7 +320,7 @@ class Unit extends PositionComponent with HasGameRef<MyGame> implements CommandH
       crit += main!.weapon!.crit;
       fatigue += main!.weapon!.fatigue;
       }
-    int damage = (might - ((attack.magic ? 1 : 0)*target.getStat('res') + (1-(attack.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
+    int damage = (might - ((attack.magic ? 1 : 0)*target.getStat('fai') + (1-(attack.magic ? 1 : 0))*target.getStat('def'))).toInt().clamp(0, 100);
     int accuracy = (hit - target.getStat('lck') - ((attack.magic ? 1 : 0)*target.getStat('wis') + (1-(attack.magic ? 1 : 0))*target.getStat('dex'))).toInt().clamp(1, 99);
     int critRate = (crit - target.getStat('lck')).toInt().clamp(1, 99);
     
