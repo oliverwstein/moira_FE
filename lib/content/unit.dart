@@ -748,7 +748,7 @@ class UnitExpEvent extends Event {
 
   @override
   bool checkComplete(){
-    if (expBar.updated) {
+    if (expBar.val == unit.exp) {
       unit.remove(expBar);
       return true;}
     else {return false;}

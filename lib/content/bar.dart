@@ -3,47 +3,51 @@ import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
 class Bar extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
-  double val;
+  int val;
   int maxVal;
   late final RectangleComponent _bar;
-  bool updated = false;
+  late final RectangleComponent _backBar;
   Bar(this.val, this.maxVal);
 
   @override
   void onLoad() {
     _bar = RectangleComponent(
-      size: Vector2(Stage.tileSize, Stage.tileSize/8), // Set the size of the health bar
+      size: Vector2(Stage.tileSize, Stage.tileSize/12),
+      position: Vector2(Stage.tileSize*.1, Stage.tileSize/12),
       paint: Paint()..color = Colors.green,
-      anchor: Anchor.bottomLeft,
+      anchor: Anchor.centerLeft,
     );
-    anchor = Anchor.bottomLeft;
-    add(_bar);
+    _backBar = RectangleComponent(
+      size: Vector2(Stage.tileSize*1.2, Stage.tileSize/6),
+      paint: Paint()..color = const Color.fromARGB(255, 52, 52, 52),
+      anchor: Anchor.center,
+    );
+    anchor = Anchor.bottomCenter;
+    add(_backBar);
+    _backBar.add(_bar);
   }
 
   @override
   void onMount() {
     super.onMount();
-    _bar.position = Vector2(0, Stage.tileSize/1.5);
-    position = Vector2(-.5*Stage.tileSize, 0);
+    _backBar.position = Vector2(0, Stage.tileSize/1.5);
+    position = Vector2(0, 0);
   }
 
   @override
   update(dt){
     if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
     _bar.size.lerp(Vector2((val / maxVal) * Stage.tileSize, _bar.size.y), dt);
-    if(_bar.size == Vector2((val / maxVal) * Stage.tileSize, _bar.size.y)){
-      updated = true;
-    } else {updated = false;}
   }
 }
 
 class HealthBar extends Bar {
   final Unit unit;
-  HealthBar(this.unit) : super(unit.hp.toDouble(), unit.getStat("hp"));
+  HealthBar(this.unit) : super(unit.hp, unit.getStat("hp"));
 
   @override
   void update(double dt) {
-    val = unit.hp.toDouble();
+    val = unit.hp;
     maxVal = unit.getStat("hp");
     _bar.paint.color = val > (maxVal * .5) ? Colors.green : Colors.red;
     super.update(dt);
@@ -53,14 +57,20 @@ class HealthBar extends Bar {
 class ExpBar extends Bar {
   final Unit unit;
   late final SpriteFontRenderer fontRenderer;
-  ExpBar(this.unit) : super(unit.exp.toDouble(), 100);
+  ExpBar(this.unit) : super(unit.exp, 100);
 
   @override
   void onLoad() {
     _bar = RectangleComponent(
-      size: Vector2(Stage.tileSize*3, Stage.tileSize/4), // Set the size of the health bar
+      size: Vector2(Stage.tileSize*3, Stage.tileSize/6), 
+      position: Vector2(Stage.tileSize*.1, Stage.tileSize/12),
       paint: Paint()..color = const Color.fromARGB(255, 208, 178, 7),
       anchor: Anchor.bottomLeft,
+    );
+    _backBar = RectangleComponent(
+      size: Vector2(Stage.tileSize*3, Stage.tileSize/4),
+      paint: Paint()..color = const Color.fromARGB(255, 52, 52, 52),
+      anchor: Anchor.center,
     );
     TextEntry("$val", 0, 0, Anchor.topLeft);
     anchor = Anchor.bottomLeft;
@@ -78,7 +88,8 @@ class ExpBar extends Bar {
   }
   @override
   void update(double dt) {
-    if(val != unit.exp.toDouble()){
+    debugPrint("$val, ${unit.exp}, ${_bar.size.x/Stage.tileSize}");
+    if(val != unit.exp){
       val = (val + 1) % maxVal;
       if(val == 0) {_bar.size.x = 0;}
     }
