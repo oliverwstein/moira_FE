@@ -1,32 +1,46 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:moira/content/content.dart';
-class HealthBar extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
-  final Unit unit;
-  late final RectangleComponent healthBar;
-  HealthBar(this.unit);
+class Bar extends PositionComponent with HasGameReference<MoiraGame>, HasVisibility {
+  double val;
+  int maxVal;
+  late final RectangleComponent _bar;
+  Bar(this.val, this.maxVal);
 
   @override
   void onLoad() {
-    healthBar = RectangleComponent(
+    _bar = RectangleComponent(
       size: Vector2(Stage.tileSize, Stage.tileSize/8), // Set the size of the health bar
       paint: Paint()..color = Colors.green,
-      anchor: Anchor.bottomCenter,
+      anchor: Anchor.bottomLeft,
     );
-    add(healthBar);
+    anchor = Anchor.bottomLeft;
+    add(_bar);
   }
 
   @override
   void onMount() {
     super.onMount();
-    // Position the health bar relative to the component
-    healthBar.position = Vector2(0, Stage.tileSize/1.5); // Position above the component
+    _bar.position = Vector2(0, Stage.tileSize/1.5);
+    position = Vector2(-.5*Stage.tileSize, 0);
   }
 
   @override
   update(dt){
     if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
-    healthBar.size.x = (unit.hp / unit.getStat("hp")) * Stage.tileSize; // Update the width of the health bar
-    healthBar.paint.color = unit.hp > unit.getStat("hp") * 0.5 ? Colors.green : Colors.red; // Change color based on health
+    _bar.size.lerp(Vector2((val / maxVal) * Stage.tileSize, _bar.size.y), dt);
+    _bar.paint.color = val > (maxVal * .5) ? Colors.green : Colors.red;
+  }
+}
+
+class HealthBar extends Bar {
+  final Unit unit;
+  HealthBar(this.unit) : super(unit.hp.toDouble(), unit.getStat("hp"));
+
+  @override
+  void update(double dt) {
+    val = unit.hp.toDouble();
+    maxVal = unit.getStat("hp");
+    super.update(dt);
   }
 }
