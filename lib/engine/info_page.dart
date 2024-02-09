@@ -46,21 +46,21 @@ class UnitInfoMenu extends Menu {
         ];
         List<TextEntry> stats = [
           TextEntry("Strength:", Stage.tileSize*.25, lineHeight*0, Anchor.topLeft),
-          TextEntry("${unit.getStat("str")}", Stage.tileSize*6, lineHeight*0, Anchor.topRight),
+          TextEntry("${unit.getStat("str")}", Stage.tileSize*5, lineHeight*0, Anchor.topRight),
           TextEntry("Defense:", Stage.tileSize*.25, lineHeight*1, Anchor.topLeft),
-          TextEntry("${unit.getStat("def")}", Stage.tileSize*6, lineHeight*1, Anchor.topRight),
+          TextEntry("${unit.getStat("def")}", Stage.tileSize*5, lineHeight*1, Anchor.topRight),
           TextEntry("Dexterity:", Stage.tileSize*.25, lineHeight*2, Anchor.topLeft),
-          TextEntry("${unit.getStat("dex")}", Stage.tileSize*6, lineHeight*2, Anchor.topRight),
+          TextEntry("${unit.getStat("dex")}", Stage.tileSize*5, lineHeight*2, Anchor.topRight),
           TextEntry("Speed:", Stage.tileSize*.25, lineHeight*3, Anchor.topLeft),
-          TextEntry("${unit.getStat("spe")}", Stage.tileSize*6, lineHeight*3, Anchor.topRight),
+          TextEntry("${unit.getStat("spe")}", Stage.tileSize*5, lineHeight*3, Anchor.topRight),
           TextEntry("Will:", Stage.tileSize*.25, lineHeight*4, Anchor.topLeft),
-          TextEntry("${unit.getStat("wil")}", Stage.tileSize*6, lineHeight*4, Anchor.topRight),
+          TextEntry("${unit.getStat("wil")}", Stage.tileSize*5, lineHeight*4, Anchor.topRight),
           TextEntry("Faith:", Stage.tileSize*.25, lineHeight*5, Anchor.topLeft),
-          TextEntry("${unit.getStat("fai")}", Stage.tileSize*6, lineHeight*5, Anchor.topRight),
+          TextEntry("${unit.getStat("fai")}", Stage.tileSize*5, lineHeight*5, Anchor.topRight),
           TextEntry("Wisdom:", Stage.tileSize*.25, lineHeight*6, Anchor.topLeft),
-          TextEntry("${unit.getStat("wis")}", Stage.tileSize*6, lineHeight*6, Anchor.topRight),
+          TextEntry("${unit.getStat("wis")}", Stage.tileSize*5, lineHeight*6, Anchor.topRight),
           TextEntry("Luck:", Stage.tileSize*.25, lineHeight*7, Anchor.topLeft),
-          TextEntry("${unit.getStat("lck")}", Stage.tileSize*6, lineHeight*7, Anchor.topRight),
+          TextEntry("${unit.getStat("lck")}", Stage.tileSize*5, lineHeight*7, Anchor.topRight),
         ];
         renderTextEntries(canvas, Vector2(0, 0), bio, fontRenderer, lineHeight);
         renderTextEntries(canvas, Vector2(0, Stage.tileSize*3), vitals, fontRenderer, lineHeight);
