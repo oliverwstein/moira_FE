@@ -709,6 +709,7 @@ class UnitExpEvent extends Event {
   static List<Event> observers = [];
   final Unit unit;
   int expGain;
+  late final ExpBar expBar;
   bool levelUp = false;
   UnitExpEvent(this.unit, this.expGain, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "UnitExpEvent: ${unit.name} gains $expGain");
   static void initialize(EventQueue queue) {
@@ -733,6 +734,8 @@ class UnitExpEvent extends Event {
   Future<void> execute() async {
     super.execute();
     debugPrint("$name");
+    expBar = ExpBar(unit);
+    unit.add(expBar);
     unit.exp += expGain;
     if(unit.exp >= 100) {
       levelUp = true;
@@ -741,7 +744,14 @@ class UnitExpEvent extends Event {
       }
     debugPrint("UnitExpEvent: ${unit.name} now has ${unit.exp} exp.");
     game.eventQueue.dispatchEvent(this);
-    completeEvent();
+  }
+
+  @override
+  bool checkComplete(){
+    if (expBar.updated) {
+      unit.remove(expBar);
+      return true;}
+    else {return false;}
   }
 }
 
