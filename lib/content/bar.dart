@@ -47,7 +47,7 @@ class HealthBar extends Bar {
 
   @override
   void update(double dt) {
-    if(game.stage.freeCursor){isVisible = true;} else {isVisible = false;}
+    if(game.stage.freeCursor || game.combatQueue.processing){isVisible = true;} else {isVisible = false;}
     val = unit.hp;
     maxVal = unit.getStat("hp");
     _bar.paint.color = val > (maxVal * .5) ? Colors.green : Colors.red;

@@ -62,7 +62,7 @@ class CantoEvent extends Event {
         unitExhaustEvent.unit.toggleCanAct(true);
         CantoEvent cantoEvent = CantoEvent(unitExhaustEvent.unit);
         EventQueue eventQueue = unitExhaustEvent.game.eventQueue;
-        eventQueue.addEventBatchToHead([cantoEvent]);
+        eventQueue.addEventBatch([cantoEvent]);
       }
     });
   }

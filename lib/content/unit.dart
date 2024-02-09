@@ -626,7 +626,7 @@ class UnitExhaustEvent extends Event {
   static void initialize(EventQueue queue) {
     queue.registerClassObserver<EndCombatEvent>((endCombatEvent) {
         UnitExhaustEvent unitExhaustEvent = UnitExhaustEvent(endCombatEvent.combat.attacker);
-        endCombatEvent.game.eventQueue.addEventBatchToHead([unitExhaustEvent]);
+        endCombatEvent.game.eventQueue.addEventBatch([unitExhaustEvent]);
     });
   }
   @override
@@ -780,7 +780,7 @@ class UnitLevelUpEvent extends Event {
       int statUp = unit.growths[stat]! ~/ 100 + (rng.nextInt(100) < (unit.growths[stat]! % 100) ? 1 : 0);
 
       debugPrint("Increase $stat by $statUp");
-      unit.stats[stat] = statUp;
+      unit.stats[stat] = unit.stats[stat]! + statUp;
     }
     game.eventQueue.dispatchEvent(this);
     completeEvent();
