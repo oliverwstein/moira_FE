@@ -44,7 +44,7 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
     // debugPrint("MenuManager given key ${key.logicalKey.keyLabel} to handle.");
     if(key.logicalKey == LogicalKeyboardKey.escape){clearStack();}
     if (isNotEmpty){
-      debugPrint("Active menu is: ${last.runtimeType}");
+      // debugPrint("Active menu is: ${last.runtimeType}");
       if(key is RawKeyDownEvent) return last!.handleKeyEvent(key, keysPressed);
       return KeyEventResult.handled;
     } else {
@@ -70,8 +70,7 @@ class MenuManager extends PositionComponent with HasGameReference<MoiraGame> imp
             return KeyEventResult.handled;
           }
         case LogicalKeyboardKey.keyB:
-          
-          if (_menuStack.isEmpty){
+          if (!isNotEmpty){
             game.stage.blankAllTiles();
           }
           return KeyEventResult.handled;
