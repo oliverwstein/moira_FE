@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -20,11 +21,17 @@ class TitleCard extends World with HasGameReference<MoiraGame> implements InputH
     game.stage = await Stage.fromJson('Prologue'); // Load the Stage asynchronously
     debugPrint("Stage is initialized!");
     game.camera.viewport = FixedAspectRatioViewport(aspectRatio: 16/14); //Vital
+    _spriteComponent.size = game.camera.visibleWorldRect.size.toVector2();
    _loadCompleter.complete();
   }
 
   Future<void> get loadCompleted => _loadCompleter.future;
 
+  @override
+  void render(Canvas canvas){
+    super.render(canvas);
+    _spriteComponent.size = game.camera.visibleWorldRect.size.toVector2();
+  }
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
    game.switchToWorld(game.stage);
