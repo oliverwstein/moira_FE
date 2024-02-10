@@ -71,8 +71,8 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
 Future<void> onLoad() async {
   debugPrint(name.toLowerCase());
   debugPrint("Load Class Sprite Sheet ${FactionOrder.fromName(factionType)!.name}.$name");
-  Image spriteSheetImage = game.images.fromCache("${FactionOrder.fromName(factionType)!.name}.$name");
-  // Image spriteSheetImage = game.images.fromCache(name);
+  // Image spriteSheetImage = game.images.fromCache("${FactionOrder.fromName(factionType)!.name}.$name");
+  Image spriteSheetImage = game.images.fromCache(name);
   spriteSheet = SpriteSheet.fromColumnsAndRows(
     image: spriteSheetImage,
     columns: 4,
