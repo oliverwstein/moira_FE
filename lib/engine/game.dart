@@ -61,6 +61,20 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     await images.load('portraits_spritesheet.png');
     await images.load('dialogue_box_spritesheet.png');
     await images.load('alphabet_spritesheet.png');
+    unitMap = await loadUnitData();
+    itemMap = await loadItemsData();
+    weaponMap = await loadWeaponsData();
+    attackMap = await loadAttacksData();
+    skillMap = await loadSkillsData();
+    classMap = await loadClassesData();
+    for (String className in classMap["classes"].keys){
+      var classSprite = await images.load('class_sprites/${className.toLowerCase()}_spritesheet.png');
+      for(FactionType factionType in FactionType.values){
+        var coloredImage = await applyFactionColorShift(classSprite, factionType);
+        images.add("${factionType.name}.$className" , coloredImage);
+        debugPrint("Added ${factionType.name}.$className");
+      }
+    }
     String alphabetOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?!'-\"º:;()0123456789\$%&×+/“”=[♪]~ ";
     Map<String, int> widths = {
       "A": 9, "B": 8, "C": 8, "D": 8, "E": 7, "F": 7, "G": 8, "H": 8,
@@ -96,12 +110,6 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     await FlameAudio.audioCache.load('105 - Prologue (Birth of the Holy Knight).mp3');
     await FlameAudio.audioCache.load('101 - Beginning.mp3');
     // FlameAudio.play('101 - Beginning.mp3');
-    unitMap = await loadUnitData();
-    itemMap = await loadItemsData();
-    weaponMap = await loadWeaponsData();
-    attackMap = await loadAttacksData();
-    skillMap = await loadSkillsData();
-    classMap = await loadClassesData();
     add(eventQueue);
     add(combatQueue);
     
