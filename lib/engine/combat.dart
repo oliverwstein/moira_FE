@@ -15,10 +15,6 @@ class Combat extends Component with HasGameReference<MoiraGame>{
     expGain[attacker] = 1; expGain[defender] = 1;
   }
 
-  @override
-  void update(dt) {
-  }
-
   static int getCombatDistance(unit, target){
     return (unit.tilePosition.x - target.tilePosition.x).abs() + (unit.tilePosition.y - target.tilePosition.y).abs();
   }

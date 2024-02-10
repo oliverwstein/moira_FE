@@ -70,17 +70,11 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   @override
 Future<void> onLoad() async {
   debugPrint(name.toLowerCase());
-
-  // Load the original sprite sheet image
-  Image spriteSheetImage = await game.images.load('class_sprites/${name.toLowerCase()}_spritesheet.png');
-
-  // Apply color transformation based on the faction
-  debugPrint("factionType $factionType, ${FactionOrder.fromName(factionType)}");
-  Image recoloredSpriteImage = await applyFactionColorShift(spriteSheetImage, FactionOrder.fromName(factionType)!);
-
-  // Create the SpriteSheet from the recolored image
+  debugPrint("Load Class Sprite Sheet ${FactionOrder.fromName(factionType)!.name}.$name");
+  Image spriteSheetImage = game.images.fromCache("${FactionOrder.fromName(factionType)!.name}.$name");
+  // Image spriteSheetImage = game.images.fromCache(name);
   spriteSheet = SpriteSheet.fromColumnsAndRows(
-    image: recoloredSpriteImage,
+    image: spriteSheetImage,
     columns: 4,
     rows: 5,
   );
@@ -92,14 +86,6 @@ Future<void> onLoad() async {
   direction = null;
 }
 }
-
-Map<int, int> grays = {
-  0xFF292929: 0, // Placeholder for dynamic replacement
-  0xFF494949: 0,
-  0xFF7A7A7A: 0,
-  0xFF8D8D8D: 0,
-  0xFFCECECE: 0,
-};
 
 Map<Color, Map<FactionType, Color>> colorTransformations = {
   Color(0xFF292929): {
@@ -131,23 +117,22 @@ Map<Color, Map<FactionType, Color>> colorTransformations = {
 
 Future<Image> applyFactionColorShift(Image image, FactionType faction) async {
   final ByteData? byteData = await image.toByteData(format: ImageByteFormat.rawUnmodified);
-  final buffer = byteData!.buffer.asUint8List();
+  if (byteData == null) return image; // Return original image if byteData is null
+  final buffer = byteData.buffer.asUint8List();
 
   for (int i = 0; i < buffer.length; i += 4) {
     // Convert RGBA to a color value
-    int currentColorValue = (buffer[i+3] << 24) | (buffer[i] << 16) | (buffer[i+1] << 8) | buffer[i+2];
+    int currentColorValue = (buffer[i + 3] << 24) | (buffer[i] << 16) | (buffer[i + 1] << 8) | buffer[i + 2];
     Color currentColor = Color(currentColorValue);
 
-    // Check if this color is one of the grays to be replaced
-    if (colorTransformations.containsKey(currentColor)) {
-      Color? newColor = colorTransformations[currentColor]?[faction];
-      if (newColor != null) {
-        buffer[i] = newColor.red;
-        buffer[i + 1] = newColor.green;
-        buffer[i + 2] = newColor.blue;
-        // Alpha remains unchanged
-      }
-    }
+    // Determine the new color based on the transformation or use the original color if no transformation is found
+    Color newColor = colorTransformations[currentColor]?[faction] ?? currentColor;
+
+    // Update the buffer with either the transformed color or the original color
+    buffer[i + 0] = newColor.red;
+    buffer[i + 1] = newColor.green;
+    buffer[i + 2] = newColor.blue;
+    // Alpha remains unchanged
   }
 
   // Recreate the image from the modified buffer
@@ -163,4 +148,5 @@ Future<Image> applyFactionColorShift(Image image, FactionType faction) async {
   final FrameInfo frameInfo = await codec.getNextFrame();
   return frameInfo.image;
 }
+
 
