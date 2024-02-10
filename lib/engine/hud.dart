@@ -12,7 +12,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
     super.onLoad();
     fontRenderer = SpriteFontRenderer.fromFont(game.hudFont);
     anchor = Anchor.topLeft;
-    size = Vector2(Stage.tileSize * 3.5, Stage.tileSize * 2.5);
+    size = Vector2(Stage.tileSize * 4, Stage.tileSize * 2);
     priority = 25;
   }
   @override
@@ -48,7 +48,7 @@ class Hud extends PositionComponent with HasGameReference<MoiraGame>, HasVisibil
 
     // Information to display in the HUD
     List<String> texts = [
-      '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
+      // '(${game.stage.cursor.tilePosition.x},${game.stage.cursor.tilePosition.y})',
       (game.stage.tileMap[game.stage.cursor.tilePosition]!.name),
       'Avoid:${game.stage.tileMap[game.stage.cursor.tilePosition]!.terrain.avoid}',
     ];
