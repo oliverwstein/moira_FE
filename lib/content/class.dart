@@ -70,13 +70,11 @@ class Class extends SpriteAnimationComponent with HasGameReference<MoiraGame>{
   @override
 Future<void> onLoad() async {
   debugPrint(name.toLowerCase());
-  Image spriteSheetImage = game.images.fromCache('class_sprites/${name.toLowerCase()}_spritesheet.png');
-  // Apply color transformation based on the faction
-  debugPrint("factionType $factionType, ${FactionOrder.fromName(factionType)}");
-  Image recoloredSpriteImage = await applyFactionColorShift(spriteSheetImage, FactionOrder.fromName(factionType)!);
-  // Create the SpriteSheet from the recolored image
+  debugPrint("Load Class Sprite Sheet ${FactionOrder.fromName(factionType)!.name}.$name");
+  // Image spriteSheetImage = game.images.fromCache("${FactionOrder.fromName(factionType)!.name}.$name");
+  Image spriteSheetImage = game.images.fromCache(name);
   spriteSheet = SpriteSheet.fromColumnsAndRows(
-    image: recoloredSpriteImage,
+    image: spriteSheetImage,
     columns: 4,
     rows: 5,
   );

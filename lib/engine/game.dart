@@ -69,6 +69,7 @@ class MoiraGame extends FlameGame with KeyboardEvents {
     classMap = await loadClassesData();
     for (String className in classMap["classes"].keys){
       var classSprite = await images.load('class_sprites/${className.toLowerCase()}_spritesheet.png');
+      images.add(className, classSprite);
       for(FactionType factionType in FactionType.values){
         var coloredImage = await applyFactionColorShift(classSprite, factionType);
         images.add("${factionType.name}.$className" , coloredImage);
