@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'engine.dart';
@@ -27,6 +28,7 @@ class TitleCard extends World with HasGameReference<MoiraGame> implements InputH
   @override
   KeyEventResult handleKeyEvent(RawKeyEvent key, Set<LogicalKeyboardKey> keysPressed) {
    game.switchToWorld(game.stage);
+   FlameAudio.bgm.play('105 - Prologue (Birth of the Holy Knight).mp3');
    return KeyEventResult.handled;
   }
 }
