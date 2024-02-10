@@ -73,7 +73,6 @@ class MoiraGame extends FlameGame with KeyboardEvents {
       for(FactionType factionType in FactionType.values){
         var coloredImage = await applyFactionColorShift(classSprite, factionType);
         images.add("${factionType.name}.$className" , coloredImage);
-        debugPrint("Added ${factionType.name}.$className");
       }
     }
     String alphabetOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?!'-\"º:;()0123456789\$%&×+/“”=[♪]~ ";
