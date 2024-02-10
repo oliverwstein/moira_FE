@@ -290,15 +290,20 @@ class DefendOrder extends Order {
   @override
   void command(Unit unit){
     debugPrint("${unit.name} ordered to Defend");
-    var combatResults = unit.rankOpenTiles(["Move", "Combat"]);
-    // Filter combatResults to include only those with events lists of length 2 or more
-    var filteredCombatResults = combatResults.where((result) => result.events.length >= 2).toList();
-    var events = filteredCombatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events;
-    if(events.isNotEmpty){
-      Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
-      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
+    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+    var combatResults = unit.rankOpenTiles(["Move", "Combat"]).where((result) => result.events.length >= 2);
+    if(combatResults.isNotEmpty){
+      var events = combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events;
+      if(events.isNotEmpty){
+        Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+        unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
+      }
+      for(Event event in events){
+        unit.game.eventQueue.addEventBatch([event]);
+      }
+      
     }
-    unit.game.eventQueue.addEventBatch(events);
+    
 
     unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
