@@ -322,7 +322,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         if (gate.factionName != unit.controller.name){
           if(gate.fort.isOccupied && gate.fort.unit!.controller.checkHostility(unit)){
             if (sta > 0) actions.add("Besiege");
-          } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit)){
+          } else if(!gate.fort.isOccupied && unit.game.stage.factionMap[gate.factionName]!.checkHostility(unit) && (unit.controller is AIPlayer || unit.controller.leader == unit)){
             actions.add("Seize");
           }
         } 
