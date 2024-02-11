@@ -13,7 +13,7 @@ class Staff extends Component with HasGameReference<MoiraGame>{
     switch (staffData["effect"]){
       case "Heal":
         int baseHealing = staffData["base"] ?? 10;
-        return Heal(staffRange, baseHealing, staminaCost, expGain);
+        return Heal(staffRange, baseHealing, expGain, staminaCost);
       default:
         return Staff(staffRange);
     }
