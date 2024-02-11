@@ -283,12 +283,15 @@ class TargetUnitOrder extends Order {
     Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
       unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
     debugPrint("${unit.name} ordered to contact $targetName");
-    assert(Unit.getUnitByName(unit.game.stage, targetName) != null);
+    if(Unit.getUnitByName(unit.game.stage, targetName) == null){
+      unit.orders.remove(this);
+    }
     Unit target = Unit.getUnitByName(unit.game.stage, targetName)!;
     List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
     Point<int> bestMove = unit.moveTowardsTarget(target.tile.point, openTiles);
     if(TalkMenu.getTalkOptions(unit, bestMove).isNotEmpty){
       unit.game.eventQueue.addEventBatch([DialogueEvent("Talk_${unit.name}_${target.name}")]);
+      unit.orders.remove(this);
     }
     unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
     unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
