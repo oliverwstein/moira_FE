@@ -293,6 +293,10 @@ class TargetUnitOrder extends Order {
       unit.game.eventQueue.addEventBatch([DialogueEvent("Talk_${unit.name}_${target.name}")]);
       unit.orders.remove(this);
     }
+    if(TalkMenu.getTalkOptions(target, unit.tile.point).isNotEmpty){
+      unit.game.eventQueue.addEventBatch([DialogueEvent("Talk_${target.name}_${unit.name}")]);
+      unit.orders.remove(this);
+    }
     unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
     unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
