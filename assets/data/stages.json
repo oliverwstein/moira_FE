@@ -1083,6 +1083,7 @@
                         31,
                         3
                     ],
+                    "orders": ["Target_Sigurd"],
                     "triggers":
                     [
                         {"StartTurnEvent":

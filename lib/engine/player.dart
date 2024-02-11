@@ -223,6 +223,9 @@ class Order extends Component {
       case 'Invade':
         assert(inputs.length == 2);
         return InvadeOrder(inputs[1]);
+      case 'Target':
+        assert(inputs.length == 2);
+        return TargetUnitOrder(inputs[1]);
       default:
         throw ArgumentError('Invalid order type: $orderType');
     }
@@ -271,15 +274,17 @@ class RansackOrder extends Order {
   }
 }
 
-class CourierOrder extends Order {
-  final Unit target;
-  CourierOrder(this.target);
+class TargetUnitOrder extends Order {
+  final String targetName;
+  TargetUnitOrder(this.targetName);
 
   @override
   void command(Unit unit){
     Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
       unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
-    debugPrint("${unit.name} ordered to contact ${target.name}");
+    debugPrint("${unit.name} ordered to contact $targetName");
+    assert(Unit.getUnitByName(unit.game.stage, targetName) != null);
+    Unit target = Unit.getUnitByName(unit.game.stage, targetName)!;
     List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
     Point<int> bestMove = unit.moveTowardsTarget(target.tile.point, openTiles);
     if(TalkMenu.getTalkOptions(unit, bestMove).isNotEmpty){
