@@ -271,6 +271,25 @@ class RansackOrder extends Order {
   }
 }
 
+class CourierOrder extends Order {
+  final Unit target;
+  CourierOrder(this.target);
+
+  @override
+  void command(Unit unit){
+    Vector2 centeredPosition = unit.game.stage.cursor.centerCameraOn(unit.tilePosition, unit.speed*150);
+      unit.game.eventQueue.addEventBatch([PanEvent(Point(centeredPosition.x~/Stage.tileSize, centeredPosition.y~/Stage.tileSize))]);
+    debugPrint("${unit.name} ordered to contact ${target.name}");
+    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
+    Point<int> bestMove = unit.moveTowardsTarget(target.tile.point, openTiles);
+    if(TalkMenu.getTalkOptions(unit, bestMove).isNotEmpty){
+      unit.game.eventQueue.addEventBatch([DialogueEvent("Talk_${unit.name}_${target.name}")]);
+    }
+    unit.makeBestAttackAt(unit.game.stage.tileMap[bestMove]!);
+    unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
+  }
+}
+
 /// Do not move, but attack enemies within range if possible. 
 class GuardOrder extends Order {
   GuardOrder();
