@@ -330,11 +330,8 @@ class DefendOrder extends Order {
       }
       for(Event event in events){
         unit.game.eventQueue.addEventBatch([event]);
-      }
-      
+      } 
     }
-    
-
     unit.game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
   }
 }
