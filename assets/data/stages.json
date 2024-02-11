@@ -1056,6 +1056,26 @@
                 },
                 {
                     "type": "UnitCreationEvent",
+                    "unitName": "Midir",
+                    "faction": "Sigurd",
+                    "tilePosition": [
+                        32,
+                        25
+                    ], 
+                    "destination": [
+                        32,
+                        26
+                    ], 
+                    "triggers":
+                    [
+                        {"DialogueEvent":
+                            {"name": "Sigurd_Seizes_Evans"}
+                        }
+                    ]
+
+                },
+                {
+                    "type": "UnitCreationEvent",
                     "unitName": "Arvis",
                     "faction": "Velthomer",
                     "level": -1,
