@@ -122,7 +122,7 @@ class AttackEvent extends Event {
   final Combat combat;
   final Unit unit;
   final Unit target;
-  AttackEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "Attack_${unit.name}_${target.name}");
+  AttackEvent(this.combat, this.unit, this.target, {Trigger? trigger, String? name}) : super(trigger: trigger, name: name ?? "AttackEvent_${unit.name}_${target.name}_${unit.attack}");
   @override
   List<Event> getObservers() {
     observers.removeWhere((event) => (event.checkTriggered()));
