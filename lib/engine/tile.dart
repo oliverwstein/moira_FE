@@ -438,6 +438,7 @@ class BesiegeEvent extends Event {
         target.getAttacksOnTarget(unit, Combat.getCombatDistance(unit, target)));
       game.eventQueue.addEventBatch([StartCombatEvent(unit, gate.fort.unit!, duel: duel)]);
     }
+    // game.eventQueue.addEventBatch([UnitExhaustEvent(unit)]);
     completeEvent();
     game.eventQueue.dispatchEvent(this);
   }

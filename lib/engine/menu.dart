@@ -385,6 +385,7 @@ class UnitActionMenu extends SelectionMenu with HasVisibility {
                 // Create a variant of the CombatMenu called BesiegeMenu. 
                 //For now, just trigger a besiege event.
                 game.eventQueue.addEventBatch([BesiegeEvent(unit.tile as CastleGate)]);
+                game.stage.menuManager.clearStack();
               case "Depart":
                 game.eventQueue.addEventBatch([DepartCastleEvent(unit, unit.tile as CastleFort)]);
                 game.stage.menuManager.clearStack();
