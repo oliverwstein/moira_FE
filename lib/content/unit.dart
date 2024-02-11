@@ -249,18 +249,18 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
           if(main?.weapon?.specialAttack != null) {
             attackSet[main!.weapon!.specialAttack!.name] = main!.weapon!.specialAttack!;
           }
-          // debugPrint("$name equipped ${item.name} as ${item.type}");
+          debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         case ItemType.gear:
           gear = item;
-          // debugPrint("$name equipped ${item.name} as ${item.type}");
+          debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         case ItemType.treasure:
           treasure = item;
-          // debugPrint("$name equipped ${item.name} as ${item.type}");
+          debugPrint("$name equipped ${item.name} as ${item.type}");
           break;
         default:
-          // debugPrint("$name can't equip ${item.name}");
+          debugPrint("$name can't equip ${item.name}");
           break;
       }
     
@@ -269,7 +269,7 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
   void unequip(ItemType? type){
     switch (type) {
       case ItemType.main:
-        // debugPrint("$name unequipped ${main?.name} as $type");
+        debugPrint("$name unequipped ${main?.name} as $type");
         if(main?.weapon != null && unitClass.name == "Knight") {remove(main!.weapon!);}
         if(main?.weapon?.specialAttack != null) {
           attackSet.remove(main!.weapon!.specialAttack!.name);
@@ -277,11 +277,11 @@ class Unit extends PositionComponent with HasGameReference<MoiraGame>, UnitMovem
         main = null;
         break;
       case ItemType.gear:
-        // debugPrint("$name unequipped ${gear?.name} as $type");
+        debugPrint("$name unequipped ${gear?.name} as $type");
         gear = null;
         break;
       case ItemType.treasure:
-        // debugPrint("$name unequipped ${treasure?.name} as $type");
+        debugPrint("$name unequipped ${treasure?.name} as $type");
         treasure = null;
         break;
       default:

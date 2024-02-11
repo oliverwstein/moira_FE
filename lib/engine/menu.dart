@@ -440,12 +440,14 @@ class InventoryMenu extends SelectionMenu {
           } 
           if (unit.inventory[selectedIndex].type != ItemType.basic) {
             if([unit.main?.name, unit.gear?.name, unit.treasure?.name].contains(options[selectedIndex])){
+              debugPrint("${options[selectedIndex]} already equipped");
               unit.unequip(unit.inventory[selectedIndex].type);
             } else {
+              debugPrint("${options[selectedIndex]} Not already equipped");
               unit.equip(unit.inventory[selectedIndex]);
             }
-            
           }
+          debugPrint("${options[selectedIndex]} is basic and cannot be equipped.");
           return KeyEventResult.handled;
       case LogicalKeyboardKey.keyB:
         close();

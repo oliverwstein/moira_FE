@@ -43,7 +43,6 @@ class Heal extends Staff {
     debugPrint("Execute Heal on ${target.name}");
     Unit wielder = parent as Unit;
     int healing = healingCalc(target);
-    debugPrint("Staff Stamina Cost is $staminaCost");
     wielder.sta = (wielder.sta - staminaCost).clamp(0, wielder.getStat("sta"));
     game.eventQueue.addEventBatch([UnitHealEvent(target, healing)]);
     game.eventQueue.addEventBatch([UnitExpEvent(wielder, expGain)]);

@@ -53,7 +53,7 @@
             },
         "Javelin":
             {
-                "weaponType" : "Axe",
+                "weaponType" : "Lance",
                 "might": 5,
                 "hit": 25,
                 "specialAttack": "Throw"
