@@ -347,7 +347,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -361,7 +361,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -389,7 +389,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -403,7 +403,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -417,7 +417,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -445,7 +445,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -509,7 +509,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -523,7 +523,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -537,7 +537,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
@@ -551,7 +551,7 @@
                 },
                 {
                     "type": "UnitCreationEvent",
-                    "unitName": "Brigand",
+                    "unitName": "Barbarian",
                     "faction": "Evans",
                     "level": 1,
                     "tilePosition": [
