@@ -290,7 +290,6 @@ class DefendOrder extends Order {
   @override
   void command(Unit unit){
     debugPrint("${unit.name} ordered to Defend");
-    List<Tile> openTiles = unit.getTilesInMoveRange(unit.movementRange.toDouble());
     var combatResults = unit.rankOpenTiles(["Move", "Combat"]).where((result) => result.events.length >= 2);
     if(combatResults.isNotEmpty){
       var events = combatResults.reduce((curr, next) => curr.score > next.score ? curr : next).events;
